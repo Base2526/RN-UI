@@ -3,6 +3,10 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 class CPUDetails extends Component {
 
+    static navigationOptions = {
+        title: 'CPUDetails',
+    }
+
     render() {
         return (
             <View style={styles.container}>
