@@ -8,11 +8,14 @@ class Menu extends React.Component{
         super(props)
 
         this.state = {
+            renderContent: false,
             x:100
         }
     }
 
     componentDidMount(){
+        setTimeout(() => {this.setState({renderContent: true})}, 0);
+
         console.log('cd-componentDidMount : ' + this.state.x)
     }
 
@@ -36,6 +39,12 @@ class Menu extends React.Component{
     }
 
     render(){
+
+        let {
+            renderContent
+        } = this.state;
+  
+          
         let props = this.props
 
         let menu
@@ -47,6 +56,8 @@ class Menu extends React.Component{
         }
 
         return(
+            <View style={{flex:1}}>
+            { renderContent &&
             <ScrollView>
                 <SafeAreaView style={styles.container} forceInset={{ top: 'always', horizontal: 'never' }}>
                 <View style={{flex:1}}>
@@ -111,6 +122,8 @@ class Menu extends React.Component{
                 </View>
                 </SafeAreaView>
             </ScrollView>
+            }
+            </View>
         )
     }
 }

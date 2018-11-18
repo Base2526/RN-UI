@@ -7,7 +7,6 @@ import ChatPage from './ChatPage'
 // })
 
 const index = createStackNavigator({
-    Home,
     'Home': {
         screen: Home,
         navigationOptions: {

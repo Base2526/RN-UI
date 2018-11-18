@@ -23,6 +23,14 @@ export default class FriendsPage extends React.Component{
     constructor(props){
         super(props)
 
+        this.state = {
+          renderContent: false,
+        }
+
+        // console.log("--FriendsPage")
+    }
+    componentDidMount() {
+      setTimeout(() => {this.setState({renderContent: true})}, 0);
     }
 
     mockData=()=>{
@@ -169,25 +177,35 @@ export default class FriendsPage extends React.Component{
     };
     
     render() {
-    return (
-        <View style={{flex: 1}}>
-        <ExpandableList
-            ref={instance => this.ExpandableList = instance}
-            dataSource={this.mockData()}
-            headerKey="title"
-            memberKey="member"
-            renderRow={this._renderRow}
-            headerOnPress={(i, state) => console.log(i, state)}
-            renderSectionHeaderX={this._renderSection}
-            openOptions={[0, 1, 2,]}
-        />
-        {/* <Button
-            style={{position: 'absolute', bottom: 0, left: 0, width: '100%', height: 50, backgroundColor: 'blue'}}
-            onPress={this._btnPress}
-            title="Scroll"
-            color="red"
-        /> */}
-        </View>
-    );
+
+      let {
+        renderContent
+      } = this.state;
+
+      return (
+          <View style={{flex: 1}}>
+
+          {
+            renderContent && 
+            <ExpandableList
+                    ref={instance => this.ExpandableList = instance}
+                    dataSource={this.mockData()}
+                    headerKey="title"
+                    memberKey="member"
+                    renderRow={this._renderRow}
+                    headerOnPress={(i, state) => console.log(i, state)}
+                    renderSectionHeaderX={this._renderSection}
+                    openOptions={[0, 1, 2,]}
+                />
+          }
+          
+          {/* <Button
+              style={{position: 'absolute', bottom: 0, left: 0, width: '100%', height: 50, backgroundColor: 'blue'}}
+              onPress={this._btnPress}
+              title="Scroll"
+              color="red"
+          /> */}
+          </View>
+      );
     }
 }

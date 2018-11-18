@@ -39,9 +39,8 @@ class iDNAHome extends Component {
     static navigationOptions = ({navigation}) => {
         const {params = {}, positionSelect} = navigation.state;
 
-        console.log(navigation.state)
+        // console.log(navigation.state)
 
-        
         return {
             title: "iDNA",
             headerLeft: (

@@ -1,5 +1,5 @@
 import React from 'react'
-import { createDrawerNavigator, StackNavigator, SwitchNavigator } from 'react-navigation';
+import { createDrawerNavigator, createStackNavigator, SwitchNavigator } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Tabs from './Tabs';  //Tab Nav
 import Profile from './Profile'; //Stack Nav
@@ -10,7 +10,8 @@ import Welcome from "./Screens/Welcome"
 
 import Menu from './DrawerMenu'
 
-export const SignedOut = StackNavigator({
+// Inbox: { screen: InboxScreen },
+export const SignedOut = createStackNavigator({
     Welcome: {
         screen: Welcome,
         navigationOptions: {
@@ -42,7 +43,7 @@ let drawerNavigatorConfig = {
   contentComponent: Menu, // กรณีเราไม่ใส่ก็จะ render routeConfigs โดยไม่มี  DrawerContent
 }
 
-export default Main = createDrawerNavigator({
+Main = createDrawerNavigator({
   Tabs: {
     screen: Tabs,
     navigationOptions: {
@@ -58,6 +59,41 @@ export default Main = createDrawerNavigator({
     }
   }
 }, drawerNavigatorConfig);
+
+// Main.navigationOptions = ({ navigation }) => {
+//   let { routeName } = navigation.state.routes[navigation.state.index];
+//     let navigationOptions = {};
+  
+//     // set tabbar visible
+//     // if (routeName === 'AddFriendsPage' || 
+//     //     routeName === 'AddClasssPage' || 
+//     //     routeName === 'AddGroupsPage' ||
+//     //     routeName === 'MyProfilePage' ||
+//     //     routeName === 'FriendProfilePage' ||
+//     //     routeName === 'ManageGroupPage' ||
+//     //     routeName === 'ListClassUserPage') {
+//     //   navigationOptions.tabBarVisible = false;
+//     //   // navigationOptions.gesturesEnabled = false;
+//     //   // navigationOptions.swipeEnabled= false;
+//     // }
+
+//     // navigationOptions.swipeEnabled= false;
+
+//     // console.log("1, navigationOptions")
+//     // console.log(navigationOptions)
+//     // console.log("2, navigationOptions")
+
+//     console.log("ooooooo------")
+
+//     // return navigationOptions;
+//     return {
+//       swipeEnabled: false,
+//       gesturesEnabled: false
+//     }
+// };
+
+
+export default Main
 
 export const createRootNavigator = (signedIn = false) => {
   return SwitchNavigator(

@@ -11,7 +11,7 @@ export default class AddFriendsPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
         title: "Add Friends",
-        
+  
         
         // headerLeft: (
         //     <TouchableOpacity
@@ -29,10 +29,13 @@ export default class AddFriendsPage extends React.Component{
         //   ),
     })
 
+    
+
     constructor(props) {
         super(props);
     
         this.state = {
+          renderContent: false,
           loading: false,
           data: [],
           page: 1,
@@ -40,9 +43,13 @@ export default class AddFriendsPage extends React.Component{
           error: null,
           refreshing: false
         };
+
     }
 
     componentDidMount() {
+
+      setTimeout(() => {this.setState({renderContent: true})}, 0);
+
       // this.makeRemoteRequest();
       this.setState({
         data: this._data(),
@@ -148,7 +155,9 @@ export default class AddFriendsPage extends React.Component{
                                       width: 40,
                                       borderRadius: 10,
                                       margin:10}}
-                                onPress={()=>alert("1")}>
+                                onPress={()=>{
+                                  this.props.navigation.navigate("InviteFriendForContactPage")
+                                }}>
                               <FastImage
                                   style={{width: 40, height: 40, borderRadius: 10}}
                                   source={{
@@ -165,8 +174,8 @@ export default class AddFriendsPage extends React.Component{
                                       borderRadius: 10,
                                       margin:10}}
                                 onPress={()=>{
-
-                                  
+                    
+                                  this.props.navigation.navigate("QRCodeReaderPage")
                                 }}>
                               <FastImage
                                   style={{width: 40, height: 40, borderRadius: 10}}
@@ -183,7 +192,9 @@ export default class AddFriendsPage extends React.Component{
                                       width: 40,
                                       borderRadius: 10,
                                       margin:10}}
-                                onPress={()=>alert("3")}>
+                                onPress={()=>{
+                                  this.props.navigation.navigate("AddFriendByIdPage")
+                                }}>
                               <FastImage
                                   style={{width: 40, height: 40, borderRadius: 10}}
                                   source={{
@@ -281,10 +292,14 @@ export default class AddFriendsPage extends React.Component{
         //   underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
         //   onPress: () => { this.deleteNote(rowData) }
         // }];
+        let {
+          renderContent
+        } = this.state;
     
         return (
           <View style={{flex:1, backgroundColor: 'white'}}>
-          {/* <List containerStyle={{ flex:1,  borderTopWidth: 0, borderBottomWidth: 0 }}> */}
+          {
+          renderContent && 
             <FlatList
               data={this.state.data}
               // renderItem={({ item }) => (
@@ -309,7 +324,7 @@ export default class AddFriendsPage extends React.Component{
               // onEndReached={this.handleLoadMore}
               onEndReachedThreshold={50}
             />
-          {/* </List> */}
+          }
           </View>
         );
       }

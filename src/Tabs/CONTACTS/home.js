@@ -15,6 +15,7 @@ class ContactsHome extends Component {
     static navigationOptions = ({ navigation }) => ({
         title: "Contacts",
         tabBarVisible: false,
+
         headerLeft: (
             <TouchableOpacity
                 style={Styles.headerButton}
@@ -36,6 +37,10 @@ class ContactsHome extends Component {
 
     constructor(props){
         super(props)
+
+        console.log("-----0------")
+        console.log(props)
+        console.log("-----1------")
 
         this.state= {
             positionSelect:0

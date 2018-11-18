@@ -10,8 +10,9 @@ import DictStyle from '../CONTACTS/dictStyle';
 export default class FollowingPage extends React.Component{
     constructor(props) {
       super(props);
-  
+
       this.state = {
+        renderContent: false,
         loading: false,
         data: [],
         page: 1,
@@ -22,6 +23,9 @@ export default class FollowingPage extends React.Component{
     }
 
     componentDidMount() {
+
+      setTimeout(() => {this.setState({renderContent: true})}, 0);
+      
       // this.makeRemoteRequest();
       this.setState({
         data: this._data(),
@@ -114,11 +118,16 @@ export default class FollowingPage extends React.Component{
       );
     };
 
-  
+    
     render() {
+      let {
+        renderContent
+      } = this.state;
+
       return (
         <View style={{flex:1}}>
-        {/* <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}> */}
+        {
+          renderContent &&
           <FlatList
             data={this.state.data}
             // renderItem={({ item }) => (
@@ -189,7 +198,7 @@ export default class FollowingPage extends React.Component{
             // onEndReached={this.handleLoadMore}
             onEndReachedThreshold={50}
           />
-        {/* </List> */}
+        }
         </View>
       );
     }

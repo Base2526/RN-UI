@@ -187,6 +187,19 @@ const sections = [
 ]
 
 export default class CenterPage extends React.Component<{}, {}> {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      renderContent: false,
+    }
+  }
+
+  componentDidMount() {
+    setTimeout(() => {this.setState({renderContent: true})}, 0);
+  }
+
   renderSection = ({ item }) => {
     return (
       <FlatList
@@ -235,13 +248,23 @@ export default class CenterPage extends React.Component<{}, {}> {
   }
 
   render () {
+
+    let {
+      renderContent
+    } = this.state;
+
     return (
-      <SectionList
-        sections={sections}
-        renderSectionHeader={this.renderSectionHeader}
-        renderItem={this.renderSection}
-        // style={{justifyContent:'space-between'}}
-      />
+      <View style={{flex:1}}>
+      {
+        renderContent &&
+        <SectionList
+          sections={sections}
+          renderSectionHeader={this.renderSectionHeader}
+          renderItem={this.renderSection}
+          // style={{justifyContent:'space-between'}}
+        />
+      }
+      </View>
     )
 
   }

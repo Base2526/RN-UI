@@ -12,17 +12,22 @@ export default class GroupsPage extends React.Component{
       super(props);
   
       this.state = {
+        renderContent: false,
         loading: false,
         data: [],
         page: 1,
         seed: 1,
         error: null,
-        refreshing: false
+        refreshing: false,
       };
+
+      // console.log("--GroupsPage")
     }
   
     componentDidMount() {
       // this.makeRemoteRequest();
+      setTimeout(() => {this.setState({renderContent: true})}, 0);
+
       this.setState({
         data: this._data(),
         error: null,
@@ -115,9 +120,17 @@ export default class GroupsPage extends React.Component{
     };
   
     render() {
+
+      let {
+        renderContent
+      } = this.state;
+
       return (
         <View style={{flex:1}}>
         {/* <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}> */}
+
+        {
+            renderContent && 
           <FlatList
             data={this.state.data}
             // renderItem={({ item }) => (
@@ -185,7 +198,8 @@ export default class GroupsPage extends React.Component{
             // refreshing={this.state.refreshing}
             // onEndReached={this.handleLoadMore}
             onEndReachedThreshold={50}
-          />
+          />  
+        }
         {/* </List> */}
         </View>
       );

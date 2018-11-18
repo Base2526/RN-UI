@@ -7,6 +7,22 @@ import { List, ListItem, SearchBar } from "react-native-elements";
 import FastImage from 'react-native-fast-image'
 import DictStyle from '../CONTACTS/dictStyle';
 
+import ImagePicker from 'react-native-image-picker';
+
+// More info on all the options is below in the API Reference... just some common use cases shown here
+const options = {
+  title: 'Select Avatar',
+  customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
+  noData: true,
+  storageOptions: {
+    skipBackup: true,
+    path: 'images',
+  },
+  quality: 0.7,
+  maxWidth: 500,
+  maxHeight: 500,
+};
+
 export default class AddGroupsPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
@@ -31,18 +47,23 @@ export default class AddGroupsPage extends React.Component{
         super(props);
     
         this.state = {
+          renderContent: false,
           loading: false,
           data: [],
           page: 1,
           seed: 1,
           error: null,
           refreshing: false,
-          text: ''
+          text: '',
+          avatarSource: {"uri":"https://unsplash.it/400/400?image=1"}
         };
     }
 
     componentDidMount() {
       // this.makeRemoteRequest();
+
+      setTimeout(() => {this.setState({renderContent: true})}, 0);
+
       this.setState({
         data: this._data(),
         error: null,
@@ -140,7 +161,7 @@ export default class AddGroupsPage extends React.Component{
 
     renderItem = ({item, index}) => {
         // return here
-        console.log("renderItem : " + index)
+        // console.log("renderItem : " + index)
         
         switch(index){
             case 0:{
@@ -151,11 +172,40 @@ export default class AddGroupsPage extends React.Component{
                                       width: 80,
                                       borderRadius: 10,
                                       margin:10}}
-                                onPress={()=>alert("1")}>
+                                onPress={()=>{
+
+                                  /**
+                                   * The first arg is the options object for customization (it can also be null or omitted for default options),
+                                   * The second arg is the callback which sends object: response (more info in the API Reference)
+                                   */
+                                  ImagePicker.showImagePicker(options, (response) => {
+                                    console.log('Response = ', response);
+
+                                    if (response.didCancel) {
+                                      console.log('User cancelled image picker');
+                                    } else if (response.error) {
+                                      console.log('ImagePicker Error: ', response.error);
+                                    } else if (response.customButton) {
+                                      console.log('User tapped custom button: ', response.customButton);
+                                    } else {
+                                      const source = { uri: response.uri };
+
+                                      // You can also display the image using data:
+                                      // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+                                      this.setState({
+                                        avatarSource: source,
+                                      });
+
+                                      console.log(this.state.avatarSource.uri)
+                                    }
+                                  });
+
+                                }}>
                               <FastImage
                                   style={{width: 80, height: 80, borderRadius: 10}}
                                   source={{
-                                  uri: 'https://unsplash.it/400/400?image=1',
+                                  uri: this.state.avatarSource.uri,
                                   headers:{ Authorization: 'someAuthToken' },
                                   priority: FastImage.priority.normal,
                                   }}
@@ -231,10 +281,17 @@ export default class AddGroupsPage extends React.Component{
         //   underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
         //   onPress: () => { this.deleteNote(rowData) }
         // }];
+
+        // console.log(this.state.avatarSource.uri)
+
+        let {
+          renderContent
+        } = this.state;
     
         return (
           <View style={{flex:1, backgroundColor: 'white'}}>
-          {/* <List containerStyle={{ flex:1,  borderTopWidth: 0, borderBottomWidth: 0 }}> */}
+          {
+            renderContent &&
             <FlatList
               data={this.state.data}
               // renderItem={({ item }) => (
@@ -258,8 +315,9 @@ export default class AddGroupsPage extends React.Component{
               // refreshing={this.state.refreshing}
               // onEndReached={this.handleLoadMore}
               onEndReachedThreshold={50}
+              extraData={this.state}
             />
-          {/* </List> */}
+          }
           </View>
         );
       }

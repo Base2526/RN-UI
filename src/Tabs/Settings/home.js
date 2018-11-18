@@ -83,12 +83,13 @@ export default class SettingsHome extends React.Component{
         //         <Icon name="address-book" size={20} />
         //     </TouchableOpacity>
         //   ),
-    })
+    })        
 
     constructor(props) {
         super(props);
     
         this.state = {
+          renderContent: false,
           loading: false,
           data: [],
           page: 1,
@@ -99,7 +100,9 @@ export default class SettingsHome extends React.Component{
       }
 
       componentDidMount() {
-        // this.makeRemoteRequest();
+      
+        setTimeout(() => {this.setState({renderContent: true})}, 0);
+
         this.setState({
           data: this._data(),
           error: null,
@@ -110,14 +113,14 @@ export default class SettingsHome extends React.Component{
   
       _data=()=>{
         return(
-          [ {"name":"Hide"},
-            {"name":"Block"},
-            {"name":"Manage class"},
-            {"name":"Manage group"},
-            {"name":"Manage my application"},
-            {"name":"Force Logout"},
-            {"name":"Customize Tab Menus"},
-            {"name":"Logout"},
+          [ {"key":1, "id":1, "name":"Hide"},
+            {"key":2, "id":2, "name":"Block"},
+            {"key":3, "id":3, "name":"Manage class"},
+            {"key":4, "id":4, "name":"Manage group"},
+            {"key":5, "id":5, "name":"Manage my application"},
+            {"key":6, "id":6, "name":"Force Logout"},
+            {"key":7, "id":7, "name":"Customize Tab Menus"},
+            {"key":8, "id":8, "name":"Logout"},
           ]      
         )
       }
@@ -200,9 +203,14 @@ export default class SettingsHome extends React.Component{
       };
     
       render() {
+        let {
+          renderContent
+        } = this.state;
+  
         return (
           <View style={{flex:1, backgroundColor:'white'}}>
-          {/* <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}> */}
+          {
+            renderContent &&
             <FlatList
               data={this.state.data}
               // renderItem={({ item }) => (
@@ -218,36 +226,41 @@ export default class SettingsHome extends React.Component{
               renderItem={({item}) =>
                 <TouchableOpacity
                   style={{backgroundColor:'white'}}
+                  key={item.id}
                   onPress={()=>{
 
-                    Alert.alert(
-                      'Logout',
-                      'Are you sure you want to log out?',
-                      [
-                        // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-                        {text: 'Cancel', 
-                        onPress: () => {console.log("cancel")}, 
-                        style: 'cancel'},
-                        {text: 'OK', 
-                        onPress: () => {
-                            AsyncStorage.removeItem("auth-demo-key", ()=>{
-                              this.props.navigation.navigate("SignedOut")
+                    
 
-                            //   // AsyncStorage.getItem("auth-demo-key")
-                            //   // .then(res => {
-                            //   //   console.log("3, res")
-                            //   //   console.log(res)
-                            //   //   console.log("4, res")
-                                
-                            //   // })
-                            //   // .catch(err => alert("error"));
-                            })
-                            console.log(this.props)
-
-                        }, },
-                      ],
-                      { cancelable: false }
-                    )
+                    if (item.id == 8) {
+                      Alert.alert(
+                        'Logout',
+                        'Are you sure you want to log out?',
+                        [
+                          // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                          {text: 'Cancel', 
+                          onPress: () => {console.log("cancel")}, 
+                          style: 'cancel'},
+                          {text: 'OK', 
+                          onPress: () => {
+                              AsyncStorage.removeItem("auth-demo-key", ()=>{
+                                this.props.navigation.navigate("SignedOut")
+  
+                              //   // AsyncStorage.getItem("auth-demo-key")
+                              //   // .then(res => {
+                              //   //   console.log("3, res")
+                              //   //   console.log(res)
+                              //   //   console.log("4, res")
+                                  
+                              //   // })
+                              //   // .catch(err => alert("error"));
+                              })
+                              console.log(this.props)
+  
+                          }, },
+                        ],
+                        { cancelable: false }
+                      )
+                    }
                   }}>
                   <View style={{padding: 20}}>
                       <Text >{item.name}</Text>
@@ -264,7 +277,7 @@ export default class SettingsHome extends React.Component{
               // onEndReached={this.handleLoadMore}
               // onEndReachedThreshold={50}
             />
-          {/* </List> */}
+          }
           </View>
         );
       }

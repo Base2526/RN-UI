@@ -32,6 +32,7 @@ class RecentHome extends Component {
         super(props);
     
         this.state = {
+          renderContent: false,
           loading: false,
           data: [],
           page: 1,
@@ -43,6 +44,9 @@ class RecentHome extends Component {
 
     componentDidMount() {
       // this.makeRemoteRequest();
+
+      setTimeout(() => {this.setState({renderContent: true})}, 0);
+
       this.setState({
         data: this._data(),
         error: null,
@@ -136,6 +140,10 @@ class RecentHome extends Component {
     
     render() {
 
+        let {
+          renderContent
+        } = this.state;
+
         // Buttons
         var swipeoutBtns = [
           {
@@ -159,7 +167,9 @@ class RecentHome extends Component {
 
         return (
           <View style={{flex:1, backgroundColor: 'white'}}>
-          {/* <List containerStyle={{ flex:1,  borderTopWidth: 0, borderBottomWidth: 0 }}> */}
+             
+          {
+            renderContent && 
             <FlatList
               data={this.state.data}
               // renderItem={({ item }) => (
@@ -235,7 +245,7 @@ class RecentHome extends Component {
               // onEndReached={this.handleLoadMore}
               onEndReachedThreshold={50}
             />
-          {/* </List> */}
+          }
           </View>
         );
       }

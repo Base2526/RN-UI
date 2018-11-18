@@ -10,6 +10,10 @@ import FriendProfilePage from './FriendProfilePage';
 import ManageGroupPage from './ManageGroupPage';
 import ListClassUserPage from './ListClassUserPage'
 
+import QRCodeReaderPage from './QRCodeReaderPage'
+import AddFriendByIdPage from './AddFriendByIdPage'
+import InviteFriendForContactPage from './InviteFriendForContactPage'
+
 const index = createStackNavigator({
     'Home': {
         screen: Home,
@@ -26,7 +30,7 @@ const index = createStackNavigator({
     'AddFriendsPage': {
         screen: AddFriendsPage,
         navigationOptions: {
-          title: 'Add Friends',
+          title: 'Add Friends'
         },
     },
     'AddClasssPage': {
@@ -65,6 +69,24 @@ const index = createStackNavigator({
         title: 'List Class User',
       }
     },
+    'QRCodeReaderPage': {
+      screen: QRCodeReaderPage,
+      navigationOptions: {
+        title: 'QRCode Reader',
+      }
+    },
+    'AddFriendByIdPage': {
+      screen: AddFriendByIdPage,
+      navigationOptions: {
+        title: 'By Id',
+      }
+    },
+    'InviteFriendForContactPage': {
+      screen: InviteFriendForContactPage,
+      navigationOptions: {
+        title: 'Invite Friend',
+      }
+    },
 });
 
 index.navigationOptions = ({ navigation }) => {
@@ -78,11 +100,16 @@ index.navigationOptions = ({ navigation }) => {
         routeName === 'MyProfilePage' ||
         routeName === 'FriendProfilePage' ||
         routeName === 'ManageGroupPage' ||
-        routeName === 'ListClassUserPage') {
+        routeName === 'ListClassUserPage' ||
+        routeName === 'QRCodeReaderPage' ||
+        routeName === 'AddFriendByIdPage' ||
+        routeName === 'InviteFriendForContactPage') {
       navigationOptions.tabBarVisible = false;
     }
-  
+
     return navigationOptions;
 };
+
+// index.swipeEnabled= false
 
 export default index
