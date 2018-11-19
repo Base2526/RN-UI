@@ -14,6 +14,8 @@ import QRCodeReaderPage from './QRCodeReaderPage'
 import AddFriendByIdPage from './AddFriendByIdPage'
 import InviteFriendForContactPage from './InviteFriendForContactPage'
 
+import ChatPage from '../RECENT/ChatPage'
+
 const index = createStackNavigator({
     'Home': {
         screen: Home,
@@ -87,6 +89,12 @@ const index = createStackNavigator({
         title: 'Invite Friend',
       }
     },
+    'ChatPage': {
+      screen: ChatPage,
+      navigationOptions: {
+        title: 'Chat Page',
+      }
+    },
 });
 
 index.navigationOptions = ({ navigation }) => {
@@ -103,7 +111,8 @@ index.navigationOptions = ({ navigation }) => {
         routeName === 'ListClassUserPage' ||
         routeName === 'QRCodeReaderPage' ||
         routeName === 'AddFriendByIdPage' ||
-        routeName === 'InviteFriendForContactPage') {
+        routeName === 'InviteFriendForContactPage' ||
+        routeName === 'ChatPage') {
       navigationOptions.tabBarVisible = false;
     }
 

@@ -68,11 +68,14 @@ class iDNAHome extends Component {
         super(props)
 
         this.state= {
-            positionSelect:0
+            positionSelect:0,
+            renderContent: false,
         }
     }
 
     componentDidMount () {
+        setTimeout(() => {this.setState({renderContent: true})}, 0);
+
         this.props.navigation.setParams({ 
             handleHeaderRight: this.handleHeaderRight,
             positionSelect: this.state.positionSelect
@@ -101,6 +104,10 @@ class iDNAHome extends Component {
     }
       
     render() {
+        let {
+            renderContent
+          } = this.state;
+
         return (
             <View style={[style.container, {backgroundColor:'white'}]}>
                 {/* <Button
@@ -108,6 +115,7 @@ class iDNAHome extends Component {
                     title="Go To Details"
                 /> */}
 
+                { renderContent &&
                 <ScrollableTabView
                     // style={{height:500}}
                     initialPage={0}
@@ -126,6 +134,7 @@ class iDNAHome extends Component {
                     <FlowPage tabLabel='Tab #5' index={2} amount={6}/>
                     <FlowPage tabLabel="Tab #6" index={3} amount={7}/> */}
                 </ScrollableTabView>
+                }
             </View>
         );
     }

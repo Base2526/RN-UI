@@ -43,11 +43,13 @@ class ContactsHome extends Component {
         console.log("-----1------")
 
         this.state= {
-            positionSelect:0
+            positionSelect:0,
+            renderContent: false,
         }
     }
 
     componentDidMount () {
+        setTimeout(() => {this.setState({renderContent: true})}, 0);
         this.props.navigation.setParams({ handleHeaderRight: this.handleHeaderRight })
     }
 
@@ -82,6 +84,11 @@ class ContactsHome extends Component {
     }
 
     render() {
+
+        let {
+            renderContent
+          } = this.state;
+
         // let{positionSelect} = this.state
         // console.log("positionSelect : " + positionSelect)
         return (
@@ -90,7 +97,7 @@ class ContactsHome extends Component {
                     onPress={() => this.props.navigation.navigate("Details")}
                     title="Go To Details"
                 /> */}
-
+                { renderContent &&
                 <ScrollableTabView
                     // style={{height:500}}
                     initialPage={0}
@@ -104,6 +111,7 @@ class ContactsHome extends Component {
                     <GroupsPage tabLabel='Groups' index={1} amount={5} params={this.props} />
                     <ClasssPage tabLabel='Classs' index={2} amount={6} params={this.props}/>
                 </ScrollableTabView>
+                }
             </View>
         );
     }

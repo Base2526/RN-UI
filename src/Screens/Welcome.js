@@ -104,10 +104,6 @@ export default class Welcome extends React.Component {
                 </TouchableHighlight>
               );
             })
-
-     
-                
-              
           }
          <TouchableHighlight
                   key="20"
@@ -133,6 +129,14 @@ export default class Welcome extends React.Component {
       this.setState({
         loading: true
       });
+
+      
+      AsyncStorage.setItem("auth-demo-key", "true", ()=>{
+        _this.props.navigation.navigate("Main")
+      });
+
+      // navigation.navigate("SignedIn")
+      /*
       simpleAuthProviders[provider](opts)
         .then((info) => {
           _this.setState({
@@ -157,6 +161,7 @@ export default class Welcome extends React.Component {
             error.message
           );
         });
+        */
     }  
 }
 

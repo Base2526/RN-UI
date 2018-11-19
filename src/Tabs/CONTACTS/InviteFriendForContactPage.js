@@ -1,8 +1,8 @@
 import React from 'react'
 import {View, Text, FlatList} from 'react-native'
-
 import Contacts from 'react-native-contacts';
 import { ListItem } from "react-native-elements";
+import {Platform, PermissionsAndroid} from 'react-native'; 
 
 export default class InviteFriendForContactPage extends React.Component{
     
@@ -11,9 +11,19 @@ export default class InviteFriendForContactPage extends React.Component{
         this.state ={
             contacts:[]
         }
+        this.getContacts = this.getContacts.bind(this);
+        this.requestCameraPermission = this.requestCameraPermission.bind(this);
     }
     
     componentWillMount(){
+        if(Platform.OS === 'android'){
+            this.requestCameraPermission();
+        }else{
+            this.getContacts()
+        }
+    }
+
+    getContacts(){
         Contacts.getAll((err, contacts) => {
             if (err) throw err;
           
@@ -52,8 +62,29 @@ export default class InviteFriendForContactPage extends React.Component{
 
             console.log(this.state.contacts)
         })
-        // console.log(Contacts)
     }
+
+    async requestCameraPermission() {
+        try {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+            {
+              'title': 'Cool Photo App Camera Permission',
+              'message': 'Cool Photo App needs access to your camera ' +
+                         'so you can take awesome pictures.'
+            }
+          )
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            console.log("You can use the contacts")
+            this.getContacts()
+          } else {
+            console.log("contacts permission denied")
+          }
+        } catch (err) {
+          console.warn(err)
+        }
+    }
+
     render(){
         return(<View style={{flex:1}}>
             <FlatList

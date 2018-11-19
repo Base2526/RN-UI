@@ -29,6 +29,7 @@ export default class FriendsPage extends React.Component{
 
         // console.log("--FriendsPage")
     }
+    
     componentDidMount() {
       setTimeout(() => {this.setState({renderContent: true})}, 0);
     }
