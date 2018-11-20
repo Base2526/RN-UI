@@ -8,7 +8,7 @@ const index = createStackNavigator({
     'Home': {
         screen: Home,
         navigationOptions: {
-          title: 'Contacts',
+          title: 'iDNA',
         },
     },
     'CreateApplicationPage': {

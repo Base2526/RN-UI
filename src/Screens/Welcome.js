@@ -14,66 +14,6 @@ import {
 import * as simpleAuthProviders from 'react-native-simple-auth';
 import secrets from './secrets.example';
 
-
-// class Welcome extends React.Component {
-
-//     constructor(props) {
-//       super(props);
-//       this.state = {
-//         name: this.getName(props.provider),
-//         picture: this.getPictureLink(props.provider)
-//       };
-//     }
-  
-//     render() {
-//       return (
- 
-//         <View style={styles.container}>
-//             <Text>WWWW</Text>
-//             {/* <Image style={styles.pic} source={{uri: this.state.picture }} />
-//             <Text style={styles.header}>{this.state.name}</Text>
-//             <View style={styles.scroll}>
-//                 <Text style={styles.mono}>{JSON.stringify(this.props.info, null, 4)}</Text>
-//             </View> */}
-//         </View>
-//       )
-//     }
-  
-//     getName(provider) {
-//       switch (provider) {
-//         case 'instagram':
-//           return this.props.info.data.full_name;
-//         case 'linkedin':
-//           return `${this.props.info.firstName} ${this.props.info.lastName}`;
-//         default:
-//           return this.props.info.name
-//       }
-//     }
-  
-//     getPictureLink(provider) {
-//       switch (provider) {
-//         case 'google':
-//           return this.props.info.picture;
-//         case 'facebook':
-//           return `https://graph.facebook.com/${this.props.info.id}/picture?type=square`
-//         case 'twitter':
-//           return this.props.info.profile_image_url_https;
-//         case 'instagram':
-//           return this.props.info.data.profile_picture;
-//         case 'tumblr':
-//           return `https://api.tumblr.com/v2/blog/${this.props.info.name}.tumblr.com/avatar/96`;
-//         case 'linkedin':
-//           const profileUrl = `https://api.linkedin.com/v1/people/~:(picture-url)?oauth2_access_token=${this.props.info.token}&format=json`
-//           fetch(profileUrl)
-//             .then(response => response.json())
-//             .then(responseJson => {
-//               this.setState({ picture: responseJson.pictureUrl });
-//             });
-//           return '';
-//       }
-//     }  
-// }
-
 export default class Welcome extends React.Component {
     constructor(props) {
       super(props);
@@ -82,15 +22,9 @@ export default class Welcome extends React.Component {
       };
     }
 
-  
     render() {
-
-        // navigation.navigate("SignedIn")
-        // console.log(this.props)
-        
-        let {navigation} = this.props
-
-    // console.log(secrets)
+      let {navigation} = this.props
+      
       return (
         <View style={styles.content}>
           {
@@ -130,13 +64,11 @@ export default class Welcome extends React.Component {
         loading: true
       });
 
-      
-      AsyncStorage.setItem("auth-demo-key", "true", ()=>{
-        _this.props.navigation.navigate("Main")
-      });
+      // AsyncStorage.setItem("auth-demo-key", "true", ()=>{
+      //   _this.props.navigation.navigate("Main")
+      // });
 
-      // navigation.navigate("SignedIn")
-      /*
+    
       simpleAuthProviders[provider](opts)
         .then((info) => {
           _this.setState({
@@ -161,7 +93,6 @@ export default class Welcome extends React.Component {
             error.message
           );
         });
-        */
     }  
 }
 

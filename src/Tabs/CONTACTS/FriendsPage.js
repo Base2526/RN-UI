@@ -1,5 +1,4 @@
 import React from 'react'
-// import {View, Text} from 'react-native'
 
 import {
     View,
@@ -9,14 +8,12 @@ import {
     Button,
     Image,
     TouchableHighlight
-} from 'react-native';
+} from 'react-native'
   
-import ExpandableList from 'react-native-expandable-section-list';
-// import MockData from './mockData';
-import DictStyle from './dictStyle';
-
+import ExpandableList from 'react-native-expandable-section-list'
+import DictStyle from './dictStyle'
 import FastImage from 'react-native-fast-image'
-import Swipeout from 'react-native-swipeout';
+import Swipeout from 'react-native-swipeout'
 
 export default class FriendsPage extends React.Component{
 
@@ -26,8 +23,6 @@ export default class FriendsPage extends React.Component{
         this.state = {
           renderContent: false,
         }
-
-        // console.log("--FriendsPage")
     }
     
     componentDidMount() {
@@ -78,30 +73,89 @@ export default class FriendsPage extends React.Component{
           ])
     }
 
-    _itemRowOnClick(rowId, sectionId){
-
+    _itemOnPress(rowId, sectionId){
       if(rowId == 0 && sectionId == 0){
         this.props.params.navigation.navigate("MyProfilePage")
-
-        // console.log(this.props.props)
       }else{
-        // console.log('Friend Profile')
-        
         this.props.params.navigation.navigate("FriendProfilePage")
       }
     }
 
     _renderRow = (rowItem, rowId, sectionId) => {
         // Buttons
+        
+        if(rowId == 0 && sectionId == 0){
+          return (
+            <TouchableOpacity 
+              key={ rowId } 
+              onPress={this._itemOnPress.bind(this, rowId, sectionId)}
+              onLongPress={()=>alert("MyProfile onLongPress")}
+              >
+              <View
+                style={{
+                  alignItems: 'center', 
+                  // margin: 5, 
+                  padding: 10,
+                  // borderWidth: 0.5, 
+                  borderColor: DictStyle.colorSet.lineColor,
+                  flexDirection: 'row',
+                }}
+              >
+                  <TouchableHighlight 
+                      style={{height:60,
+                              width: 60,
+                              borderRadius: 10}}        
+                      >
+                      {/* <Image
+                          style={{width: 40, height: 40, borderRadius: 10}}
+                          source={{uri: 
+                  'https://www.planwallpaper.com/static/images/9-credit-1.jpg'
+                      }}/> */}
+                      <FastImage
+                          style={{width: 60, height: 60, borderRadius: 10}}
+                          source={{
+                          uri: 'https://unsplash.it/400/400?image=1',
+                          headers:{ Authorization: 'someAuthToken' },
+                          priority: FastImage.priority.normal,
+                          }}
+                          resizeMode={FastImage.resizeMode.contain}
+                      />
+                  </TouchableHighlight>
+                  <Text style={{fontSize: DictStyle.fontSet.mSize, 
+                              color: DictStyle.colorSet.normalFontColor,
+                              paddingLeft: 10}}>
+                      {rowItem.title}
+                  </Text>
+              </View>
+            </TouchableOpacity>
+
+          )
+        }
+
         var swipeoutBtns = [
           {
-            text: 'Button'
+            text: 'Delete',
+            backgroundColor: 'red',
+            onPress: () => { alert("Delete Click") }
+          },{
+            text: 'Hide',
+            backgroundColor: '#3c33ff',
+            onPress: () => { alert("Hide Click") }
+          },{
+            text: 'Block',
+            backgroundColor: '#22ff1a',
+            onPress: () => { alert("Block Click") }
           }
         ]
 
         return (
-          <Swipeout style={{backgroundColor:'white'}} right={swipeoutBtns}>
-          <TouchableOpacity key={ rowId } onPress={this._itemRowOnClick.bind(this, rowId, sectionId)}>
+          <Swipeout 
+            style={{backgroundColor:'white'}} 
+            right={swipeoutBtns}>
+          <TouchableOpacity 
+            key={ rowId } 
+            onPress={this._itemOnPress.bind(this, rowId, sectionId)}
+            onLongPress={()=>alert("Friend onLongPress")}>
             <View
               style={{
                 alignItems: 'center', 
@@ -144,37 +198,36 @@ export default class FriendsPage extends React.Component{
     };
     
     _renderSection = (section, sectionId, state)  => {
-    return (
-        <View
-            style={{ 
-                    height: 30, 
-                    flexDirection: 'row',
-                    justifyContent: 'space-between', 
-                    alignItems: 'center', 
-                    borderBottomWidth: 0.5,
-                    borderBottomColor: DictStyle.colorSet.lineColor }}
-        >
-        <View style={{ flexDirection: 'row', 
-                       alignItems: 'center' }}>
-            <Text style={{ fontSize: DictStyle.fontSet.mSize, 
-                            color: DictStyle.colorSet.normalFontColor,
-                            paddingLeft: 10 }}>
-            {section}
-            </Text>
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={{ fontSize: 24, 
-                            color: DictStyle.colorSet.weakFontColor }}>
-            {'^ '}
-            </Text>
-        </View>
-        </View>
-    );
-    };
+      return (
+          <View
+              style={{ 
+                      height: 30, 
+                      flexDirection: 'row',
+                      justifyContent: 'space-between', 
+                      alignItems: 'center', 
+                      borderBottomWidth: 0.5,
+                      borderBottomColor: DictStyle.colorSet.lineColor }}>
+          <View style={{ flexDirection: 'row', 
+                        alignItems: 'center' }}>
+              <Text style={{ fontSize: DictStyle.fontSet.mSize, 
+                              color: DictStyle.colorSet.normalFontColor,
+                              paddingLeft: 10 }}>
+              {section}
+              </Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={{ fontSize: 24, 
+                              color: DictStyle.colorSet.weakFontColor }}>
+              {'^ '}
+              </Text>
+          </View>
+          </View>
+      )
+    }
     
     _btnPress = () => {
-    console.log(this.ExpandableList);
-    this.ExpandableList.setSectionState(0, false);
+      console.log(this.ExpandableList);
+      this.ExpandableList.setSectionState(0, false);
     };
     
     render() {
@@ -185,7 +238,6 @@ export default class FriendsPage extends React.Component{
 
       return (
           <View style={{flex: 1}}>
-
           {
             renderContent && 
             <ExpandableList

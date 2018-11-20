@@ -39,7 +39,31 @@ class iDNAHome extends Component {
     static navigationOptions = ({navigation}) => {
         const {params = {}, positionSelect} = navigation.state;
 
-        // console.log(navigation.state)
+        let __headerRight
+        switch(params.positionSelect){
+            case 0:{
+                __headerRight = <TouchableOpacity
+                style={Styles.headerButton}
+                onPress={() => {
+                    const { params = {} } = navigation.state
+                    params.handleHeaderRight()
+                } }>
+                <Icon name="plus" size={20} />
+            </TouchableOpacity>
+            }
+            break
+            case 1:{
+                __headerRight = <TouchableOpacity
+                style={Styles.headerButton}
+                onPress={() => {
+                    const { params = {} } = navigation.state
+                    params.handleHeaderRight()
+                } }>
+                <Icon name="search" size={20} />
+            </TouchableOpacity>
+            }
+            break
+        }
 
         return {
             title: "iDNA",
@@ -51,7 +75,9 @@ class iDNAHome extends Component {
                 </TouchableOpacity>
             ),
             headerRight: (
+                /*
                 params.positionSelect == 0 &&
+
                 <TouchableOpacity
                     style={Styles.headerButton}
                     onPress={() => {
@@ -60,6 +86,8 @@ class iDNAHome extends Component {
                     } }>
                     <Icon name="plus" size={20} />
                 </TouchableOpacity>
+                */
+               __headerRight
               ),
         }
     };
@@ -138,56 +166,6 @@ class iDNAHome extends Component {
             </View>
         );
     }
-}
-
-class FlowPage extends React.Component{
-	constructor(props){
-            super(props)
-            
-            this.state = {
-                  renderContent: false,
-            }
-      }
-      
-      componentDidMount() {
-            // console.log("FlowPage : " + this.props.tabLabel);
-            //  setTimeout(() => {this.setState({renderContent: true})}, 0);
-      }
-
-	render(){
-            // const { index } = this.props;
-            // console.log("Parent index > " + index)
-
-            console.log("+1")
-            console.log(this.props)
-
-            console.log("+2")
-            
-		return (
-                  <View style={{flex:1}}>
-            {
-                  <Text> XXX</Text>
-		// <ScrollableTabView
-        //     style={{height:250}}
-        //     initialPage={0}
-        //     renderTabBar={() => <ScrollableTabBar />}
-        //     locked={false}
-        //     tabBarPosition='bottom'>
-        //           <BestGrid tabLabel='Tab #1' index={4} {...this.props}></BestGrid>
-        //           <BestGrid tabLabel='Tab #2' index={5} {...this.props}></BestGrid>
-        //           <BestGrid tabLabel='Tab #3' index={6} {...this.props}></BestGrid>
-        //           <BestGrid tabLabel='Tab #4' index={6} {...this.props}></BestGrid>
-        //           <BestGrid tabLabel='Tab #5' index={6} {...this.props}></BestGrid>
-        //           <BestGrid tabLabel='Tab #6' index={6} {...this.props}></BestGrid>
-        //           <BestGrid tabLabel='Tab #7' index={6} {...this.props}></BestGrid>
-        //           <BestGrid tabLabel='Tab #8' index={6} {...this.props}></BestGrid>
-        //           <BestGrid tabLabel='Tab #9' index={6} {...this.props}></BestGrid>
-        //           <BestGrid tabLabel='Tab #10' index={6} {...this.props}></BestGrid>
-		// </ScrollableTabView>
-      }
-      </View>
-		)
-	}
 }
 
 let style = StyleSheet.create({
