@@ -6,7 +6,7 @@ import Profile from './Profile'; //Stack Nav
 
 import SignUp from "./Screens/SignUp";
 import SignIn from "./Screens/SignIn";
-import Welcome from "./Screens/Welcome"
+import Welcome from "./Screens/Welcome2"
 
 import Menu from './DrawerMenu'
 

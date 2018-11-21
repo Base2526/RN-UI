@@ -10,11 +10,28 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 
+#import <Firebase.h>
+#import <TwitterKit/TWTRKit.h>
+
+//#import "RNTwitterSignIn.h"
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+
+//import <>
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  // firebase
+  [FIRApp configure];
+  
+  // fb
+  [[FBSDKApplicationDelegate sharedInstance] application:application
+                           didFinishLaunchingWithOptions:launchOptions];
+  
   NSURL *jsCodeLocation;
+  
+  
 
   jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
 
@@ -29,7 +46,43 @@
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+  
   return YES;
 }
+
+// twitter
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<NSString *,id> *)options {
+//  return [[Twitter sharedInstance] application:app openURL:url options:options];
+  
+  if ([Twitter.sharedInstance application:app openURL:url options:options])
+  {
+    
+    return YES;
+    
+  }
+  
+  return [[FBSDKApplicationDelegate sharedInstance] application:app
+                                                        openURL:url
+                                              sourceApplication:[options objectForKey:UIApplicationOpenURLOptionsSourceApplicationKey] annotation:[options objectForKey:UIApplicationOpenURLOptionsAnnotationKey]];
+
+}
+// twitter
+
+
+// fb
+//- (BOOL)application:(UIApplication *)application
+//            openURL:(NSURL *)url
+//  sourceApplication:(NSString *)sourceApplication
+//         annotation:(id)annotation {
+//  return [[FBSDKApplicationDelegate sharedInstance] application:application
+//                                                        openURL:url
+//                                              sourceApplication:sourceApplication
+//                                                     annotation:annotation];
+//}
+
+//- (void)applicationDidBecomeActive:(UIApplication *)application {
+//  [FBSDKAppEvents activateApp];
+//}
+// fb
 
 @end
