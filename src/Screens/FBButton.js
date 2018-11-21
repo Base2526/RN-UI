@@ -22,14 +22,41 @@ const {
   } = FBSDK;
 
 export default class FBButton extends Component {
-    state = {
-      isLoggedIn: false
-    }
+    // state = {
+    //   isLoggedIn: false
+    // }
     
     constructor(props){
         super(props)
 
+        this.state = {
+            isLoggedIn: false
+        }
+
         this.facebookLogin = this.facebookLogin.bind(this)
+        this.facebookLogout = this.facebookLogout.bind(this)
+    }
+
+    componentDidMount(){
+        AccessToken.getCurrentAccessToken().then(
+            (data) => {
+                console.log(data)
+                if(data){
+                    this.setState({
+                        isLoggedIn: true
+                    })
+                }
+            }
+        )
+    }
+
+    facebookLogout(){
+        console.log("facebookLogout")
+        LoginManager.logOut()
+
+        this.setState({
+            isLoggedIn: false
+        })
     }
 
     facebookLogin() {
@@ -52,32 +79,85 @@ export default class FBButton extends Component {
         //     );
         // }
         // console.log(FBSDK)
-        // console.log(LoginManager)
+
+        console.log("facebookLogin")
+
+        // AccessToken.getCurrentAccessToken().then(
+        //     (data) => {
+        //         console.log(data)
+        //         if(data){
+        //             this.setState({
+        //                 isLoggedIn: true
+        //             })
+        //         }
+        //     }
+        // )
+
         LoginManager.logInWithReadPermissions(["public_profile"]).then(
             function(result) {
-                console.log(result)
+                // console.log(result)
                 if (result.isCancelled) {
                     console.log("Login cancelled");
+                    this.setState({
+                        isLoggedIn: false
+                    })
                 } else {
-                    console.log(
-                    "Login success with permissions: " +
+                    console.log("Login success with permissions: " +
                         result.grantedPermissions.toString()
                     );
+
+                    this.setState({
+                        isLoggedIn: true
+                    })
                 }
             },
             function(error) {
-              console.log("Login fail with error: " + error);
+                console.log("Login fail with error: " + error);
+                this.setState({
+                    isLoggedIn: false
+                })
             }
           );
       }
 
     render(){
-        return (<View>
-            <TouchableOpacity
-            onPress={()=>this.facebookLogin()}>
-                <Text>Login with facebook</Text>
-            </TouchableOpacity></View>)
+            console.log("this.state.isLoggedIn : " + this.state.isLoggedIn)
 
+
+            // return (<View>
+            //     <TouchableOpacity
+            //         onPress={()=>this.facebookLogin()}>
+            //         <Text>Login with facebook</Text>
+            //     </TouchableOpacity>
+            //         <TouchableOpacity
+            //             onPress={()=>this.facebookLogout()}
+            //             style={{padding:10}}>
+            //             <Text>Logout</Text>
+            //         </TouchableOpacity>
+            //     </View>)
+                    if(this.state.isLoggedIn){
+                        return (<View>
+                            <TouchableOpacity
+                                onPress={()=>this.facebookLogin()}>
+                                <Text>Login with facebook</Text>
+                            </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={()=>this.facebookLogout()}
+                                    style={{padding:10}}>
+                                    <Text>Logout</Text>
+                                </TouchableOpacity>
+                            </View>)
+                    }else{
+                        return (<View>
+                            <TouchableOpacity
+                            onPress={()=>this.facebookLogin()}>
+                                <Text>Login with facebook</Text>
+                            </TouchableOpacity>
+                            
+                            </View>)
+                    }
+
+        /*
         return (<View>
              <LoginButton
           onLoginFinished={
@@ -97,6 +177,13 @@ export default class FBButton extends Component {
             }
           }
           onLogoutFinished={() => console.log("logout.")}/>
+
+             <TouchableOpacity
+            onPress={()=>this.facebookLogout()}
+            style={{padding:10}}>
+                <Text>Logout</Text>
+            </TouchableOpacity>
           </View>)
+          */
     }
 }

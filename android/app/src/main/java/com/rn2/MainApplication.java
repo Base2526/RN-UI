@@ -60,7 +60,6 @@ public class MainApplication extends Application implements ReactApplication {
       return "index";
     }
 
-
   };
 
   public CallbackManager getCallbackManager() {
