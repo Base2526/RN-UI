@@ -35,7 +35,7 @@ export default class FriendsPage extends React.Component{
               title: 'Profile',
               member: [
                 {
-                  title: '组1--row1',
+                  title: '1--row1',
                 }
               ]
             },
@@ -43,16 +43,16 @@ export default class FriendsPage extends React.Component{
               title: 'Friends',
               member: [
                 {
-                  title: '组2--row1',
+                  title: '2--row1',
                 },
                 {
-                  title: '组2--row2',
+                  title: '2--row2',
                 },
                 {
-                  title: '组2--row3',
+                  title: '2--row3',
                 },
                 {
-                  title: '组2--row4',
+                  title: '2--row4',
                 }
               ]
             },
@@ -60,13 +60,13 @@ export default class FriendsPage extends React.Component{
               title: 'Friend Request Sent',
               member: [
                 {
-                  title: '组3--row1',
+                  title: '3--row1',
                 },
                 {
-                  title: '组3--row2',
+                  title: '3--row2',
                 },
                 {
-                  title: '组3--row3',
+                  title: '3--row3',
                 },
               ]
             }
@@ -114,9 +114,9 @@ export default class FriendsPage extends React.Component{
                       <FastImage
                           style={{width: 60, height: 60, borderRadius: 10}}
                           source={{
-                          uri: 'https://unsplash.it/400/400?image=1',
-                          headers:{ Authorization: 'someAuthToken' },
-                          priority: FastImage.priority.normal,
+                            uri: 'https://unsplash.it/400/400?image=1',
+                            headers:{ Authorization: 'someAuthToken' },
+                            priority: FastImage.priority.normal,
                           }}
                           resizeMode={FastImage.resizeMode.contain}
                       />
@@ -198,7 +198,8 @@ export default class FriendsPage extends React.Component{
     };
     
     _renderSection = (section, sectionId, state)  => {
-      return (
+      if(sectionId == 0){
+        return (
           <View
               style={{ 
                       height: 30, 
@@ -208,21 +209,66 @@ export default class FriendsPage extends React.Component{
                       borderBottomWidth: 0.5,
                       borderBottomColor: DictStyle.colorSet.lineColor }}>
           <View style={{ flexDirection: 'row', 
-                        alignItems: 'center' }}>
+                        alignItems: 'center'}}>
               <Text style={{ fontSize: DictStyle.fontSet.mSize, 
                               color: DictStyle.colorSet.normalFontColor,
-                              paddingLeft: 10 }}>
+                              paddingLeft: 10,
+                              fontWeight:'700' }}>
               {section}
               </Text>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={{ fontSize: 24, 
                               color: DictStyle.colorSet.weakFontColor }}>
               {'^ '}
               </Text>
+          </View> */}
           </View>
-          </View>
-      )
+        )
+      }else{
+        let ic_collapse;
+        if(state){
+          ic_collapse = <FastImage
+                        style={{width: 20, height: 20}}
+                        source={require('../../Images/collapse_down.png')}
+                        resizeMode={FastImage.resizeMode.contain}
+                    />
+        }else{
+          ic_collapse = <FastImage
+                        style={{width: 20, height: 20}}
+                        source={require('../../Images/collapse_up.png')}
+                        resizeMode={FastImage.resizeMode.contain}
+                    />
+        }
+
+        return (
+            <View
+                style={{ 
+                        height: 30, 
+                        flexDirection: 'row',
+                        justifyContent: 'space-between', 
+                        alignItems: 'center', 
+                        borderBottomWidth: 0.5,
+                        borderBottomColor: DictStyle.colorSet.lineColor }}>
+            <View style={{ flexDirection: 'row', 
+                          alignItems: 'center'}}>
+                <Text style={{ fontSize: DictStyle.fontSet.mSize, 
+                                color: DictStyle.colorSet.normalFontColor,
+                                paddingLeft: 10,
+                                fontWeight:'700' }}>
+                {section}
+                </Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                {/* <Text style={{ fontSize: 24, 
+                                color: DictStyle.colorSet.weakFontColor }}>
+                {'^ '}
+                </Text> */}
+                {ic_collapse}
+            </View>
+            </View>
+        )
+      }
     }
     
     _btnPress = () => {

@@ -12,6 +12,8 @@ import FollowingPage from './FollowingPage'
 
 class iDNAHome extends Component {
 
+
+
     /*
     static navigationOptions = ({ navigation }) => ({
         title: "iDNA",
@@ -53,14 +55,14 @@ class iDNAHome extends Component {
             }
             break
             case 1:{
-                __headerRight = <TouchableOpacity
-                style={Styles.headerButton}
-                onPress={() => {
-                    const { params = {} } = navigation.state
-                    params.handleHeaderRight()
-                } }>
-                <Icon name="search" size={20} />
-            </TouchableOpacity>
+            //     __headerRight = <TouchableOpacity
+            //     style={Styles.headerButton}
+            //     onPress={() => {
+            //         const { params = {} } = navigation.state
+            //         params.handleHeaderRight()
+            //     } }>
+            //     <Icon name="search" size={20} />
+            // </TouchableOpacity>
             }
             break
         }

@@ -116,6 +116,26 @@ android {
             include "armeabi-v7a", "x86"
         }
     }
+    signingConfigs {
+        release {
+//            storeFile file("release-key.keystore")
+//            storePassword 'passwotd'
+//            keyAlias 'alias'
+//            keyPassword 'password'
+        }
+    }
+
+    /*
+    * signingConfigs {
+        release {
+            storeFile file(MYAPP_RELEASE_STORE_FILE)
+            storePassword MYAPP_RELEASE_STORE_PASSWORD
+            keyAlias MYAPP_RELEASE_KEY_ALIAS
+            keyPassword MYAPP_RELEASE_KEY_PASSWORD
+        }
+    }
+    * */
+
     buildTypes {
         release {
             minifyEnabled enableProguardInReleaseBuilds
@@ -138,15 +158,16 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-fbsdk')
-    compile project(':react-native-twitter-signin')
-    compile project(':react-native-vector-icons')
-    compile project(':react-native-gesture-handler')
-    compile project(':react-native-firebase')
-    compile project(':react-native-fast-image')
-    compile project(':react-native-camera')
-    compile project(':react-native-contacts')
-    compile project(':react-native-image-picker')
+    implementation project(':react-native-google-signin')
+    implementation project(':react-native-fbsdk')
+    implementation project(':react-native-twitter-signin')
+    implementation project(':react-native-vector-icons')
+    implementation project(':react-native-gesture-handler')
+    implementation project(':react-native-firebase')
+    implementation project(':react-native-fast-image')
+    implementation project(':react-native-camera')
+    implementation project(':react-native-contacts')
+    implementation project(':react-native-image-picker')
     implementation project(':react-native-camera')
     implementation project(':react-native-gesture-handler')
     implementation project(':react-native-fast-image')
@@ -159,6 +180,7 @@ dependencies {
     implementation "com.google.android.gms:play-services-base:15.0.1"
     implementation "com.google.firebase:firebase-core:16.0.1"
     implementation "com.google.firebase:firebase-auth:16.0.1"
+    implementation "com.google.android.gms:play-services-auth:15.0.1"
 
     implementation 'com.android.support:multidex:1.0.0'
 

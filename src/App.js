@@ -6,7 +6,8 @@ import Profile from './Profile'; //Stack Nav
 
 import SignUp from "./Screens/SignUp";
 import SignIn from "./Screens/SignIn";
-import Welcome from "./Screens/Welcome2"
+import ForgotPassword from "./Screens/ForgotPassword"
+import Welcome from "./Screens/Welcome"
 
 import Menu from './DrawerMenu'
 
@@ -30,7 +31,12 @@ export const SignedOut = createStackNavigator({
             title: "Sign In"
         }
     },
-    
+    ForgotPassword:{
+      screen: ForgotPassword,
+      navigationOptions:{
+        title: "Forgot Password"
+      }
+    }
 });
 
 let drawerNavigatorConfig = {
@@ -106,7 +112,7 @@ export const createRootNavigator = (signedIn = false) => {
       }
     },
     {
-      initialRouteName: signedIn ? "SignedOut" : "Main"
+      initialRouteName: signedIn ? "Main" : "SignedOut"
     }
   );
 };

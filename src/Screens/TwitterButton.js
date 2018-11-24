@@ -9,31 +9,37 @@ import {
   NativeModules,
   TouchableOpacity } from "react-native"
 
-  // RNTwitterSignIn
+import Constant from '../Utils/Constant'
+import {saveDataLocal} from '../Utils/Helpers'
+
 const { RNTwitterSignIn } = NativeModules
 
-const Constants = {
-  //Dev Parse keys
-  TWITTER_COMSUMER_KEY: "a7SsmDvq3XwzSN0za5uokCiBT",
-  TWITTER_CONSUMER_SECRET: "765FrNfImzNSWGKjbQSId3wI86EdiD7QxQKeJWSbhvqMMPTmCf"
-}
+// const Constants = {
+//   //Dev Parse keys
+//   TWITTER_COMSUMER_KEY: "a7SsmDvq3XwzSN0za5uokCiBT",
+//   TWITTER_CONSUMER_SECRET: "765FrNfImzNSWGKjbQSId3wI86EdiD7QxQKeJWSbhvqMMPTmCf"
+// }
 
 export default class TwitterButton extends Component {
-  state = {
-    isLoggedIn: false
-  }
+  // state = {
+  //   isLoggedIn: false
+  // }
 
   _twitterSignIn = () => {
-    //   console.log(RNTwitterSignIn)
-    
-    RNTwitterSignIn.init(Constants.TWITTER_COMSUMER_KEY, Constants.TWITTER_CONSUMER_SECRET)
+    _this = this.props
+    RNTwitterSignIn.init(Constant.TWITTER_COMSUMER_KEY, Constant.TWITTER_CONSUMER_SECRET)
     RNTwitterSignIn.logIn()
       .then(loginData => {
-        console.log(loginData)
         const { authToken, authTokenSecret } = loginData
         if (authToken && authTokenSecret) {
-          this.setState({
-            isLoggedIn: true
+    
+          saveDataLocal(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.TWITTER}).then((data)=>{
+            if(data.status){
+              let {navigator} = _this
+              navigator.navigate("Main")
+            }
+          }).catch((error)=>{
+            console.log(error)
           })
         }
       })
@@ -44,23 +50,29 @@ export default class TwitterButton extends Component {
   }
 
   handleLogout = () => {
-    console.log("logout")
-    RNTwitterSignIn.logOut()
-    this.setState({
-      isLoggedIn: false
-    })
+    // console.log("logout")
+    // RNTwitterSignIn.logOut()
+    // this.setState({
+    //   isLoggedIn: false
+    // })
   }
 
   render() {
-    const { isLoggedIn } = this.state
+    // const { isLoggedIn } = this.state
+
+    let {navigator} = this.props
+    console.log(navigator)
+    
     return (
-      <View style={this.props.style}>
-        {isLoggedIn
-          ? <TouchableOpacity onPress={this.handleLogout}>
-              <Text>Log out</Text>
-            </TouchableOpacity>
-          : <Button name="logo-twitter" style={styles.button} onPress={this._twitterSignIn} title="Login with Twitter">
-            </Button>}
+      <View style={{padding:10}}>
+        <TouchableOpacity 
+          onPress={this._twitterSignIn}
+          style={{backgroundColor:'#4da6ea', padding: 10, alignItems:'center'}}>
+            <Text
+              style={{color:'white', fontSize: 18, fontWeight:'700'}}>
+              Login with Twitter
+            </Text>
+        </TouchableOpacity>
       </View>
     )
   }

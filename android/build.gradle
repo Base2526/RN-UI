@@ -7,6 +7,9 @@ buildscript {
         compileSdkVersion = 27
         targetSdkVersion = 26
         supportLibVersion = "27.1.1"
+
+        // google signin
+        googlePlayServicesAuthVersion = "15.0.1" // <--- use this version or newer
     }
     repositories {
         google()
@@ -20,6 +23,10 @@ buildscript {
         // in the individual module build.gradle files
 
         classpath 'com.google.gms:google-services:4.0.2'
+
+        // google signin
+        classpath 'com.android.tools.build:gradle:3.1.2' // <--- use this version or newer
+        classpath 'com.google.gms:google-services:3.2.1' // <--- use this version or newer
     }
 }
 

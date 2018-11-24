@@ -161,7 +161,7 @@ export default class AddFriendsPage extends React.Component{
                               <FastImage
                                   style={{width: 40, height: 40, borderRadius: 10}}
                                   source={{
-                                  uri: 'https://unsplash.it/400/400?image=1',
+                                  uri: 'https://cdn0.iconfinder.com/data/icons/thin-communication-messaging/57/thin-328_phone_book_number_contact-512.png',
                                   headers:{ Authorization: 'someAuthToken' },
                                   priority: FastImage.priority.normal,
                                   }}
@@ -198,7 +198,7 @@ export default class AddFriendsPage extends React.Component{
                               <FastImage
                                   style={{width: 40, height: 40, borderRadius: 10}}
                                   source={{
-                                  uri: 'https://unsplash.it/400/400?image=1',
+                                  uri: 'http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/user-id-icon.png',
                                   headers:{ Authorization: 'someAuthToken' },
                                   priority: FastImage.priority.normal,
                                   }}

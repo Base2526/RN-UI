@@ -4,6 +4,9 @@ import CreateApplicationPage from './CreateApplicationPage';
 
 import ApplicationDetailPage from './ApplicationDetailPage'
 
+import ListAllCategory from './ListAllCategory'
+import ListAllSubcategory from './ListAllSubcategory'
+
 const index = createStackNavigator({
     'Home': {
         screen: Home,
@@ -22,6 +25,18 @@ const index = createStackNavigator({
         navigationOptions: {
           title: 'Application Detail',
         },
+    },
+    'ListAllCategory': {
+        screen: ListAllCategory,
+        navigationOptions: {
+          title: 'Select Category',
+        },
+    },
+    'ListAllSubcategory': {
+        screen: ListAllSubcategory,
+        navigationOptions: {
+          title: 'Select Subcategory',
+        },
     }
 });
 
@@ -31,7 +46,8 @@ index.navigationOptions = ({ navigation }) => {
   
     // set tabbar visible
     if (routeName === 'CreateApplicationPage' || 
-        routeName === 'ApplicationDetailPage' ) {
+        routeName === 'ApplicationDetailPage' ||
+        routeName === 'ListAllCategory' ) {
       navigationOptions.tabBarVisible = false;
     }
   

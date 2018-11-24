@@ -1,182 +1,166 @@
 import React from 'react'
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    Navigator,
-    StyleSheet,
     Text,
-    TouchableHighlight,
     View,
-    SafeAreaView,
-    AsyncStorage
-  } from 'react-native';
-import * as simpleAuthProviders from 'react-native-simple-auth';
-import secrets from './secrets.example';
+    TouchableOpacity,
+    StyleSheet,
+    ActivityIndicator,
+    NativeModules
+} from 'react-native';
+
+import Spinner from 'react-native-loading-spinner-overlay';
+
+
+// import FBButton from './FBButton'
+
+const { RNTwitterSignIn } = NativeModules
+
+const FBSDK = require('react-native-fbsdk');
+const { LoginButton, AccessToken, LoginManager } = FBSDK;
+
+import Constant from '../Utils/Constant'
+import {saveDataLocal} from '../Utils/Helpers'
+
+// import TwitterButton from './TwitterButton';
+
 
 export default class Welcome extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        loading: false
-      };
-    }
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: false,
+      arg1: {}
+    };
+  }
 
-    render() {
-      let {navigation} = this.props
-      
-      return (
-        <View style={styles.content}>
-          {
-            this.state.loading ? null : Object.keys(secrets).map((provider, i) => {
-              return (
-                <TouchableHighlight
-                  key={provider}
-                  style={[styles.button, styles[provider]]}
-                  onPress={this.onBtnPressed.bind(this, provider, secrets[provider])}>
-                  <Text style={[styles.buttonText]}>{provider.split('-')[0]}</Text>
-                </TouchableHighlight>
-              );
-            })
-          }
-         <TouchableHighlight
-                  key="20"
-                  style={[styles.button, styles.google]}
-                    onPress={()=>{
-                        // AsyncStorage.setItem("auth-demo-key", "true", ()=>{
-                            // navigation.navigate("SignedOut")
-                            navigation.navigate('SignUp')
-                        //   });
-                    }}>
-                  <Text style={[styles.buttonText]}>SignIn/SignUp</Text>
-                </TouchableHighlight>
-          <ActivityIndicator
-              animating={this.state.loading}
-              style={[styles.loading]}
-              size='large' />
+  __loading(){
+    this.setState({
+      loading:!this.state.loading
+    })
+
+    console.log("isShow : " + isShow)
+  }
+
+  _facebookSignIn = () => {
+    console.log("#1");
+    _this = this.props
+    LoginManager.logInWithReadPermissions(["public_profile"]).then(
+        function(result) {
+            if (result.isCancelled) {
+                console.log("Login cancelled");
+            } else {
+                // this.setState({
+                //   loading:true
+                // })
+                saveDataLocal(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.FACEBOOK}).then((data)=>{
+                    if(data.status){
+                      // let {navigator} = _this
+                      _this.navigation.navigate("Main")
+
+                    }
+                }).catch((error)=>{
+                    console.log(error)
+                })
+            }
+        },
+        function(error) {
+            console.log("Login fail with error: " + error);
+        }
+    );
+  }
+
+  renderFB(){
+    return (<View style={{padding:10}}>
+      <TouchableOpacity
+      onPress={this._facebookSignIn}
+      style={{backgroundColor:'#3a579d', padding: 10, alignItems:'center'}}>
+          <Text style={{color:'white', fontSize: 18, fontWeight:'700'}}>Login with facebook</Text>
+      </TouchableOpacity>
+    </View>)
+  }
+
+  _twitterSignIn = () => {
+    _this = this.props
+    RNTwitterSignIn.init(Constant.TWITTER_COMSUMER_KEY, Constant.TWITTER_CONSUMER_SECRET)
+    RNTwitterSignIn.logIn()
+      .then(loginData => {
+        const { authToken, authTokenSecret } = loginData
+        if (authToken && authTokenSecret) {
+
+          saveDataLocal(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.TWITTER}).then((data)=>{
+            if(data.status){
+              _this.navigation.navigate("Main")
+            }
+          }).catch((error)=>{
+            console.log(error)
+          })
+        }
+      })
+      .catch(error => {
+        console.log(error)
+      }
+    )
+  }
+
+  renderTwitter(){
+    return (
+      <View style={{padding:10}}>
+        <TouchableOpacity 
+          onPress={this._twitterSignIn}
+          style={{backgroundColor:'#4da6ea', padding: 10, alignItems:'center'}}>
+            <Text
+              style={{color:'white', fontSize: 18, fontWeight:'700'}}>
+              Login with Twitter
+            </Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
+  render() {
+    let {navigation} = this.props
+    return (
+      <View style={{flex: 1, backgroundColor:'white'}} >
+        {/* <FBButton navigator={this.props.navigation} /> */}
+        {this.renderFB()}
+        {/* <TwitterButton navigator={this.props.navigation}  /> */}
+        {this.renderTwitter()}
+        <View style={{padding:10}}>
+        <TouchableOpacity
+            style={{backgroundColor:'gray', padding: 10, alignItems:'center'}}
+            onPress={()=>{
+                      navigation.navigate('SignIn')
+                  }}>
+          <Text style={{color:'white', fontSize: 18, fontWeight:'700'}}>SignIn/SignUp</Text>
+        </TouchableOpacity>
         </View>
-      );
-    }
-  
-    onBtnPressed(provider, opts) {
-      const _this = this;
-      this.setState({
-        loading: true
-      });
 
-      // AsyncStorage.setItem("auth-demo-key", "true", ()=>{
-      //   _this.props.navigation.navigate("Main")
-      // });
-
-    
-      simpleAuthProviders[provider](opts)
-        .then((info) => {
-          _this.setState({
-              loading: false
-          });
-        //   _this.props.navigator.push({
-        //     title: provider,
-        //     provider,
-        //     info,
-        //     index: 1
-        //   });
-
-          // SignedIn
-          navigation.navigate("SignedIn")
-        })
-        .catch((error) => {
-          _this.setState({
-              loading: false
-          });
-          Alert.alert(
-            'Authorize Error',
-            error.message
-          );
-        });
-    }  
+        {
+        this.state.loading && <Spinner
+          visible={false}
+          textContent={'Loading...'}
+          textStyle={styles.spinnerTextStyle}
+        />
+        }
+      </View>
+    );
+  }
 }
 
-// export class Welcome extends React.Component{
 
-//     render(){
-//         return(
-//             <Profile />
-//         )
-//     }
-// }
-
-let styles = StyleSheet.create({
-    text: {
-      color: 'black',
-      backgroundColor: 'white',
-      fontSize: 30
-    },
-    container: {
-      flex: 1
-    },
-    content: {
-      flex: 1,
-      marginTop: 10,
-      marginRight: 10,
-      marginLeft: 10
-    },
-    buttonText: {
-      color: '#fff',
-      fontSize: 18,
-      alignSelf: 'center'
-    },
-    button: {
-      height: 36,
-      flexDirection: 'row',
-      borderRadius: 8,
-      marginBottom: 10,
-      justifyContent: 'center'
-    },
-    pic: {
-      width: 100,
-      height: 100
-    },
-    mono: {
-      fontFamily: 'Menlo',
-      paddingTop: 10
-    },
-    scroll: {
-      marginTop: 0,
-      paddingTop: 0,
-      backgroundColor: '#f2f2f2',
-      borderColor: '#888',
-      borderWidth: 1,
-      marginBottom: 10,
-      padding: 10,
-      flexDirection: 'row'
-    },
-    header: {
-      fontWeight: 'bold',
-      marginBottom: 10,
-      marginTop: 10,
-      fontSize: 16
-    },
-    loading: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center'
-    },
-    google: {
-      backgroundColor: '#ccc'
-    },
-    facebook: {
-      backgroundColor: '#3b5998'
-    },
-    twitter: {
-      backgroundColor: '#48BBEC'
-    },
-    instagram: {
-      backgroundColor: '#3F729B'
-    },
-    tumblr: {
-      backgroundColor: '#36465D'
-    },
-    linkedin: {
-      backgroundColor: '#0077B5'
-    }
-  });
+const styles = StyleSheet.create({
+  loading: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: 0.5,
+    backgroundColor: 'black',
+  },
+  spinnerTextStyle: {
+    color: '#FFF'
+  },
+})

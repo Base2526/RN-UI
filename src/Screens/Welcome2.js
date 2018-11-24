@@ -9,6 +9,7 @@ import {
 
 import TwitterButton from './TwitterButton';
 import FBButton from './FBButton'
+import GoogleSigninButton from './GoogleSigninButton'
 
 export default class App extends Component<{}> {
 
@@ -23,6 +24,7 @@ export default class App extends Component<{}> {
       <View style={styles.container}>
         <TwitterButton style={{height: 50}} />
         <FBButton />
+        {/* <GoogleSigninButton /> */}
       </View>
     );
   }

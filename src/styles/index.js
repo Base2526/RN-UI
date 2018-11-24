@@ -11,6 +11,6 @@ export default StyleSheet.create({
         width: 44,
         flex: 1,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
     }
 })

@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   AsyncStorage,
   Alert,
+  NativeModules,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -19,6 +20,14 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 
 import Styles from '../../styles';
+
+import Constant from '../../Utils/Constant'
+import {loadDataLocal, removeDataLocalByKey} from '../../Utils/Helpers'
+
+
+const { RNTwitterSignIn } = NativeModules
+const FBSDK = require('react-native-fbsdk');
+const { LoginManager } = FBSDK;
 
 // Example component for section:headerComponent
 const CustomSectionHeader = () => (
@@ -304,19 +313,39 @@ export default class homeY extends Component<{}> {
                           style: 'cancel'},
                           {text: 'OK', 
                           onPress: () => {
-                              AsyncStorage.removeItem("auth-demo-key", ()=>{
-                                this.props.navigation.navigate("SignedOut")
-      
-                                //   // AsyncStorage.getItem("auth-demo-key")
-                                //   // .then(res => {
-                                //   //   console.log("3, res")
-                                //   //   console.log(res)
-                                //   //   console.log("4, res")
-                                    
-                                //   // })
-                                //   // .catch(err => alert("error"));
+                                loadDataLocal(Constant.USER_LOGIN).then((data) => {      
+                                  if(data.status){
+                                    let value = JSON.parse(data.value)
+                                    console.log(value.provider)
+                                    console.log("then #1")
+                                    if(value.provider == Constant.PROVIDERS.EMAIL){
+
+                                    }else if(value.provider == Constant.PROVIDERS.TWITTER){
+                                      console.log("Logout Twitter")
+                                      RNTwitterSignIn.init(Constant.TWITTER_COMSUMER_KEY, Constant.TWITTER_CONSUMER_SECRET)
+                                      RNTwitterSignIn.logOut()
+                                    }else if(value.provider == Constant.PROVIDERS.GOOGLE){
+
+                                    }else if(value.provider == Constant.PROVIDERS.FACEBOOK){
+                                      console.log("Logout Facebook")
+                                      LoginManager.logOut()
+                                    }
+                                  }
+                                }).then(()=>{
+                                  console.log("then #2")
+                                  removeDataLocalByKey(Constant.USER_LOGIN).then((data) => {      
+                                    if(data.status){
+                                      console.log("Go to SignedOut")
+                                      this.props.navigation.navigate("SignedOut")
+                                    }else{
+                                      
+                                    }
+                                  })
+                                }).catch((error)=>{
+                                  
                                 })
-                                console.log(this.props)
+
+                                
                               }, 
                           },
                         ],
