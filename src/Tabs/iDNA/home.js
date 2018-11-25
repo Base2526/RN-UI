@@ -13,7 +13,6 @@ import FollowingPage from './FollowingPage'
 class iDNAHome extends Component {
 
 
-
     /*
     static navigationOptions = ({ navigation }) => ({
         title: "iDNA",
@@ -140,11 +139,6 @@ class iDNAHome extends Component {
 
         return (
             <View style={[style.container, {backgroundColor:'white'}]}>
-                {/* <Button
-                    onPress={() => this.props.navigation.navigate("Details")}
-                    title="Go To Details"
-                /> */}
-
                 { renderContent &&
                 <ScrollableTabView
                     // style={{height:500}}
@@ -153,16 +147,10 @@ class iDNAHome extends Component {
                     locked={true}
                     tabBarPosition='top'
                     //  contentProps={...props}
-                    onChangeTab={this.handleChangeTab.bind(this)}
-                    >
+                    onChangeTab={this.handleChangeTab.bind(this)}>
                     <MyAppPage tabLabel='My App' index={0} amount={4} params={this.props} />
                     <CenterPage tabLabel='Center' index={1} amount={5} params={this.props} />
                     <FollowingPage tabLabel='Following' index={2} amount={6} params={this.props} />
-                    {/*<FlowPage tabLabel="Tab #4" index={3} amount={7}/>
-                    <FlowPage tabLabel='Tab #5' index={2} amount={6}/>
-                    <FlowPage tabLabel="Tab #6" index={3} amount={7}/>
-                    <FlowPage tabLabel='Tab #5' index={2} amount={6}/>
-                    <FlowPage tabLabel="Tab #6" index={3} amount={7}/> */}
                 </ScrollableTabView>
                 }
             </View>

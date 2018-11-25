@@ -1,5 +1,10 @@
 import * as React from "react"
-import { Text, View, FlatList, SectionList, TouchableOpacity } from "react-native"
+import {Text, 
+        View, 
+        FlatList, 
+        SectionList, 
+        TouchableOpacity,
+        Dimensions } from "react-native"
 
 import FastImage from 'react-native-fast-image'
 
@@ -32,14 +37,7 @@ const sections = [
           {
             name: "Cabbage",
             color: "Purple",
-          },{
-            name: "Carrot",
-            color: "Orange",
-          },
-          {
-            name: "Cabbage",
-            color: "Purple",
-          },
+          }
         ],
       },
     ],
@@ -52,14 +50,6 @@ const sections = [
         key: 'fruits',
         list: [
           {
-            name: "Apple",
-            color: "Green",
-          },
-          {
-            name: "Banana",
-            color: "Yellow",
-          },
-          {
             name: "Strawberry",
             color: "Red",
           },
@@ -71,42 +61,16 @@ const sections = [
             color: "Green",
           },
           {
-            name: "Banana",
-            color: "Yellow",
+            name: "Blueberry",
+            color: "Blue",
           },
           {
-            name: "Strawberry",
-            color: "Red",
+            name: "Banana",
+            color: "Yellow",
           },
           {
             name: "Blueberry",
             color: "Blue",
-          },{
-            name: "Apple",
-            color: "Green",
-          },
-          {
-            name: "Banana",
-            color: "Yellow",
-          },
-          {
-            name: "Strawberry",
-            color: "Red",
-          },
-          {
-            name: "Blueberry",
-            color: "Blue",
-          },{
-            name: "Apple",
-            color: "Green",
-          },
-          {
-            name: "Banana",
-            color: "Yellow",
-          },
-          {
-            name: "Strawberry",
-            color: "Red",
           },
           {
             name: "Blueberry",
@@ -124,10 +88,6 @@ const sections = [
         key: 'fruits2',
         list: [
           {
-            name: "Apple",
-            color: "Green",
-          },
-          {
             name: "Banana",
             color: "Yellow",
           },
@@ -138,17 +98,10 @@ const sections = [
           {
             name: "Blueberry",
             color: "Blue",
-          },{
-            name: "Apple",
-            color: "Green",
           },
           {
-            name: "Banana",
-            color: "Yellow",
-          },
-          {
-            name: "Strawberry",
-            color: "Red",
+            name: "Blueberry",
+            color: "Blue",
           },
           {
             name: "Blueberry",
@@ -156,35 +109,35 @@ const sections = [
           },{
             name: "Apple",
             color: "Green",
-          },
-          {
-            name: "Banana",
-            color: "Yellow",
-          },
-          {
-            name: "Strawberry",
-            color: "Red",
-          },
-          {
-            name: "Blueberry",
-            color: "Blue",
           },{
             name: "Apple",
             color: "Green",
-          },
-          {
-            name: "Banana",
-            color: "Yellow",
-          },
-          {
-            name: "Strawberry",
-            color: "Red",
-          },
+          }
+
         ],
       },
     ],
   },
 ]
+
+const formatData = (data, numColumns) => {
+  // เป้นการ ลบ item ที่มี ​field ออกทั้งหมด เพราะว่าเรารองรับการ orientation srceen ด้วย
+  data = data.filter(function(item){
+    return !('empty' in item);
+  }).map((item)=>{
+    return item;
+  });
+
+  const numberOfFullRows = Math.floor(data.length / numColumns);
+
+  let numberOfElementsLastRow = data.length - (numberOfFullRows * numColumns);
+  while (numberOfElementsLastRow !== numColumns && numberOfElementsLastRow !== 0) {
+    data.push({ name: `blank-${numberOfElementsLastRow}`, empty: true });
+    numberOfElementsLastRow++;
+  }
+
+  return data;
+};
 
 export default class CenterPage extends React.Component<{}, {}> {
 
@@ -193,6 +146,8 @@ export default class CenterPage extends React.Component<{}, {}> {
 
     this.state = {
       renderContent: false,
+      orientation:'PORTRAIT',
+      numColumns:3
     }
   }
 
@@ -200,61 +155,89 @@ export default class CenterPage extends React.Component<{}, {}> {
     setTimeout(() => {this.setState({renderContent: true})}, 0);
   }
 
+  onLayout(e) {
+    const {width, height} = Dimensions.get('window')
+    // console.log(width, height)
+
+    if(width<height){
+      this.setState({orientation:'PORTRAIT', numColumns:3})
+    }else{
+      this.setState({orientation:'LANDSCAPE', numColumns:5})
+    }
+  }
+
   renderSection = ({ item }) => {
+    // console.log(item)
     return (
       <FlatList
-        data={item.list}
-        numColumns={3}
+        key = {this.state.orientation}
+        // data={item.list}
+        /*  เราต้องมีการคำนวณ item ให้เต็มแต่ละแถว  */
+        data = {formatData(item.list, this.state.numColumns)}
+        numColumns={this.state.numColumns}
         renderItem={this.renderListItem}
         keyExtractor={this.keyExtractor}
+        extraData={this.state}
+        contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
+        // style={{flex:1, backgroundColor:'red'}}
       />
     )
   }
 
   renderSectionHeader = ({ section }) => {
-    return <Text>{section.title}</Text>
+    return (<View style={{borderColor:'gray', borderWidth:1}}><Text>{section.title}</Text></View>)
   }
 
-  // import FastImage from 'react-native-fast-image'
   renderListItem = ({ item }) => {
-      return (
-        <View style={{height: 100, width: 100, borderColor: "green", borderWidth: 1, justifyContent:'center', alignItems:'center' }}>
-          {/* <Text>{item.name}</Text>
-          <Text>{item.color}</Text> */}
-           <TouchableOpacity 
-                              style={{height:80,
-                                      width: 80,
-                                      borderRadius: 10,
-                                      }}
-                                onPress={()=>{
-                                  this.props.params.navigation.navigate("ApplicationDetailPage")
-                                }}>
-                              <FastImage
-                                  style={{width: 80, height: 80, borderRadius: 10}}
-                                  source={{
-                                  uri: 'https://unsplash.it/400/400?image=1',
-                                  headers:{ Authorization: 'someAuthToken' },
-                                  priority: FastImage.priority.normal,
-                                  }}
-                                  resizeMode={FastImage.resizeMode.contain}
-                              />
-                    </TouchableOpacity>
-        </View>
-      )
+    if ('empty' in item) {
+      return <View style={{height: 100, 
+        width: 100, 
+        flex:1,
+        // borderColor: "green", 
+        // borderWidth: 1, 
+        justifyContent:'center', 
+        alignItems:'center',
+        backgroundColor: 'transparent',}} />;
     }
+
+    return (
+      <View style={{height: 100, 
+                    width: 100, 
+                    flex:1,
+                    // borderColor: "green", 
+                    // borderWidth: 1, 
+                    justifyContent:'center', 
+                    alignItems:'center' }}>
+        <TouchableOpacity 
+            onPress={()=>{
+              this.props.params.navigation.navigate("ApplicationDetailPage")
+            }}>
+            <FastImage
+                style={{width: 80, height: 80, borderRadius: 10}}
+                source={{
+                uri: 'https://unsplash.it/400/400?image=1',
+                headers:{ Authorization: 'someAuthToken' },
+                priority: FastImage.priority.normal,
+                }}
+                resizeMode={FastImage.resizeMode.contain}
+            />
+        </TouchableOpacity>
+      </View>
+    )
+  }
 
   keyExtractor = (item) => {
     return item.name
   }
 
   render () {
-
+    console.log('render')
     let {
       renderContent
     } = this.state;
 
     return (
-      <View style={{flex:1}}>
+      <View style={{flex:1}} onLayout={this.onLayout.bind(this)} >
       {
         renderContent &&
         <SectionList
@@ -262,6 +245,7 @@ export default class CenterPage extends React.Component<{}, {}> {
           renderSectionHeader={this.renderSectionHeader}
           renderItem={this.renderSection}
           // style={{justifyContent:'space-between'}}
+          extraData={this.state}
         />
       }
       </View>
