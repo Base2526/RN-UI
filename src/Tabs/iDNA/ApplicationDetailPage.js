@@ -384,12 +384,15 @@ Credit: Yeshwanth's Kitchen (bit.ly/2R9Mw3Y)</Text>
                     }}
                     renderHeader={(currentIndex)=>
                         {
-                        return(<View style={{padding: 30, position:'absolute', top:0, right:0}}>
-                                    <Icon 
-                                        onPress={()=>this.setState({ modalVisible: false })} 
-                                        name="times" 
-                                        color='white' 
-                                        size={30} />
+                        return(<View style={{padding: 30, position:'absolute', top:0, right:0, zIndex: 50}}>
+                                    <TouchableOpacity
+                                        onPress={()=>this.setState({ modalVisible: false })} >
+                                        <Icon 
+                                            
+                                            name="times" 
+                                            color='white' 
+                                            size={30} />
+                                    </TouchableOpacity>
                                 </View>)
                         }
                     }
