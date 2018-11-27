@@ -61,301 +61,116 @@ export default class homeY extends Component<{}> {
     /*
      * Uncomment following line to render example with flatlist
      */
-    // return <ExampleWithFlatList />;
 
     return (
       <ScrollView contentContainerStyle={styles.stage}>
         <TableView>
-          <Section header="STANDARD" footer="A Footer">
-            <Cell cellStyle="Basic" title="Basic" />
-            <Cell cellStyle="RightDetail" title="RightDetail" detail="Detail" />
-            <Cell cellStyle="LeftDetail" title="LeftDetail" detail="Detail" />
-            <Cell
-              cellStyle="Subtitle"
-              title="Subtitle"
-              detail="No linebreakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
-            />
-            <Cell
-              cellStyle="Basic"
-              title="Pressable w/ accessory"
+          <Section header="STANDARD">
+            <Cell 
+              cellStyle="Basic" 
+              title="Hide" 
               accessory="DisclosureIndicator"
-              onPress={() => console.log('Heyho!')}
-            />
-          </Section>
-          <Section header="DISABLED">
-            <Cell cellStyle="Basic" isDisabled title="Basic" />
-            <Cell
-              cellStyle="RightDetail"
-              isDisabled
-              title="RightDetail"
-              detail="Detail"
-            />
-            <Cell
-              cellStyle="LeftDetail"
-              isDisabled
-              title="LeftDetail"
-              detail="Detail"
-            />
-            <Cell
-              cellStyle="Subtitle"
-              isDisabled
-              title="Subtitle"
-              detail="No linebreakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
-            />
-            <Cell
-              cellStyle="Basic"
-              isDisabled
-              title="Pressable w/ accessory"
+              onPress={()=>{
+                this.props.navigation.navigate("hide")
+              }} />
+            <Cell 
+              cellStyle="Basic" 
+              title="Block" 
               accessory="DisclosureIndicator"
-              onPress={() => console.log('Heyho!')}
-            />
-          </Section>
-          <Section header="ACCESSORY">
-            <Cell
-              cellStyle="Basic"
+              onPress={()=>{
+                this.props.navigation.navigate("block")
+              }} />
+            <Cell 
+              cellStyle="Basic" 
+              title="Manage class" 
               accessory="DisclosureIndicator"
-              title="Basic"
-            />
-            <Cell
-              cellStyle="RightDetail"
-              accessory="DetailDisclosure"
-              title="RightDetail"
-              detail="Detail"
-            />
-            <Cell
-              cellStyle="LeftDetail"
-              accessory="Detail"
-              title="LeftDetail"
-              detail="Detail"
-            />
-            <Cell
-              cellStyle="Subtitle"
-              accessory="Checkmark"
-              title="Subtitle"
-              detail="No linebreakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
-            />
-            <Cell
-              cellStyle="Basic"
-              accessory="Detail"
-              title="Pressable w/ accessory"
-              onPress={() => console.log('Heyho!')}
-            />
-          </Section>
-          <Section header="Image" footer="A Footer">
-            <Cell
-              cellStyle="Basic"
-              title="Basic"
-              image={
-                <Image
-                  style={{ borderRadius: 5 }}
-                  source={{
-                    uri: 'https://facebook.github.io/react/img/logo_og.png',
-                  }}
-                />
-              }
-            />
-            <Cell
-              cellStyle="RightDetail"
-              title="RightDetail"
-              detail="Detail"
-              image={
-                <Image
-                  style={{ borderRadius: 5 }}
-                  source={{
-                    uri: 'https://facebook.github.io/react/img/logo_og.png',
-                  }}
-                />
-              }
-            />
-            <Cell
-              cellStyle="LeftDetail"
-              title="LeftDetail"
-              detail="Detail"
-              image={
-                <Image
-                  style={{ borderRadius: 5 }}
-                  source={{
-                    uri: 'https://facebook.github.io/react/img/logo_og.png',
-                  }}
-                />
-              }
-            />
-            <Cell
-              cellStyle="Subtitle"
-              title="Subtitle"
-              detail="No linebreakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
-              image={
-                <Image
-                  style={{ borderRadius: 5 }}
-                  source={{
-                    uri: 'https://facebook.github.io/react/img/logo_og.png',
-                  }}
-                />
-              }
-            />
-            <Cell
-              cellStyle="Basic"
-              title="Pressable w/ accessory"
+              onPress={()=>{
+                this.props.navigation.navigate("manage_class")
+              }} />
+            <Cell 
+              cellStyle="Basic" 
+              title="Manage group" 
               accessory="DisclosureIndicator"
-              onPress={() => console.log('Heyho!')}
-              image={
-                <Image
-                  style={{ borderRadius: 5 }}
-                  source={{
-                    uri: 'https://facebook.github.io/react/img/logo_og.png',
-                  }}
-                />
-              }
-            />
-            <Cell
-              cellStyle="Basic"
-              title="Disable image resize"
-              disableImageResize
-              image={
-                <Image
-                  style={{ height: 50, width: 50, borderRadius: 5 }}
-                  source={{
-                    uri: 'https://facebook.github.io/react/img/logo_og.png',
-                  }}
-                />
-              }
-            />
-          </Section>
-          <Section header="MISC">
-            <Cell
-              cellStyle="RightDetail"
-              title="RightDetail"
-              detail="Detail"
-              rightDetailColor="#6cc644"
-            />
-            <Cell
-              cellStyle="LeftDetail"
-              title="LeftDetail"
-              detail="Detail"
-              leftDetailColor="#6cc644"
-            />
-            <Cell
-              cellStyle="Basic"
-              title="Switch"
-              cellAccessoryView={<Switch />}
-              contentContainerStyle={{ paddingVertical: 4 }}
-            />
-            <Cell
-              cellStyle="Basic"
-              title="ActivityIndicator"
-              cellAccessoryView={<ActivityIndicator />}
-            />
-            <Cell
-              cellContentView={
-                <TextInput
-                  style={{ fontSize: 16, flex: 1 }}
-                  placeholder="TextInput"
-                />
-              }
-            />
-          </Section>
-          <Section header="CUSTOMCELLS">
-            <Cell
-              onPress={() => console.log('Heyho!')}
-              contentContainerStyle={{ alignItems: 'flex-start', height: 120 }}
-              cellContentView={
-                <Text style={{ flex: 1, fontSize: 16 }}>
-                  Custom height with Cell-Component Custom height with Cell-Component Custom height with Cell-Component Custom height with Cell-Component Custom height with Cell-Component Custom height with Cell-Component Custom height with Cell-Component Custom height with Cell-Component Custom height with Cell-Component
-                </Text>
-              }
-            />
-          </Section>
-          <Section headerComponent={<CustomSectionHeader />}>
-            <Cell cellStyle="Basic" title="Section uses prop headerComponent" />
-          </Section>
-        </TableView>
-        <View
-          style={{
-            minHeight: Dimensions.get('window').height,
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: '#37474F',
-              height: 500,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <View
-              style={{
-                backgroundColor: '#ffc107',
-                width: 80,
-                height: 80,
-                borderRadius: 10,
-              }}
-            />
-          </View>
-          <TableView>
-            <Section footer="All rights reserved.">
-              <Cell
-                title="Help / FAQ"
-                titleTextColor="#007AFF"
-                onPress={() => console.log('open Help/FAQ')}
-              />
-              <Cell
-                title="Logout"
-                titleTextColor="#007AFF"
-                onPress={() => {
+              onPress={()=>{
+                this.props.navigation.navigate("manage_group")
+              }} />
+            <Cell 
+              cellStyle="Basic" 
+              title="Manage my application" 
+              accessory="DisclosureIndicator"
+              onPress={()=>{
+                this.props.navigation.navigate("manage_my_application")
+              }} />
+            <Cell 
+              cellStyle="Basic" 
+              title="Force Logout" 
+              accessory="DisclosureIndicator"
+              onPress={()=>{
+                this.props.navigation.navigate("manage_force_logout")
+              }} />
+            <Cell 
+              cellStyle="Basic" 
+              title="Customize tab menus" 
+              accessory="DisclosureIndicator"
+              onPress={()=>{
+                this.props.navigation.navigate("manage_customize_tab_menus")
+              }} />
+            <Cell 
+              cellStyle="Basic" 
+              title="Logout" 
+              accessory="DisclosureIndicator"
+              onPress={
+                ()=> Alert.alert(
+                  'Logout',
+                  'Are you sure you want to log out?',
+                  [
+                    // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                    {text: 'Cancel', 
+                    onPress: () => {console.log("cancel")}, 
+                    style: 'cancel'},
+                    {text: 'OK', 
+                    onPress: () => {
+                          loadDataLocal(Constant.USER_LOGIN).then((data) => {      
+                            if(data.status){
+                              let value = JSON.parse(data.value)
+                              console.log(value.provider)
+                              console.log("then #1")
+                              if(value.provider == Constant.PROVIDERS.EMAIL){
 
-                    Alert.alert(
-                        'Logout',
-                        'Are you sure you want to log out?',
-                        [
-                          // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-                          {text: 'Cancel', 
-                          onPress: () => {console.log("cancel")}, 
-                          style: 'cancel'},
-                          {text: 'OK', 
-                          onPress: () => {
-                                loadDataLocal(Constant.USER_LOGIN).then((data) => {      
-                                  if(data.status){
-                                    let value = JSON.parse(data.value)
-                                    console.log(value.provider)
-                                    console.log("then #1")
-                                    if(value.provider == Constant.PROVIDERS.EMAIL){
+                              }else if(value.provider == Constant.PROVIDERS.TWITTER){
+                                console.log("Logout Twitter")
+                                RNTwitterSignIn.init(Constant.TWITTER_COMSUMER_KEY, Constant.TWITTER_CONSUMER_SECRET)
+                                RNTwitterSignIn.logOut()
+                              }else if(value.provider == Constant.PROVIDERS.GOOGLE){
 
-                                    }else if(value.provider == Constant.PROVIDERS.TWITTER){
-                                      console.log("Logout Twitter")
-                                      RNTwitterSignIn.init(Constant.TWITTER_COMSUMER_KEY, Constant.TWITTER_CONSUMER_SECRET)
-                                      RNTwitterSignIn.logOut()
-                                    }else if(value.provider == Constant.PROVIDERS.GOOGLE){
-
-                                    }else if(value.provider == Constant.PROVIDERS.FACEBOOK){
-                                      console.log("Logout Facebook")
-                                      LoginManager.logOut()
-                                    }
-                                  }
-                                }).then(()=>{
-                                  console.log("then #2")
-                                  removeDataLocalByKey(Constant.USER_LOGIN).then((data) => {      
-                                    if(data.status){
-                                      console.log("Go to SignedOut")
-                                      this.props.navigation.navigate("SignedOut")
-                                    }else{
-                                      
-                                    }
-                                  })
-                                }).catch((error)=>{
-                                  
-                                })
-
+                              }else if(value.provider == Constant.PROVIDERS.FACEBOOK){
+                                console.log("Logout Facebook")
+                                LoginManager.logOut()
+                              }
+                            }
+                          }).then(()=>{
+                            console.log("then #2")
+                            removeDataLocalByKey(Constant.USER_LOGIN).then((data) => {      
+                              if(data.status){
+                                console.log("Go to SignedOut")
+                                this.props.navigation.navigate("SignedOut")
+                              }else{
                                 
-                              }, 
-                          },
-                        ],
-                        { cancelable: false }
-                      )
-                }}
-              />
-            </Section>
+                              }
+                            })
+                          }).catch((error)=>{
+                            
+                          })
+
+                          
+                        }, 
+                    },
+                  ],
+                  { cancelable: false }
+              )
+            } />
+          </Section>
           </TableView>
-        </View>
       </ScrollView>
     );
   }

@@ -7,7 +7,7 @@ import FastImage from 'react-native-fast-image'
 
 import DictStyle from '../CONTACTS/dictStyle';
 
-export default class FollowingPage extends React.Component{
+export default class ListFollowingPage extends React.Component{
     constructor(props) {
       super(props);
 

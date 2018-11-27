@@ -42,15 +42,13 @@ export default class AddClasssPage extends React.Component{
         //     </TouchableOpacity>
         // ),
         headerRight: (
-            <TouchableOpacity
-                style={Styles.headerButton}
-                onPress={() => alert("save")}>
-                <Text style={{fontSize:18}}>Save</Text>
-            </TouchableOpacity>
+        <TouchableOpacity
+        style={{paddingRight:10}}
+        onPress={() => alert("Create")}>
+          <Text style={{fontSize:16, fontWeight:'600'}}>Create</Text>
+        </TouchableOpacity>
           ),
     })
-
-    
 
     render(){
         return(

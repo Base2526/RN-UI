@@ -10,7 +10,7 @@ import FastImage from 'react-native-fast-image'
 
 const sections = [
   {
-    title: "Vegetables",
+    title: "Brand and Business",
     key: "vegetables",
     data: [
      {
@@ -43,7 +43,7 @@ const sections = [
     ],
   },
   {
-    title: "Fruits",
+    title: "Enterainment",
     key: "fruits",
     data: [
       {
@@ -81,7 +81,7 @@ const sections = [
     ],
   },
   {
-    title: "Fruits 2",
+    title: "Finance",
     key: "fruits2",
     data: [
       {
@@ -139,7 +139,7 @@ const formatData = (data, numColumns) => {
   return data;
 };
 
-export default class CenterPage extends React.Component<{}, {}> {
+export default class ListCenterPage extends React.Component {
 
   constructor(props) {
     super(props);
@@ -190,7 +190,7 @@ export default class CenterPage extends React.Component<{}, {}> {
 
   renderListItem = ({ item }) => {
     if ('empty' in item) {
-      return <View style={{height: 100, 
+      return <View style={{height: 120, 
         width: 100, 
         flex:1,
         // borderColor: "green", 
@@ -200,12 +200,14 @@ export default class CenterPage extends React.Component<{}, {}> {
         backgroundColor: 'transparent',}} />;
     }
 
+    // console.log(item)
     return (
-      <View style={{height: 100, 
+      <View style={{height: 120, 
                     width: 100, 
                     flex:1,
                     // borderColor: "green", 
                     // borderWidth: 1, 
+                    // backgroundColor:'red',
                     justifyContent:'center', 
                     alignItems:'center' }}>
         <TouchableOpacity 
@@ -222,6 +224,9 @@ export default class CenterPage extends React.Component<{}, {}> {
                 resizeMode={FastImage.resizeMode.contain}
             />
         </TouchableOpacity>
+        <View style={{justifyContent:'center', paddingTop:5}}>
+          <Text >{item.name}</Text>
+        </View>
       </View>
     )
   }

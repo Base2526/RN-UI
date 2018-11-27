@@ -1,44 +1,3 @@
-// import React from 'react'
-// import {View, Text, TouchableOpacity} from 'react-native'
-
-// import Styles from '../../styles';
-// import Icon from 'react-native-vector-icons/FontAwesome5';
-
-// export default class FriendProfilePage extends React.Component{
-
-//     static navigationOptions = ({ navigation }) => ({
-//         title: "Friend Profile",
-//         // tabBarVisible: false,
-//         // headerLeft: (
-//         //     <TouchableOpacity
-//         //         style={Styles.headerButton}
-//         //         onPress={() => navigation.openDrawer()}>
-//         //         <Icon name="bars" size={25} />
-//         //     </TouchableOpacity>
-//         // ),
-//         headerRight: (
-//             <TouchableOpacity
-//                 style={Styles.headerButton}
-//                 onPress={() => {
-//                     // const { params = {} } = navigation.state
-//                     // params.handleHeaderRight()
-//                     navigation.navigate("ChatPage")
-//                 } }>
-//                 <Icon name="comments" size={20} />
-//             </TouchableOpacity>
-//           ),
-//     });
-
-//     constructor(props){
-//         super(props)
-//         console.log(props)
-//     }
-
-//     render(){
-//         return(<View><Text>Friend Profile Page</Text></View>)
-//     }
-// }
-
 import React from 'react'
 import {FlatList, 
         StyleSheet, 
@@ -51,21 +10,21 @@ import {FlatList,
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import FastImage from 'react-native-fast-image'
 
-import Styles from '../../styles';
-
-export default class FriendProfilePage extends React.Component{
+export default class MyApplicationProfilePage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
-        title: "Friend Profile",
+        title: "Contacts",
         headerRight: (
             <TouchableOpacity
-                style={Styles.headerButton}
+                // style={Styles.headerButton}
+                style={{marginRight:5}}
                 onPress={() => {
                     // const { params = {} } = navigation.state
                     // params.handleHeaderRight()
-                    navigation.navigate("ChatPage")
+
+                    alert('share')
                 } }>
-                <Icon name="comments" size={20} />
+                <Icon name="share-alt-square" size={25} />
             </TouchableOpacity>
           ),
     });
@@ -80,7 +39,9 @@ export default class FriendProfilePage extends React.Component{
                 {key: '2'},
                 {key: '3'},
                 {key: '4'},
-                {key: '5'}
+                {key: '5'},
+                {key: '6'},
+                {key: '7'},
             ]
         }
     }
@@ -137,14 +98,15 @@ export default class FriendProfilePage extends React.Component{
                         />
                     </TouchableOpacity>
                     <View style={{paddingLeft:10}}>
-                        <Text>Name : Somkid</Text>
-                        <Text>Subname : Simajarn</Text>
+                        <Text>App Name : name application</Text>
+                        <Text>Followers</Text>
                     </View>
             
                 </View>
                 </TouchableOpacity>
                 {this.FlatListItemSeparator()}
 
+                
             </View>
         );
         return header_View ; 
@@ -167,7 +129,7 @@ export default class FriendProfilePage extends React.Component{
             case '1':
             {
                 return( <View style={{flex:1, height:60, padding:10, backgroundColor:'white', justifyContent:'center'}}>
-                    <Text style={{fontSize:18}}>My ID: XUYDDE</Text>
+                    <Text style={{fontSize:18}}>Name: Default</Text>
                     <FastImage
                         style={{width: 20, height: 20, position:'absolute', right:0}}
                         source={require('../../Images/disclosure_indicator.png')}
@@ -179,7 +141,7 @@ export default class FriendProfilePage extends React.Component{
             case '2':
             {
                 return( <View style={{flex:1, height:60, padding:10, backgroundColor:'white', justifyContent:'center'}}>
-                    <Text style={{fontSize:18}}>Messages: xx-xxx</Text>
+                    <Text style={{fontSize:18}}>Category: Personal</Text>
                     <FastImage
                         style={{width: 20, height: 20, position:'absolute', right:0}}
                         source={require('../../Images/disclosure_indicator.png')}
@@ -191,7 +153,7 @@ export default class FriendProfilePage extends React.Component{
             case '3':
             {
                 return( <View style={{flex:1, height:60, padding:10, backgroundColor:'white', justifyContent:'center'}}>
-                    <Text style={{fontSize:18}}>Address: test test</Text>
+                    <Text style={{fontSize:18}}>Subcategory: #A</Text>
                     <FastImage
                         style={{width: 20, height: 20, position:'absolute', right:0}}
                         source={require('../../Images/disclosure_indicator.png')}
@@ -215,7 +177,7 @@ export default class FriendProfilePage extends React.Component{
             case '5':
             {
                 return( <View style={{flex:1, height:60, padding:10, backgroundColor:'white', justifyContent:'center'}}>
-                    <Text style={{fontSize:18}}>Phones: Not phone</Text>
+                    <Text style={{fontSize:18}}>Phone: Not phone</Text>
                     <FastImage
                         style={{width: 20, height: 20, position:'absolute', right:0}}
                         source={require('../../Images/disclosure_indicator.png')}
@@ -224,7 +186,46 @@ export default class FriendProfilePage extends React.Component{
                 </View>)
             }
             break
-           
+            case '6':
+            {
+                return( <View style={{flex:1, height:60, padding:10, backgroundColor:'white', justifyContent:'center'}}>
+                    <Text style={{fontSize:18}}>Status: Published</Text>
+                    <FastImage
+                        style={{width: 20, height: 20, position:'absolute', right:0}}
+                        source={require('../../Images/disclosure_indicator.png')}
+                        resizeMode={FastImage.resizeMode.contain}
+                    />
+                </View>)
+            }
+            break
+            case '7':
+            {
+                return( <TouchableOpacity
+                            onPress={()=>{
+
+                                Alert.alert(
+                                    'Delete',
+                                    'Are you sure you want to delete?',
+                                    [
+                                      // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                                      {text: 'Cancel', 
+                                      onPress: () => {console.log("cancel")}, 
+                                      style: 'cancel'},
+                                      {text: 'OK', 
+                                      onPress: () => {
+                                            
+                                          }, 
+                                      },
+                                    ],
+                                    { cancelable: false }
+                                )
+                            }}>
+                            <View style={{flex:1, height:60, padding:10, backgroundColor:'white', justifyContent:'center', alignItems:'center'}}>
+                                <Text style={{fontSize:18, color:'red'}}>Delete</Text>
+                            </View>
+                        </TouchableOpacity>)
+            }
+            break
         }
     }
 

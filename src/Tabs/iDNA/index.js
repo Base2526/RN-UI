@@ -7,6 +7,12 @@ import ApplicationDetailPage from './ApplicationDetailPage'
 import ListAllCategory from './ListAllCategory'
 import ListAllSubcategory from './ListAllSubcategory'
 
+import CommentPage from './CommentPage'
+
+import MyProfilePage from '../CONTACTS/MyProfilePage'
+
+import MyApplicationProfilePage from './MyApplicationProfilePage'
+
 const index = createStackNavigator({
     'Home': {
         screen: Home,
@@ -23,7 +29,7 @@ const index = createStackNavigator({
     'ApplicationDetailPage': {
         screen: ApplicationDetailPage,
         navigationOptions: {
-          title: 'Application Detail',
+          title: 'Detail',
         },
     },
     'ListAllCategory': {
@@ -37,7 +43,25 @@ const index = createStackNavigator({
         navigationOptions: {
           title: 'Select Subcategory',
         },
-    }
+    },
+    'Comment': {
+        screen: CommentPage,
+        navigationOptions: {
+          title: 'Comment',
+        },
+    },
+    'MyProfilePage': {
+        screen: MyProfilePage,
+        navigationOptions: {
+          title: 'MyProfile',
+        }
+      },
+    'MyApplicationProfilePage': {
+        screen: MyApplicationProfilePage,
+        navigationOptions: {
+          title: 'My Application',
+        }
+      },
 });
 
 index.navigationOptions = ({ navigation }) => {
@@ -47,7 +71,10 @@ index.navigationOptions = ({ navigation }) => {
     // set tabbar visible
     if (routeName === 'CreateApplicationPage' || 
         routeName === 'ApplicationDetailPage' ||
-        routeName === 'ListAllCategory' ) {
+        routeName === 'ListAllCategory' ||
+        routeName === 'Comment' ||
+        routeName === 'MyProfilePage' ||
+        routeName === 'MyApplicationProfilePage') {
       navigationOptions.tabBarVisible = false;
     }
   

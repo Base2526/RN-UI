@@ -4,10 +4,11 @@ import {View, Text, FlatList, ActivityIndicator, TouchableOpacity, TouchableHigh
 import { List, ListItem, SearchBar } from "react-native-elements";
 
 import FastImage from 'react-native-fast-image'
+import Swipeout from 'react-native-swipeout'
 
 import DictStyle from '../CONTACTS/dictStyle';
 
-export default class MyAppPage extends React.Component{
+export default class ListMyAppPage extends React.Component{
     constructor(props) {
       super(props);
   
@@ -120,7 +121,24 @@ export default class MyAppPage extends React.Component{
 
   
     render() {
-
+      // publicd
+      var swipeoutBtns = [
+        {
+          text: 'Unpublished',
+          backgroundColor: 'gray',
+          onPress: () => {
+            alert('Unpublished')
+          }
+        },
+        {
+          text: 'Delete',
+          backgroundColor: 'red',
+          onPress: () => {
+            alert('Delete')
+          }
+        },
+      ]
+      
       let {
         renderContent
       } = this.state;
@@ -150,45 +168,49 @@ export default class MyAppPage extends React.Component{
             //         <Text >{item.email}</Text>
             //     </View>
             //     </TouchableOpacity>
-            <TouchableOpacity key={ item.name.first } onPress={() => {
-              this.props.params.navigation.navigate("ApplicationDetailPage")
-            }}>
-              <View
-                style={{
-                  alignItems: 'center', 
-                  // margin: 5, 
-                  padding: 10,
-                  // borderWidth: 0.5, 
-                  borderColor: DictStyle.colorSet.lineColor,
-                  flexDirection: 'row'
-                }}
-              >
-                  <TouchableHighlight 
-                      style={{height:60,
-                              width: 60,
-                              borderRadius: 10}}>
-                      {/* <Image
-                          style={{width: 40, height: 40, borderRadius: 10}}
-                          source={{uri: 
-                  'https://www.planwallpaper.com/static/images/9-credit-1.jpg'
-                      }}/> */}
-                      <FastImage
-                          style={{width: 60, height: 60, borderRadius: 10}}
-                          source={{
-                          uri: 'https://unsplash.it/400/400?image=1',
-                          headers:{ Authorization: 'someAuthToken' },
-                          priority: FastImage.priority.normal,
-                          }}
-                          resizeMode={FastImage.resizeMode.contain}
-                      />
-                  </TouchableHighlight>
-                  <Text style={{fontSize: DictStyle.fontSet.mSize, 
-                              color: DictStyle.colorSet.normalFontColor,
-                              paddingLeft: 10}}>
-                      {item.name.first}
-                  </Text>
-              </View>
-            </TouchableOpacity>
+            <Swipeout 
+            style={{backgroundColor:'white'}} 
+            right={swipeoutBtns}>
+              <TouchableOpacity key={ item.name.first } onPress={() => {
+                this.props.params.navigation.navigate("ApplicationDetailPage")
+              }}>
+                <View
+                  style={{
+                    alignItems: 'center', 
+                    // margin: 5, 
+                    padding: 10,
+                    // borderWidth: 0.5, 
+                    borderColor: DictStyle.colorSet.lineColor,
+                    flexDirection: 'row'
+                  }}
+                >
+                    <TouchableHighlight 
+                        style={{height:60,
+                                width: 60,
+                                borderRadius: 10}}>
+                        {/* <Image
+                            style={{width: 40, height: 40, borderRadius: 10}}
+                            source={{uri: 
+                    'https://www.planwallpaper.com/static/images/9-credit-1.jpg'
+                        }}/> */}
+                        <FastImage
+                            style={{width: 60, height: 60, borderRadius: 10}}
+                            source={{
+                            uri: 'https://unsplash.it/400/400?image=1',
+                            headers:{ Authorization: 'someAuthToken' },
+                            priority: FastImage.priority.normal,
+                            }}
+                            resizeMode={FastImage.resizeMode.contain}
+                        />
+                    </TouchableHighlight>
+                    <Text style={{fontSize: DictStyle.fontSet.mSize, 
+                                color: DictStyle.colorSet.normalFontColor,
+                                paddingLeft: 10}}>
+                        {item.name.first}
+                    </Text>
+                </View>
+              </TouchableOpacity>
+            </Swipeout>
             }
             keyExtractor={item => item.email}
             ItemSeparatorComponent={this.renderSeparator}

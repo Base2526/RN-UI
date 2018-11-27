@@ -5,13 +5,11 @@ import Styles from '../../styles';
 
 import ScrollableTabView, {ScrollableTabBar, DefaultTabBar} from 'react-native-scrollable-tab-view';
 
-// import friendsPage from './friendsPage'
-import MyAppPage from './MyAppPage'
-import CenterPage from './CenterPage'
-import FollowingPage from './FollowingPage'
+import ListMyAppPage from './ListMyAppPage'
+import ListCenterPage from './ListCenterPage'
+import ListFollowingPage from './ListFollowingPage'
 
-class iDNAHome extends Component {
-
+export default class home extends Component {
 
     /*
     static navigationOptions = ({ navigation }) => ({
@@ -148,9 +146,9 @@ class iDNAHome extends Component {
                     tabBarPosition='top'
                     //  contentProps={...props}
                     onChangeTab={this.handleChangeTab.bind(this)}>
-                    <MyAppPage tabLabel='My App' index={0} amount={4} params={this.props} />
-                    <CenterPage tabLabel='Center' index={1} amount={5} params={this.props} />
-                    <FollowingPage tabLabel='Following' index={2} amount={6} params={this.props} />
+                    <ListMyAppPage tabLabel='My App' index={0} amount={4} params={this.props} />
+                    <ListCenterPage tabLabel='Center' index={1} amount={5} params={this.props} />
+                    <ListFollowingPage tabLabel='Following' index={2} amount={6} params={this.props} />
                 </ScrollableTabView>
                 }
             </View>
@@ -163,5 +161,3 @@ let style = StyleSheet.create({
         flex: 1
     },
 });
-
-export default iDNAHome;

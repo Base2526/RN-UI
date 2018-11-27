@@ -35,7 +35,21 @@ export default class FriendsPage extends React.Component{
               title: 'Profile',
               member: [
                 {
-                  title: '1--row1',
+                  title: 'User name',
+                  status: 'test'
+                }
+              ]
+            },
+            {
+              title: 'Groups',
+              member: [
+                {
+                  title: 'Group name',
+                  status: 'test'
+                },
+                {
+                  title: 'Group name',
+                  status: 'test'
                 }
               ]
             },
@@ -43,16 +57,20 @@ export default class FriendsPage extends React.Component{
               title: 'Friends',
               member: [
                 {
-                  title: '2--row1',
+                  title: 'Friend name',
+                  status: 'test'
                 },
                 {
-                  title: '2--row2',
+                  title: 'Friend name',
+                  status: 'test'
                 },
                 {
-                  title: '2--row3',
+                  title: 'Friend name',
+                  status: 'test'
                 },
                 {
-                  title: '2--row4',
+                  title: 'Friend name',
+                  status: 'test'
                 }
               ]
             },
@@ -60,13 +78,16 @@ export default class FriendsPage extends React.Component{
               title: 'Friend Request Sent',
               member: [
                 {
-                  title: '3--row1',
+                  title: 'Friend name',
+                  status: 'test'
                 },
                 {
-                  title: '3--row2',
+                  title: 'Friend name',
+                  status: 'test'
                 },
                 {
-                  title: '3--row3',
+                  title: 'Friend name',
+                  status: 'test'
                 },
               ]
             }
@@ -82,8 +103,6 @@ export default class FriendsPage extends React.Component{
     }
 
     _renderRow = (rowItem, rowId, sectionId) => {
-        // Buttons
-        
         if(rowId == 0 && sectionId == 0){
           return (
             <TouchableOpacity 
@@ -106,11 +125,6 @@ export default class FriendsPage extends React.Component{
                               width: 60,
                               borderRadius: 10}}        
                       >
-                      {/* <Image
-                          style={{width: 40, height: 40, borderRadius: 10}}
-                          source={{uri: 
-                  'https://www.planwallpaper.com/static/images/9-credit-1.jpg'
-                      }}/> */}
                       <FastImage
                           style={{width: 60, height: 60, borderRadius: 10}}
                           source={{
@@ -121,14 +135,22 @@ export default class FriendsPage extends React.Component{
                           resizeMode={FastImage.resizeMode.contain}
                       />
                   </TouchableHighlight>
-                  <Text style={{fontSize: DictStyle.fontSet.mSize, 
-                              color: DictStyle.colorSet.normalFontColor,
-                              paddingLeft: 10}}>
-                      {rowItem.title}
-                  </Text>
+                  <View>
+                    <Text style={{fontSize: 18, 
+                                  fontWeight: '600',
+                                  color: DictStyle.colorSet.normalFontColor,
+                                  paddingLeft: 10, 
+                                  paddingBottom:5}}>
+                        Name : {rowItem.title}
+                    </Text>
+                    <Text style={{fontSize: DictStyle.fontSet.mSize, 
+                                color: DictStyle.colorSet.normalFontColor,
+                                paddingLeft: 10}}>
+                        Status : {rowItem.status}
+                    </Text>
+                  </View>
               </View>
             </TouchableOpacity>
-
           )
         }
 
@@ -171,11 +193,6 @@ export default class FriendsPage extends React.Component{
                             width: 60,
                             borderRadius: 10}}        
                     >
-                    {/* <Image
-                        style={{width: 40, height: 40, borderRadius: 10}}
-                        source={{uri: 
-                'https://www.planwallpaper.com/static/images/9-credit-1.jpg'
-                    }}/> */}
                     <FastImage
                         style={{width: 60, height: 60, borderRadius: 10}}
                         source={{
@@ -186,11 +203,20 @@ export default class FriendsPage extends React.Component{
                         resizeMode={FastImage.resizeMode.contain}
                     />
                 </TouchableHighlight>
-                <Text style={{fontSize: DictStyle.fontSet.mSize, 
-                            color: DictStyle.colorSet.normalFontColor,
-                            paddingLeft: 10}}>
-                    {rowItem.title}
-                </Text>
+                <View>
+                    <Text style={{fontSize: 18, 
+                                  fontWeight: '600',
+                                  color: DictStyle.colorSet.normalFontColor,
+                                  paddingLeft: 10, 
+                                  paddingBottom:5}}>
+                        Name : {rowItem.title}
+                    </Text>
+                    <Text style={{fontSize: DictStyle.fontSet.mSize, 
+                                color: DictStyle.colorSet.normalFontColor,
+                                paddingLeft: 10}}>
+                        Status : {rowItem.status}
+                    </Text>
+                  </View>
             </View>
           </TouchableOpacity>
           </Swipeout>
@@ -211,7 +237,7 @@ export default class FriendsPage extends React.Component{
           <View style={{ flexDirection: 'row', 
                         alignItems: 'center'}}>
               <Text style={{ fontSize: DictStyle.fontSet.mSize, 
-                              color: DictStyle.colorSet.normalFontColor,
+                              color: 'gray',
                               paddingLeft: 10,
                               fontWeight:'700' }}>
               {section}
@@ -241,6 +267,19 @@ export default class FriendsPage extends React.Component{
                     />
         }
 
+
+        // var friend = this.mockData().filter(function(user) {
+        //   // console.log(user.title)
+
+        //   if(user.title.toLocaleLowerCase().localeCompare(section.toLocaleLowerCase()) == 0){
+        //     // console.log(Object.keys(user.member).length)
+        //     // return Object.keys(user.member).length
+        //     return user;
+        //   }
+        //   return {};
+        // })
+        // console.log(friend)
+
         return (
             <View
                 style={{ 
@@ -253,10 +292,10 @@ export default class FriendsPage extends React.Component{
             <View style={{ flexDirection: 'row', 
                           alignItems: 'center'}}>
                 <Text style={{ fontSize: DictStyle.fontSet.mSize, 
-                                color: DictStyle.colorSet.normalFontColor,
+                                color: 'gray',
                                 paddingLeft: 10,
                                 fontWeight:'700' }}>
-                {section}
+                {section + "(4)"}
                 </Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -294,16 +333,9 @@ export default class FriendsPage extends React.Component{
                     renderRow={this._renderRow}
                     headerOnPress={(i, state) => console.log(i, state)}
                     renderSectionHeaderX={this._renderSection}
-                    openOptions={[0, 1, 2,]}
+                    openOptions={[0, 1, 2, 3]}
                 />
           }
-          
-          {/* <Button
-              style={{position: 'absolute', bottom: 0, left: 0, width: '100%', height: 50, backgroundColor: 'blue'}}
-              onPress={this._btnPress}
-              title="Scroll"
-              color="red"
-          /> */}
           </View>
       );
     }

@@ -182,11 +182,18 @@ export default class GroupsPage extends React.Component{
                           resizeMode={FastImage.resizeMode.contain}
                       />
                   </TouchableHighlight>
-                  <Text style={{fontSize: DictStyle.fontSet.mSize, 
-                              color: DictStyle.colorSet.normalFontColor,
-                              paddingLeft: 10}}>
-                      {item.name.first}
-                  </Text>
+                  <View style={{paddingLeft: 10}}>
+                    <Text style={{fontSize: 18, 
+                                  fontWeight: '600', 
+                                  color: DictStyle.colorSet.normalFontColor,
+                                  paddingBottom:5
+                                }}>
+                        {item.name.first}
+                    </Text>
+                    <Text>
+                      3 Users
+                    </Text>
+                  </View>
               </View>
             </TouchableOpacity>
             }

@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, Text, TouchableOpacity} from 'react-native'
+import {View, Text, TouchableOpacity, SafeAreaView} from 'react-native'
 
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Styles from '../../styles';
@@ -49,6 +49,10 @@ export default class ChatPage extends React.Component{
             },
             ],
         })
+
+        this.props.navigation.setParams({ 
+            handleHeaderRight: this.handleHeaderRight,
+        })
     }
     
     // componentDidMount () {
@@ -68,13 +72,15 @@ export default class ChatPage extends React.Component{
     render(){
         // return(<View><Text>Chat Page</Text></View>)
         return (
-            <GiftedChat
-              messages={this.state.messages}
-              onSend={messages => this.onSend(messages)}
-              user={{
-                _id: 1,
-              }}
-            />
+            <SafeAreaView style={{flex:1}}>
+                <GiftedChat
+                messages={this.state.messages}
+                onSend={messages => this.onSend(messages)}
+                user={{
+                    _id: 1,
+                }}
+                />
+            </SafeAreaView>
         )
     }
 }

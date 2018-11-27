@@ -1,4 +1,5 @@
 import React from 'react'
+import {View, Text} from 'react-native'
 import { createDrawerNavigator, createStackNavigator, SwitchNavigator } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Tabs from './Tabs';  //Tab Nav
@@ -63,7 +64,8 @@ Main = createDrawerNavigator({
       drawerLabel: 'Profile',
       drawerIcon: ({ tintColor }) => <Icon name="user-circle" size={17} />,
     }
-  }
+  },
+  
 }, drawerNavigatorConfig);
 
 // Main.navigationOptions = ({ navigation }) => {
@@ -99,7 +101,25 @@ Main = createDrawerNavigator({
 // };
 
 
-export default Main
+// export default Main
+
+export default class _ContentMain extends React.Component{
+  constructor(props){
+    super(props)
+  }
+
+  componentWillMount(){
+    console.log("_ContentMain : componentWillMount")
+  }
+
+  componentWillUpdate(){
+    console.log("_ContentMain : componentWillUpdate")
+  }
+
+  render(){
+    return (<View style={{flex:1}}><Main /></View>)
+  }
+}
 
 export const createRootNavigator = (signedIn = false) => {
   return SwitchNavigator(
@@ -108,7 +128,7 @@ export const createRootNavigator = (signedIn = false) => {
         screen: SignedOut
       },
       Main: {
-        screen: Main
+        screen: _ContentMain
       }
     },
     {

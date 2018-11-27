@@ -1,9 +1,15 @@
 import React from 'react'
-import {View, Text, FlatList, ActivityIndicator, TouchableOpacity, TouchableHighlight} from 'react-native'
+import {View, 
+        Text, 
+        FlatList, 
+        ActivityIndicator, 
+        TouchableOpacity, 
+        Alert} from 'react-native'
 
 import { List, ListItem, SearchBar } from "react-native-elements";
 
 import FastImage from 'react-native-fast-image'
+import Swipeout from 'react-native-swipeout'
 
 import DictStyle from './dictStyle';
 
@@ -125,6 +131,31 @@ export default class ClasssPage extends React.Component{
         renderContent
       } = this.state;
 
+      var swipeoutBtns = [
+        {
+          text: 'Delete',
+          backgroundColor: 'red',
+          onPress: () => {
+            Alert.alert(
+              'Delete Classs',
+              'Are you sure you want to delete?',
+              [
+                // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                {text: 'Cancel', 
+                onPress: () => {console.log("cancel")}, 
+                style: 'cancel'},
+                {text: 'OK', 
+                onPress: () => {
+                      
+                    }, 
+                },
+              ],
+              { cancelable: false })
+
+          }
+        }
+      ]
+
       return (
         <View style={{flex:1}}>
         {
@@ -142,53 +173,52 @@ export default class ClasssPage extends React.Component{
             //   />
             // )}
             renderItem={({item}) =>
-            // <TouchableOpacity
-            // style={{backgroundColor:'white'}}
-            // onPress={()=>alert(item.email)}>
-            //     <View style={{padding: 10}}>
-            //         <Text >{item.name.first}</Text>
-            //         <Text >{item.email}</Text>
-            //     </View>
-            //     </TouchableOpacity>
-            <TouchableOpacity key={ item.name.first } onPress={() => {
-              this.props.params.navigation.navigate("ListClassUserPage")
-            }}>
-              <View
-                style={{
-                  alignItems: 'center', 
-                  // margin: 5, 
-                  padding: 10,
-                  // borderWidth: 0.5, 
-                  borderColor: DictStyle.colorSet.lineColor,
-                  flexDirection: 'row'
-                }}
-              >
-                  <TouchableHighlight 
-                      style={{height:60,
-                              width: 60,
-                              borderRadius: 10}}>
-                      {/* <Image
-                          style={{width: 40, height: 40, borderRadius: 10}}
-                          source={{uri: 
-                  'https://www.planwallpaper.com/static/images/9-credit-1.jpg'
-                      }}/> */}
-                      <FastImage
-                          style={{width: 60, height: 60, borderRadius: 10}}
-                          source={{
-                          uri: 'https://unsplash.it/400/400?image=1',
-                          headers:{ Authorization: 'someAuthToken' },
-                          priority: FastImage.priority.normal,
-                          }}
-                          resizeMode={FastImage.resizeMode.contain}
-                      />
-                  </TouchableHighlight>
-                  <Text style={{fontSize: DictStyle.fontSet.mSize, 
-                              color: DictStyle.colorSet.normalFontColor,
-                              paddingLeft: 10}}>
-                      {item.name.first}
-                  </Text>
-              </View>
-            </TouchableOpacity>
+            <Swipeout 
+            style={{backgroundColor:'white'}} 
+            right={swipeoutBtns}>
+              <TouchableOpacity key={ item.name.first } onPress={() => {
+                this.props.params.navigation.navigate("ListClassUserPage")
+              }}>
+                <View
+                  style={{
+                    alignItems: 'center', 
+                    // margin: 5, 
+                    padding: 10,
+                    // borderWidth: 0.5, 
+                    borderColor: DictStyle.colorSet.lineColor,
+                    flexDirection: 'row'
+                  }}
+                >
+                    <TouchableOpacity 
+                        style={{height:60,
+                                width: 60,
+                                borderRadius: 10}}>
+                        
+                        <FastImage
+                            style={{width: 60, height: 60, borderRadius: 10}}
+                            source={{
+                            uri: 'https://unsplash.it/400/400?image=1',
+                            headers:{ Authorization: 'someAuthToken' },
+                            priority: FastImage.priority.normal,
+                            }}
+                            resizeMode={FastImage.resizeMode.contain}
+                        />
+                    </TouchableOpacity>
+                    <View style={{paddingLeft: 10}}>
+                    <Text style={{fontSize: 18, 
+                                    fontWeight: '600', 
+                                    color: DictStyle.colorSet.normalFontColor,
+                                    paddingBottom:5
+                                  }}>
+                          {item.name.first}
+                      </Text>
+                      <Text>
+                        3 Users
+                      </Text>
+                    </View>
+                </View>
+              </TouchableOpacity>
+            </Swipeout>
             }
             keyExtractor={item => item.email}
             ItemSeparatorComponent={this.renderSeparator}

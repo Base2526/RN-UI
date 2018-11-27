@@ -123,7 +123,74 @@ export default class AddFriendsPage extends React.Component{
     };
   
     renderHeader = () => {
-      return <SearchBar placeholder="Type Here..." lightTheme round />;
+      // return <SearchBar placeholder="Type Here..." lightTheme round />;
+      return(
+        <View style={{flexDirection:'row', justifyContent:'center'}}>
+            <TouchableOpacity 
+                      style={{height:40,
+                              width: 40,
+                              borderRadius: 10,
+                              margin:10}}
+                        onPress={()=>{
+                          this.props.navigation.navigate("InviteFriendForContactPage")
+                        }}>
+                      <FastImage
+                          style={{width: 40, height: 40, borderRadius: 10}}
+                          source={{
+                          uri: 'https://cdn0.iconfinder.com/data/icons/thin-communication-messaging/57/thin-328_phone_book_number_contact-512.png',
+                          headers:{ Authorization: 'someAuthToken' },
+                          priority: FastImage.priority.normal,
+                          }}
+                          resizeMode={FastImage.resizeMode.contain}
+                      />
+            </TouchableOpacity>
+            <TouchableOpacity 
+                      style={{height:40,
+                              width: 40,
+                              borderRadius: 10,
+                              margin:10}}
+                        onPress={()=>{
+            
+                          this.props.navigation.navigate("QRCodeReaderPage")
+                        }}>
+                        <Icon name="qrcode" size={40} />
+            </TouchableOpacity>
+            <TouchableOpacity 
+                      style={{height:40,
+                              width: 40,
+                              borderRadius: 10,
+                              margin:10}}
+                        onPress={()=>{
+                          this.props.navigation.navigate("AddFriendByIdPage")
+                        }}>
+                        <Icon name="search" size={40} />
+                      {/* <FastImage
+                          style={{width: 40, height: 40, borderRadius: 10}}
+                          source={{
+                          uri: 'http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/user-id-icon.png',
+                          headers:{ Authorization: 'someAuthToken' },
+                          priority: FastImage.priority.normal,
+                          }}
+                          resizeMode={FastImage.resizeMode.contain}
+                      /> */}
+            </TouchableOpacity>
+            {/* <TouchableOpacity 
+                      style={{height:40,
+                              width: 40,
+                              borderRadius: 10,
+                              margin:10}}
+                    onPress={()=>alert("4")}>
+                      <FastImage
+                          style={{width: 40, height: 40, borderRadius: 10}}
+                          source={{
+                          uri: 'https://unsplash.it/400/400?image=1',
+                          headers:{ Authorization: 'someAuthToken' },
+                          priority: FastImage.priority.normal,
+                          }}
+                          resizeMode={FastImage.resizeMode.contain}
+                      />
+            </TouchableOpacity> */}
+        </View>)
     };
   
     renderFooter = () => {
@@ -144,73 +211,34 @@ export default class AddFriendsPage extends React.Component{
 
     renderItem = ({item, index}) => {
         // return here
-        console.log("renderItem : " + index)
+        // console.log("renderItem : " + index)
         
         switch(index){
             case 0:{
+                return(<View><Text>People you may know.</Text></View>)
+            }
+            break
+            default:{
                 return(
-                <View style={{flexDirection:'row', justifyContent:'center'}}>
-                    <TouchableOpacity 
-                              style={{height:40,
+                      <View
+                        style={{
+                          alignItems: 'center', 
+                          padding: 10,
+                          borderColor: DictStyle.colorSet.lineColor,
+                          flexDirection: 'row',
+                          backgroundColor: 'white'
+                        }}
+                      >
+                        <View style={{flex:1, alignItems:'center'}}>
+                          <TouchableOpacity 
+                              style={{
+                                      height: 40,
                                       width: 40,
                                       borderRadius: 10,
-                                      margin:10}}
-                                onPress={()=>{
-                                  this.props.navigation.navigate("InviteFriendForContactPage")
-                                }}>
-                              <FastImage
-                                  style={{width: 40, height: 40, borderRadius: 10}}
-                                  source={{
-                                  uri: 'https://cdn0.iconfinder.com/data/icons/thin-communication-messaging/57/thin-328_phone_book_number_contact-512.png',
-                                  headers:{ Authorization: 'someAuthToken' },
-                                  priority: FastImage.priority.normal,
-                                  }}
-                                  resizeMode={FastImage.resizeMode.contain}
-                              />
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                              style={{height:40,
-                                      width: 40,
-                                      borderRadius: 10,
-                                      margin:10}}
-                                onPress={()=>{
-                    
-                                  this.props.navigation.navigate("QRCodeReaderPage")
-                                }}>
-                              <FastImage
-                                  style={{width: 40, height: 40, borderRadius: 10}}
-                                  source={{
-                                  uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/220px-QR_code_for_mobile_English_Wikipedia.svg.png',
-                                  headers:{ Authorization: 'someAuthToken' },
-                                  priority: FastImage.priority.normal,
-                                  }}
-                                  resizeMode={FastImage.resizeMode.contain}
-                              />
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                              style={{height:40,
-                                      width: 40,
-                                      borderRadius: 10,
-                                      margin:10}}
-                                onPress={()=>{
-                                  this.props.navigation.navigate("AddFriendByIdPage")
-                                }}>
-                              <FastImage
-                                  style={{width: 40, height: 40, borderRadius: 10}}
-                                  source={{
-                                  uri: 'http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/user-id-icon.png',
-                                  headers:{ Authorization: 'someAuthToken' },
-                                  priority: FastImage.priority.normal,
-                                  }}
-                                  resizeMode={FastImage.resizeMode.contain}
-                              />
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                              style={{height:40,
-                                      width: 40,
-                                      borderRadius: 10,
-                                      margin:10}}
-                            onPress={()=>alert("4")}>
+                                      alignItems:'center'}}
+                              onPress={
+                                ()=>this.props.navigation.navigate("FriendProfilePage")
+                              }>
                               <FastImage
                                   style={{width: 40, height: 40, borderRadius: 10}}
                                   source={{
@@ -220,63 +248,33 @@ export default class AddFriendsPage extends React.Component{
                                   }}
                                   resizeMode={FastImage.resizeMode.contain}
                               />
-                    </TouchableOpacity>
-                </View>)
-            }
-            break
-            case 1:{
-                return(<View><Text>People you may know.</Text></View>)
-            }
-            break
-            default:{
-                return(
-                    <TouchableOpacity key={ item.name } onPress={() => {
-                    }}>
-                      <View
-                        style={{
-                          alignItems: 'center', 
-                          // margin: 5, 
-                          padding: 10,
-                          // borderWidth: 0.5, 
-                          borderColor: DictStyle.colorSet.lineColor,
-                          flexDirection: 'row',
-                          backgroundColor: 'white'
-                        }}
-                      >
-                            <TouchableHighlight 
-                                style={{height:60,
-                                        width: 60,
-                                        borderRadius: 10}}>
-                                <FastImage
-                                    style={{width: 60, height: 60, borderRadius: 10}}
-                                    source={{
-                                    uri: 'https://unsplash.it/400/400?image=1',
-                                    headers:{ Authorization: 'someAuthToken' },
-                                    priority: FastImage.priority.normal,
-                                    }}
-                                    resizeMode={FastImage.resizeMode.contain}
-                                />
-                            </TouchableHighlight>
-                            <Text style={{fontSize: DictStyle.fontSet.mSize, 
-                                        color: DictStyle.colorSet.normalFontColor,
-                                        paddingLeft: 10}}>
-                                {item.name}
-                            </Text>
-                            <TouchableHighlight
-                                style={{
-                                    position:'absolute',
-                                    borderRadius:3,
-                                    top:3,
-                                    right:0,
-                                    padding:2,
-                                    borderWidth:1,
-                                    borderColor:'red',
-                                    padding:10}}    
-                                underlayColor='#fff'>
-                                <Text style={{color:'green', fontSize:16}}>Add Friend</Text>
-                            </TouchableHighlight>
+                          </TouchableOpacity>
+                        </View>
+                        <View style={{flex:3}}>
+                          <Text style={{
+                                      fontSize: 18, 
+                                      color: DictStyle.colorSet.normalFontColor,
+                                      paddingLeft: 5}}>
+                              {item.name}
+                          </Text>
+                        </View>
+                        <View style={{flex:2}}>
+                          <TouchableOpacity
+                              style={{
+                                  borderRadius:3,
+                                  top:3,
+                                  right:0,
+                                  borderWidth:1,
+                                  borderColor:'red',
+                                  alignItems:'center',
+                                  padding:10}}
+                                onPress={
+                                  ()=>this.props.navigation.goBack()
+                                }>
+                              <Text style={{color:'green', fontSize:14}}>Add Friend</Text>
+                          </TouchableOpacity>
+                        </View>
                       </View>
-                    </TouchableOpacity>
                 )
             }
         }
@@ -317,7 +315,7 @@ export default class AddFriendsPage extends React.Component{
               renderItem={this.renderItem.bind(this)}
               keyExtractor={item => item.name}
               ItemSeparatorComponent={this.renderSeparator}
-              // ListHeaderComponent={this.renderHeader}
+              ListHeaderComponent={this.renderHeader}
               ListFooterComponent={this.renderFooter}
               // onRefresh={this.handleRefresh}
               // refreshing={this.state.refreshing}

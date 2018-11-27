@@ -1,7 +1,11 @@
 import React from 'react'
-import {View, Text, Button, ScrollView, StyleSheet, TouchableHighlight, Image} from 'react-native'
+import {Modal, Alert ,View, Text, Button, ScrollView, StyleSheet, TouchableOpacity, Image} from 'react-native'
 
 import {DrawerNavigator, DrawerItems, createDrawerNavigator, SafeAreaView} from 'react-navigation'
+
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import FastImage from 'react-native-fast-image'
+
 
 class Menu extends React.Component{
     constructor(props){
@@ -9,8 +13,11 @@ class Menu extends React.Component{
 
         this.state = {
             renderContent: false,
-            x:100
+            x:100,
+            modalVisible: false,
         }
+
+        this.onPressLearnMore = this.onPressLearnMore.bind(this)
     }
 
     componentDidMount(){
@@ -35,7 +42,118 @@ class Menu extends React.Component{
                 x:100
             })
         }
-        
+    }
+
+    renderManageAccountsView=()=>{
+        return( <Modal
+                    animationType="slide"
+                    transparent={false}
+                    visible={this.state.modalVisible}
+                    onRequestClose={() => {
+                        Alert.alert('Modal has been closed.');
+                    }}>
+                    <View style={{marginTop: 40}}>
+                        <View style={{flexDirection:'row'}}>
+                            <View style={{flex:1, alignItems:'center'}}>
+                                <Text style={{fontSize:22, fontWeight:'600'}}>Accounts</Text>
+                            </View>
+                            <TouchableOpacity
+                                style={{position:'absolute', right:10, top:10}}
+                                onPress={() => {
+                                    // this.setModalVisible(!this.state.modalVisible);
+                                    this.setState({modalVisible: false});
+                                }}>
+                                <Text>DONE</Text>
+                            </TouchableOpacity>
+                        </View>
+                
+                        <View>
+                            <View style={{padding:5}}>
+                                <TouchableOpacity style={{flexDirection:'row'}}>
+                                    <View style={{justifyContent:'center', padding:10}}>
+                                        <FastImage
+                                            style={{width: 30, height: 30, borderRadius: 20}}
+                                            source={{
+                                                uri: 'https://unsplash.it/400/400?image=1',
+                                                headers:{ Authorization: 'someAuthToken' },
+                                                priority: FastImage.priority.normal,
+                                            }}
+                                            resizeMode={FastImage.resizeMode.contain}
+                                        />
+                                    </View>
+                                    <View style={{height:60, justifyContent:'center', padding:5}}>
+                                        <Text>ms.android@gmail.com</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{padding:5}}>
+                                <TouchableOpacity style={{flexDirection:'row'}}>
+                                    <View style={{justifyContent:'center', padding:10}}>
+                                        <FastImage
+                                            style={{width: 30, height: 30, borderRadius: 20}}
+                                            source={{
+                                                uri: 'https://unsplash.it/400/400?image=1',
+                                                headers:{ Authorization: 'someAuthToken' },
+                                                priority: FastImage.priority.normal,
+                                            }}
+                                            resizeMode={FastImage.resizeMode.contain}
+                                        />
+                                    </View>
+                                    <View style={{height:60, justifyContent:'center', padding:5}}>
+                                        <Text>android.somkid@gmail.com</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{padding:5}}>
+                                <TouchableOpacity style={{flexDirection:'row'}}>
+                                    <View style={{justifyContent:'center', padding:10}}>
+                                        <Icon name="plus-circle" size={30} />
+                                    </View>
+                                    <View style={{height:60, justifyContent:'center', padding:5}}>
+                                        <Text>Add account</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>)
+    }
+
+    renderManageAccounts=()=>{
+        return( <View>
+                <View style={{padding:5}}>
+                    <TouchableOpacity style={{flexDirection:'row'}}>
+                        <View style={{justifyContent:'center', padding:10}}>
+                            <FastImage
+                                style={{width: 30, height: 30, borderRadius: 20}}
+                                source={{
+                                    uri: 'https://unsplash.it/400/400?image=1',
+                                    headers:{ Authorization: 'someAuthToken' },
+                                    priority: FastImage.priority.normal,
+                                }}
+                                resizeMode={FastImage.resizeMode.contain}
+                            />
+                        </View>
+                        <View style={{height:60, justifyContent:'center', padding:5}}>
+                            <Text>ms.android@gmail.com</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+                <View style={{padding:5}}>
+                <TouchableOpacity 
+                    style={{flexDirection:'row'}}
+                    onPress={()=>{
+                        this.setState({modalVisible: true});
+                    }}>
+                    <View style={{justifyContent:'center', padding:10}}>
+                        <Icon name="cog" size={30} />
+                    </View>
+                    <View style={{height:60, justifyContent:'center', padding:5}}>
+                        <Text>Manage accounts</Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
+        </View>)
     }
 
     render(){
@@ -47,12 +165,25 @@ class Menu extends React.Component{
           
         let props = this.props
 
-        let menu
+        let menu, collapse, other_user
 
         if(this.state.x === 100){
             menu = <DrawerItems {...props} />
+
+            collapse = require('../Images/collapse_down.png')
+
+            other_user =<View style={{ position:'absolute', right: 0}}>
+                            <TouchableOpacity style={ styles.imageContainer2 }>
+                                <Image style={ styles.image2 } source={{ uri: 'http://www.free-avatars.com/data/media/37/cat_avatar_0597.jpg' }} />
+                            </TouchableOpacity> 
+                            <Text style={{ color: 'black', fontSize: 10, justifyContent:'flex-end', paddingTop:10, paddingLeft:10 }}>
+                                Somkid Sim 2,
+                            </Text> 
+                        </View>
         }else{
-            menu = <Text>9000</Text>
+            menu = this.renderManageAccounts()
+
+            collapse = require('../Images/collapse_up.png')
         }
 
         return(
@@ -72,20 +203,13 @@ class Menu extends React.Component{
                                 Header
                             </Text>    */}
                             
-                            <TouchableHighlight style={ styles.imageContainer }>
+                            <TouchableOpacity style={ styles.imageContainer }>
                                 <Image style={ styles.image } source={{ uri: 'http://www.free-avatars.com/data/media/37/cat_avatar_0597.jpg' }} />
-                            </TouchableHighlight> 
+                            </TouchableOpacity> 
                                 
                         </View>
                         
-                        <View style={{ position:'absolute', right: 0}}>
-                                <TouchableHighlight style={ styles.imageContainer2 }>
-                                    <Image style={ styles.image2 } source={{ uri: 'http://www.free-avatars.com/data/media/37/cat_avatar_0597.jpg' }} />
-                                </TouchableHighlight> 
-                                <Text style={{ color: 'black', fontSize: 10, justifyContent:'flex-end', paddingTop:10, paddingLeft:10 }}>
-                                    Somkid Sim 2,
-                                </Text> 
-                            </View>
+                        {other_user}
                         
                         <View style={{width:null, position:'absolute', bottom:0, padding:10}}>
                             <Text
@@ -106,15 +230,27 @@ class Menu extends React.Component{
                             >android.somkid@gmail.com</Text>
                         </View>
                         
-                        <View style={{width:null, backgroundColor:'blue', position:'absolute', bottom:0, right:0}}>
-                            <Text
+                        <View style={{width:null, position:'absolute', bottom:0, right:0}}>
+                            {/* <Text
                             onPress={this.onPressLearnMore.bind(this)}
                             title="Menu"
                             // color="#841584"
                             accessibilityLabel="Learn more about this purple button"
 
                             style={{ textAlign:'right', padding:10}}
-                            >Menu</Text>
+                            >Menu--</Text> */}
+                            {/* {collapse} */}
+                            <TouchableOpacity
+                                style={{padding:5}}
+                                onPress={()=>{
+                                    this.onPressLearnMore()
+                                }}>
+                                <FastImage
+                                    style={{width: 20, height: 20}}
+                                    source={collapse}
+                                    resizeMode={FastImage.resizeMode.contain}
+                                />
+                            </TouchableOpacity>
                         </View>
                     </View>
                     {menu}
@@ -123,6 +259,9 @@ class Menu extends React.Component{
                 </SafeAreaView>
             </ScrollView>
             }
+
+            
+            {this.renderManageAccountsView()}
             </View>
         )
     }
