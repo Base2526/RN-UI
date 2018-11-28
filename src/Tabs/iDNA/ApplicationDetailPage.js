@@ -6,14 +6,24 @@ import {FlatList,
         Alert, 
         Platform, 
         TouchableOpacity,
+        TouchableHighlight,
         ActivityIndicator,
         Modal,
-        SafeAreaView} from 'react-native'
+        Image,
+        SafeAreaView,
+        } from 'react-native'
 
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import FastImage from 'react-native-fast-image'
 
 import ImageViewer from 'react-native-image-zoom-viewer';
+
+import Modalbox from 'react-native-modalbox';
+import Slider from 'react-native-slider';
+
+import {Button} from 'react-native-elements'
+
+// import {ModalAction, ActionItem} from 'react-native-modal-action';
 
 // const images = [
 //     {
@@ -111,6 +121,8 @@ export default class ApplicationDetailPage extends React.Component{
             renderContent: false,
             modalVisible: false,
             index: 0,
+            modalAction:false,
+            sliderValue: 0.3,
             FlatListItems: [
                 {key: 'Apple'},
                 {key: 'Apricot'},
@@ -127,6 +139,12 @@ export default class ApplicationDetailPage extends React.Component{
 
     componentDidMount() {
         setTimeout(() => {this.setState({renderContent: true})}, 0);
+
+        
+    }
+
+    componentDidUpdate(){
+        
     }
 
     FlatListItemSeparator = () => {
@@ -225,7 +243,13 @@ export default class ApplicationDetailPage extends React.Component{
                         <View style={{position:'absolute', top:0, right:0}}>
                             <TouchableOpacity
                                 style={{padding:10}}
-                                onPress={()=>alert('menu')}>
+                                onPress={()=>{
+                                    // alert('ellipsis-n') // modalAction
+
+                                    // this.setState({modalAction:true})
+
+                                    this.refs.modalBox.open()
+                                }}>
                                 <Icon name="ellipsis-h" size={15} />
                             </TouchableOpacity>
                         </View>
@@ -339,6 +363,7 @@ Credit: Yeshwanth's Kitchen (bit.ly/2R9Mw3Y)</Text>
         alert("_itemClick : " + index)
     }
 
+
     render() {
         console.log("renderModel" + this.state.modalVisible)
         let {
@@ -399,7 +424,7 @@ Credit: Yeshwanth's Kitchen (bit.ly/2R9Mw3Y)</Text>
                     renderFooter={(currentIndex)=>
                         {
                         return(
-                                <View style={{position:'absolute', bottom:0, padding: 30}}>
+                                <View style={{paddingBottom:30}}>
                                     <View>
                                         <Text style={{color:'white', fontSize:16}}>No mixing bowl necessary. Just a jar, a spoon, and a can-do attitude.
 
@@ -412,7 +437,7 @@ Make Tastemade UK's Nutella Cookies 👉 https://bit.ly/2DPZWiS</Text>
                                             <TouchableOpacity
                                                 style={{width:25, height:25}}
                                                 onPress={()=> {
-                                                    // this.setState({ modalVisible: false }) 
+                                                    alert('Like')
                                                 }}>
                                                 <Icon name="thumbs-up" size={25} color='white' />
                                             </TouchableOpacity>
@@ -421,7 +446,7 @@ Make Tastemade UK's Nutella Cookies 👉 https://bit.ly/2DPZWiS</Text>
                                             <TouchableOpacity
                                                 style={{width:25, height:25}}
                                                 onPress={()=>{
-                                                    // this.setState({ modalVisible: false })
+                                                    alert('Comment')
                                                 }}>
                                                 <Icon name="comment" size={25} color='white' />
                                             </TouchableOpacity>
@@ -430,7 +455,7 @@ Make Tastemade UK's Nutella Cookies 👉 https://bit.ly/2DPZWiS</Text>
                                             <TouchableOpacity
                                                 style={{width:25, height:25}}
                                                 onPress={()=>{
-                                                    // this.setState({ modalVisible: false })
+                                                    alert('Share')
                                                 }}>
                                                 <Icon name="share" size={25} color='white' />
                                             </TouchableOpacity>
@@ -444,6 +469,43 @@ Make Tastemade UK's Nutella Cookies 👉 https://bit.ly/2DPZWiS</Text>
                     }
                 />
             </Modal>
+
+            <SafeAreaView style={{flex:1}}>
+            <Modalbox style={{height:240, bottom:0, backgroundColor:'rgba(52,52,52,alpha)'}} position={"bottom"} ref={"modalBox"} coverScreen={true} onLayout={(event) => {
+                var {x, y, width, height} = event.nativeEvent.layout;
+                console.log("------> Modalbox")
+            }}>
+                {/* <View style={{alignItems:'center', height: 10}}>
+                    <Image
+                        style={{width: 150, borderRadius:5, backgroundColor:'white'}}
+                        source={{uri: 'https://facebook.github.io/react-native/docs/assets/favicon.png'}}
+                        />
+                </View> */}
+                <View style={{height:60, backgroundColor:'white', justifyContent:'center'}}>
+                    <TouchableOpacity
+                        style={{padding:5}}>
+                        <Text style={{color: "black", fontSize: 22}}>test 1</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{height:60, backgroundColor:'white', justifyContent:'center'}}>
+                    <TouchableOpacity
+                        style={{padding:5}}>
+                        <Text style={{color: "black", fontSize: 22}}>test 2</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{height:60, backgroundColor:'white', justifyContent:'center'}}>
+                    <TouchableOpacity>
+                        <Text style={{color: "black", fontSize: 22}}>test 3</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{height:60, backgroundColor:'white', justifyContent:'center'}}>
+                    <TouchableOpacity>
+                        <Text style={{color: "black", fontSize: 22}}>test 4</Text>
+                    </TouchableOpacity>
+                </View>
+            </Modalbox>
+            </SafeAreaView>
+            
             {/* <View
                 style={{
                 padding: 10,

@@ -109,4 +109,4 @@ const SettingsTabs = createBottomTabNavigator({
 });
 
 //Issue: the tab navigator needs to be wrapped inside a stack navigator
-export default createStackNavigator({ SettingsTabs }, { headerMode: "none" });
+export default createStackNavigator({ SettingsTabs }, {mode: 'modal', headerMode: "none" });
