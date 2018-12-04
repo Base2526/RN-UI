@@ -6,7 +6,7 @@ import { StyleSheet, Text, TouchableOpacity, View, ViewPropTypes } from 'react-n
 import Color from './Color';
 
 export default function Send({ text, containerStyle, onSend, children, textStyle, label, alwaysShowSend }) {
-  if (alwaysShowSend || text.trim().length > 0) {
+  // if (alwaysShowSend || text.trim().length > 0) {
     return (
       <TouchableOpacity
         testID="send"
@@ -18,11 +18,11 @@ export default function Send({ text, containerStyle, onSend, children, textStyle
         }}
         accessibilityTraits="button"
       >
-        <View>{children || <Text style={[styles.text, textStyle]}>{label}</Text>}</View>
+        <View style={{flex:1, justifyContent:'center'}}>{children || <Text style={[styles.text, textStyle]}>{label}</Text>}</View>
       </TouchableOpacity>
     );
-  }
-  return <View />;
+  // }
+  // return <View />;
 }
 
 const styles = StyleSheet.create({
@@ -34,10 +34,10 @@ const styles = StyleSheet.create({
     color: Color.defaultBlue,
     fontWeight: '600',
     fontSize: 17,
-    backgroundColor: Color.backgroundTransparent,
-    marginBottom: 12,
-    marginLeft: 10,
-    marginRight: 10,
+    // backgroundColor: 'green',
+    // marginBottom: 12,
+    // marginLeft: 10,
+    // marginRight: 10,
   },
 });
 

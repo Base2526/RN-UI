@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   container: {
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: Color.defaultColor,
-    backgroundColor: Color.white,
+    // backgroundColor: 'red',
     bottom: 0,
     left: 0,
     right: 0,
@@ -108,6 +108,7 @@ const styles = StyleSheet.create({
   primary: {
     flexDirection: 'row',
     alignItems: 'flex-end',
+    backgroundColor: 'white',
   },
   accessory: {
     height: 44,
