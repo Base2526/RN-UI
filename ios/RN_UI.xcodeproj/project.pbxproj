@@ -967,6 +967,7 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = 32ENZ344NK;
+						ProvisioningStyle = Automatic;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -1636,6 +1637,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 32ENZ344NK;
@@ -1664,6 +1667,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = idna.ui;
 				PRODUCT_NAME = RN_UI;
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -1672,6 +1677,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 32ENZ344NK;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1699,6 +1706,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = idna.ui;
 				PRODUCT_NAME = RN_UI;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

@@ -1,5 +1,14 @@
 import React from "react";
-import { StyleSheet, Text, View , AsyncStorage, SafeAreaView} from "react-native";
+import {StyleSheet, 
+        Text, 
+        View , 
+        AsyncStorage, 
+        SafeAreaView,
+        AppState} from "react-native";
+
+import * as firebase from "firebase";
+
+import {db} from './Utils/Firebase'
 
 import { createRootNavigator } from "./App"; 
 import Constant from './Utils/Constant'
@@ -12,11 +21,81 @@ export default class App extends React.Component {
     this.state = {
       checkedSignIn: false,
       signedIn: false,
+      appState: AppState.currentState
     };
   }
 
   componentDidMount() {
+
+    console.log("componentDidMount")
+    AppState.addEventListener('change', this._handleAppStateChange);
+    AppState.addEventListener('memoryWarning', this._handleAppStateChange);
+
     this.isSignedIn()
+
+    db.ref('/items').set({
+      date_of_birth: "June 23, 1912",
+      full_name: "Alan Turing",
+      name: "Somkid Simajarn"
+    });
+
+    db.ref('/items').on("child_added", (snapshot, prevChildKey) => {
+      var newPost = snapshot.val();
+      // console.log("Author: " + newPost.author);
+      // console.log("Title: " + newPost.title);
+      // console.log("Previous Post ID: " + prevChildKey);
+
+      console.log('1, child_added')
+      console.log(newPost)
+      console.log('2, child_added')
+    });
+
+    db.ref('/items').on("child_changed", (snapshot) => {
+      var changedPost = snapshot.val();
+      console.log('1, child_changed')
+      console.log(changedPost);
+      console.log('2, child_changed')
+    });
+
+    db.ref('/items/kid').on("child_removed", function(snapshot) {
+      var deletedPost = snapshot.val();
+      // console.log("The blog post titled '" + deletedPost.title + "' has been deleted");
+
+      console.log('1, child_changed')
+      console.log(deletedPost);
+      console.log('2, child_changed')
+    });
+
+    // ref.off("value");
+    db.ref('/items').off()
+  }
+
+  componentWillReceiveProps(){
+    console.log("componentWillReceiveProps")
+  }
+
+  componentWillUnmount(){
+    console.log("componentWillUnmount")
+
+    AppState.removeEventListener('change', this._handleAppStateChange);
+    AppState.removeEventListener('memoryWarning', this._handleAppStateChange);
+  }
+
+  _handleAppStateChange = (nextAppState) => {
+    // if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+    //   console.log('App has come to the foreground!')
+    // }
+    
+    if (nextAppState === 'active') {
+      // do this
+    } else if (nextAppState === 'background') {
+      // do that
+    } else if (nextAppState === 'inactive') {
+      // do that other thing
+    }
+
+    console.log("nextAppState : " + nextAppState)
+    this.setState({appState: nextAppState});
   }
 
   isSignedIn(){
@@ -51,7 +130,5 @@ export default class App extends React.Component {
 
     const Layout = createRootNavigator(signedIn);
     return <Layout />;
-
-    // return(<View><Text>index</Text></View>)
   }
 }
