@@ -27,7 +27,7 @@ export default class App extends React.Component {
 
   componentDidMount() {
 
-    console.log("componentDidMount")
+    // console.log("componentDidMount")
     AppState.addEventListener('change', this._handleAppStateChange);
     AppState.addEventListener('memoryWarning', this._handleAppStateChange);
 
@@ -88,10 +88,8 @@ export default class App extends React.Component {
     
     if (nextAppState === 'active') {
       // do this
-    } else if (nextAppState === 'background') {
+    } else if (nextAppState === 'background' || nextAppState === 'inactive') {
       // do that
-    } else if (nextAppState === 'inactive') {
-      // do that other thing
     }
 
     console.log("nextAppState : " + nextAppState)

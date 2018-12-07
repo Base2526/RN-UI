@@ -23,11 +23,11 @@ class Menu extends React.Component{
     componentDidMount(){
         setTimeout(() => {this.setState({renderContent: true})}, 0);
 
-        console.log('cd-componentDidMount : ' + this.state.x)
+        // console.log('cd-componentDidMount : ' + this.state.x)
     }
 
     componentDidUpdate(){
-        console.log('cd-componentDidUpdate : ' + this.state.x)
+        // console.log('cd-componentDidUpdate : ' + this.state.x)
     }
 
     onPressLearnMore(){

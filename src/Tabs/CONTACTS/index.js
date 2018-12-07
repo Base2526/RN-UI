@@ -1,3 +1,5 @@
+import { Animated } from "react-native";
+
 import { createStackNavigator, createTabNavigator } from 'react-navigation'
 import Home from './home';
 import Details from './details';
@@ -14,7 +16,13 @@ import QRCodeReaderPage from './QRCodeReaderPage'
 import AddFriendByIdPage from './AddFriendByIdPage'
 import InviteFriendForContactPage from './InviteFriendForContactPage'
 
+import ContactsSearch from './ContactsSearch'
+
 import ChatPage from '../RECENT/ChatPage'
+
+// import SearchLayout from 'react-navigation-addon-search-layout';
+
+// import SearchLayout from '../../Utils/SearchLayout'
 
 const index = createStackNavigator({
     'Home': {
@@ -95,6 +103,20 @@ const index = createStackNavigator({
         title: 'Chat Page',
       }
     },
+    'ContactsSearch': {
+      screen: ContactsSearch,
+      navigationOptions: {
+        title: 'Search',
+      }
+    },
+    // 'Search': {
+    //   screen: () => (
+    //     <SearchLayout
+    //       searchInputUnderlineColorAndroid="#fff"
+    //       renderResults={q => <Text>{q}</Text>}
+    //     />
+    //   ),
+    // },
 });
 
 index.navigationOptions = ({ navigation }) => {
@@ -112,7 +134,8 @@ index.navigationOptions = ({ navigation }) => {
         routeName === 'QRCodeReaderPage' ||
         routeName === 'AddFriendByIdPage' ||
         routeName === 'InviteFriendForContactPage' ||
-        routeName === 'ChatPage') {
+        routeName === 'ChatPage' ||
+        routeName === 'ContactsSearch') {
       navigationOptions.tabBarVisible = false;
     }
 

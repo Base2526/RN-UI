@@ -5,9 +5,12 @@ import Styles from '../../styles';
 
 import ScrollableTabView, {ScrollableTabBar, DefaultTabBar} from 'react-native-scrollable-tab-view';
 
+import FastImage from 'react-native-fast-image'
+
 import FriendsPage from './FriendsPage'
 import GroupsPage from './GroupsPage'
 import ClasssPage from './ClasssPage'
+
 
 export default class ContactsHome extends Component {
 
@@ -23,16 +26,53 @@ export default class ContactsHome extends Component {
             </TouchableOpacity>
         ),
         headerRight: (
-            <TouchableOpacity
-                style={Styles.headerButton}
-                onPress={() => {
-                    const { params = {} } = navigation.state
-                    params.handleHeaderRight()
-                } }>
-                <Icon name="plus" size={20} />
-            </TouchableOpacity>
+            <View style={{flexDirection:'row'}}>
+                <TouchableOpacity
+                    style={{height: 20,
+                            width: 30,
+                            alignItems:'center'}}
+                    onPress={() => {
+                        const { params = {} } = navigation.state
+                        params.handleHeaderRightContactsSearch()
+
+                        // navigation.navigate('Search')
+                    } }>
+                    <Icon name="search" size={20} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={{height: 20,
+                            width: 30,
+                            alignItems:'center'}}
+                    onPress={() => {
+                        const { params = {} } = navigation.state
+                        params.handleHeaderRight()
+                    } }>
+                    <Icon name="plus" size={20} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={{height: 20,
+                            width: 30,
+                            alignItems:'center'}}
+                    onPress={() => {
+                        const { params = {} } = navigation.state
+                        params.handleHeaderRight()
+                    } }>
+                    {/* <Icon name="allergies" size={20} /> */}
+
+                    <FastImage
+                        style={{width: 35, height: 20}}
+                        source={require('../../Images/collapse_down_menu.png')}
+                        resizeMode={FastImage.resizeMode.contain}
+                    /> 
+                </TouchableOpacity>
+            </View>
           ),
     });
+
+    /**
+     
+     
+      */
 
     constructor(props){
         super(props)
@@ -46,6 +86,7 @@ export default class ContactsHome extends Component {
     componentDidMount () {
         setTimeout(() => {this.setState({renderContent: true})}, 0);
         this.props.navigation.setParams({ handleHeaderRight: this.handleHeaderRight })
+        this.props.navigation.setParams({ handleHeaderRightContactsSearch: this.handleHeaderRightContactsSearch })
     }
 
     handleHeaderRight = () => {
@@ -67,6 +108,10 @@ export default class ContactsHome extends Component {
         }
     }
 
+    handleHeaderRightContactsSearch= () => {
+        this.props.navigation.navigate("ContactsSearch")
+    }
+
     handleChangeTab({i, ref, from, }) {
         // this.children[i].onEnter();
         // this.children[from].onLeave();
@@ -77,6 +122,8 @@ export default class ContactsHome extends Component {
             positionSelect:i
         })
     }
+
+    
 
     render() {
         let {renderContent} = this.state;
@@ -97,6 +144,8 @@ export default class ContactsHome extends Component {
                     <ClasssPage tabLabel='Classs' index={2} amount={6} params={this.props}/>
                 </ScrollableTabView>
                 }
+
+                
             </View>
         );
     }

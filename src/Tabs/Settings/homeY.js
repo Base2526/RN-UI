@@ -118,7 +118,7 @@ export default class homeY extends Component<{}> {
             <Cell 
               cellStyle="Basic" 
               title="Logout" 
-              accessory="DisclosureIndicator"
+              // accessory="DisclosureIndicator"
               onPress={
                 ()=> Alert.alert(
                   'Logout',
