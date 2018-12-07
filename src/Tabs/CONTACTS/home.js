@@ -1,5 +1,11 @@
 import React, { Component } from 'react';
-import { View, Text, Button, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, 
+        Text, 
+        Button, 
+        TouchableOpacity, 
+        StyleSheet,
+        FlatList, 
+        SectionList,  } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Styles from '../../styles';
 
@@ -10,6 +16,25 @@ import FastImage from 'react-native-fast-image'
 import FriendsPage from './FriendsPage'
 import GroupsPage from './GroupsPage'
 import ClasssPage from './ClasssPage'
+
+const formatData = (data, numColumns) => {
+    // เป้นการ ลบ item ที่มี ​field ออกทั้งหมด เพราะว่าเรารองรับการ orientation srceen ด้วย
+    data = data.filter(function(item){
+      return !('empty' in item);
+    }).map((item)=>{
+      return item;
+    });
+  
+    const numberOfFullRows = Math.floor(data.length / numColumns);
+  
+    let numberOfElementsLastRow = data.length - (numberOfFullRows * numColumns);
+    while (numberOfElementsLastRow !== numColumns && numberOfElementsLastRow !== 0) {
+      data.push({ name: `blank-${numberOfElementsLastRow}`, empty: true });
+      numberOfElementsLastRow++;
+    }
+  
+    return data;
+};
 
 
 export default class ContactsHome extends Component {
@@ -55,7 +80,7 @@ export default class ContactsHome extends Component {
                             alignItems:'center'}}
                     onPress={() => {
                         const { params = {} } = navigation.state
-                        params.handleHeaderRight()
+                        params.handleHeaderRightContactsMenu()
                     } }>
                     {/* <Icon name="allergies" size={20} /> */}
 
@@ -69,17 +94,13 @@ export default class ContactsHome extends Component {
           ),
     });
 
-    /**
-     
-     
-      */
-
     constructor(props){
         super(props)
 
         this.state= {
             positionSelect:0,
             renderContent: false,
+            isOpenMenu:false,
         }
     }
 
@@ -87,6 +108,11 @@ export default class ContactsHome extends Component {
         setTimeout(() => {this.setState({renderContent: true})}, 0);
         this.props.navigation.setParams({ handleHeaderRight: this.handleHeaderRight })
         this.props.navigation.setParams({ handleHeaderRightContactsSearch: this.handleHeaderRightContactsSearch })
+        this.props.navigation.setParams({ handleHeaderRightContactsMenu: this.handleHeaderRightContactsMenu })
+    }
+
+    componentWillUnmount(){
+        console.log('9999 --> componentWillUnmount')
     }
 
     handleHeaderRight = () => {
@@ -112,6 +138,12 @@ export default class ContactsHome extends Component {
         this.props.navigation.navigate("ContactsSearch")
     }
 
+    handleHeaderRightContactsMenu= () => {
+        this.setState({
+            isOpenMenu:!this.state.isOpenMenu
+        })
+    }
+
     handleChangeTab({i, ref, from, }) {
         // this.children[i].onEnter();
         // this.children[from].onLeave();
@@ -123,13 +155,114 @@ export default class ContactsHome extends Component {
         })
     }
 
+    renderListItem = ({ item }) => {
+        if ('empty' in item) {
+          return <View style={{height: 120, 
+            width: 100, 
+            flex:1,
+            // borderColor: "green", 
+            // borderWidth: 1, 
+            justifyContent:'center', 
+            alignItems:'center',
+            backgroundColor: 'transparent',
+            borderWidth:.5, 
+            borderColor:'#C9C4C4',}} />;
+        }
     
+        return (
+          <View style={{height: 120, 
+                        width: 100, 
+                        flex:1,
+                        // borderColor: "green", 
+                        // borderWidth: 1, 
+                        // backgroundColor:'red',
+                        justifyContent:'center', 
+                        alignItems:'center',
+                        borderWidth:.5, 
+                        borderColor:'#C9C4C4',}}>
+
+            <TouchableOpacity 
+                onPress={()=>{
+                //   this.props.params.navigation.navigate("ApplicationDetailPage")
+                    alert("Click Menu")
+                }}>
+                <FastImage
+                    style={{width: 40, height: 40, borderRadius: 10}}
+                    source={{
+                    uri: 'https://unsplash.it/400/400?image=1',
+                    headers:{ Authorization: 'someAuthToken' },
+                    priority: FastImage.priority.normal,
+                    }}
+                    resizeMode={FastImage.resizeMode.contain}
+                />
+            </TouchableOpacity>
+            <View style={{justifyContent:'center', paddingTop:5}}>
+              <Text >{item.name}</Text>
+            </View>
+          </View>
+        )
+      }
+
+    renderViewMenu(){
+        return(
+            <View style={{position:'absolute', backgroundColor:'#F7F6F6', zIndex:100, left:0, right:0}}>
+            <FlatList
+            // key = {this.state.orientation}
+            // data={item.list}
+            /*  เราต้องมีการคำนวณ item ให้เต็มแต่ละแถว  */
+            data = {formatData([
+                {
+                  name: "menu 1",
+                  color: "Yellow",
+                },
+                {
+                  name: "menu 2",
+                  color: "Red",
+                },
+                {
+                  name: "menu 3",
+                  color: "Blue",
+                },
+                {
+                  name: "menu 4",
+                  color: "Blue",
+                },
+                {
+                  name: "menu 5",
+                  color: "Blue",
+                },{
+                  name: "menu 6",
+                  color: "Green",
+                },{
+                  name: "menu 7",
+                  color: "Green",
+                }
+      
+              ], 3)}
+            numColumns={3}
+            renderItem={this.renderListItem}
+            keyExtractor={this.keyExtractor}
+            extraData={this.state}
+            contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
+            // style={{flex:1, backgroundColor:'red'}}
+        />
+        </View>
+        )
+    }
 
     render() {
-        let {renderContent} = this.state;
+        let {renderContent, isOpenMenu} = this.state;
+
+        let menuView
+        if (isOpenMenu) {
+            menuView = this.renderViewMenu()
+        }
 
         return (
             <View style={[style.container, {backgroundColor:'white'}]}>
+                
+                {menuView}
+
                 { renderContent &&
                 <ScrollableTabView
                     // style={{height:500}}
