@@ -5,7 +5,7 @@ import { View,
         TouchableOpacity, 
         StyleSheet,
         FlatList, 
-        SectionList,  } from 'react-native';
+        Dimensions,  } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Styles from '../../styles';
 
@@ -101,6 +101,8 @@ export default class ContactsHome extends Component {
             positionSelect:0,
             renderContent: false,
             isOpenMenu:false,
+            orientation:'PORTRAIT',
+            numMenuColumns:4,
         }
     }
 
@@ -113,6 +115,17 @@ export default class ContactsHome extends Component {
 
     componentWillUnmount(){
         console.log('9999 --> componentWillUnmount')
+    }
+
+    onLayout(e) {
+        const {width, height} = Dimensions.get('window')
+        // console.log(width, height)
+    
+        if(width<height){
+          this.setState({orientation:'PORTRAIT', numMenuColumns:4})
+        }else{
+          this.setState({orientation:'LANDSCAPE', numMenuColumns:6})
+        }
     }
 
     handleHeaderRight = () => {
@@ -157,8 +170,8 @@ export default class ContactsHome extends Component {
 
     renderListItem = ({ item }) => {
         if ('empty' in item) {
-          return <View style={{height: 120, 
-            width: 100, 
+          return <View style={{height: 80, 
+            width: 80, 
             flex:1,
             // borderColor: "green", 
             // borderWidth: 1, 
@@ -170,8 +183,8 @@ export default class ContactsHome extends Component {
         }
     
         return (
-          <View style={{height: 120, 
-                        width: 100, 
+          <View style={{height: 80, 
+                        width: 80, 
                         flex:1,
                         // borderColor: "green", 
                         // borderWidth: 1, 
@@ -207,7 +220,7 @@ export default class ContactsHome extends Component {
         return(
             <View style={{position:'absolute', backgroundColor:'#F7F6F6', zIndex:100, left:0, right:0}}>
             <FlatList
-            // key = {this.state.orientation}
+            key = {this.state.orientation}
             // data={item.list}
             /*  เราต้องมีการคำนวณ item ให้เต็มแต่ละแถว  */
             data = {formatData([
@@ -238,8 +251,8 @@ export default class ContactsHome extends Component {
                   color: "Green",
                 }
       
-              ], 3)}
-            numColumns={3}
+              ], this.state.numMenuColumns)}
+            numColumns={this.state.numMenuColumns}
             renderItem={this.renderListItem}
             keyExtractor={this.keyExtractor}
             extraData={this.state}
@@ -259,7 +272,7 @@ export default class ContactsHome extends Component {
         }
 
         return (
-            <View style={[style.container, {backgroundColor:'white'}]}>
+            <View style={[style.container, {backgroundColor:'white'}]} onLayout={this.onLayout.bind(this)} >
                 
                 {menuView}
 
