@@ -30,7 +30,7 @@
     "react-native-swipeout": "^2.3.6",
     "react-native-tableview-simple": "^1.0.0",
     "react-native-vector-icons": "^6.1.0",
-    "react-navigation": "^3.0.2",
+    "react-navigation": "^3.0.7",
     "react-navigation-header-buttons": "^2.1.1"
   },
   "devDependencies": {

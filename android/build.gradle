@@ -14,10 +14,12 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven { url 'https://maven.google.com' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.4'
+//        classpath 'com.android.tools.build:gradle:3.1.4'
 
+        classpath 'com.android.tools.build:gradle:3.2.1'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
 
@@ -25,8 +27,8 @@ buildscript {
         classpath 'com.google.gms:google-services:4.0.2'
 
         // google signin
-        classpath 'com.android.tools.build:gradle:3.1.2' // <--- use this version or newer
-        classpath 'com.google.gms:google-services:3.2.1' // <--- use this version or newer
+//        classpath 'com.android.tools.build:gradle:3.1.2' // <--- use this version or newer
+//        classpath 'com.google.gms:google-services:3.2.1' // <--- use this version or newer
     }
 }
 

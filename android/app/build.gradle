@@ -95,14 +95,14 @@ def enableProguardInReleaseBuilds = false
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "com.rn2"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "2.0"
         multiDexEnabled true
         ndk {
 //            reset()
@@ -112,7 +112,7 @@ android {
         }
     }
 
-    // build production
+//     build production
     signingConfigs {
         release {
             storeFile file(MY_AWESOME_PROJECT_RELEASE_STORE_FILE)
@@ -121,7 +121,7 @@ android {
             keyPassword MY_AWESOME_PROJECT_RELEASE_KEY_PASSWORD
         }
     }
-    // build production
+//     build production
 
     splits {
         abi {
@@ -158,10 +158,28 @@ android {
 dependencies {
     implementation project(':react-native-fbsdk')
     implementation project(':react-native-gesture-handler')
-    implementation project(':react-native-contacts')
+    implementation project(':react-native-contacts') {
+        buildscript {
+            repositories {
+                maven { url = "https://dl.bintray.com/android/android-tools/" }
+            }
+        }
+    }
     implementation project(':react-native-camera')
-    implementation project(':react-native-image-picker')
-    implementation project(':react-native-fast-image')
+    implementation project(':react-native-image-picker') {
+        buildscript {
+            repositories {
+                maven { url = "https://dl.bintray.com/android/android-tools/" }
+            }
+        }
+    }
+    implementation project(':react-native-fast-image'){
+        buildscript {
+            repositories {
+                maven { url = "https://dl.bintray.com/android/android-tools/" }
+            }
+        }
+    }
     implementation project(':react-native-vector-icons')
     implementation fileTree(dir: "libs", include: ["*.jar"])
 //    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"

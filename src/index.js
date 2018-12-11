@@ -6,9 +6,9 @@ import {StyleSheet,
         SafeAreaView,
         AppState} from "react-native";
 
-import * as firebase from "firebase";
+// import * as firebase from "firebase";
 
-import {db} from './Utils/Firebase'
+// import {db} from './Utils/Firebase'
 
 import { createRootNavigator } from "./App"; 
 import Constant from './Utils/Constant'
@@ -33,6 +33,7 @@ export default class App extends React.Component {
 
     this.isSignedIn()
 
+    /*
     db.ref('/items').set({
       date_of_birth: "June 23, 1912",
       full_name: "Alan Turing",
@@ -68,6 +69,7 @@ export default class App extends React.Component {
 
     // ref.off("value");
     db.ref('/items').off()
+    */
   }
 
   componentWillReceiveProps(){
@@ -126,6 +128,7 @@ export default class App extends React.Component {
       return null;
     }
 
+    // return(<View><Text>isSignedIn</Text></View>)
     const Layout = createRootNavigator(signedIn);
     return <Layout />;
   }

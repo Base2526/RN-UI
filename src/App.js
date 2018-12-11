@@ -1,6 +1,6 @@
 import React from 'react'
 import {View, Text} from 'react-native'
-import { createDrawerNavigator, createStackNavigator, createSwitchNavigator, createAppContainer } from 'react-navigation';
+import { createDrawerNavigator, createStackNavigator, createSwitchNavigator, createAppContainer, StackNavigator } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Tabs from './Tabs';  //Tab Nav
 import Profile from './Profile'; //Stack Nav
@@ -80,3 +80,11 @@ export const createRootNavigator = (signedIn = false) => {
     )
   ))
 };
+
+// const AppStack = createStackNavigator({ Main : { screen: Main } });
+
+// export default class App extends React.Component {
+//   render() {
+//     return <AppStack/>;
+//   }
+// }
