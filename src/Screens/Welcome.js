@@ -11,6 +11,9 @@ import {
 import Spinner from 'react-native-loading-spinner-overlay';
 
 
+import firebase from 'react-native-firebase';
+
+
 // import FBButton from './FBButton'
 
 const { RNTwitterSignIn } = NativeModules
@@ -31,6 +34,11 @@ export default class Welcome extends React.Component {
       loading: false,
       arg1: {}
     };
+  }
+
+  componentDidMount(){
+    console.log("off firebase 001")
+    firebase.database().ref('/items').off()
   }
 
   __loading(){

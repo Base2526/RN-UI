@@ -114,7 +114,7 @@ export default class ContactsHome extends Component {
     }
 
     componentWillUnmount(){
-        console.log('9999 --> componentWillUnmount')
+        // console.log('9999 --> componentWillUnmount')
     }
 
     onLayout(e) {
