@@ -12,12 +12,17 @@
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
+@import Firebase;
+
 //#import <TwitterKit/TWTRKit.h>
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  // firebase
+  [FIRApp configure];
+  
   // fb
   [[FBSDKApplicationDelegate sharedInstance] application:application
                            didFinishLaunchingWithOptions:launchOptions];
