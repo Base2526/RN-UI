@@ -1,4 +1,5 @@
 module.exports = {
+    API_URL:'',
     USER_LOGIN: 'user_login',
     PROVIDERS:{
         EMAIL:'email',

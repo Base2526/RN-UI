@@ -5,18 +5,15 @@ import {StyleSheet,
         AsyncStorage, 
         SafeAreaView,
         AppState} from "react-native";
-
-// import * as firebase from "firebase";
-
-// import * as firebase from './Utils/Firebase'
-
+        
 import firebase from 'react-native-firebase';
-
 import DeviceInfo from 'react-native-device-info';
 
 import { createRootNavigator } from "./App"; 
 import Constant from './Utils/Constant'
 import {loadDataLocal} from './Utils/Helpers'
+
+import {__test, login, logout} from './Utils/Services'
 
 export default class App extends React.Component {
   constructor(props) {
@@ -30,6 +27,29 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
+
+    console.log(login())
+    console.log(logout())
+
+    __test("mr.simajarn@gmail.com")
+          .then((res) => {
+              if(res.message === 'Not Found') {
+                console.log("------------ y")
+              }
+            else {
+              console.log("------------ x1")
+              console.log(res)
+              console.log("------------ x2")
+              // this.props.navigator.push({
+              //   title: res.name || 'No Title',
+              //   passProps: {userInfo: res}
+              // });
+              // this.setState({
+              //   error: false,
+              //   username: ''
+              // })
+            }
+        });
 
     console.log("componentDidMount")
     AppState.addEventListener('change', this._handleAppStateChange);
@@ -47,7 +67,13 @@ export default class App extends React.Component {
     //   this.log("===>");
     // })
 
-    console.log(this)
+    // console.log(this)
+
+
+    // var observer = ReactObserver();
+    // var listener = observer.subscribe('exampleEvent',(data)=>{
+    //   console.log('data is: '+data);
+    // });
 
 
     /*

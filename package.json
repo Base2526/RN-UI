@@ -8,7 +8,6 @@
   },
   "dependencies": {
     "react": "16.6.1",
-    "react-event-observer": "^0.5.11",
     "react-native": "0.57.7",
     "react-native-camera": "^1.4.3",
     "react-native-camera-roll-picker": "file:src/Library/react-native-camera-roll-picker",
