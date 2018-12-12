@@ -8,7 +8,9 @@ import {StyleSheet,
 
 // import * as firebase from "firebase";
 
-// import {db} from './Utils/Firebase'
+// import * as firebase from './Utils/Firebase'
+
+import firebase from 'react-native-firebase';
 
 import { createRootNavigator } from "./App"; 
 import Constant from './Utils/Constant'
@@ -32,6 +34,19 @@ export default class App extends React.Component {
     AppState.addEventListener('memoryWarning', this._handleAppStateChange);
 
     this.isSignedIn()
+
+
+    firebase.database().ref('/items').on("value", (snapshot, prevChildKey) => {
+      var newPost = snapshot.val();
+      // console.log("Author: " + newPost.author);
+      // console.log("Title: " + newPost.title);
+      // console.log("Previous Post ID: " + prevChildKey);
+
+      console.log('001, child_added')
+      console.log(newPost)
+      console.log('002, child_added')
+    });
+
 
     /*
     db.ref('/items').set({
