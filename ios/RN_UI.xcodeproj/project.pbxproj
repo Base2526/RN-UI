@@ -48,6 +48,9 @@
 		602CB69421C0A51700809717 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 602CB69321C0A51700809717 /* GoogleService-Info.plist */; };
 		6051380C21B50F8B0046D911 /* libRCTCameraRoll.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 605137E321B50ED00046D911 /* libRCTCameraRoll.a */; };
 		607B986021C0C6C800AB0CBF /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 607B984321C0BB3D00AB0CBF /* libRNDeviceInfo.a */; };
+		60F92A6C21C370F600AC5145 /* libSQLite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F92A6B21C370B900AC5145 /* libSQLite.a */; };
+		60F92A6E21C3710100AC5145 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F92A6D21C3710100AC5145 /* libsqlite3.0.tbd */; };
+		60F92ABE21C3A0E100AC5145 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 60F92ABD21C3A0E100AC5145 /* www */; };
 		6EB7211D4BE443EB9FAF7B9C /* libRCTFBSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AFAB67619744DF5898ECD50 /* libRCTFBSDK.a */; };
 		71400F1FC9BBF0C26B1C8653 /* libPods-RN_UITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AE9D66EEBB287E48AF5188 /* libPods-RN_UITests.a */; };
 		74C40EE8E6684E379B68EEAC /* FontAwesome5_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 953E1094C35F454FA44935B5 /* FontAwesome5_Solid.ttf */; };
@@ -416,6 +419,13 @@
 			remoteGlobalIDString = E72EC1401F7ABB5A0001BC90;
 			remoteInfo = "RNDeviceInfo-tvOS";
 		};
+		60F92A6A21C370B900AC5145 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 60F92A3421C370B800AC5145 /* SQLite.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E23D7B471ACEFE2A00C59171;
+			remoteInfo = SQLite;
+		};
 		78C398B81ACF4ADC00677621 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */;
@@ -483,6 +493,9 @@
 		6039E82A21B10ED900B34E68 /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKCoreKit.framework; path = ../../../Documents/FacebookSDK/FBSDKCoreKit.framework; sourceTree = "<group>"; };
 		605137D821B50ED00046D911 /* RCTCameraRoll.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTCameraRoll.xcodeproj; path = "../node_modules/react-native/Libraries/CameraRoll/RCTCameraRoll.xcodeproj"; sourceTree = "<group>"; };
 		607B983D21C0BB3D00AB0CBF /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNDeviceInfo.xcodeproj; path = "../node_modules/react-native-device-info/ios/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; };
+		60F92A3421C370B800AC5145 /* SQLite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SQLite.xcodeproj; path = "../node_modules/react-native-sqlite-storage/src/ios/SQLite.xcodeproj"; sourceTree = "<group>"; };
+		60F92A6D21C3710100AC5145 /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
+		60F92ABD21C3A0E100AC5145 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../www; sourceTree = "<group>"; };
 		65905BFD330C4B9584164E60 /* RNImagePicker.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNImagePicker.xcodeproj; path = "../node_modules/react-native-image-picker/ios/RNImagePicker.xcodeproj"; sourceTree = "<group>"; };
 		688B080E5BC44368B1B0D48F /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		6ECE58078C2E4CD6BB58C892 /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
@@ -535,6 +548,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60F92A6E21C3710100AC5145 /* libsqlite3.0.tbd in Frameworks */,
+				60F92A6C21C370F600AC5145 /* libSQLite.a in Frameworks */,
 				607B986021C0C6C800AB0CBF /* libRNDeviceInfo.a in Frameworks */,
 				6051380C21B50F8B0046D911 /* libRCTCameraRoll.a in Frameworks */,
 				ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */,
@@ -673,6 +688,7 @@
 		13B07FAE1A68108700A75B9A /* RN_UI */ = {
 			isa = PBXGroup;
 			children = (
+				60F92ABD21C3A0E100AC5145 /* www */,
 				602CB69321C0A51700809717 /* GoogleService-Info.plist */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -711,6 +727,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				60F92A6D21C3710100AC5145 /* libsqlite3.0.tbd */,
 				6039E82A21B10ED900B34E68 /* FBSDKCoreKit.framework */,
 				6039E7FA21B10ED900B34E68 /* FBSDKLoginKit.framework */,
 				6039E82921B10ED900B34E68 /* FBSDKShareKit.framework */,
@@ -862,6 +879,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		60F92A3521C370B800AC5145 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				60F92A6B21C370B900AC5145 /* libSQLite.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		78C398B11ACF4ADC00677621 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -889,6 +914,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				60F92A3421C370B800AC5145 /* SQLite.xcodeproj */,
 				607B983D21C0BB3D00AB0CBF /* RNDeviceInfo.xcodeproj */,
 				605137D821B50ED00046D911 /* RCTCameraRoll.xcodeproj */,
 				5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */,
@@ -1172,6 +1198,10 @@
 				{
 					ProductGroup = 6039E52621B0DA5E00B34E68 /* Products */;
 					ProjectRef = 2F1212C6C1844777BD79B6BF /* RNVectorIcons.xcodeproj */;
+				},
+				{
+					ProductGroup = 60F92A3521C370B800AC5145 /* Products */;
+					ProjectRef = 60F92A3421C370B800AC5145 /* SQLite.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -1514,6 +1544,13 @@
 			remoteRef = 607B984421C0BB3D00AB0CBF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		60F92A6B21C370B900AC5145 /* libSQLite.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSQLite.a;
+			remoteRef = 60F92A6A21C370B900AC5145 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		78C398B91ACF4ADC00677621 /* libRCTLinking.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1567,6 +1604,7 @@
 				48CA84DB806447BD8F0A5B69 /* Octicons.ttf in Resources */,
 				1F1D4490C8A24BE3B40306EA /* SimpleLineIcons.ttf in Resources */,
 				AA5A9E4916EA443B8398D88F /* Zocial.ttf in Resources */,
+				60F92ABE21C3A0E100AC5145 /* www in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

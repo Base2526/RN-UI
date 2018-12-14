@@ -4,6 +4,14 @@ import android.app.Application;
 
 import com.facebook.CallbackManager;
 import com.facebook.react.ReactApplication;
+import com.oblador.vectoricons.VectorIconsPackage;
+import com.imagepicker.ImagePickerPackage;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.facebook.reactnative.androidsdk.FBSDKPackage;
+import com.dylanvann.fastimage.FastImageViewPackage;
+import com.learnium.RNDeviceInfo.RNDeviceInfo;
+import com.rt2zz.reactnativecontacts.ReactNativeContacts;
+import org.reactnative.camera.RNCameraPackage;
 import io.invertase.firebase.RNFirebasePackage;
 
 import com.facebook.reactnative.androidsdk.FBSDKPackage;
@@ -23,6 +31,10 @@ import com.learnium.RNDeviceInfo.RNDeviceInfo;
 
 import java.util.Arrays;
 import java.util.List;
+
+
+import org.pgsqlite.SQLitePluginPackage;
+
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -47,7 +59,8 @@ public class MainApplication extends Application implements ReactApplication {
             new ImagePickerPackage(),
             new FastImageViewPackage(),
             new VectorIconsPackage(),
-            new RNDeviceInfo()
+            new RNDeviceInfo(),
+            new SQLitePluginPackage()
       );
     }
 

@@ -4,7 +4,7 @@ import {
     View,
     TouchableOpacity,
     StyleSheet,
-    ActivityIndicator,
+    Platform,
     NativeModules
 } from 'react-native';
 
@@ -14,7 +14,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import firebase from 'react-native-firebase';
 
 
-// import FBButton from './FBButton'
+// import { openDatabase } from 'react-native-sqlite-storage';
 
 const { RNTwitterSignIn } = NativeModules
 
@@ -26,6 +26,8 @@ import {saveAsyncStorage} from '../Utils/Helpers'
 
 // import TwitterButton from './TwitterButton';
 
+import Database from '../Utils/DB'
+// Database.getConnection()
 
 export default class Welcome extends React.Component {
   constructor(props) {
@@ -36,9 +38,57 @@ export default class Welcome extends React.Component {
     };
   }
 
+  // errorCB(err) {
+  //   console.log("SQL Error: " + err);
+  // }
+  
+  // successCB() {
+  //   console.log("SQL executed fine");
+  // }
+  
+  // openCB() {
+  //   console.log("Database OPENED");
+  // }
+
   componentDidMount(){
     console.log("off firebase 001")
     firebase.database().ref('/items').off()
+
+    // var db
+    // if(Platform.OS === 'ios'){
+    //   db = openDatabase({ name: 'db.sql', createFromLocation : "~www/db.sql", location: 'Library'}, this.openCB, this.errorCB);
+    // }else{
+    //   db = openDatabase({ name: 'db.sql', createFromLocation : "~db.sql"}, this.openCB, this.errorCB);
+    // }
+
+    // console.log(db)
+    Database.getConnection().transaction((tx) => {
+      // SELECT name FROM sqlite_master WHERE type=\'table\'
+      tx.executeSql("SELECT name FROM sqlite_master WHERE type=\'table\'", [], (tx, results) => {
+        console.log("Query completed");
+  
+        // Get rows with Web SQL Database spec compliance.
+        console.log(results.rows)
+        var len = results.rows.length;
+        for (let i = 0; i < len; i++) {
+          let row = results.rows.item(i);
+          // console.log(`Employee name: ${row.name}, Dept Name: ${row.deptName}`);
+        
+          console.log(row)
+        }
+        
+        // console.log('len : ' + len)
+  
+        // Alternatively, you can use the non-standard raw method.
+  
+        /*
+          let rows = results.rows.raw(); // shallow copy of rows Array
+  
+          rows.map(row => console.log(`Employee name: ${row.name}, Dept Name: ${row.deptName}`));
+        */
+      });
+
+    })
   }
 
   __loading(){
