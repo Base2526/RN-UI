@@ -11,9 +11,9 @@ import DeviceInfo from 'react-native-device-info';
 
 import { createRootNavigator } from "./App"; 
 import Constant from './Utils/Constant'
-import {loadDataLocal} from './Utils/Helpers'
+import {loadAsyncStorage} from './Utils/Helpers'
 
-import {__test, login, logout} from './Utils/Services'
+
 
 export default class App extends React.Component {
   constructor(props) {
@@ -28,9 +28,12 @@ export default class App extends React.Component {
 
   componentDidMount() {
 
-    console.log(login())
-    console.log(logout())
+    // login("admin", "1234").then(data => {
+    //   console.log('Print list of movies:', data);
+    // })
+    // console.log(logout())
 
+    /*
     __test("mr.simajarn@gmail.com")
           .then((res) => {
               if(res.message === 'Not Found') {
@@ -50,6 +53,7 @@ export default class App extends React.Component {
               // })
             }
         });
+        */
 
     console.log("componentDidMount")
     AppState.addEventListener('change', this._handleAppStateChange);
@@ -189,7 +193,7 @@ export default class App extends React.Component {
   }
 
   isSignedIn(){
-    loadDataLocal(Constant.USER_LOGIN).then((data) => {      
+    loadAsyncStorage(Constant.USER_LOGIN).then((data) => {      
       if(data.status){
         let value = JSON.parse(data.value)
         this.setState({

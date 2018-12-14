@@ -1,28 +1,54 @@
+import {Platform} from 'react-native'
 import Constant from '../Constant'
 
-export const __test = (name) => {
-    // let username = name.toLowerCase().trim();
-    const URL = `https://api.github.com/users/${name}`;
-    return fetch(URL)
-            .then((res) => res.json());
+export const login = (name, pass) => {
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({
+            'name': name,
+            'pass': pass
+        }),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.LOGIN, data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+        });
 };
 
-export const login = (name, password) => {
+export const login_with_social = (type, value) => {
     // let username = name.toLowerCase().trim();
     // const URL = `https://api.github.com/users/${name}`;
     // return fetch(URL)
     //         .then((res) => res.json());
 
-    return 'login function'
-};
+    // LOGIN_WITH_SOCIAL
 
-export const login_with_social = (name, password) => {
-    // let username = name.toLowerCase().trim();
-    // const URL = `https://api.github.com/users/${name}`;
-    // return fetch(URL)
-    //         .then((res) => res.json());
+    /*
+    type
+    data
+     */
 
-    return 'login_with_social function'
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({
+            'type': type,
+            'data': value
+        }),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.LOGIN_WITH_SOCIAL, data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+        });
 };
 
 export const logout = () => {
@@ -31,28 +57,75 @@ export const logout = () => {
     // return fetch(URL)
     //         .then((res) => res.json());
 
-    return 'logout function'
+    return 'logout function > ' + Constant.LOGOUT
 };
 
-export const sign_up = () => {
+export const register = (mail, pass) => {
     // let username = name.toLowerCase().trim();
     // const URL = `https://api.github.com/users/${name}`;
     // return fetch(URL)
     //         .then((res) => res.json());
 
-    return 'sign_up function'
+    // ?udid=%@&platform=ios&bundleidentifier=%@&version=%@
+
+    // ?udid='udid'&platform=ios&bundleidentifier='bundleidentifier'&version='1.0'
+
+
+    /**
+    @"name": username,
+    @"pass": @"1234",
+    @"mail": email,
+    @"udid": [[Configs sharedInstance] getUniqueDeviceIdentifierAsString],
+    @"platform" : @"ios",
+    @"bundleidentifier" : [[Configs sharedInstance] getBundleIdentifier],
+    @"version" : [[Configs sharedInstance] getVersionApplication]
+      */
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({
+            'name': 'name',
+            'pass': pass,
+            'mail': mail,
+            'udid': 'udid',
+            'platform': Platform.OS,
+            'bundleidentifier': 'bundleidentifier',
+            'version': '1.0'
+        }),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.REGISTER + "?udid='udid'&platform=ios&bundleidentifier='bundleidentifier'&version='1.0'", data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+        });
 };
 
-export const forgot_password = () => {
+export const forget_password = (mail) => {
     // let username = name.toLowerCase().trim();
     // const URL = `https://api.github.com/users/${name}`;
     // return fetch(URL)
     //         .then((res) => res.json());
+    // 
 
-    return 'forgot_password function'
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({
+            'mail': mail,
+        }),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.FORGET_PASSWORD, data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+        });
 };
-
-
 
 
 /*

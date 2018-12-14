@@ -22,7 +22,7 @@ const FBSDK = require('react-native-fbsdk');
 const { LoginButton, AccessToken, LoginManager } = FBSDK;
 
 import Constant from '../Utils/Constant'
-import {saveDataLocal} from '../Utils/Helpers'
+import {saveAsyncStorage} from '../Utils/Helpers'
 
 // import TwitterButton from './TwitterButton';
 
@@ -60,7 +60,7 @@ export default class Welcome extends React.Component {
                 // this.setState({
                 //   loading:true
                 // })
-                saveDataLocal(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.FACEBOOK}).then((data)=>{
+                saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.FACEBOOK}).then((data)=>{
                     if(data.status){
                       // let {navigator} = _this
                       _this.navigation.navigate("Main")
@@ -95,7 +95,7 @@ export default class Welcome extends React.Component {
         const { authToken, authTokenSecret } = loginData
         if (authToken && authTokenSecret) {
 
-          saveDataLocal(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.TWITTER}).then((data)=>{
+          saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.TWITTER}).then((data)=>{
             if(data.status){
               _this.navigation.navigate("Main")
             }

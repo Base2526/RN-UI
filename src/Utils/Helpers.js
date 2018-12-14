@@ -3,7 +3,7 @@ import {AsyncStorage} from 'react-native'
 import { Dimensions, DeviceInfo, Platform } from 'react-native';
 import { Header } from 'react-navigation';
 
-export async function loadDataLocal(key) {
+export async function loadAsyncStorage(key) {
     let result = {}
 
     if(key == null){
@@ -24,7 +24,7 @@ export async function loadDataLocal(key) {
     }
 }
 
-export async function saveDataLocal(key, data) {
+export async function saveAsyncStorage(key, data) {
     let result = {}
 
     if(key == null){
@@ -38,7 +38,7 @@ export async function saveDataLocal(key, data) {
     return result
 }
 
-export async function removeDataLocalByKey(key){
+export async function removeAsyncStorageByKey(key){
     
     let result = {}
 
@@ -81,3 +81,17 @@ export const getOrientation = () => {
   const { width, height } = Dimensions.get('window');
   return width > height ? LANDSCAPE : PORTRAIT;
 };
+
+export const validateEmail = (text) => {
+    // console.log(text);
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/ ;
+    if(reg.test(text) === false){
+      // console.log("Email is Not Correct");
+      // this.setState({email:text})
+      return false;
+    }else{
+      // this.setState({email:text})
+      // console.log("Email is Correct");
+      return true;
+    }
+}

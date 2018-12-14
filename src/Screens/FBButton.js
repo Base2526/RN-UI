@@ -14,7 +14,9 @@ const FBSDK = require('react-native-fbsdk');
 const { LoginButton, AccessToken, LoginManager } = FBSDK;
 
 import Constant from '../Utils/Constant'
-import {saveDataLocal} from '../Utils/Helpers'
+import {saveAsyncStorage} from '../Utils/Helpers'
+
+import {login_with_social} from '../Utils/Services'
 
 export default class FBButton extends Component {
 
@@ -50,16 +52,18 @@ export default class FBButton extends Component {
                 if (result.isCancelled) {
                     console.log("Login cancelled");
                 } else {
-                    
-                    saveDataLocal(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.FACEBOOK}).then((data)=>{
-                        if(data.status){
-                          let {navigator} = _this
-                          navigator.navigate("Main")
 
-                        }
-                    }).catch((error)=>{
-                        console.log(error)
-                    })
+                    console.log(result)
+                    
+                    // saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.FACEBOOK}).then((data)=>{
+                    //     if(data.status){
+                    //       let {navigator} = _this
+                    //       navigator.navigate("Main")
+
+                    //     }
+                    // }).catch((error)=>{
+                    //     console.log(error)
+                    // })
                 }
             },
             function(error) {
@@ -71,7 +75,7 @@ export default class FBButton extends Component {
     render(){
         return (<View style={{padding:10}}>
                     <TouchableOpacity
-                    onPress={this._facebookSignIn}
+                    onPress={()=>this._facebookSignIn()}
                     style={{backgroundColor:'#3a579d', padding: 10, alignItems:'center'}}>
                         <Text style={{color:'white', fontSize: 18, fontWeight:'700'}}>Login with facebook</Text>
                     </TouchableOpacity>

@@ -22,7 +22,7 @@ import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import Styles from '../../styles';
 
 import Constant from '../../Utils/Constant'
-import {loadDataLocal, removeDataLocalByKey} from '../../Utils/Helpers'
+import {loadAsyncStorage, removeAsyncStorageByKey} from '../../Utils/Helpers'
 
 
 const { RNTwitterSignIn } = NativeModules
@@ -130,7 +130,7 @@ export default class homeY extends Component<{}> {
                     style: 'cancel'},
                     {text: 'OK', 
                     onPress: () => {
-                          loadDataLocal(Constant.USER_LOGIN).then((data) => {      
+                      loadAsyncStorage(Constant.USER_LOGIN).then((data) => {      
                             if(data.status){
                               let value = JSON.parse(data.value)
                               console.log(value.provider)
@@ -150,7 +150,7 @@ export default class homeY extends Component<{}> {
                             }
                           }).then(()=>{
                             console.log("then #2")
-                            removeDataLocalByKey(Constant.USER_LOGIN).then((data) => {      
+                            removeAsyncStorageByKey(Constant.USER_LOGIN).then((data) => {      
                               if(data.status){
                                 console.log("Go to SignedOut")
                                 this.props.navigation.navigate("SignedOut")

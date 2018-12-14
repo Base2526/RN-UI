@@ -2,7 +2,39 @@ import React from 'react'
 import {View, Text, TouchableOpacity} from 'react-native'
 import { Card, Button, FormLabel, FormInput } from "react-native-elements";
 
+import Spinner from 'react-native-loading-spinner-overlay';
+
+import {forget_password} from '../Utils/Services'
+import {validateEmail} from '../Utils/Helpers'
+
 export default class ForgotPassword extends React.Component{
+
+    constructor(props){
+        super(props)
+    
+        this.state = {
+            isShowSpinner: false,
+            email:'',
+        }
+    }
+
+    _forget_password(){
+        // console.log('_forget_password : ' + this.state.email)
+
+        if(this.state.email === '' ){
+            alert("Email is empty.")
+        }else if(!validateEmail(this.state.email)){
+            alert("Email is Not Correct")
+        }else{
+            console.log('success forget password')
+
+            this.setState({
+                email:''
+            })
+
+            this.props.navigation.goBack()
+        }
+    }
 
     render(){
 
@@ -10,8 +42,18 @@ export default class ForgotPassword extends React.Component{
 
         return(
             <View style={{flex:1, backgroundColor:'white'}}>
+                <Spinner
+                    visible={this.state.isShowSpinner}
+                    textContent={'Loading...'}
+                    textStyle={{color: '#FFF'}}
+                    overlayColor={'rgba(0,0,0,0.5)'}
+                />
+        
                 <FormLabel>Email</FormLabel>
-                <FormInput placeholder="Email address..." />
+                <FormInput placeholder="Email..." 
+                ref= {(el) => { this.email = el; }}
+                onChangeText={(email) => this.setState({email})}
+                value={this.state.email}/>
             
                 <View style={{padding:10}}>
                     <TouchableOpacity
@@ -24,7 +66,9 @@ export default class ForgotPassword extends React.Component{
                         // }).catch((error)=>{
                         // console.log(error)
                         // })
-                        navigation.goBack()
+                        // navigation.goBack()
+
+                        this._forget_password()
                     }}>
                     <Text style={{color:'white', fontSize: 18, fontWeight:'700'}}>SEND</Text>
                     </TouchableOpacity>

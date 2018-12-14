@@ -10,7 +10,7 @@ import {
   TouchableOpacity } from "react-native"
 
 import Constant from '../Utils/Constant'
-import {saveDataLocal} from '../Utils/Helpers'
+import {saveAsyncStorage} from '../Utils/Helpers'
 
 const { RNTwitterSignIn } = NativeModules
 
@@ -33,7 +33,7 @@ export default class TwitterButton extends Component {
         const { authToken, authTokenSecret } = loginData
         if (authToken && authTokenSecret) {
     
-          saveDataLocal(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.TWITTER}).then((data)=>{
+          saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.TWITTER}).then((data)=>{
             if(data.status){
               let {navigator} = _this
               navigator.navigate("Main")
