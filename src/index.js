@@ -13,8 +13,6 @@ import { createRootNavigator } from "./App";
 import Constant from './Utils/Constant'
 import {loadAsyncStorage} from './Utils/Helpers'
 
-
-
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -35,25 +33,25 @@ export default class App extends React.Component {
 
     /*
     __test("mr.simajarn@gmail.com")
-          .then((res) => {
-              if(res.message === 'Not Found') {
-                console.log("------------ y")
-              }
-            else {
-              console.log("------------ x1")
-              console.log(res)
-              console.log("------------ x2")
-              // this.props.navigator.push({
-              //   title: res.name || 'No Title',
-              //   passProps: {userInfo: res}
-              // });
-              // this.setState({
-              //   error: false,
-              //   username: ''
-              // })
-            }
-        });
-        */
+      .then((res) => {
+          if(res.message === 'Not Found') {
+            console.log("------------ y")
+          }
+        else {
+          console.log("------------ x1")
+          console.log(res)
+          console.log("------------ x2")
+          // this.props.navigator.push({
+          //   title: res.name || 'No Title',
+          //   passProps: {userInfo: res}
+          // });
+          // this.setState({
+          //   error: false,
+          //   username: ''
+          // })
+        }
+    });
+    */
 
     console.log("componentDidMount")
     AppState.addEventListener('change', this._handleAppStateChange);
@@ -73,12 +71,10 @@ export default class App extends React.Component {
 
     // console.log(this)
 
-
     // var observer = ReactObserver();
     // var listener = observer.subscribe('exampleEvent',(data)=>{
     //   console.log('data is: '+data);
     // });
-
 
     /*
     db.ref('/items').set({

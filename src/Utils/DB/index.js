@@ -7,7 +7,7 @@ if(Platform.OS === 'ios'){
 }else{
     conn = openDatabase({ name: "db.sql", createFromLocation : "~db.sql"});
 }
-// export const db
+
 class Database  {
     getConnection() {
         return conn;
@@ -15,3 +15,13 @@ class Database  {
 }
 
 module.exports = new Database();
+
+/** 
+ * use
+ * 
+ * import Database from '../Utils/DB'
+ * 
+ * Database.getConnection().transaction((tx) => {
+ *      ...query
+ * })
+ * */
