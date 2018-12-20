@@ -6,6 +6,6 @@ import AppReducers from './AppReducers'
 
 export default combineReducers({
     auth: AuthReducer,
-    // appState: AppStateReducers,
+    appState: AppStateReducers,
     // app:AppReducers
 })

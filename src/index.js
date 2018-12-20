@@ -6,13 +6,21 @@ import {StyleSheet,
         SafeAreaView,
         AppState} from "react-native";
         
-import firebase from 'react-native-firebase';
+// import firebase from 'react-native-firebase';
 import DeviceInfo from 'react-native-device-info';
 
 import {Provider} from 'react-redux'
 import { createStore, applyMiddleware, compose } from 'redux'
 import ReduxThunk from 'redux-thunk'
 import applyAppStateListener from 'redux-enhancer-react-native-appstate';
+
+
+// import { autoRehydrate, persistCombineReducers } from 'redux-persist'
+
+import { persistStore, persistReducer } from 'redux-persist'
+import storage from 'redux-persist/lib/storage' // default: localStorage if web, AsyncStorage if react-native
+import { PersistGate } from 'redux-persist/integration/react'
+// import reducers from './reducers' // where reducers is an object of reducers
 
 import reducers from './Reducers'
 
@@ -32,6 +40,8 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
+
+    console.log("---> 009")
 
     // login("admin", "1234").then(data => {
     //   console.log('Print list of movies:', data);
@@ -122,6 +132,10 @@ export default class App extends React.Component {
     */
 
   //  firebase.database().ref('/items').off()
+
+
+
+    
   }
 
   componentWillReceiveProps(){
@@ -148,6 +162,7 @@ export default class App extends React.Component {
       console.log("getUniqueID is defined")
     }
 
+    /*
     firebase.database().ref('/items').on("value", (snapshot, prevChildKey) => {
       var newPost = snapshot.val();
       // console.log("Author: " + newPost.author);
@@ -176,6 +191,7 @@ export default class App extends React.Component {
       // console.log(newPost)
       // console.log('2, child_added')
     });
+    */
   }
 
   _handleAppStateChange = (nextAppState) => {
@@ -231,19 +247,46 @@ export default class App extends React.Component {
 
     if(!signedIn){
       // console.log("off firebase")
-      firebase.database().ref('/items').off()
+      // firebase.database().ref('/items').off()
     }else{
       // console.log("on firebase")
       this._firebase()
     }
 
-    const store = createStore(reducers, {}, applyMiddleware(ReduxThunk))
+    // const store = createStore(reducers, {}, applyMiddleware(ReduxThunk))
 
-    // const store = createStore(reducers, {}, compose(
-    //   applyAppStateListener(),
-    //   applyMiddleware(ReduxThunk)
-    // ))
+    const persistConfig = {
+      key: 'root',
+      storage,
+    }
+    
+    // const reducer = persistCombineReducers(config, reducers)
+
+    const persistedReducer = persistReducer(persistConfig, reducers)
+
+
+    const store = createStore(persistedReducer, {}, compose(
+      applyAppStateListener(),
+      applyMiddleware(ReduxThunk),
+      // autoRehydrate()
+    ))
+
+    let persistor = persistStore(store)
         
+    // persistStore(
+    //   store,
+    //   {
+    //     storage: AsyncStorage,
+    //     // transforms: [
+    //     //   saveSubsetBlacklistFilter,
+    //     // ]
+    //   },
+    //   () => {
+    //     this.setState({
+    //       isReady: true
+    //     })
+    //   }
+    // ) //purge here
 
     /*
     const store = createStore(reducers, initalState, [
@@ -259,7 +302,10 @@ composeEnhancers(
     // return(<View><Text>isSignedIn</Text></View>)
     // const Layout = createRootNavigator(signedIn);
     return (<Provider store={store}>
-              <AppNavigator />
+              {/* <AppNavigator /> */}
+              <PersistGate loading={null} persistor={persistor}>
+                <AppNavigator />
+              </PersistGate>
             </Provider>);
   }
 }

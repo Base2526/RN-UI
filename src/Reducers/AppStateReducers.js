@@ -1,25 +1,24 @@
-// import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-appstate';
+import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-appstate';
 
-// export default (state= {}, action)=>{
-//     // console.log(action)
-//     switch(action.type){
-//         case FOREGROUND:{
-//             return {...state, 
-//                     state: FOREGROUND, 
-//                     }
-//         } 
-//         case BACKGROUND:{
-//             return {...state,
-//                     state: BACKGROUND, 
-//                     }
-//         }
-//         case INACTIVE:{
-//             return {...state,
-//                     state: INACTIVE, 
-//                     }
-//         }
-
-//         default:
-//             return state
-//     }
-// }
+export default (state= {status:''}, action)=>{
+    console.log(action)
+    switch(action.type){
+        case FOREGROUND:{
+            return {...state, 
+                    status: FOREGROUND, 
+                    }
+        } 
+        case BACKGROUND:{
+            return {...state,
+                    status: BACKGROUND, 
+                    }
+        }
+        case INACTIVE:{
+            return {...state,
+                    status: INACTIVE, 
+                    }
+        }
+        default:
+            return state
+    }
+}

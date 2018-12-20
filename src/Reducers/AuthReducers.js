@@ -5,10 +5,11 @@ import {LOGIN_USER_SUCCESS,
 
 const INITIAL_STATE = {user:null,
                        provider:'',
-                       isLogin: false}
+                       isLogin: false,
+                       }
 
 export default (state= INITIAL_STATE, action)=>{
-    console.log(action)
+    // console.log(action)
     switch(action.type){
         // case EMAIL_CHANGED:{
         //     return { ...state, email: action.payload };
@@ -20,7 +21,7 @@ export default (state= INITIAL_STATE, action)=>{
             return {...state, 
                     user: action.user, 
                     provider: action.provider,
-                    isLogin: true
+                    isLogin: true,
                     }
         } 
         case LOGIN_USER_FAIL:{
@@ -28,31 +29,7 @@ export default (state= INITIAL_STATE, action)=>{
                     provider: action.provider,
                     isLogin: false}
         }
-        // case GET_USER_LOGIN:
-        //     return { 
-        //         ...state, 
-        //         // user: action.payload,
-        //         // provider: action.provider,
-        //     }
-
-        // case LOADING:
-        //     return { ...state, loading: action.isLoading };
-
-        // case FOREGROUND:{
-        //     return {...state, 
-        //             state: FOREGROUND, 
-        //             }
-        // } 
-        // case BACKGROUND:{
-        //     return {...state,
-        //             state: BACKGROUND, 
-        //             }
-        // }
-        // case INACTIVE:{
-        //     return {...state,
-        //             state: INACTIVE, 
-        //             }
-        // }
+        
         default:
             return state
     }

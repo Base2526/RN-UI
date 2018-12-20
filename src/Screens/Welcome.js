@@ -11,7 +11,7 @@ import {
 import Spinner from 'react-native-loading-spinner-overlay';
 
 import { connect } from 'react-redux';
-import firebase from 'react-native-firebase';
+// import firebase from 'react-native-firebase';
 
 
 // import { openDatabase } from 'react-native-sqlite-storage';
@@ -54,7 +54,7 @@ class Welcome extends React.Component {
 
   componentDidMount(){
     // console.log("off firebase 001")
-    firebase.database().ref('/items').off()
+    // firebase.database().ref('/items').off()
 
     // var db
     // if(Platform.OS === 'ios'){

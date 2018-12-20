@@ -12,7 +12,7 @@ import com.dylanvann.fastimage.FastImageViewPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 import org.reactnative.camera.RNCameraPackage;
-import io.invertase.firebase.RNFirebasePackage;
+//import io.invertase.firebase.RNFirebasePackage;
 
 import com.facebook.reactnative.androidsdk.FBSDKPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
@@ -26,7 +26,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 
-import io.invertase.firebase.database.RNFirebaseDatabasePackage;
+//import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 
 import java.util.Arrays;
@@ -50,8 +50,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNFirebasePackage(),
-            new RNFirebaseDatabasePackage(),
+//            new RNFirebasePackage(),
+//            new RNFirebaseDatabasePackage(),
             new FBSDKPackage(mCallbackManager),
             new RNGestureHandlerPackage(),
             new ReactNativeContacts(),
