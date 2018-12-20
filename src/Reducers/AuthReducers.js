@@ -1,6 +1,7 @@
+import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-appstate';
+
 import {LOGIN_USER_SUCCESS,
-        LOGIN_USER_FAIL,
-        LOGIN_USER}  from '../Actions/types'
+        LOGIN_USER_FAIL}  from '../Actions/types'
 
 const INITIAL_STATE = {user:null,
                        provider:'',
@@ -36,6 +37,22 @@ export default (state= INITIAL_STATE, action)=>{
 
         // case LOADING:
         //     return { ...state, loading: action.isLoading };
+
+        // case FOREGROUND:{
+        //     return {...state, 
+        //             state: FOREGROUND, 
+        //             }
+        // } 
+        // case BACKGROUND:{
+        //     return {...state,
+        //             state: BACKGROUND, 
+        //             }
+        // }
+        // case INACTIVE:{
+        //     return {...state,
+        //             state: INACTIVE, 
+        //             }
+        // }
         default:
             return state
     }

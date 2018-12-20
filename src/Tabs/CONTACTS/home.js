@@ -290,8 +290,6 @@ class ContactsHome extends Component {
                     <ClasssPage tabLabel='Classs' index={2} amount={6} params={this.props}/>
                 </ScrollableTabView>
                 }
-
-                
             </View>
         );
     }
@@ -304,7 +302,7 @@ let style = StyleSheet.create({
 });
 
 const mapStateToProps = (state) => {
-    console.log(state)
+    // console.log(state)
     return({
         // loading:state.auth.loading,
         // isLogin:state.auth.isLogin

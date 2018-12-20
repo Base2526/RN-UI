@@ -10,8 +10,9 @@ import firebase from 'react-native-firebase';
 import DeviceInfo from 'react-native-device-info';
 
 import {Provider} from 'react-redux'
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import ReduxThunk from 'redux-thunk'
+import applyAppStateListener from 'redux-enhancer-react-native-appstate';
 
 import reducers from './Reducers'
 
@@ -237,7 +238,23 @@ export default class App extends React.Component {
     }
 
     const store = createStore(reducers, {}, applyMiddleware(ReduxThunk))
+
+    // const store = createStore(reducers, {}, compose(
+    //   applyAppStateListener(),
+    //   applyMiddleware(ReduxThunk)
+    // ))
         
+
+    /*
+    const store = createStore(reducers, initalState, [
+  applyAppStateListener(),
+]);
+
+composeEnhancers(
+  applyAppStateListener(),
+  applyMiddleware(sagaMiddleware)
+)
+     */ 
 
     // return(<View><Text>isSignedIn</Text></View>)
     // const Layout = createRootNavigator(signedIn);

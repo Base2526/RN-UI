@@ -14,8 +14,11 @@ import ExpandableList from 'react-native-expandable-section-list'
 import DictStyle from './dictStyle'
 import FastImage from 'react-native-fast-image'
 import Swipeout from 'react-native-swipeout'
+import { connect } from 'react-redux';
 
-export default class FriendsPage extends React.Component{
+import * as actions from '../../Actions'
+
+class FriendsPage extends React.Component{
 
     constructor(props){
         super(props)
@@ -27,15 +30,55 @@ export default class FriendsPage extends React.Component{
     
     componentDidMount() {
       setTimeout(() => {this.setState({renderContent: true})}, 0);
+    
+      // console.log(this.props.profile)
+      // console.log(this.props.friends)
     }
 
-    mockData=()=>{
+    loadData=()=>{
+      /*
+        let profile = {
+          title: 'Profile',
+          member: [
+            {
+              title: this.props.profile.name,
+              status: this.props.profile.status_message,
+              image_url: this.props.profile.image_url,
+            }
+          ]
+        }
+
+        let friends = {title: 'Friends',
+                        member: [
+                         
+                          {
+                            title: 'Friend name',
+                            status: 'test'
+                          },
+                          {
+                            title: 'Friend name',
+                            status: 'test'
+                          },
+                          {
+                            title: 'Friend name',
+                            status: 'test'
+                          },
+                          {
+                            title: 'Friend name',
+                            status: 'test'
+                          }
+                        ]}
+
+        // console.log([profile, friends])
+        return [profile, friends];
+        */
+
         return( [
             {
               title: 'Profile',
               member: [
                 {
-                  title: 'User name',
+                  title: "Name",
                   status: 'test'
                 }
               ]
@@ -327,7 +370,7 @@ export default class FriendsPage extends React.Component{
             renderContent && 
             <ExpandableList
                     ref={instance => this.ExpandableList = instance}
-                    dataSource={this.mockData()}
+                    dataSource={this.loadData()}
                     headerKey="title"
                     memberKey="member"
                     renderRow={this._renderRow}
@@ -340,3 +383,19 @@ export default class FriendsPage extends React.Component{
       );
     }
 }
+
+
+const mapStateToProps = (state) => {
+  console.log(state)
+
+  // if(state.auth === null){
+  //   return {}
+  // }
+  return ({})
+  // return({
+  //     profile:state.auth.user.user_profile.profiles,
+  //     friends:state.auth.user.user_profile.friends,
+  // })
+}
+
+export default connect(mapStateToProps, actions)(FriendsPage);
