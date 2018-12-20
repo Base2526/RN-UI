@@ -6,7 +6,7 @@ import {StyleSheet,
         SafeAreaView,
         AppState} from "react-native";
         
-// import firebase from 'react-native-firebase';
+import firebase from 'react-native-firebase';
 import DeviceInfo from 'react-native-device-info';
 
 import {Provider} from 'react-redux'
@@ -17,10 +17,15 @@ import applyAppStateListener from 'redux-enhancer-react-native-appstate';
 
 // import { autoRehydrate, persistCombineReducers } from 'redux-persist'
 
-import { persistStore, persistReducer } from 'redux-persist'
+import { persistStore, persistReducer, REHYDRATE } from 'redux-persist'
 import storage from 'redux-persist/lib/storage' // default: localStorage if web, AsyncStorage if react-native
 import { PersistGate } from 'redux-persist/integration/react'
+// import { REHYDRATE } from 'redux-persist/constants';
 // import reducers from './reducers' // where reducers is an object of reducers
+
+// import FilesystemStorage from 'redux-persist-filesystem-storage'
+
+// import * as firebase from 'firebase';
 
 import reducers from './Reducers'
 
@@ -162,16 +167,16 @@ export default class App extends React.Component {
       console.log("getUniqueID is defined")
     }
 
-    /*
+    
     firebase.database().ref('/items').on("value", (snapshot, prevChildKey) => {
       var newPost = snapshot.val();
       // console.log("Author: " + newPost.author);
       // console.log("Title: " + newPost.title);
       // console.log("Previous Post ID: " + prevChildKey);
 
-      // console.log('001, value')
-      // console.log(newPost)
-      // console.log('002, value')
+      console.log('001, value')
+      console.log(newPost)
+      console.log('002, value')
     });
 
     firebase.database().ref('/items').on("child_changed", (snapshot) => {
@@ -191,7 +196,7 @@ export default class App extends React.Component {
       // console.log(newPost)
       // console.log('2, child_added')
     });
-    */
+  
   }
 
   _handleAppStateChange = (nextAppState) => {
@@ -245,11 +250,12 @@ export default class App extends React.Component {
       return null;
     }
 
+    console.log("------- render --------")
     if(!signedIn){
-      // console.log("off firebase")
+      console.log("off firebase")
       // firebase.database().ref('/items').off()
     }else{
-      // console.log("on firebase")
+      console.log("on firebase")
       this._firebase()
     }
 
@@ -262,7 +268,14 @@ export default class App extends React.Component {
     
     // const reducer = persistCombineReducers(config, reducers)
 
-    const persistedReducer = persistReducer(persistConfig, reducers)
+    // const createRehydrateRootReducer = reducer => (state, action) => {
+    //   if (action.type === REHYDRATE) {
+    //     return { ...state, ...action.payload, rehidrate: true };
+    //   }
+    //   return reducer(state, action);
+    // };
+
+    const persistedReducer = persistReducer(persistConfig, /*createRehydrateRootReducer(reducers)*/reducers)
 
 
     const store = createStore(persistedReducer, {}, compose(

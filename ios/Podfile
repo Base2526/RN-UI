@@ -15,6 +15,8 @@ target 'RN_UI' do
     # Pods for testing
     pod 'react-native-sqlite-storage', :path => '../node_modules/react-native-sqlite-storage'
 
+#    pod 'rn-fetch-blob', :path => '../node_modules/rn-fetch-blob'
+
   end
 
   target 'RN_UITests' do

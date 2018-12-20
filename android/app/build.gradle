@@ -156,15 +156,16 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-vector-icons')
-    compile project(':react-native-image-picker')
-    compile project(':react-native-gesture-handler')
-    compile project(':react-native-fbsdk')
-    compile project(':react-native-fast-image')
-    compile project(':react-native-device-info')
-    compile project(':react-native-contacts')
-    compile project(':react-native-camera')
-//    compile project(':react-native-firebase')
+//    compile project(':rn-fetch-blob')
+    implementation project(':react-native-vector-icons')
+    implementation project(':react-native-image-picker')
+    implementation project(':react-native-gesture-handler')
+    implementation project(':react-native-fbsdk')
+    implementation project(':react-native-fast-image')
+    implementation project(':react-native-device-info')
+    implementation project(':react-native-contacts')
+    implementation project(':react-native-camera')
+    compile project(':react-native-firebase')
     implementation project(':react-native-fbsdk')
     implementation project(':react-native-gesture-handler')
     implementation project(':react-native-contacts') {
@@ -202,8 +203,8 @@ dependencies {
 
     // Firebase dependencies
     implementation "com.google.android.gms:play-services-base:16.0.1"
-//    implementation "com.google.firebase:firebase-core:16.0.4"
-//    implementation "com.google.firebase:firebase-database:16.0.4"
+    implementation "com.google.firebase:firebase-core:16.0.4"
+    implementation "com.google.firebase:firebase-database:16.0.4"
 
 
     implementation project(':react-native-device-info')

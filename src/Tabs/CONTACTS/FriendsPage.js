@@ -16,7 +16,11 @@ import FastImage from 'react-native-fast-image'
 import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 
+import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-appstate';
+
+
 import * as actions from '../../Actions'
+// import { stat } from 'fs';
 
 class FriendsPage extends React.Component{
 
@@ -30,49 +34,75 @@ class FriendsPage extends React.Component{
     
     componentDidMount() {
       setTimeout(() => {this.setState({renderContent: true})}, 0);
-    
-      // console.log(this.props.profile)
-      // console.log(this.props.friends)
+    }
+
+    componentWillReceiveProps(nextProps){
+      
+      /* 
+      check ว่ามี property auth ถ้าไม่มีแสดงข้อมูลอาจผิดพลาดเราจะไม่ทำอะไร
+      */
+      if(!nextProps.hasOwnProperty('auth')){
+        return;
+      }
+
+      console.log('componentWillReceiveProps : auth')
+      console.log(nextProps)
     }
 
     loadData=()=>{
-      /*
         let profile = {
           title: 'Profile',
           member: [
             {
-              title: this.props.profile.name,
-              status: this.props.profile.status_message,
-              image_url: this.props.profile.image_url,
+              title: this.props.auth.user.user_profile.profiles.name,
+              status: this.props.auth.user.user_profile.profiles.status_message,
+              image_url: this.props.auth.user.user_profile.profiles.image_url,
             }
           ]
         }
 
         let friends = {title: 'Friends',
                         member: [
-                         
-                          {
-                            title: 'Friend name',
-                            status: 'test'
-                          },
-                          {
-                            title: 'Friend name',
-                            status: 'test'
-                          },
-                          {
-                            title: 'Friend name',
-                            status: 'test'
-                          },
-                          {
-                            title: 'Friend name',
-                            status: 'test'
-                          }
+                          // {
+                          //   title: 'Friend name',
+                          //   status: 'test'
+                          // },
+                          // {
+                          //   title: 'Friend name',
+                          //   status: 'test'
+                          // },
+                          // {
+                          //   title: 'Friend name',
+                          //   status: 'test'
+                          // },
+                          // {
+                          //   title: 'Friend name',
+                          //   status: 'test'
+                          // }
+                          
                         ]}
 
-        // console.log([profile, friends])
-        return [profile, friends];
-        */
+        let friendRequestSent = {
+          title: 'Friend Request Sent',
+          member: [
+            {
+              title: 'Friend name',
+              status: 'test'
+            },
+            {
+              title: 'Friend name',
+              status: 'test'
+            },
+            {
+              title: 'Friend name',
+              status: 'test'
+            },
+          ]
+        }
 
+        // console.log([profile, friends, friendRequestSent])
+        return [profile, friends, friendRequestSent];
+        
         return( [
             {
               title: 'Profile',
@@ -295,6 +325,14 @@ class FriendsPage extends React.Component{
           </View>
         )
       }else{
+
+        // console.log(this.loadData()[sectionId].member)
+
+        let member_size = this.loadData()[sectionId].member.length
+        if(member_size == 0){
+          return ;
+        }
+
         let ic_collapse;
         if(state){
           ic_collapse = <FastImage
@@ -338,7 +376,7 @@ class FriendsPage extends React.Component{
                                 color: 'gray',
                                 paddingLeft: 10,
                                 fontWeight:'700' }}>
-                {section + "(4)"}
+                {section + "("+ member_size +")"}
                 </Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -364,6 +402,10 @@ class FriendsPage extends React.Component{
         renderContent
       } = this.state;
 
+      if(!this.props.hasOwnProperty('auth')){
+        return <View style={{flex: 1}}></View>
+      }
+
       return (
           <View style={{flex: 1}}>
           {
@@ -388,14 +430,21 @@ class FriendsPage extends React.Component{
 const mapStateToProps = (state) => {
   console.log(state)
 
-  // if(state.auth === null){
-  //   return {}
-  // }
-  return ({})
-  // return({
-  //     profile:state.auth.user.user_profile.profiles,
-  //     friends:state.auth.user.user_profile.friends,
-  // })
+  // return {}
+  /*
+  profile:state.auth.user.user_profile.profiles,
+      friends:state.auth.user.user_profile.friends,
+   */
+
+  // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
+  //_persist.rehydrated parameter is initially set to false
+  if(!state._persist.rehydrated){
+    return {}
+  }
+
+  return{
+    auth:state.auth
+  }
 }
 
 export default connect(mapStateToProps, actions)(FriendsPage);

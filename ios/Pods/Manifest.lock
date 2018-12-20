@@ -57,10 +57,16 @@ PODS:
     - nanopb/encode (= 0.3.901)
   - nanopb/decode (0.3.901)
   - nanopb/encode (0.3.901)
+  - React (0.11.0):
+    - React/Core (= 0.11.0)
+  - react-native-sqlite-storage (3.3.9):
+    - React
+  - React/Core (0.11.0)
 
 DEPENDENCIES:
   - Firebase/Core
   - Firebase/Database
+  - react-native-sqlite-storage (from `../node_modules/react-native-sqlite-storage`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -74,6 +80,11 @@ SPEC REPOS:
     - GoogleUtilities
     - leveldb-library
     - nanopb
+    - React
+
+EXTERNAL SOURCES:
+  react-native-sqlite-storage:
+    :path: "../node_modules/react-native-sqlite-storage"
 
 SPEC CHECKSUMS:
   Firebase: 963d5685fae888a56d6d4d9cfce6b9c976958798
@@ -86,7 +97,9 @@ SPEC CHECKSUMS:
   GoogleUtilities: 95996bea7c7d9b8fb811b7507669a4a8762f80c7
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
+  React: ab1a2e21deb34965c38328d5ec40cc7d12c6050a
+  react-native-sqlite-storage: 848fb96c0b6d17b3f70e169ac41f84434cdad94c
 
-PODFILE CHECKSUM: 1d47bdf45fe237e739bde57faf9ea0dfef80ac0a
+PODFILE CHECKSUM: 41d64f041adb3f2ff595c1b95433b85bf7649453
 
 COCOAPODS: 1.5.3
