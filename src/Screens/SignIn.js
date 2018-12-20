@@ -4,21 +4,25 @@ import { View,
         Text,
         SafeAreaView } from "react-native";
 import { Card, Button, FormLabel, FormInput } from "react-native-elements";
-
 import Spinner from 'react-native-loading-spinner-overlay';
+import { connect } from 'react-redux';
 
 import Constant from '../Utils/Constant'
 import {saveAsyncStorage} from '../Utils/Helpers'
 
 import {login} from '../Utils/Services'
 
+import * as actions from '../Actions'
+
+import {LOADING} from '../Actions/types'
+
 // export default ({navigation}) =>
-export default class SignIn extends React.Component{
+class SignIn extends React.Component{
   constructor(props){
     super(props)
 
     this.state={
-      isShowSpinner: false,
+      loading: false,
       email:'',
       password:''
     }
@@ -30,7 +34,7 @@ export default class SignIn extends React.Component{
     // })
    */
 
-  _login(){
+  onLogin(){
     // console.log('email : ' + this.state.email + " , password : " + this.state.password)
 
     if(this.state.email === '' && this.state.password === ''){
@@ -40,7 +44,9 @@ export default class SignIn extends React.Component{
     }else if(this.state.password === ''){
       alert("Password is empty.")
     }else{
-      this.setState({isShowSpinner:true})
+
+      /*
+      this.setState({loading:true})
       login(this.state.email, this.state.password).then(data => {
         this.setState({isShowSpinner:false})
         if((data instanceof Array)){
@@ -67,23 +73,40 @@ export default class SignIn extends React.Component{
           }
         }
       })
+      */
+
+      this.setState({loading:true})
+      this.props.actionLogin({email:this.state.email, password:this.state.password}).then((result) => {
+        console.log(result)
+
+        this.setState({loading:false})
+        if(result.status){
+          this.props.navigation.navigate("App") 
+        }else{
+
+        }
+      })
     }
   }
 
   render(){
-    let {navigation} = this.props
+    let {navigation, isLogin} = this.props
+
+    // if(isLogin){
+    //   navigation.navigate("Main")
+    // }
+
     return (
     <SafeAreaView style={{flex:1}}>
     <View style={{ flex:1, paddingVertical: 20, backgroundColor:'white' }}>
       {/* <Card title="SIGN IN"> */}
 
         <Spinner
-          visible={this.state.isShowSpinner}
+          visible={this.state.loading}
           textContent={'Loading...'}
           textStyle={{color: '#FFF'}}
           overlayColor={'rgba(0,0,0,0.5)'}
         />
-
         <FormLabel>Email</FormLabel>
         <FormInput 
           placeholder="email..." 
@@ -117,7 +140,7 @@ export default class SignIn extends React.Component{
           <TouchableOpacity
             style={{backgroundColor:'#03A9F4', padding: 10, alignItems:'center'}}
             onPress={() => {
-              this._login()
+              this.onLogin()
               /*
               saveDataLocal(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.EMAIL}).then((data)=>{
                 if(data.status){
@@ -152,9 +175,17 @@ export default class SignIn extends React.Component{
             <Text style={{color:'black', fontSize: 18}}>Forgot Password</Text>
           </TouchableOpacity>
         </View>
-
-        
     </View>
     </SafeAreaView>)
   }
 }
+
+const mapStateToProps = (state) => {
+  // console.log(state)
+  return({
+      loading:state.auth.loading,
+      isLogin:state.auth.isLogin
+  })
+}
+
+export default connect(mapStateToProps, actions)(SignIn)

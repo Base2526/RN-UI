@@ -12,8 +12,10 @@ import Welcome from "./Screens/Welcome"
 
 import Menu from './DrawerMenu'
 
+import AuthLoadingScreen from './Screens/AuthLoadingScreen'
+
 // Inbox: { screen: InboxScreen },
-export const SignedOut = createStackNavigator({
+export const AuthStack = createStackNavigator({
     Welcome: {
         screen: Welcome,
         navigationOptions: {
@@ -50,7 +52,7 @@ let drawerNavigatorConfig = {
   contentComponent: Menu, // กรณีเราไม่ใส่ก็จะ render routeConfigs โดยไม่มี  DrawerContent
 }
 
-Main = createDrawerNavigator({
+AppDrawer = createDrawerNavigator({
   Tabs: {
     screen: Tabs,
     navigationOptions: {
@@ -71,20 +73,23 @@ Main = createDrawerNavigator({
 export const createRootNavigator = (signedIn = false) => {
   return( createAppContainer(createSwitchNavigator(
       {
-        SignedOut: SignedOut,
-        Main: Main,
+        Auth: AuthStack,
+        App: AppDrawer,
       },
       {
-        initialRouteName: signedIn ? "Main" : "SignedOut"
+        initialRouteName: signedIn ? "App" : "Auth"
       }
     )
   ))
 };
 
-// const AppStack = createStackNavigator({ Main : { screen: Main } });
-
-// export default class App extends React.Component {
-//   render() {
-//     return <AppStack/>;
-//   }
-// }
+export const AppNavigator = createAppContainer(createSwitchNavigator(
+  {
+      AuthLoading: AuthLoadingScreen,
+      Auth: AuthStack,
+      App: AppDrawer,
+  },
+  {
+      initialRouteName: 'AuthLoading',
+  }
+));

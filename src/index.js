@@ -9,7 +9,13 @@ import {StyleSheet,
 import firebase from 'react-native-firebase';
 import DeviceInfo from 'react-native-device-info';
 
-import { createRootNavigator } from "./App"; 
+import {Provider} from 'react-redux'
+import { createStore, applyMiddleware } from 'redux'
+import ReduxThunk from 'redux-thunk'
+
+import reducers from './Reducers'
+
+import { createRootNavigator, AppNavigator } from "./App"; 
 import Constant from './Utils/Constant'
 import {loadAsyncStorage} from './Utils/Helpers'
 
@@ -53,7 +59,7 @@ export default class App extends React.Component {
     });
     */
 
-    console.log("componentDidMount")
+    // console.log("componentDidMount")
     AppState.addEventListener('change', this._handleAppStateChange);
     AppState.addEventListener('memoryWarning', this._handleAppStateChange);
 
@@ -147,16 +153,16 @@ export default class App extends React.Component {
       // console.log("Title: " + newPost.title);
       // console.log("Previous Post ID: " + prevChildKey);
 
-      console.log('001, value')
-      console.log(newPost)
-      console.log('002, value')
+      // console.log('001, value')
+      // console.log(newPost)
+      // console.log('002, value')
     });
 
     firebase.database().ref('/items').on("child_changed", (snapshot) => {
       var changedPost = snapshot.val();
-      console.log('1, child_changed')
-      console.log(changedPost);
-      console.log('2, child_changed')
+      // console.log('1, child_changed')
+      // console.log(changedPost);
+      // console.log('2, child_changed')
     });
 
     firebase.database().ref('/items').on("child_added", (snapshot, prevChildKey) => {
@@ -165,9 +171,9 @@ export default class App extends React.Component {
       // console.log("Title: " + newPost.title);
       // console.log("Previous Post ID: " + prevChildKey);
 
-      console.log('1, child_added')
-      console.log(newPost)
-      console.log('2, child_added')
+      // console.log('1, child_added')
+      // console.log(newPost)
+      // console.log('2, child_added')
     });
   }
 
@@ -211,7 +217,7 @@ export default class App extends React.Component {
   };
 
   componentDidUpdate(){
-    console.log("------> componentDidUpdate")
+    // console.log("------> componentDidUpdate")
   }
 
   render() {
@@ -223,15 +229,20 @@ export default class App extends React.Component {
     }
 
     if(!signedIn){
-      console.log("off firebase")
+      // console.log("off firebase")
       firebase.database().ref('/items').off()
     }else{
-      console.log("on firebase")
+      // console.log("on firebase")
       this._firebase()
     }
 
+    const store = createStore(reducers, {}, applyMiddleware(ReduxThunk))
+        
+
     // return(<View><Text>isSignedIn</Text></View>)
-    const Layout = createRootNavigator(signedIn);
-    return <Layout />;
+    // const Layout = createRootNavigator(signedIn);
+    return (<Provider store={store}>
+              <AppNavigator />
+            </Provider>);
   }
 }

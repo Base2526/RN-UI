@@ -8,14 +8,15 @@ import { View,
         Dimensions,  } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Styles from '../../styles';
-
 import ScrollableTabView, {ScrollableTabBar, DefaultTabBar} from 'react-native-scrollable-tab-view';
-
 import FastImage from 'react-native-fast-image'
+import { connect } from 'react-redux';
 
 import FriendsPage from './FriendsPage'
 import GroupsPage from './GroupsPage'
 import ClasssPage from './ClasssPage'
+
+import * as actions from '../../Actions'
 
 const formatData = (data, numColumns) => {
     // เป้นการ ลบ item ที่มี ​field ออกทั้งหมด เพราะว่าเรารองรับการ orientation srceen ด้วย
@@ -36,8 +37,7 @@ const formatData = (data, numColumns) => {
     return data;
 };
 
-
-export default class ContactsHome extends Component {
+class ContactsHome extends Component {
 
     static navigationOptions = ({ navigation }) => ({
         title: "Contacts",
@@ -302,3 +302,13 @@ let style = StyleSheet.create({
         flex: 1
     },
 });
+
+const mapStateToProps = (state) => {
+    console.log(state)
+    return({
+        // loading:state.auth.loading,
+        // isLogin:state.auth.isLogin
+    })
+}
+
+export default connect(mapStateToProps, actions)(ContactsHome);

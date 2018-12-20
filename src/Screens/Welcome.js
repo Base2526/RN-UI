@@ -10,7 +10,7 @@ import {
 
 import Spinner from 'react-native-loading-spinner-overlay';
 
-
+import { connect } from 'react-redux';
 import firebase from 'react-native-firebase';
 
 
@@ -29,7 +29,9 @@ import {saveAsyncStorage} from '../Utils/Helpers'
 import Database from '../Utils/DB'
 // Database.getConnection()
 
-export default class Welcome extends React.Component {
+import * as actions from '../Actions'
+
+class Welcome extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -51,7 +53,7 @@ export default class Welcome extends React.Component {
   // }
 
   componentDidMount(){
-    console.log("off firebase 001")
+    // console.log("off firebase 001")
     firebase.database().ref('/items').off()
 
     // var db
@@ -65,16 +67,16 @@ export default class Welcome extends React.Component {
     Database.getConnection().transaction((tx) => {
       // SELECT name FROM sqlite_master WHERE type=\'table\'
       tx.executeSql("SELECT name FROM sqlite_master WHERE type=\'table\'", [], (tx, results) => {
-        console.log("Query completed");
+        // console.log("Query completed");
   
         // Get rows with Web SQL Database spec compliance.
-        console.log(results.rows)
+        // console.log(results.rows)
         var len = results.rows.length;
         for (let i = 0; i < len; i++) {
           let row = results.rows.item(i);
           // console.log(`Employee name: ${row.name}, Dept Name: ${row.deptName}`);
         
-          console.log(row)
+          // console.log(row)
         }
         
         // console.log('len : ' + len)
@@ -96,11 +98,11 @@ export default class Welcome extends React.Component {
       loading:!this.state.loading
     })
 
-    console.log("isShow : " + isShow)
+    // console.log("isShow : " + isShow)
   }
 
   _facebookSignIn = () => {
-    console.log("#1");
+    // console.log("#1");
     _this = this.props
     LoginManager.logInWithReadPermissions(["public_profile"]).then(
         function(result) {
@@ -113,7 +115,7 @@ export default class Welcome extends React.Component {
                 saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.FACEBOOK}).then((data)=>{
                     if(data.status){
                       // let {navigator} = _this
-                      _this.navigation.navigate("Main")
+                      _this.navigation.navigate("App")
 
                     }
                 }).catch((error)=>{
@@ -130,7 +132,8 @@ export default class Welcome extends React.Component {
   renderFB(){
     return (<View style={{padding:10}}>
       <TouchableOpacity
-      onPress={this._facebookSignIn}
+      // onPress={this._facebookSignIn}
+      onPress={()=>this.props.loginWithFacebook()}
       style={{backgroundColor:'#3a579d', padding: 10, alignItems:'center'}}>
           <Text style={{color:'white', fontSize: 18, fontWeight:'700'}}>Login with facebook</Text>
       </TouchableOpacity>
@@ -147,7 +150,7 @@ export default class Welcome extends React.Component {
 
           saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.TWITTER}).then((data)=>{
             if(data.status){
-              _this.navigation.navigate("Main")
+              _this.navigation.navigate("App")
             }
           }).catch((error)=>{
             console.log(error)
@@ -205,6 +208,16 @@ export default class Welcome extends React.Component {
   }
 }
 
+const mapStateToProps = (state) => {
+  // console.log(state)
+  return({
+      email:state.auth.email,
+      password:state.auth.password,
+      loading:state.auth.loading
+  })
+}
+
+export default connect(mapStateToProps, actions)(Welcome)
 
 const styles = StyleSheet.create({
   loading: {

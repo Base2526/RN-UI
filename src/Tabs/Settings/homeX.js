@@ -307,7 +307,7 @@ class home extends React.Component {
                     {text: 'OK', 
                     onPress: () => {
                         AsyncStorage.removeItem("auth-demo-key", ()=>{
-                          this.props.navigation.navigate("SignedOut")
+                          this.props.navigation.navigate("Auth")
 
                           //   // AsyncStorage.getItem("auth-demo-key")
                           //   // .then(res => {

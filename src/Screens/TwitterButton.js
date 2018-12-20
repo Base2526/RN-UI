@@ -36,7 +36,7 @@ export default class TwitterButton extends Component {
           saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.TWITTER}).then((data)=>{
             if(data.status){
               let {navigator} = _this
-              navigator.navigate("Main")
+              navigator.navigate("App")
             }
           }).catch((error)=>{
             console.log(error)

@@ -135,7 +135,7 @@ export default class homeY extends Component<{}> {
                               let value = JSON.parse(data.value)
                               console.log(value.provider)
                               console.log("then #1")
-                              if(value.provider == Constant.PROVIDERS.EMAIL){
+                              if(value.provider == Constant.PROVIDERS.USER){
 
                               }else if(value.provider == Constant.PROVIDERS.TWITTER){
                                 console.log("Logout Twitter")
@@ -152,8 +152,8 @@ export default class homeY extends Component<{}> {
                             console.log("then #2")
                             removeAsyncStorageByKey(Constant.USER_LOGIN).then((data) => {      
                               if(data.status){
-                                console.log("Go to SignedOut")
-                                this.props.navigation.navigate("SignedOut")
+                                console.log("Go to Auth")
+                                this.props.navigation.navigate("Auth")
                               }else{
                                 
                               }

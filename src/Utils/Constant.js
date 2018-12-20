@@ -27,7 +27,7 @@ module.exports = {
     //AsyncStorage key
     USER_LOGIN:'user_login',
     PROVIDERS:{
-        EMAIL:'email',
+        USER:'user',
         GOOGLE: 'google',
         FACEBOOK: 'facebook',
         TWITTER: 'twitter',

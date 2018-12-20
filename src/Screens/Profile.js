@@ -45,7 +45,7 @@ export default ({navigation}) => (
             //   // .catch(err => alert("error"));
             // })
 
-            navigation.navigate("SignedOut")
+            navigation.navigate("Auth")
         } // NEW LOGIC
       />
     </Card>
