@@ -41,25 +41,33 @@ export default class home extends Component {
         let __headerRight
         switch(params.positionSelect){
             case 0:{
-                __headerRight = <TouchableOpacity
-                style={Styles.headerButton}
-                onPress={() => {
-                    const { params = {} } = navigation.state
-                    params.handleHeaderRight()
-                } }>
-                <Icon name="plus" size={20} />
-            </TouchableOpacity>
+                __headerRight = 
+                <View style={{flexDirection:'row'}}>
+                    
+                    <TouchableOpacity
+                        style={{height: 20,
+                                width: 30,
+                                alignItems:'center'}}
+                        onPress={() => {
+                            const { params = {} } = navigation.state
+                            params.handleHeaderRight()
+                        } }>
+                        <Icon name="plus" size={20} />
+                    </TouchableOpacity>
+                </View>
             }
             break
             case 1:{
-            //     __headerRight = <TouchableOpacity
-            //     style={Styles.headerButton}
-            //     onPress={() => {
-            //         const { params = {} } = navigation.state
-            //         params.handleHeaderRight()
-            //     } }>
-            //     <Icon name="search" size={20} />
-            // </TouchableOpacity>
+                __headerRight = <TouchableOpacity
+                        style={{height: 20,
+                            width: 30,
+                            alignItems:'center'}}
+                    onPress={() => {
+                        const { params = {} } = navigation.state
+                        params.handleHeaderRightCenterSearch()
+                    } }>
+                    <Icon name="search" size={20} />
+                </TouchableOpacity>
             }
             break
         }
@@ -105,8 +113,11 @@ export default class home extends Component {
 
         this.props.navigation.setParams({ 
             handleHeaderRight: this.handleHeaderRight,
-            positionSelect: this.state.positionSelect
+            positionSelect: this.state.positionSelect,
+            handleHeaderRightCenterSearch: this.handleHeaderRightCenterSearch
         })
+
+        // this.props.navigation.setParams({ handleHeaderRightContactsSearch: this.handleHeaderRightContactsSearch })
     }
 
     handleHeaderRight = () => {
@@ -115,6 +126,10 @@ export default class home extends Component {
                 this.props.navigation.navigate("CreateApplicationPage")
             }
         }
+    }
+
+    handleHeaderRightCenterSearch= () => {
+        this.props.navigation.navigate("CenterSearch")
     }
 
     handleChangeTab({i, ref, from, }) {

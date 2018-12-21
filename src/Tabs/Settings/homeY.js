@@ -115,6 +115,14 @@ export default class homeY extends Component<{}> {
               onPress={()=>{
                 this.props.navigation.navigate("manage_customize_tab_menus")
               }} />
+
+            <Cell 
+              cellStyle="Basic" 
+              title="Google Search Company" 
+              accessory="DisclosureIndicator"
+              onPress={()=>{
+                this.props.navigation.navigate("google_search_company")
+              }} />
             <Cell 
               cellStyle="Basic" 
               title="Logout" 

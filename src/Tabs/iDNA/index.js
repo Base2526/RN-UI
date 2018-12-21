@@ -13,6 +13,8 @@ import MyProfilePage from '../CONTACTS/MyProfilePage'
 
 import MyApplicationProfilePage from './MyApplicationProfilePage'
 
+import CenterSearch from './CenterSearch'
+
 const index = createStackNavigator({
     'Home': {
         screen: Home,
@@ -62,6 +64,12 @@ const index = createStackNavigator({
           title: 'My Application',
         }
       },
+    'CenterSearch': {
+        screen: CenterSearch,
+        navigationOptions: {
+          title: 'Search',
+        }
+    },
 });
 
 index.navigationOptions = ({ navigation }) => {
@@ -74,7 +82,8 @@ index.navigationOptions = ({ navigation }) => {
         routeName === 'ListAllCategory' ||
         routeName === 'Comment' ||
         routeName === 'MyProfilePage' ||
-        routeName === 'MyApplicationProfilePage') {
+        routeName === 'MyApplicationProfilePage' ||
+        routeName === 'CenterSearch') {
       navigationOptions.tabBarVisible = false;
     }
   

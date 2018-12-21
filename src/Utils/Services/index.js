@@ -148,3 +148,15 @@ return fetch('/appointments/get_appos', data)
         .then(json => dispatch(receiveAppos(json)))
 } 
  */
+
+
+export const search_google = (textSearch) => {
+    return fetch('https://www.googleapis.com/customsearch/v1?key=AIzaSyDAVMdipuafrh2sfZbwDL7smEsk0HJrgHs&cx=011532986475707227508:bsrvzot-rza&q=' + textSearch)
+    .then((response) => response.json())
+    .then((responseJson) => {
+      return responseJson;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};

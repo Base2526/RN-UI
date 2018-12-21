@@ -250,14 +250,15 @@ export default class App extends React.Component {
       return null;
     }
 
-    console.log("------- render --------")
-    if(!signedIn){
-      console.log("off firebase")
-      // firebase.database().ref('/items').off()
-    }else{
-      console.log("on firebase")
-      this._firebase()
-    }
+    // console.log("------- render --------")
+    // if(!signedIn){
+    //   console.log("off firebase")
+    //   // firebase.database().ref('/items').off()
+    // }else{
+    //   console.log("on firebase")
+    //   this._firebase()
+    // }
+    
 
     // const store = createStore(reducers, {}, applyMiddleware(ReduxThunk))
 

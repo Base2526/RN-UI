@@ -430,12 +430,6 @@ class FriendsPage extends React.Component{
 const mapStateToProps = (state) => {
   console.log(state)
 
-  // return {}
-  /*
-  profile:state.auth.user.user_profile.profiles,
-      friends:state.auth.user.user_profile.friends,
-   */
-
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
   //_persist.rehydrated parameter is initially set to false
   if(!state._persist.rehydrated){

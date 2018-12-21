@@ -11,6 +11,8 @@ import SettingListManageGroup from './SettingListManageGroup'
 import SettingListManageMyApplication from './SettingListManageMyApplication'
 import SettingListForceLogout from './SettingListForceLogout'
 import SettingListCustomizeTabMenus from './SettingListCustomizeTabMenus'
+import GoogleSearchCompany from './GoogleSearchCompany'
+import GoogleSearchCompanyDetail from './GoogleSearchCompanyDetail'
 
 const index =  createStackNavigator({
     'home': {
@@ -61,6 +63,19 @@ const index =  createStackNavigator({
           title: 'Customize Tab Menus'
         },
     },
+    'google_search_company': {
+        screen: GoogleSearchCompany,
+        navigationOptions: {
+          title: 'Google Search Company'
+        },
+    },
+    // 
+    'google_search_company_detail': {
+        screen: GoogleSearchCompanyDetail,
+        navigationOptions: {
+          title: 'Google Search Company Detail'
+        },
+    },
 })
 
 index.navigationOptions = ({ navigation }) => {
@@ -74,7 +89,9 @@ index.navigationOptions = ({ navigation }) => {
         routeName === 'manage_group' ||
         routeName === 'manage_my_application' ||
         routeName === 'manage_force_logout' ||
-        routeName === 'manage_customize_tab_menus') {
+        routeName === 'manage_customize_tab_menus' ||
+        routeName === 'google_search_company' ||
+        routeName === 'google_search_company_detail') {
       navigationOptions.tabBarVisible = false;
     }
     return navigationOptions;
