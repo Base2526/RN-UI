@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.CallbackManager;
 import com.facebook.react.ReactApplication;
+//import io.fixd.rctlocale.RCTLocalePackage;
 //import com.RNFetchBlob.RNFetchBlobPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.imagepicker.ImagePickerPackage;
@@ -51,6 +52,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+//            new RCTLocalePackage(),
 //            new RNFetchBlobPackage(),
             new RNFirebasePackage(),
             new RNFirebaseDatabasePackage(),

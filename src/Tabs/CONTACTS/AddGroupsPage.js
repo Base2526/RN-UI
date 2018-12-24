@@ -5,9 +5,15 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import Styles from '../../styles';
 import { List, ListItem, SearchBar } from "react-native-elements";
 import FastImage from 'react-native-fast-image'
+import { connect } from 'react-redux';
 import DictStyle from '../CONTACTS/dictStyle';
 
 import ImagePicker from 'react-native-image-picker';
+
+import * as actions from '../../Actions'
+import Constant from '../../Utils/Constant'
+
+import {getUid} from '../../Utils/Helpers'
 
 // More info on all the options is below in the API Reference... just some common use cases shown here
 const options = {
@@ -23,7 +29,7 @@ const options = {
   maxHeight: 500,
 };
 
-export default class AddGroupsPage extends React.Component{
+class AddGroupsPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
         title: "Create Groups",
@@ -37,7 +43,10 @@ export default class AddGroupsPage extends React.Component{
         headerRight: (
             <TouchableOpacity
                 style={{paddingRight:10}}
-                onPress={() => alert("Create")}>
+                onPress={() => {
+                  const { params = {} } = navigation.state
+                  params.handleCreateGroup()
+                }}>
                 <Text style={{fontSize:16, fontWeight:'600'}}>Create</Text>
             </TouchableOpacity>
           ),
@@ -55,8 +64,9 @@ export default class AddGroupsPage extends React.Component{
           error: null,
           refreshing: false,
           text: '',
-          avatarSource: {"uri":"https://unsplash.it/400/400?image=1"},
-          seleteds: []
+          avatarSource: {"uri":""},
+          seleteds: [],
+          groupName: ''
         };
     }
 
@@ -65,23 +75,92 @@ export default class AddGroupsPage extends React.Component{
 
       setTimeout(() => {this.setState({renderContent: true})}, 0);
 
+      this.props.navigation.setParams({ handleCreateGroup: this.handleCreateGroup })
+
       this.setState({
-        data: this._data(),
+        data: this.loadData(),
         error: null,
         loading: false,
         refreshing: false
       });
     }
 
-    _data=()=>{
-        return(
-            [ {"key":99, "name":'00'},
-              {"key":1, "name":'A1'}, 
-              {"key":2, "name":'A2'}, 
-              {"key":3, "name":'A3'}, 
-              {"key":4, "name":'A4'}, 
-              {"key":5, "name":'A5'}]
-        )
+    handleCreateGroup = () => {
+      let groupName = this.state.groupName.trim()
+      let uri = this.state.avatarSource.uri; 
+      let seleteds = this.state.seleteds;
+      if(groupName === "" && uri === "" && seleteds.length === 0){
+        alert("Group name and Image && Select friend is empty.")
+      }else if(groupName === ""){
+        alert("Group name is empty.")
+      }else if(uri === ""){
+        alert("Image is empty.")
+      }else if(seleteds.length === 0){
+        alert("Select friend is empty.")
+      }else{
+        console.log('-success-')
+
+        this.setState({loading:true})
+        // uid, group_name, members, uri)
+        this.props.actionCreateGroup({uid:this.props.uid, group_name:groupName, members: seleteds, uri:this.state.avatarSource.uri}).then((result) => {
+          console.log(result)
+
+          this.setState({loading:false})
+          if(result.status){
+            // this.props.navigation.navigate("App") 
+          }else{
+
+          }
+        })
+      }
+    }
+
+    loadData=()=>{
+        // return(
+        //     [ {"key":99, "name":'00'},
+        //       {"key":1, "name":'A1'}, 
+        //       {"key":2, "name":'A2'}, 
+        //       {"key":3, "name":'A3'}, 
+        //       {"key":4, "name":'A4'}, 
+        //       {"key":5, "name":'A5'}]
+        // )
+
+         // return [this.props.auth.user.user_profile.groups]
+
+      let friend_member = [{"key":99, "name":'00'}]
+      let friend_profiles = this.props.auth.user.friend_profiles
+      for (var key in this.props.auth.user.user_profile.friends) {
+    
+        let friend =  this.props.auth.user.user_profile.friends[key]
+        let friend_profile = friend_profiles[key]
+
+        switch(friend.status){
+          case Constant.FRIEND_STATUS_FRIEND:{
+            // console.log('1, --' + key)
+            
+            friend_member.push({...friend, ...friend_profile});
+            break
+          }
+
+          case Constant.FRIEND_STATUS_FRIEND_CANCEL:{
+            // console.log('2, --' + key)
+            break
+          }
+
+          case Constant.FRIEND_STATUS_FRIEND_REQUEST:{
+            // console.log('3, --' + key)
+            break
+          }
+
+          case Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND:{
+            // console.log('4, --' + key)
+            break
+          }
+        }
+      }
+
+      // console.log(friend_member)
+      return friend_member
     }
 
     makeRemoteRequest = () => {
@@ -182,7 +261,7 @@ export default class AddGroupsPage extends React.Component{
               <FastImage
                   style={{width: 80, height: 80, borderRadius: 10}}
                   source={{
-                  uri: this.state.avatarSource.uri,
+                  uri: this.state.avatarSource.uri === "" ? "https://unsplash.it/400/400?image=1" : this.state.avatarSource.uri,
                   headers:{ Authorization: 'someAuthToken' },
                   priority: FastImage.priority.normal,
                   }}
@@ -195,10 +274,12 @@ export default class AddGroupsPage extends React.Component{
                                 borderColor: 'gray',
                                 borderWidth: 1}}
                 underlineColorAndroid = "transparent"
-                placeholder = "Name chat group"
+                placeholder = "Group Name"
                 placeholderTextColor = "gray"
                 autoCapitalize = "none"
-                onChangeText = {this.handleEmail}/>
+                ref= {(el) => { this.groupName = el; }}
+                onChangeText = {this.handleEmail}
+                value={this.state.groupName}/>
         </View>)
     };
   
@@ -218,8 +299,8 @@ export default class AddGroupsPage extends React.Component{
       );
     };
 
-    handleEmail = (text) => {
-        this.setState({ text: text })
+    handleEmail = (groupName) => {
+        this.setState({ groupName })
     }
 
     _check=(key)=>{
@@ -243,6 +324,8 @@ export default class AddGroupsPage extends React.Component{
           seleteds
         })
       } 
+
+      console.log(this.state.seleteds)
     }
 
     renderItem = ({item, index}) => {
@@ -255,17 +338,12 @@ export default class AddGroupsPage extends React.Component{
             default:{
                 // console.log(item)
 
-                let check
-                if('seleted' in item){
-                  
-                }
-
-                let seleteds = this.state.seleteds
-                let _c = seleteds.find((seleted) => {
-                  return seleted.key === item.key;
+                let check = null
+                let __ = this.state.seleteds.filter(obj => {
+                  return obj.key === item.item_id
                 })
 
-                if(_c !== undefined){
+                if(__.length !== 0){
                   check = <Icon name="check" size={15} />
                 }
 
@@ -290,7 +368,7 @@ export default class AddGroupsPage extends React.Component{
                               <FastImage
                                   style={{width: 40, height: 40, borderRadius: 10}}
                                   source={{
-                                  uri: 'https://unsplash.it/400/400?image=1',
+                                  uri: Constant.API_URL + item.image_url,
                                   headers:{ Authorization: 'someAuthToken' },
                                   priority: FastImage.priority.normal,
                                   }}
@@ -301,13 +379,14 @@ export default class AddGroupsPage extends React.Component{
                         <View style={{flex:5}}>
                           <TouchableOpacity 
                             onPress={()=>{
-                              this._check(item.key)
+                              this._check(item.item_id)
                             }}
-                            >
+                            style={{flex:1, justifyContent:'center'}}>
                             <Text style={{
                                         fontSize: 16, 
                                         fontWeight: '600',
                                         color: DictStyle.colorSet.normalFontColor,
+                                        
                                         paddingLeft: 10}}>
                                 {item.name}
                             </Text>
@@ -326,7 +405,7 @@ export default class AddGroupsPage extends React.Component{
     
     render() {
 
-        console.log(this.state.seleteds)
+        // console.log(this.state.seleteds)
 
         // let swipeBtns = [{
         //   text: 'Delete',
@@ -376,3 +455,20 @@ export default class AddGroupsPage extends React.Component{
         );
       }
 }
+
+const mapStateToProps = (state) => {
+  console.log(state)
+
+  // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
+  //_persist.rehydrated parameter is initially set to false
+  if(!state._persist.rehydrated){
+    return {}
+  }
+
+  return{
+    auth:state.auth,
+    uid:getUid(state)
+  }
+}
+
+export default connect(mapStateToProps, actions)(AddGroupsPage);

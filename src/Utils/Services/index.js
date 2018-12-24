@@ -149,6 +149,112 @@ return fetch('/appointments/get_appos', data)
 } 
  */
 
+export const people_you_may_khow = () => {
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({
+            'uid': '1',
+        }),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.PEOPLE_YOU_MAY_KNOW, data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            // console.log(responseJson)
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+        });
+}
+
+export const add_friend = (uid, friend_id) =>{
+    // ADD_FRIEND
+
+    // @"uid":[[Configs sharedInstance] getUIDU], @"friend_id":friend_id
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({
+            'uid': uid,
+            'friend_id': friend_id
+        }),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.ADD_FRIEND, data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            // console.log(responseJson)
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+        });
+}
+
+// CREATE_GROUP
+export const create_group = (uid, group_name, members, uri) =>{
+
+    let body = new FormData();
+    body.append('photo', {uri: uri,name: 'photo.png',filename :'imageName.png',type: 'image/png'});
+    body.append('Content-Type', 'image/png');
+    body.append('name', group_name); 
+    
+    return fetch(Constant.CREATE_GROUP,{ method: 'POST',
+        headers:{  
+        // "Content-Type": "multipart/form-data",
+        // "otherHeader": "foo",
+        
+        'Accept': 'application/json',
+        // 'Content-Type': 'application/json',
+        'Content-Type': 'multipart/form-data',
+        'version_os': 'version_os',
+        'system_name': 'system_name',
+        'device_name': 'device_name',
+        'bundle_identifier': 'bundle_identifier',
+        'platform': 'ios',
+        'version_application': '1.0',
+        'udid': 'udid',
+        'model_number': 'model_number',
+        'build': '1',
+        'token_notification': 'token_notification',
+        'token_pushkit': 'token_pushkit',
+        } 
+        , body :JSON.stringify(body)} )
+    // .then((response) => response.json())
+     .then((res) => res.json())
+     .then((res) => { 
+         console.log("response" +JSON.stringify(res)); 
+    })
+     .catch((e) => console.log(e))
+
+
+
+    const data = new FormData();
+    data.append('uid', uid); // you can append anyone.
+    data.append('name', group_name); // you can append anyone.
+    data.append('members', members);
+    data.append('idna', {
+    uri: uri,
+        type: 'image/jpeg', // or photo.type
+        name: 'testPhotoName'
+    });
+
+    // @"uid":[[Configs sharedInstance] getUIDU], @"friend_id":friend_id
+    let ___ = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.CREATE_GROUP, ___)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            console.log(responseJson)
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+        });
+}
 
 export const search_google = (textSearch) => {
     return fetch('https://www.googleapis.com/customsearch/v1?key=AIzaSyDAVMdipuafrh2sfZbwDL7smEsk0HJrgHs&cx=011532986475707227508:bsrvzot-rza&q=' + textSearch)

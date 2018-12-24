@@ -156,6 +156,7 @@ android {
 }
 
 dependencies {
+//    compile project(':react-native-locale')
 //    compile project(':rn-fetch-blob')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-image-picker')

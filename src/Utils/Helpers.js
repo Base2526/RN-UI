@@ -3,6 +3,14 @@ import {AsyncStorage} from 'react-native'
 import { Dimensions, DeviceInfo, Platform } from 'react-native';
 import { Header } from 'react-navigation';
 
+export const getUid = (state) =>{
+    console.log(state)
+    if(!state._persist.rehydrated){
+        return -1
+    }
+    return state.auth.user.user.user.uid
+}
+
 export async function loadAsyncStorage(key) {
     let result = {}
 
@@ -94,4 +102,22 @@ export const validateEmail = (text) => {
       // console.log("Email is Correct");
       return true;
     }
+}
+
+/*
+    let date = new Date()
+    console.log(date)
+
+    const timestamp = Math.floor(date / 1000);
+    console.log(timestamp)
+
+    var t = new Date(timestamp * 1000);
+    console.log(t.toLocaleDateString())
+*/
+export const currentTimestamp = () => {
+    return Math.floor(new Date() / 1000);
+}
+
+export const displayTimestamp = (timestamp) =>{
+    return new Date(timestamp * 1000);
 }

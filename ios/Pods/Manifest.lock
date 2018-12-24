@@ -59,6 +59,8 @@ PODS:
   - nanopb/encode (0.3.901)
   - React (0.11.0):
     - React/Core (= 0.11.0)
+  - react-native-locale (0.0.19):
+    - React
   - react-native-sqlite-storage (3.3.9):
     - React
   - React/Core (0.11.0)
@@ -66,6 +68,7 @@ PODS:
 DEPENDENCIES:
   - Firebase/Core
   - Firebase/Database
+  - react-native-locale (from `../node_modules/react-native-locale`)
   - react-native-sqlite-storage (from `../node_modules/react-native-sqlite-storage`)
 
 SPEC REPOS:
@@ -83,6 +86,8 @@ SPEC REPOS:
     - React
 
 EXTERNAL SOURCES:
+  react-native-locale:
+    :path: "../node_modules/react-native-locale"
   react-native-sqlite-storage:
     :path: "../node_modules/react-native-sqlite-storage"
 
@@ -98,8 +103,9 @@ SPEC CHECKSUMS:
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
   React: ab1a2e21deb34965c38328d5ec40cc7d12c6050a
+  react-native-locale: cc551c4a467d0e2e7c5e5913a89630870ba43293
   react-native-sqlite-storage: 848fb96c0b6d17b3f70e169ac41f84434cdad94c
 
-PODFILE CHECKSUM: 41d64f041adb3f2ff595c1b95433b85bf7649453
+PODFILE CHECKSUM: 805636c46d7644403c1e1134ea0fed70b1e554d3
 
 COCOAPODS: 1.5.3

@@ -26,8 +26,9 @@ import {saveAsyncStorage} from '../Utils/Helpers'
 
 // import TwitterButton from './TwitterButton';
 
-import Database from '../Utils/DB'
-// Database.getConnection()
+// import Database from '../Utils/DB'
+
+
 
 import * as actions from '../Actions'
 
@@ -64,6 +65,7 @@ class Welcome extends React.Component {
     // }
 
     // console.log(db)
+    /*
     Database.getConnection().transaction((tx) => {
       // SELECT name FROM sqlite_master WHERE type=\'table\'
       tx.executeSql("SELECT name FROM sqlite_master WHERE type=\'table\'", [], (tx, results) => {
@@ -83,14 +85,13 @@ class Welcome extends React.Component {
   
         // Alternatively, you can use the non-standard raw method.
   
-        /*
-          let rows = results.rows.raw(); // shallow copy of rows Array
-  
-          rows.map(row => console.log(`Employee name: ${row.name}, Dept Name: ${row.deptName}`));
-        */
+        
+        // let rows = results.rows.raw(); // shallow copy of rows Array
+        // rows.map(row => console.log(`Employee name: ${row.name}, Dept Name: ${row.deptName}`));
+        
       });
-
     })
+    */
   }
 
   __loading(){

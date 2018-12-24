@@ -20,7 +20,11 @@ import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-ap
 
 
 import * as actions from '../../Actions'
+import firebase from 'react-native-firebase';
+import { Constants } from 'react-native-navigation';
 // import { stat } from 'fs';
+
+import Constant from '../../Utils/Constant'
 
 class FriendsPage extends React.Component{
 
@@ -54,54 +58,82 @@ class FriendsPage extends React.Component{
           title: 'Profile',
           member: [
             {
-              title: this.props.auth.user.user_profile.profiles.name,
+              name: this.props.auth.user.user_profile.profiles.name,
               status: this.props.auth.user.user_profile.profiles.status_message,
               image_url: this.props.auth.user.user_profile.profiles.image_url,
             }
           ]
         }
 
-        let friends = {title: 'Friends',
-                        member: [
-                          // {
-                          //   title: 'Friend name',
-                          //   status: 'test'
-                          // },
-                          // {
-                          //   title: 'Friend name',
-                          //   status: 'test'
-                          // },
-                          // {
-                          //   title: 'Friend name',
-                          //   status: 'test'
-                          // },
-                          // {
-                          //   title: 'Friend name',
-                          //   status: 'test'
-                          // }
-                          
-                        ]}
+        /*
+        #define _FRIEND_STATUS_FRIEND            @"10"
+        #define _FRIEND_STATUS_FRIEND_CANCEL     @"13"
+        #define _FRIEND_STATUS_FRIEND_REQUEST    @"11"
+        #define _FRIEND_STATUS_WAIT_FOR_A_FRIEND @"12"
+
+           FRIEND_STATUS_FRIEND: 10,
+   FRIEND_STATUS_FRIEND_CANCEL: 13,
+   FRIEND_STATUS_FRIEND_REQUEST: 11,
+   FRIEND_STATUS_WAIT_FOR_A_FRIEND : 12,
+         */
+
+        let friend_profiles = this.props.auth.user.friend_profiles
+        // console.log(friend_profiles)
+        let friendRequestSent_member = []
+        let friend_member = []
+        for (var key in this.props.auth.user.user_profile.friends) {
+          // console.log()
+
+          let friend =  this.props.auth.user.user_profile.friends[key]
+
+          let friend_profile = friend_profiles[key]
+          // console.log(friend)
+          // console.log(friend_profile)
+
+          // console.log(friend.status)
+          // console.log(Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND)
+          switch(friend.status){
+            case Constant.FRIEND_STATUS_FRIEND:{
+              // console.log('1, --' + key)
+              
+              friend_member.push({...friend, ...friend_profile});
+              break
+            }
+
+            case Constant.FRIEND_STATUS_FRIEND_CANCEL:{
+              // console.log('2, --' + key)
+              break
+            }
+
+            case Constant.FRIEND_STATUS_FRIEND_REQUEST:{
+              // console.log('3, --' + key)
+              break
+            }
+
+            case Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND:{
+              // console.log('4, --' + key)
+              // console.log()
+
+              friendRequestSent_member.push({...friend, ...friend_profile});  
+              break
+            }
+          }
+        }
+
+        // console.log(friendRequestSent_member)
+        // console.log(friend_member)
 
         let friendRequestSent = {
           title: 'Friend Request Sent',
-          member: [
-            {
-              title: 'Friend name',
-              status: 'test'
-            },
-            {
-              title: 'Friend name',
-              status: 'test'
-            },
-            {
-              title: 'Friend name',
-              status: 'test'
-            },
-          ]
+          member: friendRequestSent_member
+        }
+
+        let friends = {title: 'Friends',
+          member: friend_member
         }
 
         // console.log([profile, friends, friendRequestSent])
-        return [profile, friends, friendRequestSent];
+        return [profile, friendRequestSent, friends];
         
         return( [
             {
@@ -176,6 +208,9 @@ class FriendsPage extends React.Component{
     }
 
     _renderRow = (rowItem, rowId, sectionId) => {
+
+        // console.log(rowItem)
+        
         if(rowId == 0 && sectionId == 0){
           return (
             <TouchableOpacity 
@@ -201,7 +236,7 @@ class FriendsPage extends React.Component{
                       <FastImage
                           style={{width: 60, height: 60, borderRadius: 10}}
                           source={{
-                            uri: 'https://unsplash.it/400/400?image=1',
+                            uri: Constant.API_URL + rowItem.image_url,
                             headers:{ Authorization: 'someAuthToken' },
                             priority: FastImage.priority.normal,
                           }}
@@ -214,7 +249,7 @@ class FriendsPage extends React.Component{
                                   color: DictStyle.colorSet.normalFontColor,
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
-                        Name : {rowItem.title}
+                        Name : {rowItem.name}
                     </Text>
                     <Text style={{fontSize: DictStyle.fontSet.mSize, 
                                 color: DictStyle.colorSet.normalFontColor,
@@ -269,7 +304,7 @@ class FriendsPage extends React.Component{
                     <FastImage
                         style={{width: 60, height: 60, borderRadius: 10}}
                         source={{
-                        uri: 'https://unsplash.it/400/400?image=1',
+                        uri: Constant.API_URL + rowItem.image_url,
                         headers:{ Authorization: 'someAuthToken' },
                         priority: FastImage.priority.normal,
                         }}
@@ -282,7 +317,7 @@ class FriendsPage extends React.Component{
                                   color: DictStyle.colorSet.normalFontColor,
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
-                        Name : {rowItem.title}
+                        Name : {rowItem.name}
                     </Text>
                     <Text style={{fontSize: DictStyle.fontSet.mSize, 
                                 color: DictStyle.colorSet.normalFontColor,

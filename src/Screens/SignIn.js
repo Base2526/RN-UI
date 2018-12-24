@@ -37,11 +37,14 @@ class SignIn extends React.Component{
   onLogin(){
     // console.log('email : ' + this.state.email + " , password : " + this.state.password)
 
-    if(this.state.email === '' && this.state.password === ''){
+    let _email    = this.state.email.trim()
+    let _password = this.state.password.trim()
+
+    if(_email === '' && _password === ''){
       alert("Email and Password is empty.")
-    }else if(this.state.email === ''){
+    }else if(_email === ''){
       alert("Email is empty.")
-    }else if(this.state.password === ''){
+    }else if(_password === ''){
       alert("Password is empty.")
     }else{
 
@@ -76,7 +79,7 @@ class SignIn extends React.Component{
       */
 
       this.setState({loading:true})
-      this.props.actionLogin({email:this.state.email, password:this.state.password}).then((result) => {
+      this.props.actionLogin({email:_email, password:_password}).then((result) => {
         console.log(result)
 
         this.setState({loading:false})

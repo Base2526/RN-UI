@@ -11,7 +11,10 @@ import {LOGIN_USER_SUCCESS,
 import {saveAsyncStorage, loadAsyncStorage} from '../Utils/Helpers'
 import Constant from '../Utils/Constant'
 
-import {login} from '../Utils/Services'
+import {login, 
+        people_you_may_khow, 
+        add_friend,
+        create_group} from '../Utils/Services'
 
 // export const emailChanged = (text) =>{
 //     return({
@@ -150,3 +153,102 @@ export const actionUserLogin = () => dispatch =>(
         return {'status':false, 'message': error}
     })
 )
+
+export const actionPeopleYouMayKhow = () => dispatch=>{
+
+    return people_you_may_khow().then(data => {
+        // this.setState({isShowSpinner:false})
+
+        // dispatch({ type: LOADING, isLoading:false})
+
+        // console.log(data)
+        if((data instanceof Array)){
+            // error message
+            // alert(data[0])
+            // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data[0] });
+
+            return {'status':false, 'message': data.message}
+        }else{
+            if(!data.result){
+                // alert(data.message)
+                // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data.message });
+        
+                return {'status':false, 'message': data.message}
+            }else{
+                // console.log(data.data.friend_profiles)
+                // console.log(data.data.user)
+                // console.log(data.data.user_profile)
+                // saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.USER, "user": data.data});
+
+                // dispatch({ type: LOGIN_USER_SUCCESS, provider: Constant.PROVIDERS.USER, user: data.data });
+                return {'status':true, 'data':data}
+            }
+        }
+    })
+}
+
+export const actionAddFriend = (uid, friend_id) => dispatch =>{
+
+    return add_friend(uid, friend_id).then(data => {
+        // this.setState({isShowSpinner:false})
+
+        // dispatch({ type: LOADING, isLoading:false})
+
+        // console.log(data)
+        if((data instanceof Array)){
+            // error message
+            // alert(data[0])
+            // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data[0] });
+
+            return {'status':false, 'message': data.message}
+        }else{
+            if(!data.result){
+                // alert(data.message)
+                // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data.message });
+        
+                return {'status':false, 'message': data.message}
+            }else{
+                // console.log(data.data.friend_profiles)
+                // console.log(data.data.user)
+                // console.log(data.data.user_profile)
+                // saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.USER, "user": data.data});
+                // dispatch({ type: LOGIN_USER_SUCCESS, provider: Constant.PROVIDERS.USER, user: data.data });
+                return {'status':true, 'data':data}
+            }
+        }
+    })
+}
+
+// create_group
+export const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
+
+    // (uid, group_name, members, uri)
+    return create_group(uid, group_name, members, uri).then(data => {
+        // this.setState({isShowSpinner:false})
+
+        // dispatch({ type: LOADING, isLoading:false})
+
+        // console.log(data)
+        if((data instanceof Array)){
+            // error message
+            // alert(data[0])
+            // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data[0] });
+
+            return {'status':false, 'message': data.message}
+        }else{
+            if(!data.result){
+                // alert(data.message)
+                // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data.message });
+        
+                return {'status':false, 'message': data.message}
+            }else{
+                // console.log(data.data.friend_profiles)
+                // console.log(data.data.user)
+                // console.log(data.data.user_profile)
+                // saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.USER, "user": data.data});
+                // dispatch({ type: LOGIN_USER_SUCCESS, provider: Constant.PROVIDERS.USER, user: data.data });
+                return {'status':true, 'data':data}
+            }
+        }
+    })
+}
