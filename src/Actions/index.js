@@ -234,13 +234,13 @@ export const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
             // alert(data[0])
             // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data[0] });
 
-            return {'status':false, 'message': data.message}
+            return {'status':false, 'message': data}
         }else{
             if(!data.result){
                 // alert(data.message)
                 // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data.message });
         
-                return {'status':false, 'message': data.message}
+                return {'status':false, 'message': data}
             }else{
                 // console.log(data.data.friend_profiles)
                 // console.log(data.data.user)

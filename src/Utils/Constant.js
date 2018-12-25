@@ -16,8 +16,8 @@ module.exports = {
     CREATE_GROUP: API_URL + END_POINT + '/create_chat_group',
     FETCH_HEADERS: {
         'Accept': 'application/json',
-        // 'Content-Type': 'application/json',
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': 'application/json',
+        // 'Content-Type': 'multipart/form-data',
         'version_os': 'version_os',
         'system_name': 'system_name',
         'device_name': 'device_name',

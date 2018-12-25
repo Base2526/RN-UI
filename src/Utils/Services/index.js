@@ -1,4 +1,6 @@
 import {Platform} from 'react-native'
+// import RNFetchBlob from 'react-native-fetch-blob'
+
 import Constant from '../Constant'
 
 export const login = (name, pass) => {
@@ -194,6 +196,117 @@ export const add_friend = (uid, friend_id) =>{
 // CREATE_GROUP
 export const create_group = (uid, group_name, members, uri) =>{
 
+    var data = new FormData();
+    data.append('idna', {
+        uri: uri, // your file path string
+        name: 'imageName.png',
+        type: 'image/png'
+    })
+
+    data.append("uid", uid)
+    data.append("name", group_name)
+ 
+    // members.forEach(function(value) {
+    //     data.append("members[]", value.key)
+    // });
+
+    // var newArr = Object.keys(members);
+    // // console.log(newArr);
+
+    // var mappedArr = newArr.map(function(i) {
+    //     return [i, members[i]];
+    // });
+
+    data.append('members', JSON.stringify(members))
+
+    return fetch(Constant.CREATE_GROUP, {
+        headers: Constant.FETCH_HEADERS,
+        method: 'POST',
+        body: data
+      }).then((response) => {
+          return response.json()
+      }).then((responseJson) => {
+          return responseJson;
+      }).catch((error) => {
+        //   console.log(error)
+
+          return {'status': false, 'message': error}
+      })
+
+    /*
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({
+            'uid': uid,
+            'name': group_name,
+            'members' : members,
+            'data':uri
+        }),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.CREATE_GROUP, data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            console.log(responseJson)
+            return responseJson;
+        }).catch((error) => {
+            co
+            */
+
+
+
+            /*
+    return RNFetchBlob.fetch('POST', Constant.CREATE_GROUP, {
+        // Authorization : "Bearer access-token",
+        // otherHeader : "foo",
+        // this is required, otherwise it won't be process as a multipart/form-data request
+        'Content-Type' : 'multipart/form-data',
+
+        // 'Accept': 'application/json',
+        // // 'Content-Type': 'application/json',
+        // // 'Content-Type': 'multipart/form-data',
+        // 'version_os': 'version_os',
+        // 'system_name': 'system_name',
+        // 'device_name': 'device_name',
+        // 'bundle_identifier': 'bundle_identifier',
+        // 'platform': 'ios',
+        // 'version_application': '1.0',
+        // 'udid': 'udid',
+        // 'model_number': 'model_number',
+        // 'build': '1',
+        // 'token_notification': 'token_notification',
+        // 'token_pushkit': 'token_pushkit',
+      }, [
+        // append field data from file path
+        {
+          name : 'avatar',
+          filename : 'avatar.png',
+          // Change BASE64 encoded data to a file path with prefix `RNFetchBlob-file://`.
+          // Or simply wrap the file path with RNFetchBlob.wrap().
+        //   data: RNFetchBlob.wrap(uri),
+            data:uri,
+          type:'image/png'
+          // string_.ltrim(uri, "file:///")
+        },
+        // elements without property `filename` will be sent as plain text
+        // { name : 'name', data : 'user'},
+        // { name : 'info', data : JSON.stringify({
+        //   mail : 'example@example.com',
+        //   tel : '12345678'
+        // })}
+        
+        ,
+      ]).then((resp) => {
+        // ...
+        console.log(resp)
+      }).catch((err) => {
+        // ...
+        console.log(err)
+      })
+      */
+
+    /*
     let body = new FormData();
     body.append('photo', {uri: uri,name: 'photo.png',filename :'imageName.png',type: 'image/png'});
     body.append('Content-Type', 'image/png');
@@ -254,6 +367,8 @@ export const create_group = (uid, group_name, members, uri) =>{
         }).catch((error) => {
             console.error(error);
         });
+
+    */
 }
 
 export const search_google = (textSearch) => {

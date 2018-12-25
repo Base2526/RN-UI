@@ -10,6 +10,10 @@ import DictStyle from '../CONTACTS/dictStyle';
 
 import ImagePicker from 'react-native-image-picker';
 
+// import RNFetchBlob from 'react-native-fetch-blob'
+
+// import ImgToBase64 from 'react-native-image-base64';
+
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
 
@@ -73,6 +77,8 @@ class AddGroupsPage extends React.Component{
     componentDidMount() {
       // this.makeRemoteRequest();
 
+      // console.log(RNFetchBlob)
+
       setTimeout(() => {this.setState({renderContent: true})}, 0);
 
       this.props.navigation.setParams({ handleCreateGroup: this.handleCreateGroup })
@@ -100,9 +106,50 @@ class AddGroupsPage extends React.Component{
       }else{
         console.log('-success-')
 
+
+        // console.log(this.state.avatarSource.uri)
+        // console.log(this.state.avatarSource.uri.replace('file://', ''))
+  
+        // console.log(RNFetchBlob.wrap(this.state.avatarSource.uri.replace('file://', '')))
+        
+
+        this.setState({loading:true})
+
+        // ImgToBase64.getBase64String(this.state.avatarSource.uri)
+        // .then(base64String => {
+          //  console.log(base64String)
+
+        this.props.actionCreateGroup(this.props.uid, groupName, seleteds, this.state.avatarSource.uri).then((result) => {
+          console.log(result)
+
+          this.setState({loading:false})
+          if(result.status){
+            // this.props.navigation.navigate("App") 
+          }else{
+
+          }
+
+          /* 
+            NSString* item_id           = [jsonDict objectForKey:@"item_id"];
+            NSDictionary *group         = [jsonDict objectForKey:@"group"];
+            NSDictionary *group_detail  = [jsonDict objectForKey:@"group_detail"];
+            
+            [[AppDelegate sharedDelegate] insertChatGroup:item_id :group];
+            [[AppDelegate sharedDelegate] insertGroupChatDetail:item_id :group_detail];
+          */
+        })
+
+        // })
+        // .catch(err => {
+        //   console.log(err)
+        // });
+
+        /*
+        
         this.setState({loading:true})
         // uid, group_name, members, uri)
-        this.props.actionCreateGroup({uid:this.props.uid, group_name:groupName, members: seleteds, uri:this.state.avatarSource.uri}).then((result) => {
+
+        this.props.actionCreateGroup({uid:this.props.uid, group_name:groupName, members: seleteds, uri:this.state.avatarSource.uri.replace('file:///', '')}).then((result) => {
           console.log(result)
 
           this.setState({loading:false})
@@ -112,6 +159,10 @@ class AddGroupsPage extends React.Component{
 
           }
         })
+        */
+        
+        
+        
       }
     }
 
@@ -138,7 +189,7 @@ class AddGroupsPage extends React.Component{
           case Constant.FRIEND_STATUS_FRIEND:{
             // console.log('1, --' + key)
             
-            friend_member.push({...friend, ...friend_profile});
+            friend_member.push({...friend, ...friend_profile, ...{'friend_id':key}});
             break
           }
 
@@ -159,7 +210,7 @@ class AddGroupsPage extends React.Component{
         }
       }
 
-      // console.log(friend_member)
+      console.log(friend_member)
       return friend_member
     }
 
@@ -303,29 +354,26 @@ class AddGroupsPage extends React.Component{
         this.setState({ groupName })
     }
 
-    _check=(key)=>{
+    _check=(friend_id)=>{
 
       let seleteds = this.state.seleteds
-      let check = seleteds.find((seleted) => {
-        return seleted.key === key;
-      })
-      
+      let check = seleteds.find(function(element) { 
+        return element === friend_id; 
+      }); 
+
       if(check === undefined){
         this.setState({
-          seleteds: [...seleteds, {key: key}]
+          seleteds: [...seleteds, friend_id]
         })
       }else{
-
-        seleteds = seleteds.filter(function(seleted){
-          return seleted.key !== key;;
+        let newSeleteds = seleteds.filter(function(member) {
+          return member !== friend_id;
         });
 
         this.setState({
-          seleteds
+          seleteds:newSeleteds
         })
-      } 
-
-      console.log(this.state.seleteds)
+      }
     }
 
     renderItem = ({item, index}) => {
@@ -336,14 +384,13 @@ class AddGroupsPage extends React.Component{
             }
             break
             default:{
-                // console.log(item)
-
+                
                 let check = null
-                let __ = this.state.seleteds.filter(obj => {
-                  return obj.key === item.item_id
-                })
+                var __ = this.state.seleteds.find(function(element) { 
+                  return element === item.friend_id; 
+                }); 
 
-                if(__.length !== 0){
+                if(__ !== undefined){
                   check = <Icon name="check" size={15} />
                 }
 
@@ -379,7 +426,7 @@ class AddGroupsPage extends React.Component{
                         <View style={{flex:5}}>
                           <TouchableOpacity 
                             onPress={()=>{
-                              this._check(item.item_id)
+                              this._check(item.friend_id)
                             }}
                             style={{flex:1, justifyContent:'center'}}>
                             <Text style={{
@@ -405,7 +452,7 @@ class AddGroupsPage extends React.Component{
     
     render() {
 
-        // console.log(this.state.seleteds)
+        console.log(this.state.seleteds)
 
         // let swipeBtns = [{
         //   text: 'Delete',

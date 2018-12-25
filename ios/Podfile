@@ -19,6 +19,8 @@ target 'RN_UI' do
 
 #    pod 'react-native-locale', :path => '../node_modules/react-native-locale'
 
+#    pod 'react-native-fetch-blob', :path => '../node_modules/react-native-fetch-blob'
+
   end
 
   target 'RN_UITests' do
