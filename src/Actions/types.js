@@ -7,3 +7,5 @@ export const LOGIN_USER = 'login_user'
 // export const GET_USER_LOGIN = "get_user_login"
 
 // export const LOADING = 'loading'
+
+export const PROFILES = 'profiles'

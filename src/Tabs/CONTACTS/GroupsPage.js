@@ -38,25 +38,25 @@ class GroupsPage extends React.Component{
         error: null,
         loading: false,
         refreshing: false
-      });
+      });      
     }
 
     loadData=()=>{
 
-      // return [this.props.auth.user.user_profile.groups]
+      console.log(this.props.groups)
 
-      let friend_member = []
-      let friend_profiles = this.props.auth.user.friend_profiles
-      for (var key in this.props.auth.user.user_profile.friends) {
+      let group_member = []
+      for (var key in this.props.groups) {
     
-        let friend =  this.props.auth.user.user_profile.friends[key]
-        let friend_profile = friend_profiles[key]
+        let group =  this.props.groups[key]
+        // let friend_profile = friend_profiles[key]
 
-        switch(friend.status){
+        group_member.push(group);
+        /*
+        switch(group.status){
           case Constant.FRIEND_STATUS_FRIEND:{
             // console.log('1, --' + key)
-            
-            friend_member.push({...friend, ...friend_profile});
+          
             break
           }
 
@@ -75,10 +75,11 @@ class GroupsPage extends React.Component{
             break
           }
         }
+        */
       }
 
-      console.log(friend_member)
-      return friend_member
+      console.log(group_member)
+      return group_member
       // console.log(friend_member)
 
       return(
@@ -169,7 +170,7 @@ class GroupsPage extends React.Component{
         renderContent
       } = this.state;
 
-      if(!this.props.hasOwnProperty('auth')){
+      if(!this.props.hasOwnProperty('groups')){
         return <View style={{flex: 1}}></View>
       }
 
@@ -223,7 +224,7 @@ class GroupsPage extends React.Component{
                       <FastImage
                           style={{width: 60, height: 60, borderRadius: 10}}
                           source={{
-                          uri: 'https://unsplash.it/400/400?image=1',
+                          uri: item.detail.image_url === '' ? Constant.DEFAULT_AVATARSOURCE_URI : Constant.API_URL + item.detail.image_url,
                           headers:{ Authorization: 'someAuthToken' },
                           priority: FastImage.priority.normal,
                           }}
@@ -236,10 +237,10 @@ class GroupsPage extends React.Component{
                                   color: DictStyle.colorSet.normalFontColor,
                                   paddingBottom:5
                                 }}>
-                        item.name
+                        {item.detail.name}
                     </Text>
-                    <Text>
-                      3 Users
+                    <Text> 
+                    { Object.keys(item.detail.members).length } Users
                     </Text>
                   </View>
               </View>
@@ -271,9 +272,14 @@ const mapStateToProps = (state) => {
     return {}
   }
 
+  // this.props.auth.user.user_profile
+  // groups
   return{
-    auth:state.auth
+    // auth:state.auth
+    groups:state.auth.user.user_profile.groups
   }
+
+  // console.log(this.props.auth.user.user_profile.groups)
 }
 
 export default connect(mapStateToProps, actions)(GroupsPage);

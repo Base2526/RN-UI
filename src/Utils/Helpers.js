@@ -4,7 +4,7 @@ import { Dimensions, DeviceInfo, Platform } from 'react-native';
 import { Header } from 'react-navigation';
 
 export const getUid = (state) =>{
-    console.log(state)
+    // console.log(state)
     if(!state._persist.rehydrated){
         return -1
     }

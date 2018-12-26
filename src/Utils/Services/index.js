@@ -193,9 +193,7 @@ export const add_friend = (uid, friend_id) =>{
         });
 }
 
-// CREATE_GROUP
 export const create_group = (uid, group_name, members, uri) =>{
-
     var data = new FormData();
     data.append('idna', {
         uri: uri, // your file path string
@@ -205,18 +203,6 @@ export const create_group = (uid, group_name, members, uri) =>{
 
     data.append("uid", uid)
     data.append("name", group_name)
- 
-    // members.forEach(function(value) {
-    //     data.append("members[]", value.key)
-    // });
-
-    // var newArr = Object.keys(members);
-    // // console.log(newArr);
-
-    // var mappedArr = newArr.map(function(i) {
-    //     return [i, members[i]];
-    // });
-
     data.append('members', JSON.stringify(members))
 
     return fetch(Constant.CREATE_GROUP, {
@@ -228,147 +214,32 @@ export const create_group = (uid, group_name, members, uri) =>{
       }).then((responseJson) => {
           return responseJson;
       }).catch((error) => {
-        //   console.log(error)
-
-          return {'status': false, 'message': error}
+        return {'status': false, 'message': error}
       })
+}
 
-    /*
-    let data = {
-        method: 'POST',
-        body: JSON.stringify({
-            'uid': uid,
-            'name': group_name,
-            'members' : members,
-            'data':uri
-        }),
-        headers: Constant.FETCH_HEADERS
-    }
-
-    return fetch(Constant.CREATE_GROUP, data)
-        .then((response) => response.json())
-        .then((responseJson) => {
-            console.log(responseJson)
-            return responseJson;
-        }).catch((error) => {
-            co
-            */
-
-
-
-            /*
-    return RNFetchBlob.fetch('POST', Constant.CREATE_GROUP, {
-        // Authorization : "Bearer access-token",
-        // otherHeader : "foo",
-        // this is required, otherwise it won't be process as a multipart/form-data request
-        'Content-Type' : 'multipart/form-data',
-
-        // 'Accept': 'application/json',
-        // // 'Content-Type': 'application/json',
-        // // 'Content-Type': 'multipart/form-data',
-        // 'version_os': 'version_os',
-        // 'system_name': 'system_name',
-        // 'device_name': 'device_name',
-        // 'bundle_identifier': 'bundle_identifier',
-        // 'platform': 'ios',
-        // 'version_application': '1.0',
-        // 'udid': 'udid',
-        // 'model_number': 'model_number',
-        // 'build': '1',
-        // 'token_notification': 'token_notification',
-        // 'token_pushkit': 'token_pushkit',
-      }, [
-        // append field data from file path
-        {
-          name : 'avatar',
-          filename : 'avatar.png',
-          // Change BASE64 encoded data to a file path with prefix `RNFetchBlob-file://`.
-          // Or simply wrap the file path with RNFetchBlob.wrap().
-        //   data: RNFetchBlob.wrap(uri),
-            data:uri,
-          type:'image/png'
-          // string_.ltrim(uri, "file:///")
-        },
-        // elements without property `filename` will be sent as plain text
-        // { name : 'name', data : 'user'},
-        // { name : 'info', data : JSON.stringify({
-        //   mail : 'example@example.com',
-        //   tel : '12345678'
-        // })}
-        
-        ,
-      ]).then((resp) => {
-        // ...
-        console.log(resp)
-      }).catch((err) => {
-        // ...
-        console.log(err)
-      })
-      */
-
-    /*
-    let body = new FormData();
-    body.append('photo', {uri: uri,name: 'photo.png',filename :'imageName.png',type: 'image/png'});
-    body.append('Content-Type', 'image/png');
-    body.append('name', group_name); 
-    
-    return fetch(Constant.CREATE_GROUP,{ method: 'POST',
-        headers:{  
-        // "Content-Type": "multipart/form-data",
-        // "otherHeader": "foo",
-        
-        'Accept': 'application/json',
-        // 'Content-Type': 'application/json',
-        'Content-Type': 'multipart/form-data',
-        'version_os': 'version_os',
-        'system_name': 'system_name',
-        'device_name': 'device_name',
-        'bundle_identifier': 'bundle_identifier',
-        'platform': 'ios',
-        'version_application': '1.0',
-        'udid': 'udid',
-        'model_number': 'model_number',
-        'build': '1',
-        'token_notification': 'token_notification',
-        'token_pushkit': 'token_pushkit',
-        } 
-        , body :JSON.stringify(body)} )
-    // .then((response) => response.json())
-     .then((res) => res.json())
-     .then((res) => { 
-         console.log("response" +JSON.stringify(res)); 
-    })
-     .catch((e) => console.log(e))
-
-
-
-    const data = new FormData();
-    data.append('uid', uid); // you can append anyone.
-    data.append('name', group_name); // you can append anyone.
-    data.append('members', members);
+export const create_class = (uid, class_name, uri) =>{
+    var data = new FormData();
     data.append('idna', {
-    uri: uri,
-        type: 'image/jpeg', // or photo.type
-        name: 'testPhotoName'
-    });
+        uri: uri, // your file path string
+        name: 'imageName.png',
+        type: 'image/png'
+    })
+    data.append("uid", uid)
+    data.append("fction", 'add')
+    data.append("name", class_name)
 
-    // @"uid":[[Configs sharedInstance] getUIDU], @"friend_id":friend_id
-    let ___ = {
+    return fetch(Constant.CREATE_CLASS, {
+        headers: Constant.FETCH_HEADERS,
         method: 'POST',
-        body: JSON.stringify(data),
-        headers: Constant.FETCH_HEADERS
-    }
-
-    return fetch(Constant.CREATE_GROUP, ___)
-        .then((response) => response.json())
-        .then((responseJson) => {
-            console.log(responseJson)
-            return responseJson;
-        }).catch((error) => {
-            console.error(error);
-        });
-
-    */
+        body: data
+      }).then((response) => {
+          return response.json()
+      }).then((responseJson) => {
+          return responseJson;
+      }).catch((error) => {
+        return {'status': false, 'message': error}
+      })
 }
 
 export const search_google = (textSearch) => {

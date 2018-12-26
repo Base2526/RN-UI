@@ -94,6 +94,8 @@ const _delete = (callback) => {
 
 export * from './profileRepo';
 export * from './friendProfileRepo';
+export * from './groupRepo'
+export * from './groupDetailRepo'
 
 // module.exports = {
 //     // conn: _conn,

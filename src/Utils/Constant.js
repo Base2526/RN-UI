@@ -14,6 +14,8 @@ module.exports = {
     ADD_FRIEND: API_URL + END_POINT + '/add_friend',
 
     CREATE_GROUP: API_URL + END_POINT + '/create_chat_group',
+    CREATE_CLASS: API_URL + END_POINT + '/create_class',
+    
     FETCH_HEADERS: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -51,8 +53,11 @@ module.exports = {
     #define _FRIEND_STATUS_WAIT_FOR_A_FRIEND @"12"
     */
 
-   FRIEND_STATUS_FRIEND: '10',
-   FRIEND_STATUS_FRIEND_CANCEL: '13',
-   FRIEND_STATUS_FRIEND_REQUEST: '11',
-   FRIEND_STATUS_WAIT_FOR_A_FRIEND: '12',
+    // avatarSource.uri
+    DEFAULT_AVATARSOURCE_URI: 'https://unsplash.it/400/400?image=1',
+
+    FRIEND_STATUS_FRIEND: '10',
+    FRIEND_STATUS_FRIEND_CANCEL: '13',
+    FRIEND_STATUS_FRIEND_REQUEST: '11',
+    FRIEND_STATUS_WAIT_FOR_A_FRIEND: '12',
 };

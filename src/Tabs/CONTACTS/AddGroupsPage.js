@@ -19,6 +19,13 @@ import Constant from '../../Utils/Constant'
 
 import {getUid} from '../../Utils/Helpers'
 
+// import {group_all, 
+//         groupDetail_all, 
+//         group_get,
+//         groupDetail_get, 
+//         group_update, 
+//         groupDetail_update} from '../../Utils/DB'
+
 // More info on all the options is below in the API Reference... just some common use cases shown here
 const options = {
   title: 'Select Avatar',
@@ -89,6 +96,19 @@ class AddGroupsPage extends React.Component{
         loading: false,
         refreshing: false
       });
+
+
+      // group_update({group_id:'1287', value:{'test':1}}, v=>{
+      //   console.log(v)
+      // })
+
+      // group_all(v=>{
+      //   console.log(v)
+      // })
+      
+      // groupDetail_all(v=>{
+      //   console.log(v)
+      // })
     }
 
     handleCreateGroup = () => {
@@ -125,18 +145,26 @@ class AddGroupsPage extends React.Component{
           this.setState({loading:false})
           if(result.status){
             // this.props.navigation.navigate("App") 
+
+            let {item_id, group, group_detail} = result.data
+
+            this.props.navigation.goBack()
+
+            // let item_id = result
+            // console.log(item_id)
+            // console.log(group)
+            // console.log(group_detail)
+
+            // group_update({'group_id':item_id,'value':group}, v=>{
+            //   console.log(v)
+            // })
+
+            // groupDetail_update({'group_id':item_id, 'value':group_detail}, v=>{
+            //   console.log(v)
+            // })
           }else{
 
           }
-
-          /* 
-            NSString* item_id           = [jsonDict objectForKey:@"item_id"];
-            NSDictionary *group         = [jsonDict objectForKey:@"group"];
-            NSDictionary *group_detail  = [jsonDict objectForKey:@"group_detail"];
-            
-            [[AppDelegate sharedDelegate] insertChatGroup:item_id :group];
-            [[AppDelegate sharedDelegate] insertGroupChatDetail:item_id :group_detail];
-          */
         })
 
         // })
@@ -179,17 +207,16 @@ class AddGroupsPage extends React.Component{
          // return [this.props.auth.user.user_profile.groups]
 
       let friend_member = [{"key":99, "name":'00'}]
-      let friend_profiles = this.props.auth.user.friend_profiles
       for (var key in this.props.auth.user.user_profile.friends) {
     
         let friend =  this.props.auth.user.user_profile.friends[key]
-        let friend_profile = friend_profiles[key]
+        // let friend_profile = friend_profiles[key]
 
         switch(friend.status){
           case Constant.FRIEND_STATUS_FRIEND:{
             // console.log('1, --' + key)
             
-            friend_member.push({...friend, ...friend_profile, ...{'friend_id':key}});
+            friend_member.push({...friend, ...{'friend_id':key}});
             break
           }
 
@@ -312,7 +339,7 @@ class AddGroupsPage extends React.Component{
               <FastImage
                   style={{width: 80, height: 80, borderRadius: 10}}
                   source={{
-                  uri: this.state.avatarSource.uri === "" ? "https://unsplash.it/400/400?image=1" : this.state.avatarSource.uri,
+                  uri: this.state.avatarSource.uri === "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.avatarSource.uri,
                   headers:{ Authorization: 'someAuthToken' },
                   priority: FastImage.priority.normal,
                   }}
@@ -415,12 +442,12 @@ class AddGroupsPage extends React.Component{
                               <FastImage
                                   style={{width: 40, height: 40, borderRadius: 10}}
                                   source={{
-                                  uri: Constant.API_URL + item.image_url,
+                                  uri: item.profile.image_url ==='' ? Constant.DEFAULT_AVATARSOURCE_URI : Constant.API_URL + item.profile.image_url,
                                   headers:{ Authorization: 'someAuthToken' },
                                   priority: FastImage.priority.normal,
                                   }}
                                   resizeMode={FastImage.resizeMode.contain}
-                              />
+                              /> 
                           </TouchableOpacity>
                         </View>
                         <View style={{flex:5}}>
@@ -435,7 +462,7 @@ class AddGroupsPage extends React.Component{
                                         color: DictStyle.colorSet.normalFontColor,
                                         
                                         paddingLeft: 10}}>
-                                {item.name}
+                                {item.profile.name}
                             </Text>
                           </TouchableOpacity>
                         </View>
@@ -486,7 +513,8 @@ class AddGroupsPage extends React.Component{
 
               
               renderItem={this.renderItem.bind(this)}
-              keyExtractor={item => item.name}
+              // keyExtractor={(item) =>item}
+              keyExtractor = { (item, index) => index.toString() }
               ItemSeparatorComponent={this.renderSeparator}
               ListHeaderComponent={this.renderHeader}
               ListFooterComponent={this.renderFooter}

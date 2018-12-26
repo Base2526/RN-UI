@@ -29,6 +29,8 @@ const { RNTwitterSignIn } = NativeModules
 const FBSDK = require('react-native-fbsdk');
 const { LoginManager } = FBSDK;
 
+// import {group_deleteAll, groupDetail_deleteAll} from '../../Utils/DB'
+
 // Example component for section:headerComponent
 const CustomSectionHeader = () => (
   <View>
@@ -157,6 +159,14 @@ export default class homeY extends Component<{}> {
                               }
                             }
                           }).then(()=>{
+
+                            // group_deleteAll(v=>{
+                            //   console.log(v)
+                            // })
+                            // groupDetail_deleteAll(v=>{
+                            //   console.log(v)
+                            // })
+
                             console.log("then #2")
                             removeAsyncStorageByKey(Constant.USER_LOGIN).then((data) => {      
                               if(data.status){

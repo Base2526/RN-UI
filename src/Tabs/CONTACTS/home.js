@@ -21,10 +21,9 @@ import ClasssPage from './ClasssPage'
 import * as actions from '../../Actions'
 
 
-
-import {profile_get, 
-        profile_update, 
-        profile_delete,} from '../../Utils/DB'
+// import {profile_get, 
+//         profile_update, 
+//         profile_delete,} from '../../Utils/DB'
 
 const formatData = (data, numColumns) => {
     // เป้นการ ลบ item ที่มี ​field ออกทั้งหมด เพราะว่าเรารองรับการ orientation srceen ด้วย
@@ -138,14 +137,14 @@ class ContactsHome extends Component {
         // let decode = utf8.decode(encode)
         // console.log(decode)
 
-        profile_update({'test':'`☹️🙁😠😡😞😟😣😖$ %  &  #   !'}, v=>{
-            console.log(v)
-        })
-        profile_get(v=>{
-            console.log(v)
+        // profile_update({'test':'`☹️🙁😠😡😞😟😣😖$ %  &  #   !'}, v=>{
+        //     console.log(v)
+        // })
+        // profile_get(v=>{
+        //     console.log(v)
 
-            // console.log(JSON.parse(v.data).test);
-        })
+        //     // console.log(JSON.parse(v.data).test);
+        // })
 
         // console.log(test())
 

@@ -26,6 +26,9 @@ import { Constants } from 'react-native-navigation';
 
 import Constant from '../../Utils/Constant'
 
+// import {group_all, 
+//         groupDetail_all} from '../../Utils/DB'
+
 class FriendsPage extends React.Component{
 
     constructor(props){
@@ -38,6 +41,15 @@ class FriendsPage extends React.Component{
     
     componentDidMount() {
       setTimeout(() => {this.setState({renderContent: true})}, 0);
+
+
+      // group_all(v=>{
+      //   console.log(v)
+      // })
+      
+      // groupDetail_all(v=>{
+      //   console.log(v)
+      // })
     }
 
     componentWillReceiveProps(nextProps){
@@ -65,19 +77,6 @@ class FriendsPage extends React.Component{
           ]
         }
 
-        /*
-        #define _FRIEND_STATUS_FRIEND            @"10"
-        #define _FRIEND_STATUS_FRIEND_CANCEL     @"13"
-        #define _FRIEND_STATUS_FRIEND_REQUEST    @"11"
-        #define _FRIEND_STATUS_WAIT_FOR_A_FRIEND @"12"
-
-           FRIEND_STATUS_FRIEND: 10,
-   FRIEND_STATUS_FRIEND_CANCEL: 13,
-   FRIEND_STATUS_FRIEND_REQUEST: 11,
-   FRIEND_STATUS_WAIT_FOR_A_FRIEND : 12,
-         */
-
-        let friend_profiles = this.props.auth.user.friend_profiles
         // console.log(friend_profiles)
         let friendRequestSent_member = []
         let friend_member = []
@@ -86,7 +85,7 @@ class FriendsPage extends React.Component{
 
           let friend =  this.props.auth.user.user_profile.friends[key]
 
-          let friend_profile = friend_profiles[key]
+          // let friend_profile = {};//friend_profiles[key]
           // console.log(friend)
           // console.log(friend_profile)
 
@@ -96,7 +95,7 @@ class FriendsPage extends React.Component{
             case Constant.FRIEND_STATUS_FRIEND:{
               // console.log('1, --' + key)
               
-              friend_member.push({...friend, ...friend_profile});
+              friend_member.push(friend);
               break
             }
 
@@ -114,7 +113,7 @@ class FriendsPage extends React.Component{
               // console.log('4, --' + key)
               // console.log()
 
-              friendRequestSent_member.push({...friend, ...friend_profile});  
+              friendRequestSent_member.push(friend);  
               break
             }
           }
@@ -209,7 +208,7 @@ class FriendsPage extends React.Component{
 
     _renderRow = (rowItem, rowId, sectionId) => {
 
-        // console.log(rowItem)
+        console.log(rowItem)
         
         if(rowId == 0 && sectionId == 0){
           return (
@@ -304,7 +303,7 @@ class FriendsPage extends React.Component{
                     <FastImage
                         style={{width: 60, height: 60, borderRadius: 10}}
                         source={{
-                        uri: Constant.API_URL + rowItem.image_url,
+                        uri: Constant.API_URL + rowItem.profile.image_url,
                         headers:{ Authorization: 'someAuthToken' },
                         priority: FastImage.priority.normal,
                         }}
@@ -317,12 +316,12 @@ class FriendsPage extends React.Component{
                                   color: DictStyle.colorSet.normalFontColor,
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
-                        Name : {rowItem.name}
+                        Name : {rowItem.profile.name}
                     </Text>
                     <Text style={{fontSize: DictStyle.fontSet.mSize, 
                                 color: DictStyle.colorSet.normalFontColor,
                                 paddingLeft: 10}}>
-                        Status : {rowItem.status}
+                        Status : {rowItem.profile.status}
                     </Text>
                   </View>
             </View>

@@ -16,6 +16,12 @@ import * as actions from '../Actions'
 
 import {LOADING} from '../Actions/types'
 
+// import {group_all, 
+//         groupDetail_all, 
+//         group_update, 
+//         groupDetail_update} from '../Utils/DB'
+
+
 // export default ({navigation}) =>
 class SignIn extends React.Component{
   constructor(props){
@@ -26,6 +32,16 @@ class SignIn extends React.Component{
       email:'',
       password:''
     }
+
+    /*
+    group_all(v=>{
+      console.log(v)
+    })
+
+    groupDetail_all(v=>{
+      console.log(v)
+    })
+    */
   }
 
   /*
@@ -84,6 +100,43 @@ class SignIn extends React.Component{
 
         this.setState({loading:false})
         if(result.status){
+
+          /*
+          let {user_profile} = result.data
+          console.log(user_profile)
+          Object.keys(user_profile).forEach((key)=>{
+            console.log(key); // key
+            switch(key){
+              case 'friends':{
+                Object.keys(user_profile[key]).forEach((friend_id)=>{
+                  console.log(friend_id)
+                  console.log({...user_profile[key][friend_id], ...{'friend_id':friend_id}})
+                })
+                break;
+              }
+              case 'groups':{
+                // console.log(user_profile[key]); // value
+
+                Object.keys(user_profile[key]).forEach((group_id)=>{
+                  console.log(user_profile[key][group_id])
+
+                  let value = user_profile[key][group_id]
+                  groupDetail_update({'group_id':group_id, 'value':value}, v=>{
+                    console.log(v)
+                  })
+
+                  group_update({'group_id':group_id,'value':{'item_id':value.item_id, 'status': value.status}}, v=>{
+                    console.log(v)
+                  })
+                })
+
+                break;
+              }
+            }
+          });
+          */
+
+          
           this.props.navigation.navigate("App") 
         }else{
 

@@ -3,8 +3,6 @@
 const FBSDK = require('react-native-fbsdk');
 const { LoginButton, AccessToken, LoginManager } = FBSDK;
 
-
-
 import {LOGIN_USER_SUCCESS,
         LOGIN_USER_FAIL} from './types'
 
@@ -14,7 +12,8 @@ import Constant from '../Utils/Constant'
 import {login, 
         people_you_may_khow, 
         add_friend,
-        create_group} from '../Utils/Services'
+        create_group,
+        create_class} from '../Utils/Services'
 
 // export const emailChanged = (text) =>{
 //     return({
@@ -71,7 +70,7 @@ export const actionLogin = ({email, password}) => dispatch => {
                 saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.USER, "user": data.data});
 
                 dispatch({ type: LOGIN_USER_SUCCESS, provider: Constant.PROVIDERS.USER, user: data.data });
-                return {'status':true}
+                return {'status':true, 'data': data.data}
             }
         }
     })
@@ -224,6 +223,39 @@ export const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
 
     // (uid, group_name, members, uri)
     return create_group(uid, group_name, members, uri).then(data => {
+        // this.setState({isShowSpinner:false})
+
+        // dispatch({ type: LOADING, isLoading:false})
+
+        // console.log(data)
+        if((data instanceof Array)){
+            // error message
+            // alert(data[0])
+            // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data[0] });
+
+            return {'status':false, 'message': data}
+        }else{
+            if(!data.result){
+                // alert(data.message)
+                // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data.message });
+        
+                return {'status':false, 'message': data}
+            }else{
+                // console.log(data.data.friend_profiles)
+                // console.log(data.data.user)
+                // console.log(data.data.user_profile)
+                // saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.USER, "user": data.data});
+                // dispatch({ type: LOGIN_USER_SUCCESS, provider: Constant.PROVIDERS.USER, user: data.data });
+                return {'status':true, 'data':data}
+            }
+        }
+    })
+}
+
+export const actionCreateClass = (uid, class_name, uri) => dispatch =>{
+
+    // (uid, group_name, members, uri)
+    return create_class(uid, class_name, uri).then(data => {
         // this.setState({isShowSpinner:false})
 
         // dispatch({ type: LOADING, isLoading:false})
