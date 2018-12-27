@@ -1,10 +1,11 @@
 // import firebase from 'firebase'
-
+import firebase from 'react-native-firebase';
 const FBSDK = require('react-native-fbsdk');
 const { LoginButton, AccessToken, LoginManager } = FBSDK;
 
-import {LOGIN_USER_SUCCESS,
-        LOGIN_USER_FAIL} from './types'
+import {USER_LOGIN_SUCCESS,
+    USER_LOGIN_FAIL,
+    USER_LOGOUT} from './types'
 
 import {saveAsyncStorage, loadAsyncStorage} from '../Utils/Helpers'
 import Constant from '../Utils/Constant'
@@ -54,22 +55,22 @@ export const actionLogin = ({email, password}) => dispatch => {
         if((data instanceof Array)){
             // error message
             // alert(data[0])
-            dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data[0] });
+            dispatch({ type: USER_LOGIN_FAIL, provider: Constant.PROVIDERS.USER, error: data[0] });
 
             return {'status':false, 'message': data.message}
         }else{
             if(!data.result){
                 // alert(data.message)
-                dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data.message });
+                dispatch({ type: USER_LOGIN_FAIL, provider: Constant.PROVIDERS.USER, error: data.message });
         
                 return {'status':false, 'message': data.message}
             }else{
                 // console.log(data.data.friend_profiles)
                 // console.log(data.data.user)
                 // console.log(data.data.user_profile)
-                saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.USER, "user": data.data});
+                // saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.USER, "user": data.data});
 
-                dispatch({ type: LOGIN_USER_SUCCESS, provider: Constant.PROVIDERS.USER, user: data.data });
+                dispatch({ type: USER_LOGIN_SUCCESS, provider: Constant.PROVIDERS.USER, user: data.data });
                 return {'status':true, 'data': data.data}
             }
         }
@@ -120,13 +121,21 @@ export const loginWithFacebook = () => {
                 console.log("login with fb : -1")
                 console.log("Login fail with error: " + error);
 
-                dispatch({ type: LOGIN_USER_FAIL, payload: error.message, provider: Constant.PROVIDERS.FACEBOOK });
+                dispatch({ type: USER_LOGIN_FAIL, payload: error.message, provider: Constant.PROVIDERS.FACEBOOK });
             }
         );
     }
 }
 
-export const actionUserLogin = () => dispatch =>(
+export const actionLogout = (callback) => dispatch => {
+    console.log('actionLogout')
+    dispatch({ type: USER_LOGOUT});
+
+    callback({'status':true})
+}
+
+/*
+export const actionCheckUserLogin = () => dispatch =>(
     // AsyncStorage.getItem('userToken')
     //     .then((data) => {
     //         dispatch(loading(false));
@@ -143,7 +152,7 @@ export const actionUserLogin = () => dispatch =>(
             let value = JSON.parse(data.value)
             // console.log(value)
 
-            dispatch({ type: LOGIN_USER_SUCCESS, provider: value.provider, user: value.user });
+            dispatch({ type: USER_LOGIN_SUCCESS, provider: value.provider, user: value.user });
             return {'status':true, 'value': value}
         }else{
             return {'status':false, 'message': data.message}
@@ -152,6 +161,7 @@ export const actionUserLogin = () => dispatch =>(
         return {'status':false, 'message': error}
     })
 )
+*/
 
 export const actionPeopleYouMayKhow = () => dispatch=>{
 
@@ -283,4 +293,31 @@ export const actionCreateClass = (uid, class_name, uri) => dispatch =>{
             }
         }
     })
+}
+
+export const watchTaskAddEvent = () => (dispatch) => {
+    firebase.database().ref('/items').on('child_added', (snap) => {
+        // dispatch(addTask(snap.val()));
+
+        console.log('child_added')
+        console.log(snap)
+    });
+}
+
+export const watchTaskChangedEvent = () => (dispatch) => {
+    firebase.database().ref('/items').on('child_changed', (snap) => {
+        // dispatch(addTask(snap.val()));
+
+        console.log('child_changed')
+        console.log(snap)
+    });
+}
+
+export const watchTaskRemovedEvent = () => (dispatch) => {
+    firebase.database().ref('/items').on('child_removed', (snap) => {
+        // dispatch(addTask(snap.val()));
+
+        console.log('child_removed')
+        console.log(snap)
+    });
 }

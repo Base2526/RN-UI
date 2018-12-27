@@ -9,6 +9,8 @@ import {
 import { connect } from 'react-redux';
 import * as actions from '../Actions';
 
+// import {actionUserLogin, watchTaskAddEvent, watchTaskChangedEvent, watchTaskRemovedEvent} from '../Actions'
+
 class AuthLoadingScreen extends React.Component {
     static navigationOptions = {
         header: null,
@@ -24,8 +26,14 @@ class AuthLoadingScreen extends React.Component {
 
     // Fetch the token from storage then navigate to our appropriate place
     _bootstrapAsync = () => {
-        this.props.actionUserLogin().then((data) => {
-            // console.log(data)
+
+        /*
+        this.props.watchTaskAddEvent()
+        this.props.watchTaskChangedEvent()
+        this.props.watchTaskRemovedEvent()
+
+        this.props.actionCheckUserLogin().then((data) => {
+            console.log(data)
             if(data.status){
                 this.props.navigation.navigate('App');
             }else{
@@ -35,6 +43,13 @@ class AuthLoadingScreen extends React.Component {
         .catch(error => {
             console.log(error)
         })
+        */
+
+        if(this.props.auth.isLogin){
+            this.props.navigation.navigate('App');
+        }else{
+            this.props.navigation.navigate('Auth');
+        }
     };
 
     // Render any loading content that you like here
@@ -57,12 +72,29 @@ const styles = StyleSheet.create({
     },
 });
 
-const mapStateToProps = state => {
-    return {}
+const mapStateToProps = (state) => {
+    console.log(state)
+
+    if(!state._persist.rehydrated){
+        return {}
+    }
+
+    return {
+        auth:state.auth
+    }
 }
 
 // const mapDispatchToProps = dispatch => ({
 //     // getUserToken: () => dispatch(getUserToken()),
 // });
 
-export default connect(null, actions)(AuthLoadingScreen);
+// const mapDispatchToProps = (dispatch) => {
+//     // watchTaskAddEvent(dispatch)
+//     // watchTaskChangedEvent(dispatch)
+//     // watchTaskRemovedEvent(dispatch)
+
+//     return {actionCheckUserLogin}
+// }
+//   export default connect(mapStateToProps, mapDispatchToProps)(FriendsPage);
+
+export default connect(mapStateToProps, actions)(AuthLoadingScreen);

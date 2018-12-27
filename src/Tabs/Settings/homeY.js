@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
   ActivityIndicator,
   Dimensions,
@@ -16,18 +16,18 @@ import {
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome5';
-
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
-
-import Styles from '../../styles';
-
-import Constant from '../../Utils/Constant'
-import {loadAsyncStorage, removeAsyncStorageByKey} from '../../Utils/Helpers'
-
+import { connect } from 'react-redux';
 
 const { RNTwitterSignIn } = NativeModules
 const FBSDK = require('react-native-fbsdk');
 const { LoginManager } = FBSDK;
+
+import Styles from '../../styles';
+import Constant from '../../Utils/Constant'
+import {loadAsyncStorage, removeAsyncStorageByKey} from '../../Utils/Helpers'
+import * as actions from '../../Actions';
+
 
 // import {group_deleteAll, groupDetail_deleteAll} from '../../Utils/DB'
 
@@ -38,33 +38,66 @@ const CustomSectionHeader = () => (
   </View>
 );
 
-export default class homeY extends Component<{}> {
+class homeY extends React.Component {
 
-    static navigationOptions = ({ navigation }) => ({
-        title: "Settings",
-        headerLeft: (
-            <TouchableOpacity
-                style={Styles.headerButton}
-                onPress={() => navigation.openDrawer()}>
-                <Icon name="bars" size={25} />
-            </TouchableOpacity>
-        ),
-        // headerRight: (
-        //     <TouchableOpacity
-        //         style={Styles.headerButton}
-        //         onPress={() => alert("address-book click")}>
-        //         <Icon name="address-book" size={20} />
-        //     </TouchableOpacity>
-        //   ),
-      }) 
+  static navigationOptions = ({ navigation }) => ({
+    title: "Settings",
+    headerLeft: (
+        <TouchableOpacity
+            style={Styles.headerButton}
+            onPress={() => navigation.openDrawer()}>
+            <Icon name="bars" size={25} />
+        </TouchableOpacity>
+    ),
+    // headerRight: (
+    //     <TouchableOpacity
+    //         style={Styles.headerButton}
+    //         onPress={() => alert("address-book click")}>
+    //         <Icon name="address-book" size={20} />
+    //     </TouchableOpacity>
+    //   ),
+  }) 
 
+  componentDidMount() {
+    console.log(this.props)
+  }
+
+  onLogout = () =>{
+    let {provider} = this.props.auth
+
+    if(provider == Constant.PROVIDERS.USER){
+      console.log("Logout User")
+    }else if(provider == Constant.PROVIDERS.TWITTER){
+      console.log("Logout Twitter")
+      RNTwitterSignIn.init(Constant.TWITTER_COMSUMER_KEY, Constant.TWITTER_CONSUMER_SECRET)
+      RNTwitterSignIn.logOut()
+    }else if(provider == Constant.PROVIDERS.GOOGLE){
+      console.log("Logout Google")
+    }else if(provider == Constant.PROVIDERS.FACEBOOK){
+      console.log("Logout Facebook")
+      LoginManager.logOut()
+    }
+
+    this.props.actionLogout(v=>{
+      if(!v.status){
+        console.log('Error logout')
+      }else{
+        this.props.navigation.navigate("Auth")
+      }
+    })
+  }
 
   render() {
     /*
      * Uncomment following line to render example with flatlist
      */
 
+    if(!this.props.hasOwnProperty('auth')){
+      return <View style={{flex: 1}}></View>
+    }
+
     return (
+
       <ScrollView contentContainerStyle={styles.stage}>
         <TableView>
           <Section header="STANDARD">
@@ -140,6 +173,10 @@ export default class homeY extends Component<{}> {
                     style: 'cancel'},
                     {text: 'OK', 
                     onPress: () => {
+
+                      this.onLogout()
+                      // console.log(this.state)
+                      /*
                       loadAsyncStorage(Constant.USER_LOGIN).then((data) => {      
                             if(data.status){
                               let value = JSON.parse(data.value)
@@ -177,11 +214,10 @@ export default class homeY extends Component<{}> {
                               }
                             })
                           }).catch((error)=>{
-                            
-                          })
+                        })
 
-                          
-                        }, 
+                        */
+                      }, 
                     },
                   ],
                   { cancelable: false }
@@ -201,3 +237,19 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
 });
+
+
+const mapStateToProps = (state) => {
+  console.log(state)
+
+  if(!state._persist.rehydrated){
+      return {}
+  }
+  
+  return{
+    auth:state.auth
+  }
+}
+
+
+export default connect(mapStateToProps, actions)(homeY);

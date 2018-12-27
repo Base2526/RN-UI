@@ -29,6 +29,8 @@ import Constant from '../../Utils/Constant'
 // import {group_all, 
 //         groupDetail_all} from '../../Utils/DB'
 
+import {watchTaskAddEvent, watchTaskChangedEvent, watchTaskRemovedEvent} from '../../Actions'
+
 class FriendsPage extends React.Component{
 
     constructor(props){
@@ -436,7 +438,7 @@ class FriendsPage extends React.Component{
         renderContent
       } = this.state;
 
-      if(!this.props.hasOwnProperty('auth')){
+      if(!this.props.hasOwnProperty('auth') || !this.props.auth.isLogin){
         return <View style={{flex: 1}}></View>
       }
 
@@ -475,4 +477,11 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, actions)(FriendsPage);
+const mapDispatchToProps = (dispatch) => {
+  // watchTaskAddEvent(dispatch)
+  // watchTaskChangedEvent(dispatch)
+  // watchTaskRemovedEvent(dispatch)
+  return {}
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(FriendsPage);
