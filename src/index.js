@@ -33,6 +33,13 @@ import { createRootNavigator, AppNavigator } from "./App";
 import Constant from './Utils/Constant'
 import {loadAsyncStorage} from './Utils/Helpers'
 
+import AuthLoadingScreen from './Screens/AuthLoadingScreen'
+
+const onBeforeLift = () => {
+  // take some action before the gate lifts
+  console.log('onBeforeLift')
+}
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -79,7 +86,7 @@ export default class App extends React.Component {
     AppState.addEventListener('change', this._handleAppStateChange);
     AppState.addEventListener('memoryWarning', this._handleAppStateChange);
 
-    this.isSignedIn()
+    // this.isSignedIn()
 
     // this.props.navigation.addListener('willFocus', () => {
     //   // // correctly gives params  
@@ -242,13 +249,15 @@ export default class App extends React.Component {
     // console.log("------> componentDidUpdate")
   }
 
+  
+
   render() {
     const { checkedSignIn, signedIn } = this.state;
 
     // If we haven't checked AsyncStorage yet, don't render anything (better ways to do this)
-    if (!checkedSignIn) {
-      return null;
-    }
+    // if (!checkedSignIn) {
+    //   return null;
+    // }
 
     // console.log("------- render --------")
     // if(!signedIn){
@@ -258,7 +267,8 @@ export default class App extends React.Component {
     //   console.log("on firebase")
     //   this._firebase()
     // }
-    
+
+    console.log('---1')
 
     // const store = createStore(reducers, {}, applyMiddleware(ReduxThunk))
 
@@ -277,7 +287,6 @@ export default class App extends React.Component {
     // };
 
     const persistedReducer = persistReducer(persistConfig, /*createRehydrateRootReducer(reducers)*/reducers)
-
 
     const store = createStore(persistedReducer, {}, compose(
       applyAppStateListener(),
@@ -317,7 +326,7 @@ composeEnhancers(
     // const Layout = createRootNavigator(signedIn);
     return (<Provider store={store}>
               {/* <AppNavigator /> */}
-              <PersistGate loading={null} persistor={persistor}>
+              <PersistGate loading={null} onBeforeLift={()=>{console.log(this)}} persistor={persistor}>
                 <AppNavigator />
               </PersistGate>
             </Provider>);

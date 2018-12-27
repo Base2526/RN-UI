@@ -5,6 +5,7 @@ import {
     StatusBar,
     StyleSheet,
     View,
+    Text
 } from 'react-native';
 import { connect } from 'react-redux';
 import * as actions from '../Actions';
@@ -20,8 +21,17 @@ class AuthLoadingScreen extends React.Component {
         super(props);
     }
 
+    componentWillMount(){
+        console.log('---- componentWillMount > _bootstrapAsync()')
+    }
+
     componentDidMount() {
-        this._bootstrapAsync();
+        console.log('---- componentDidMount > _bootstrapAsync()')
+        // this._bootstrapAsync();
+    }
+
+    componentWillReceiveProps({ _persist }) {
+        console.log('---- componentWillReceiveProps > _bootstrapAsync()')
     }
 
     // Fetch the token from storage then navigate to our appropriate place
@@ -45,15 +55,33 @@ class AuthLoadingScreen extends React.Component {
         })
         */
 
+        console.log('---- _bootstrapAsync()')
+
+        console.log(this.props)
+
         if(this.props.auth.isLogin){
             this.props.navigation.navigate('App');
         }else{
             this.props.navigation.navigate('Auth');
         }
+
+    
     };
 
     // Render any loading content that you like here
     render() {
+
+        console.log(this.props)
+        if(!this.props.hasOwnProperty('auth')){
+            return <View style={{flex: 1}}><Text>Loading 1</Text></View>
+        }
+
+        if(!this.props.hasOwnProperty('navigation')){
+            return <View style={{flex: 1}}><Text>Loading 2</Text></View>
+        }
+
+        this._bootstrapAsync();
+
         return (
             <View style={styles.container}>
                 {/* <ActivityIndicator /> */}

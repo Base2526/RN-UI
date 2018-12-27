@@ -70,18 +70,18 @@ AppDrawer = createDrawerNavigator({
   
 }, drawerNavigatorConfig);
 
-export const createRootNavigator = (signedIn = false) => {
-  return( createAppContainer(createSwitchNavigator(
-      {
-        Auth: AuthStack,
-        App: AppDrawer,
-      },
-      {
-        initialRouteName: signedIn ? "App" : "Auth"
-      }
-    )
-  ))
-};
+// export const createRootNavigator = (signedIn = false) => {
+//   return( createAppContainer(createSwitchNavigator(
+//       {
+//         Auth: AuthStack,
+//         App: AppDrawer,
+//       },
+//       {
+//         initialRouteName: signedIn ? "App" : "Auth"
+//       }
+//     )
+//   ))
+// };
 
 export const AppNavigator = createAppContainer(createSwitchNavigator(
   {
