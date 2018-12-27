@@ -19,7 +19,7 @@ import applyAppStateListener from 'redux-enhancer-react-native-appstate';
 
 import { persistStore, persistReducer, REHYDRATE } from 'redux-persist'
 import storage from 'redux-persist/lib/storage' // default: localStorage if web, AsyncStorage if react-native
-import { PersistGate } from 'redux-persist/integration/react'
+import { PersistGate } from 'redux-persist/es/integration/react'
 // import { REHYDRATE } from 'redux-persist/constants';
 // import reducers from './reducers' // where reducers is an object of reducers
 
@@ -27,13 +27,25 @@ import { PersistGate } from 'redux-persist/integration/react'
 
 // import * as firebase from 'firebase';
 
+
+// import FilesystemStorage from 'redux-persist-filesystem-storage'
+
 import reducers from './Reducers'
 
-import { createRootNavigator, AppNavigator } from "./App"; 
+import { AppNavigator } from "./App"; 
 import Constant from './Utils/Constant'
 import {loadAsyncStorage} from './Utils/Helpers'
 
+import Loading from './Screens/Loading'
+
 import AuthLoadingScreen from './Screens/AuthLoadingScreen'
+
+
+import configureStore from './configureStore'
+
+// import configureStore from './store/configureStore'
+
+const { persistor, store } = configureStore()
 
 const onBeforeLift = () => {
   // take some action before the gate lifts
@@ -268,10 +280,13 @@ export default class App extends React.Component {
     //   this._firebase()
     // }
 
+    console.log(this.props)
+
     console.log('---1')
 
     // const store = createStore(reducers, {}, applyMiddleware(ReduxThunk))
 
+    /*
     const persistConfig = {
       key: 'root',
       storage,
@@ -286,7 +301,7 @@ export default class App extends React.Component {
     //   return reducer(state, action);
     // };
 
-    const persistedReducer = persistReducer(persistConfig, /*createRehydrateRootReducer(reducers)*/reducers)
+    const persistedReducer = persistReducer(persistConfig, reducers)
 
     const store = createStore(persistedReducer, {}, compose(
       applyAppStateListener(),
@@ -294,7 +309,20 @@ export default class App extends React.Component {
       // autoRehydrate()
     ))
 
-    let persistor = persistStore(store)
+
+    // let persistor = persistStore(store)
+    const middleware = [];
+
+    const enhancers = [applyMiddleware(...middleware)];
+
+    const _persistConfig = { enhancers };
+    let persistor = persistStore(store, _persistConfig, () => {
+      console.log(store.getState());
+    });
+
+    // persistStore(store, {}, () => {
+    //   this.setState({ rehydrated: true })
+    // })
         
     // persistStore(
     //   store,
@@ -311,22 +339,14 @@ export default class App extends React.Component {
     //   }
     // ) //purge here
 
-    /*
-    const store = createStore(reducers, initalState, [
-  applyAppStateListener(),
-]);
-
-composeEnhancers(
-  applyAppStateListener(),
-  applyMiddleware(sagaMiddleware)
-)
-     */ 
-
+    */
+    console.log('#1')
+    // console.log(store)
+    console.log('#2')
     // return(<View><Text>isSignedIn</Text></View>)
     // const Layout = createRootNavigator(signedIn);
     return (<Provider store={store}>
-              {/* <AppNavigator /> */}
-              <PersistGate loading={null} onBeforeLift={()=>{console.log(this)}} persistor={persistor}>
+              <PersistGate loading={null} persistor={persistor}>
                 <AppNavigator />
               </PersistGate>
             </Provider>);

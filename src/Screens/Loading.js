@@ -10,9 +10,10 @@ import {
 import { connect } from 'react-redux';
 import * as actions from '../Actions';
 
-// import {actionUserLogin, watchTaskAddEvent, watchTaskChangedEvent, watchTaskRemovedEvent} from '../Actions'
+import { AppNavigator } from "../App"; 
 
-class AuthLoadingScreen extends React.Component {
+// import {actionUserLogin, watchTaskAddEvent, watchTaskChangedEvent, watchTaskRemovedEvent} from '../Actions'
+ class Loading extends React.Component {
     static navigationOptions = {
         header: null,
     };
@@ -27,7 +28,7 @@ class AuthLoadingScreen extends React.Component {
 
     componentDidMount() {
         console.log('---- componentDidMount > _bootstrapAsync()')
-        this._bootstrapAsync();
+        // this._bootstrapAsync();
     }
 
     componentWillReceiveProps({ _persist }) {
@@ -59,11 +60,11 @@ class AuthLoadingScreen extends React.Component {
 
         console.log(this.props)
 
-        if(this.props.auth.isLogin){
-            this.props.navigation.navigate('App');
-        }else{
-            this.props.navigation.navigate('Auth');
-        }
+        // if(this.props.auth.isLogin){
+        //     this.props.navigation.navigate('App');
+        // }else{
+        //     this.props.navigation.navigate('Auth');
+        // }
     };
 
     // Render any loading content that you like here
@@ -80,11 +81,15 @@ class AuthLoadingScreen extends React.Component {
 
         // this._bootstrapAsync();
 
+        console.log(this.props)
+
         return (
             <View style={styles.container}>
                 {/* <ActivityIndicator /> */}
 
-                <StatusBar barStyle="default" />
+                {/* <StatusBar barStyle="default" /> */}
+
+                <Text>Loading</Text>
             </View>
         );
     }
@@ -123,4 +128,4 @@ const mapStateToProps = (state) => {
 // }
 //   export default connect(mapStateToProps, mapDispatchToProps)(FriendsPage);
 
-export default connect(mapStateToProps, actions)(AuthLoadingScreen);
+ export default connect(mapStateToProps, actions)(Loading);

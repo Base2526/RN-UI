@@ -52,6 +52,7 @@
 		6048BF0C21CB2D8E00B1E049 /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048BF0921CB2D8E00B1E049 /* FBSDKCoreKit.framework */; };
 		6051380C21B50F8B0046D911 /* libRCTCameraRoll.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 605137E321B50ED00046D911 /* libRCTCameraRoll.a */; };
 		607B986021C0C6C800AB0CBF /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 607B984321C0BB3D00AB0CBF /* libRNDeviceInfo.a */; };
+		60C56BC821D4DF6C005ABF3F /* libRNFetchBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60C56BC121D4DF5E005ABF3F /* libRNFetchBlob.a */; };
 		60F92A6C21C370F600AC5145 /* libSQLite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F92A6B21C370B900AC5145 /* libSQLite.a */; };
 		60F92A6E21C3710100AC5145 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F92A6D21C3710100AC5145 /* libsqlite3.0.tbd */; };
 		60F92ABE21C3A0E100AC5145 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 60F92ABD21C3A0E100AC5145 /* www */; };
@@ -422,6 +423,13 @@
 			remoteGlobalIDString = E72EC1401F7ABB5A0001BC90;
 			remoteInfo = "RNDeviceInfo-tvOS";
 		};
+		60C56BC021D4DF5E005ABF3F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 60C56B8F21D4DF5D005ABF3F /* RNFetchBlob.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A15C300E1CD25C330074CB35;
+			remoteInfo = RNFetchBlob;
+		};
 		60F92A6A21C370B900AC5145 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 60F92A3421C370B800AC5145 /* SQLite.xcodeproj */;
@@ -496,6 +504,7 @@
 		6048BF0921CB2D8E00B1E049 /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKCoreKit.framework; path = ../../../Documents/FacebookSDK/FBSDKCoreKit.framework; sourceTree = "<group>"; };
 		605137D821B50ED00046D911 /* RCTCameraRoll.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTCameraRoll.xcodeproj; path = "../node_modules/react-native/Libraries/CameraRoll/RCTCameraRoll.xcodeproj"; sourceTree = "<group>"; };
 		607B983D21C0BB3D00AB0CBF /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNDeviceInfo.xcodeproj; path = "../node_modules/react-native-device-info/ios/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; };
+		60C56B8F21D4DF5D005ABF3F /* RNFetchBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFetchBlob.xcodeproj; path = "../node_modules/rn-fetch-blob/ios/RNFetchBlob.xcodeproj"; sourceTree = "<group>"; };
 		60F92A3421C370B800AC5145 /* SQLite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SQLite.xcodeproj; path = "../node_modules/react-native-sqlite-storage/src/ios/SQLite.xcodeproj"; sourceTree = "<group>"; };
 		60F92A6D21C3710100AC5145 /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
 		60F92ABD21C3A0E100AC5145 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../www; sourceTree = "<group>"; };
@@ -552,6 +561,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60C56BC821D4DF6C005ABF3F /* libRNFetchBlob.a in Frameworks */,
 				603A01F221CBF05500D4BF86 /* libRNFirebase.a in Frameworks */,
 				6048BF0A21CB2D8E00B1E049 /* FBSDKLoginKit.framework in Frameworks */,
 				6048BF0B21CB2D8E00B1E049 /* FBSDKShareKit.framework in Frameworks */,
@@ -887,6 +897,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		60C56B9021D4DF5D005ABF3F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				60C56BC121D4DF5E005ABF3F /* libRNFetchBlob.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		60F92A3521C370B800AC5145 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -922,6 +940,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				60C56B8F21D4DF5D005ABF3F /* RNFetchBlob.xcodeproj */,
 				60F92A3421C370B800AC5145 /* SQLite.xcodeproj */,
 				607B983D21C0BB3D00AB0CBF /* RNDeviceInfo.xcodeproj */,
 				605137D821B50ED00046D911 /* RCTCameraRoll.xcodeproj */,
@@ -1190,6 +1209,10 @@
 				{
 					ProductGroup = 607B983E21C0BB3D00AB0CBF /* Products */;
 					ProjectRef = 607B983D21C0BB3D00AB0CBF /* RNDeviceInfo.xcodeproj */;
+				},
+				{
+					ProductGroup = 60C56B9021D4DF5D005ABF3F /* Products */;
+					ProjectRef = 60C56B8F21D4DF5D005ABF3F /* RNFetchBlob.xcodeproj */;
 				},
 				{
 					ProductGroup = 6025344321CBE3DB00C2EF31 /* Products */;
@@ -1550,6 +1573,13 @@
 			fileType = archive.ar;
 			path = "libRNDeviceInfo-tvOS.a";
 			remoteRef = 607B984421C0BB3D00AB0CBF /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		60C56BC121D4DF5E005ABF3F /* libRNFetchBlob.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNFetchBlob.a;
+			remoteRef = 60C56BC021D4DF5E005ABF3F /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		60F92A6B21C370B900AC5145 /* libSQLite.a */ = {
