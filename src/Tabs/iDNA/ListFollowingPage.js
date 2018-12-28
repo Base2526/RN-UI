@@ -3,9 +3,11 @@ import {View, Text, FlatList, ActivityIndicator, TouchableOpacity, TouchableHigh
 
 import { List, ListItem, SearchBar } from "react-native-elements";
 
-import FastImage from 'react-native-fast-image'
+// import FastImage from 'react-native-fast-image'
 
 import DictStyle from '../CONTACTS/dictStyle';
+
+import ImageWithDefault from '../../Utils/ImageWithDefault'
 
 export default class ListFollowingPage extends React.Component{
     constructor(props) {
@@ -171,7 +173,7 @@ export default class ListFollowingPage extends React.Component{
                           source={{uri: 
                   'https://www.planwallpaper.com/static/images/9-credit-1.jpg'
                       }}/> */}
-                      <FastImage
+                      {/* <FastImage
                           style={{width: 60, height: 60, borderRadius: 10}}
                           source={{
                           uri: 'https://unsplash.it/400/400?image=1',
@@ -179,7 +181,12 @@ export default class ListFollowingPage extends React.Component{
                           priority: FastImage.priority.normal,
                           }}
                           resizeMode={FastImage.resizeMode.contain}
-                      />
+                      /> */}
+
+                  <ImageWithDefault 
+                    source={{uri: ''}}
+                    style={{width: 60, height: 60, borderRadius: 10}}
+                  />
                   </TouchableHighlight>
                   <Text style={{fontSize: DictStyle.fontSet.mSize, 
                               color: DictStyle.colorSet.normalFontColor,

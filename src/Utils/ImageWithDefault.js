@@ -6,6 +6,8 @@ import { createImageProgress } from 'react-native-image-progress';
 
 import Constant from '../Utils/Constant'
 
+let Image = createImageProgress(FastImage);
+
 export default class ImageWithDefault extends React.Component {
     constructor(props) {
       super(props);
@@ -19,7 +21,7 @@ export default class ImageWithDefault extends React.Component {
         this.setState({ failed: true });
     }
     render() {
-      let Image = createImageProgress(FastImage);
+      
 
       // imageStyle
       const defaultImage = <Image source={this.state.default} imageStyle={this.props.style}/>;

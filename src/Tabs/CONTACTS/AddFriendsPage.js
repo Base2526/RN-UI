@@ -17,6 +17,8 @@ import {API_URL} from '../../Utils/Constant'
 
 import {getUid} from '../../Utils/Helpers'
 
+import ImageWithDefault from '../../Utils/ImageWithDefault'
+
 class AddFriendsPage extends React.Component{
 
   static navigationOptions = ({ navigation }) => ({
@@ -164,6 +166,8 @@ class AddFriendsPage extends React.Component{
                         }}
                         resizeMode={FastImage.resizeMode.contain}
                     />
+
+                      
           </TouchableOpacity>
           <TouchableOpacity 
                     style={{height:40,
@@ -259,7 +263,7 @@ class AddFriendsPage extends React.Component{
                         onPress={
                           ()=>this.props.navigation.navigate("FriendProfilePage")
                         }>
-                        <FastImage
+                        {/* <FastImage
                             style={{width: 40, height: 40, borderRadius: 10}}
                             source={{
                             uri:  API_URL + item.url_image,
@@ -267,7 +271,12 @@ class AddFriendsPage extends React.Component{
                             priority: FastImage.priority.normal,
                             }}
                             resizeMode={FastImage.resizeMode.contain}
-                        />
+                        /> */}
+
+                      <ImageWithDefault 
+                        source={{uri: API_URL + item.url_image}}
+                        style={{width: 40, height: 40, borderRadius: 10}}
+                      />
                     </TouchableOpacity>
                   </View>
                   <View style={{flex:3}}>

@@ -6,7 +6,9 @@ import {Text,
         TouchableOpacity,
         Dimensions } from "react-native"
 
-import FastImage from 'react-native-fast-image'
+// import FastImage from 'react-native-fast-image'
+
+import ImageWithDefault from '../../Utils/ImageWithDefault'
 
 const sections = [
   {
@@ -167,7 +169,7 @@ export default class ListCenterPage extends React.Component {
   }
 
   renderSection = ({ item }) => {
-    // console.log(item)
+    console.log("renderSection")
     return (
       <FlatList
         key = {this.state.orientation}
@@ -214,7 +216,7 @@ export default class ListCenterPage extends React.Component {
             onPress={()=>{
               this.props.params.navigation.navigate("ApplicationDetailPage")
             }}>
-            <FastImage
+            {/* <FastImage
                 style={{width: 80, height: 80, borderRadius: 10}}
                 source={{
                 uri: 'https://unsplash.it/400/400?image=1',
@@ -222,7 +224,12 @@ export default class ListCenterPage extends React.Component {
                 priority: FastImage.priority.normal,
                 }}
                 resizeMode={FastImage.resizeMode.contain}
-            />
+            /> */}
+
+                <ImageWithDefault 
+                    source={{uri: 'https://unsplash.it/400/400?image=1'}}
+                    style={{width: 60, height: 60, borderRadius: 10}}
+                  />
         </TouchableOpacity>
         <View style={{justifyContent:'center', paddingTop:5}}>
           <Text >{item.name}</Text>

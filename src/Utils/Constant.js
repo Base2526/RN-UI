@@ -54,7 +54,7 @@ module.exports = {
     */
 
     // avatarSource.uri
-    DEFAULT_AVATARSOURCE_URI: 'https://unsplash.it/400/400?image=1',
+    DEFAULT_AVATARSOURCE_URI: 'https://www.ricoh-europe.com/img/error.jpeg',
 
     FRIEND_STATUS_FRIEND: '10',
     FRIEND_STATUS_FRIEND_CANCEL: '13',

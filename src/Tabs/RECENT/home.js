@@ -7,6 +7,8 @@ import Swipeout from 'react-native-swipeout';
 import FastImage from 'react-native-fast-image'
 import DictStyle from '../CONTACTS/dictStyle';
 
+import ImageWithDefault from '../../Utils/ImageWithDefault'
+
 class RecentHome extends Component {
   
     static navigationOptions = ({ navigation }) => ({
@@ -217,7 +219,7 @@ class RecentHome extends Component {
                               source={{uri: 
                       'https://www.planwallpaper.com/static/images/9-credit-1.jpg'
                           }}/> */}
-                          <FastImage
+                          {/* <FastImage
                               style={{width: 60, height: 60, borderRadius: 10}}
                               source={{
                               uri: 'https://unsplash.it/400/400?image=1',
@@ -225,7 +227,12 @@ class RecentHome extends Component {
                               priority: FastImage.priority.normal,
                               }}
                               resizeMode={FastImage.resizeMode.contain}
-                          />
+                          /> */}
+
+                      <ImageWithDefault 
+                        source={{uri: ''}}
+                        style={{width: 60, height: 60, borderRadius: 10}}
+                      />
                       </TouchableHighlight>
                       <Text style={{fontSize: DictStyle.fontSet.mSize, 
                                   color: DictStyle.colorSet.normalFontColor,

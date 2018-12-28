@@ -8,7 +8,7 @@ import {View,
 
 import { List, ListItem, SearchBar } from "react-native-elements";
 
-import FastImage from 'react-native-fast-image'
+// import FastImage from 'react-native-fast-image'
 import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 
@@ -16,6 +16,8 @@ import DictStyle from './dictStyle';
 
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
+
+import ImageWithDefault from '../../Utils/ImageWithDefault'
 
 class ClasssPage extends React.Component{
     constructor(props) {
@@ -213,7 +215,7 @@ class ClasssPage extends React.Component{
                                 width: 60,
                                 borderRadius: 10}}>
                         
-                        <FastImage
+                        {/* <FastImage
                             style={{width: 60, height: 60, borderRadius: 10}}
                             source={{
                               uri: item.image_url === '' ? Constant.DEFAULT_AVATARSOURCE_URI : Constant.API_URL + item.image_url,
@@ -221,7 +223,12 @@ class ClasssPage extends React.Component{
                             priority: FastImage.priority.normal,
                             }}
                             resizeMode={FastImage.resizeMode.contain}
-                        />
+                        /> */}
+
+                      <ImageWithDefault 
+                        source={{uri: Constant.API_URL + item.image_url}}
+                        style={{width: 60, height: 60, borderRadius: 10}}
+                      />
                     </TouchableOpacity>
                     <View style={{paddingLeft: 10}}>
                     <Text style={{fontSize: 18, 

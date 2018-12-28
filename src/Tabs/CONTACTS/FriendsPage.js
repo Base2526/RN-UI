@@ -31,10 +31,8 @@ class FriendsPage extends React.Component{
 
     constructor(props){
         super(props)
-
         this.state = {
           renderContent: false,
-          source:'https://cdn-images-1.medium.com/max/1600/1*-CY5bU4OqiJRox7G00sftwO.gif'
         }
     }
     
@@ -170,66 +168,17 @@ class FriendsPage extends React.Component{
                   flexDirection: 'row',
                 }}
               >
-                  <TouchableHighlight 
+                  <TouchableOpacity
                       style={{height:60,
                               width: 60,
                               borderRadius: 10}}        
                       >
-                      
-                      {/* <FastImage
-                          style={{width: 60, height: 60, borderRadius: 10}}
-                          source={{
-                            uri: rowItem.image_url === "" ? Constant.DEFAULT_AVATARSOURCE_URI : Constant.API_URL + rowItem.image_url,
-                            // uri: 'https://cdn-images-1.medium.com/max/1600/1*-CY5bU4OqiJRox7G00sftw.gif',
-                            headers:{ Authorization: 'someAuthToken' },
-                            priority: FastImage.priority.normal,
-                          }}
-                          resizeMode={FastImage.resizeMode.contain}
-
-                          onLoadStart={()=>{
-                            console.log('onLoadStart')
-                          }}
-                          onProgress={e => console.log(e.nativeEvent.loaded / e.nativeEvent.total)}
-
-                          onLoadEnd={()=>{
-                            console.log('onLoadEnd')
-                          }}
-                      /> */}
-
-                      {/* <Image
-                        // defaultSource={require('../../Images/disclosure_indicator.png')}
-                        source={{ uri: this.state.source }}
-                        style={{width: 60, height: 60, borderRadius: 10}}
-                        indicator={Progress.Pie}
-                        indicatorProps={{
-                          size: 20,
-                          borderWidth: 0,
-                          color: 'rgba(150, 150, 150, 1)',
-                          unfilledColor: 'rgba(200, 200, 200, 0.2)'
-                        }}
-                        // onLoadEnd={()=>{
-                        //   console.log('onLoadEnd')
-                        // }}
-                        onError={(e) => { 
-                          // this.props.source = { uri: 'https://example.domain.com/no-photo.png' }
-                        
-                          console.log(this.props)
-                          console.log('onError')
-                         
-                        
-
-                          this.setState({
-                            source: 'https://cdn-images-1.medium.com/max/1600/1*-CY5bU4OqiJRox7G00sftw.gif'
-                          })
-                        }}
-                      /> */}
-
                       <ImageWithDefault 
                         source={{uri: Constant.API_URL + rowItem.image_url}}
                         style={{width: 60, height: 60, borderRadius: 10}}
                       />
                       
-                  </TouchableHighlight>
+                  </TouchableOpacity>
                   <View>
                     <Text style={{fontSize: 18, 
                                   fontWeight: '600',

@@ -4,13 +4,14 @@ import {View, Text, FlatList, ActivityIndicator, TouchableOpacity, TouchableHigh
 import { List, ListItem, SearchBar } from "react-native-elements";
 import { connect } from 'react-redux';
 
-import FastImage from 'react-native-fast-image'
+// import FastImage from 'react-native-fast-image'
 
 import DictStyle from './dictStyle';
 
 import * as actions from '../../Actions'
 
 import Constant from '../../Utils/Constant'
+import ImageWithDefault from '../../Utils/ImageWithDefault'
 
 class GroupsPage extends React.Component{
     constructor(props) {
@@ -221,7 +222,7 @@ class GroupsPage extends React.Component{
                           source={{uri: 
                   'https://www.planwallpaper.com/static/images/9-credit-1.jpg'
                       }}/> */}
-                      <FastImage
+                      {/* <FastImage
                           style={{width: 60, height: 60, borderRadius: 10}}
                           source={{
                           uri: item.detail.image_url === '' ? Constant.DEFAULT_AVATARSOURCE_URI : Constant.API_URL + item.detail.image_url,
@@ -229,6 +230,11 @@ class GroupsPage extends React.Component{
                           priority: FastImage.priority.normal,
                           }}
                           resizeMode={FastImage.resizeMode.contain}
+                      /> */}
+
+                      <ImageWithDefault 
+                        source={{uri: Constant.API_URL + item.detail.image_url}}
+                        style={{width: 60, height: 60, borderRadius: 10}}
                       />
                   </TouchableHighlight>
                   <View style={{paddingLeft: 10}}>
