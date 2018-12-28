@@ -6,18 +6,17 @@ import {
     TouchableOpacity,
     AppRegistry,
     Button,
-    Image,
-    TouchableHighlight
+    TouchableHighlight,
+    Image
 } from 'react-native'
   
 import ExpandableList from 'react-native-expandable-section-list'
 import DictStyle from './dictStyle'
-import FastImage from 'react-native-fast-image'
+
 import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 
 import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-appstate';
-
 
 import * as actions from '../../Actions'
 import firebase from 'react-native-firebase';
@@ -25,11 +24,8 @@ import { Constants } from 'react-native-navigation';
 // import { stat } from 'fs';
 
 import Constant from '../../Utils/Constant'
-
-// import {group_all, 
-//         groupDetail_all} from '../../Utils/DB'
-
 import {watchTaskAddEvent, watchTaskChangedEvent, watchTaskRemovedEvent} from '../../Actions'
+import ImageWithDefault from '../../Utils/ImageWithDefault'
 
 class FriendsPage extends React.Component{
 
@@ -38,6 +34,7 @@ class FriendsPage extends React.Component{
 
         this.state = {
           renderContent: false,
+          source:'https://cdn-images-1.medium.com/max/1600/1*-CY5bU4OqiJRox7G00sftwO.gif'
         }
     }
     
@@ -52,6 +49,13 @@ class FriendsPage extends React.Component{
       // groupDetail_all(v=>{
       //   console.log(v)
       // })
+
+      // FastImage.preload([
+      //   {
+      //     uri: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii0xMS41IC0xMC4yMzE3NCAyMyAyMC40NjM0OCI+CiAgPHRpdGxlPlJlYWN0IExvZ288L3RpdGxlPgogIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIyLjA1IiBmaWxsPSIjNjFkYWZiIi8+CiAgPGcgc3Ryb2tlPSIjNjFkYWZiIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiPgogICAgPGVsbGlwc2Ugcng9IjExIiByeT0iNC4yIi8+CiAgICA8ZWxsaXBzZSByeD0iMTEiIHJ5PSI0LjIiIHRyYW5zZm9ybT0icm90YXRlKDYwKSIvPgogICAgPGVsbGlwc2Ugcng9IjExIiByeT0iNC4yIiB0cmFuc2Zvcm09InJvdGF0ZSgxMjApIi8+CiAgPC9nPgo8L3N2Zz4K',
+      //     headers: { Authorization: 'someAuthToken' },
+      //   }
+      // ])
     }
 
     componentWillReceiveProps(nextProps){
@@ -134,70 +138,7 @@ class FriendsPage extends React.Component{
         }
 
         // console.log([profile, friends, friendRequestSent])
-        return [profile, friendRequestSent, friends];
-        
-        return( [
-            {
-              title: 'Profile',
-              member: [
-                {
-                  title: "Name",
-                  status: 'test'
-                }
-              ]
-            },
-            {
-              title: 'Groups',
-              member: [
-                {
-                  title: 'Group name',
-                  status: 'test'
-                },
-                {
-                  title: 'Group name',
-                  status: 'test'
-                }
-              ]
-            },
-            {
-              title: 'Friends',
-              member: [
-                {
-                  title: 'Friend name',
-                  status: 'test'
-                },
-                {
-                  title: 'Friend name',
-                  status: 'test'
-                },
-                {
-                  title: 'Friend name',
-                  status: 'test'
-                },
-                {
-                  title: 'Friend name',
-                  status: 'test'
-                }
-              ]
-            },
-            {
-              title: 'Friend Request Sent',
-              member: [
-                {
-                  title: 'Friend name',
-                  status: 'test'
-                },
-                {
-                  title: 'Friend name',
-                  status: 'test'
-                },
-                {
-                  title: 'Friend name',
-                  status: 'test'
-                },
-              ]
-            }
-          ])
+        return [profile, friendRequestSent, friends];        
     }
 
     _itemOnPress(rowId, sectionId){
@@ -234,15 +175,60 @@ class FriendsPage extends React.Component{
                               width: 60,
                               borderRadius: 10}}        
                       >
-                      <FastImage
+                      
+                      {/* <FastImage
                           style={{width: 60, height: 60, borderRadius: 10}}
                           source={{
-                            uri: Constant.API_URL + rowItem.image_url,
+                            uri: rowItem.image_url === "" ? Constant.DEFAULT_AVATARSOURCE_URI : Constant.API_URL + rowItem.image_url,
+                            // uri: 'https://cdn-images-1.medium.com/max/1600/1*-CY5bU4OqiJRox7G00sftw.gif',
                             headers:{ Authorization: 'someAuthToken' },
                             priority: FastImage.priority.normal,
                           }}
                           resizeMode={FastImage.resizeMode.contain}
+
+                          onLoadStart={()=>{
+                            console.log('onLoadStart')
+                          }}
+                          onProgress={e => console.log(e.nativeEvent.loaded / e.nativeEvent.total)}
+
+                          onLoadEnd={()=>{
+                            console.log('onLoadEnd')
+                          }}
+                      /> */}
+
+                      {/* <Image
+                        // defaultSource={require('../../Images/disclosure_indicator.png')}
+                        source={{ uri: this.state.source }}
+                        style={{width: 60, height: 60, borderRadius: 10}}
+                        indicator={Progress.Pie}
+                        indicatorProps={{
+                          size: 20,
+                          borderWidth: 0,
+                          color: 'rgba(150, 150, 150, 1)',
+                          unfilledColor: 'rgba(200, 200, 200, 0.2)'
+                        }}
+                        // onLoadEnd={()=>{
+                        //   console.log('onLoadEnd')
+                        // }}
+                        onError={(e) => { 
+                          // this.props.source = { uri: 'https://example.domain.com/no-photo.png' }
+                        
+                          console.log(this.props)
+                          console.log('onError')
+                         
+                        
+
+                          this.setState({
+                            source: 'https://cdn-images-1.medium.com/max/1600/1*-CY5bU4OqiJRox7G00sftw.gif'
+                          })
+                        }}
+                      /> */}
+
+                      <ImageWithDefault 
+                        source={{uri: Constant.API_URL + rowItem.image_url}}
+                        style={{width: 60, height: 60, borderRadius: 10}}
                       />
+                      
                   </TouchableHighlight>
                   <View>
                     <Text style={{fontSize: 18, 
@@ -302,15 +288,32 @@ class FriendsPage extends React.Component{
                             width: 60,
                             borderRadius: 10}}        
                     >
+                    { /*}
                     <FastImage
                         style={{width: 60, height: 60, borderRadius: 10}}
                         source={{
-                        uri: Constant.API_URL + rowItem.profile.image_url,
+                        uri: rowItem.profile.image_url === "" ? Constant.DEFAULT_AVATARSOURCE_URI : Constant.API_URL + rowItem.profile.image_url,
+                        // uri: 'https://cdn-images-1.medium.com/max/1600/1*-CY5bU4OqiJRox7G00sftw.gif',
                         headers:{ Authorization: 'someAuthToken' },
                         priority: FastImage.priority.normal,
                         }}
                         resizeMode={FastImage.resizeMode.contain}
+
+                        onLoadStart={()=>{
+                          console.log('onLoadStart')
+                        }}
+                        onProgress={e => console.log(e.nativeEvent.loaded / e.nativeEvent.total)}
+
+                        onLoadEnd={()=>{
+                          console.log('onLoadEnd')
+                        }}
                     />
+                    */ }
+
+                      <ImageWithDefault 
+                        source={{uri:Constant.API_URL + rowItem.profile.image_url}}
+                        style={{width: 60, height: 60, borderRadius: 10}}
+                      />
                 </TouchableHighlight>
                 <View>
                     <Text style={{fontSize: 18, 
@@ -371,16 +374,16 @@ class FriendsPage extends React.Component{
 
         let ic_collapse;
         if(state){
-          ic_collapse = <FastImage
+          ic_collapse = <Image
                         style={{width: 20, height: 20}}
                         source={require('../../Images/collapse_down.png')}
-                        resizeMode={FastImage.resizeMode.contain}
+                        // resizeMode={FastImage.resizeMode.contain}
                     />
         }else{
-          ic_collapse = <FastImage
+          ic_collapse = <Image
                         style={{width: 20, height: 20}}
                         source={require('../../Images/collapse_up.png')}
-                        resizeMode={FastImage.resizeMode.contain}
+                        // resizeMode={FastImage.resizeMode.contain}
                     />
         }
 

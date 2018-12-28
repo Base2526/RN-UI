@@ -1,71 +1,29 @@
 import React from "react";
-import {StyleSheet, 
-        Text, 
-        View , 
-        AsyncStorage, 
-        SafeAreaView,
-        AppState} from "react-native";
+import {AppState} from "react-native";
         
-import firebase from 'react-native-firebase';
-import DeviceInfo from 'react-native-device-info';
-
 import {Provider} from 'react-redux'
-import { createStore, applyMiddleware, compose } from 'redux'
-import ReduxThunk from 'redux-thunk'
-import applyAppStateListener from 'redux-enhancer-react-native-appstate';
-
-
-// import { autoRehydrate, persistCombineReducers } from 'redux-persist'
-
-import { persistStore, persistReducer, REHYDRATE } from 'redux-persist'
-import storage from 'redux-persist/lib/storage' // default: localStorage if web, AsyncStorage if react-native
 import { PersistGate } from 'redux-persist/es/integration/react'
-// import { REHYDRATE } from 'redux-persist/constants';
-// import reducers from './reducers' // where reducers is an object of reducers
-
-// import FilesystemStorage from 'redux-persist-filesystem-storage'
-
-// import * as firebase from 'firebase';
-
-
-// import FilesystemStorage from 'redux-persist-filesystem-storage'
-
-import reducers from './Reducers'
-
 import { AppNavigator } from "./App"; 
 import Constant from './Utils/Constant'
 import {loadAsyncStorage} from './Utils/Helpers'
 
-import Loading from './Screens/Loading'
-
-import AuthLoadingScreen from './Screens/AuthLoadingScreen'
-
-
-import configureStore from './configureStore'
-
-// import configureStore from './store/configureStore'
-
+import configureStore from './ConfigureStore'
 const { persistor, store } = configureStore()
-
-const onBeforeLift = () => {
-  // take some action before the gate lifts
-  console.log('onBeforeLift')
-}
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      checkedSignIn: false,
-      signedIn: false,
-      appState: AppState.currentState
-    };
+    // this.state = {
+    //   checkedSignIn: false,
+    //   signedIn: false,
+    //   appState: AppState.currentState
+    // };
   }
 
   componentDidMount() {
 
-    console.log("---> 009")
+    // console.log("---> 009")
 
     // login("admin", "1234").then(data => {
     //   console.log('Print list of movies:', data);
@@ -95,8 +53,8 @@ export default class App extends React.Component {
     */
 
     // console.log("componentDidMount")
-    AppState.addEventListener('change', this._handleAppStateChange);
-    AppState.addEventListener('memoryWarning', this._handleAppStateChange);
+    // AppState.addEventListener('change', this._handleAppStateChange);
+    // AppState.addEventListener('memoryWarning', this._handleAppStateChange);
 
     // this.isSignedIn()
 
@@ -156,10 +114,6 @@ export default class App extends React.Component {
     */
 
   //  firebase.database().ref('/items').off()
-
-
-
-    
   }
 
   componentWillReceiveProps(){
@@ -169,10 +123,11 @@ export default class App extends React.Component {
   componentWillUnmount(){
     console.log("componentWillUnmount")
 
-    AppState.removeEventListener('change', this._handleAppStateChange);
-    AppState.removeEventListener('memoryWarning', this._handleAppStateChange);
+    // AppState.removeEventListener('change', this._handleAppStateChange);
+    // AppState.removeEventListener('memoryWarning', this._handleAppStateChange);
   }
 
+  /*
   _firebase(){
     // console.log(DeviceInfo)
     console.log(DeviceInfo.getUniqueID())
@@ -217,7 +172,9 @@ export default class App extends React.Component {
     });
   
   }
+  */
 
+  /*
   _handleAppStateChange = (nextAppState) => {
     // if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
     //   console.log('App has come to the foreground!')
@@ -256,15 +213,14 @@ export default class App extends React.Component {
       })
     })
   };
+  */
 
   componentDidUpdate(){
     // console.log("------> componentDidUpdate")
   }
 
-  
-
   render() {
-    const { checkedSignIn, signedIn } = this.state;
+    // const { checkedSignIn, signedIn } = this.state;
 
     // If we haven't checked AsyncStorage yet, don't render anything (better ways to do this)
     // if (!checkedSignIn) {
@@ -280,9 +236,9 @@ export default class App extends React.Component {
     //   this._firebase()
     // }
 
-    console.log(this.props)
+    // console.log(this.props)
 
-    console.log('---1')
+    // console.log('---1')
 
     // const store = createStore(reducers, {}, applyMiddleware(ReduxThunk))
 
@@ -338,11 +294,10 @@ export default class App extends React.Component {
     //     })
     //   }
     // ) //purge here
-
     */
-    console.log('#1')
+    // console.log('#1')
     // console.log(store)
-    console.log('#2')
+    // console.log('#2')
     // return(<View><Text>isSignedIn</Text></View>)
     // const Layout = createRootNavigator(signedIn);
     return (<Provider store={store}>

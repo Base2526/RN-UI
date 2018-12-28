@@ -5,7 +5,7 @@ import storage from 'redux-persist/lib/storage' // defaults to localStorage for 
 import ReduxThunk from 'redux-thunk'
 import applyAppStateListener from 'redux-enhancer-react-native-appstate';
 
-import reducers from '../src/Reducers'
+import reducers from './Reducers'
 
 const persistConfig = {
   key: 'root',
