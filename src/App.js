@@ -93,14 +93,3 @@ export const AppNavigator = createAppContainer(createSwitchNavigator(
       initialRouteName: 'AuthLoading',
   }
 ));
-
-
-// export class TabbarTest extends React.Component {
-//   render() {
-//     console.log('--TabbarTest--')
-//       return (
-
-//           <AppNavigator/>
-//       );
-//   }
-// }

@@ -24,7 +24,7 @@ import { Constants } from 'react-native-navigation';
 // import { stat } from 'fs';
 
 import Constant from '../../Utils/Constant'
-import {watchTaskAddEvent, watchTaskChangedEvent, watchTaskRemovedEvent} from '../../Actions'
+// import {watchTaskAddEvent, watchTaskChangedEvent, watchTaskRemovedEvent} from '../../Actions'
 import ImageWithDefault from '../../Utils/ImageWithDefault'
 
 class FriendsPage extends React.Component{

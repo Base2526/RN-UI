@@ -8,9 +8,9 @@ import {
     Text
 } from 'react-native';
 import { connect } from 'react-redux';
-import * as actions from '../Actions';
+// import * as actions from '../Actions';
 
-// import {actionUserLogin, watchTaskAddEvent, watchTaskChangedEvent, watchTaskRemovedEvent} from '../Actions'
+import {watchTaskEvent} from '../Actions'
 
 class AuthLoadingScreen extends React.Component {
     static navigationOptions = {
@@ -110,17 +110,21 @@ const mapStateToProps = (state) => {
     }
 }
 
+// watchTaskEvent
+
 // const mapDispatchToProps = dispatch => ({
 //     // getUserToken: () => dispatch(getUserToken()),
 // });
 
-// const mapDispatchToProps = (dispatch) => {
-//     // watchTaskAddEvent(dispatch)
-//     // watchTaskChangedEvent(dispatch)
-//     // watchTaskRemovedEvent(dispatch)
+const mapDispatchToProps = (dispatch) => {
+    // watchTaskAddEvent(dispatch)
+    // watchTaskChangedEvent(dispatch)
+    // watchTaskRemovedEvent(dispatch)
 
-//     return {actionCheckUserLogin}
-// }
+    watchTaskEvent(dispatch)
+
+    return {}
+}
 //   export default connect(mapStateToProps, mapDispatchToProps)(FriendsPage);
 
-export default connect(mapStateToProps, actions)(AuthLoadingScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(AuthLoadingScreen);

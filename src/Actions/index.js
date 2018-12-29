@@ -295,7 +295,7 @@ export const actionCreateClass = (uid, class_name, uri) => dispatch =>{
     })
 }
 
-export const watchTaskAddEvent = () => (dispatch) => {
+export const watchTaskEvent = () => (dispatch) => {
     firebase.database().ref('/items').on('child_added', (snap) => {
         // dispatch(addTask(snap.val()));
 
@@ -304,6 +304,7 @@ export const watchTaskAddEvent = () => (dispatch) => {
     });
 }
 
+/*
 export const watchTaskChangedEvent = () => (dispatch) => {
     firebase.database().ref('/items').on('child_changed', (snap) => {
         // dispatch(addTask(snap.val()));
@@ -321,3 +322,4 @@ export const watchTaskRemovedEvent = () => (dispatch) => {
         console.log(snap)
     });
 }
+*/

@@ -82,7 +82,7 @@ class homeY extends React.Component {
       if(!v.status){
         console.log('Error logout')
       }else{
-        this.props.navigation.navigate("Auth")
+        this.props.navigation.navigate("AuthLoading")
       }
     })
   }

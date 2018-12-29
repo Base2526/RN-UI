@@ -135,9 +135,8 @@ class SignIn extends React.Component{
             }
           });
           */
-
-          
-          this.props.navigation.navigate("App") 
+         
+          this.props.navigation.navigate("AuthLoading") 
         }else{
 
         }
