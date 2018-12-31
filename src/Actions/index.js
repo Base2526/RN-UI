@@ -296,7 +296,7 @@ export const actionCreateClass = (uid, class_name, uri) => dispatch =>{
 }
 
 export const watchTaskEvent = () => (dispatch) => {
-    firebase.database().ref('/items').on('child_added', (snap) => {
+    firebase.database().ref('/').on('child_added', (snap) => {
         // dispatch(addTask(snap.val()));
 
         console.log('child_added')

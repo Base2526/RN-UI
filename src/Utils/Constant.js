@@ -1,4 +1,6 @@
-let API_URL = 'http://139.59.228.56';
+// let API_URL = 'http://139.59.228.56';
+
+let API_URL = 'http://128.199.149.168';
 let END_POINT = '/api';
 
 module.exports = {

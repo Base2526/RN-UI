@@ -17,12 +17,12 @@ export default class ImageWithDefault extends React.Component {
         default: {uri:Constant.DEFAULT_AVATARSOURCE_URI}
       };
     }
-    _onError = () => {
+    _onError = (e) => {
+        console.log(e)
         this.setState({ failed: true });
     }
     render() {
-      
-
+    
       // imageStyle
       const defaultImage = <Image source={this.state.default} imageStyle={this.props.style}/>;
 
@@ -36,17 +36,18 @@ export default class ImageWithDefault extends React.Component {
         // />
         <Image
             source={this.props.source}
-            // style={this.props.style}
+            // style={{justifyContent: 'center', alignItems: 'center',}}
             imageStyle={this.props.style}
             indicator={Progress.Pie}
             indicatorProps={{
                 size: 20,
                 borderWidth: 0,
                 color: 'rgba(150, 150, 150, 1)',
-                unfilledColor: 'rgba(200, 200, 200, 0.2)'
+                unfilledColor: 'rgba(200, 200, 200, 0.2)',
+            
             }}
             onError={(e) => { 
-                this._onError()
+                this._onError(e)
             }}
         />
       );

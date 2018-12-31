@@ -3,9 +3,9 @@ description = Module iDNA
 package = KLOVERS.ORG
 core = 7.x 
 
-version = "7.x-1.0"
+; version = "7.x-1.0"
 
 # dependencies[] = logintoboggan
 
 # opentok
-dependencies[] = opentok
+; dependencies[] = opentok

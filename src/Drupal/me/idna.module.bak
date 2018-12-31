@@ -1,0 +1,738 @@
+<?php
+
+require_once ( dirname(__FILE__) . '/includes/klovers.inc');
+require_once ( dirname(__FILE__) . '/includes/configs.inc');
+
+// qrcode
+require_once ( dirname(__FILE__) . '/libraries/qrcode/qrlib.php');
+
+
+// Parse Server
+// define( 'PARSE_SDK_DIR', dirname(__FILE__) .'/parse/src/Parse/' );
+// // include Parse SDK autoloader
+// require_once(dirname(__FILE__) .'/parse/autoload.php' );
+// // Add the "use" declarations where you'll be using the classes
+// use Parse\ParseClient;
+// use Parse\ParseObject;
+// use Parse\ParseQuery;
+// use Parse\ParseACL;
+// use Parse\ParsePush;
+// use Parse\ParseUser;
+// use Parse\ParseInstallation;
+// use Parse\ParseException;
+// use Parse\ParseAnalytics;
+// use Parse\ParseFile;
+// use Parse\ParseCloud;
+// Parse Server
+
+function klovers_init()
+{
+  // dpm("k init");
+
+
+}
+
+/*
+ * hook_help()
+ * */
+function klovers_help($path, $arg)
+{
+  switch ($path) {
+    case 'admin/help#klovers':
+      return t('Klovers Module');
+    default:
+      break;
+  }
+}
+
+
+/**
+ * Implements hook_permission().
+ */
+function klovers_permission() {
+  return array(
+    'klovers_test' => array(
+      'title' => t('Klovers Test Function.'),
+    )
+  );
+}
+
+/*
+ * hook_menu()
+ * 
+ *  
+ * */
+function klovers_menu() 
+{ 
+  $items['klovers/test'] = array(
+    'title' => t('ทดสอบ function'),
+    'page callback' => '_klovers_test',
+    'access arguments' => array('klovers_test'),
+    // 'access callback' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['klovers/upload_file'] = array(
+    'title' => t('ทดสอบ การ upload file'),
+    'page callback' => '_klovers_upload_file',
+    'access arguments' => array('klovers_test'),
+    // 'access callback' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  //  $items['klovers/mail'] = array(
+  //   'title' => t('ทดสอบ function mail'),
+  //   'page callback' => '_klovers_mail',
+  //   'access arguments' => array('klovers_test'),
+  //   // 'access callback' => TRUE,
+  //   'type' => MENU_NORMAL_ITEM,
+  // );
+  return $items;
+}
+
+/*
+ * hook_user_insert()
+ * this hook triggered when a user registered . you can implement it in your custom module.
+*/
+function klovers_user_insert(&$edit, $account, $category) {
+  watchdog(TAG, 'Add New User = %uid', array('%uid' => $account->uid), WATCHDOG_INFO);
+
+
+  // dpm($account->mail);
+
+/*
+  // Where 'main' is your profile2 type machine name.
+  $profile = profile2_create(array('type' => 'main', 'uid' => $account->uid));
+  // Add in the necessary custom fields and values.
+  $profile->field_just_example[LANGUAGE_NONE][0]['value'] = 'Awesome!';
+  // Save the profile2 to the user account.
+  profile2_save($profile);
+  */
+
+  try {
+        // Gen QRCode
+        //set it to writable location, a place for temp generated PNG files
+        $PNG_TEMP_DIR = PATH_FOLDER_QRCODE;
+
+        //Create the directory if it does not already exist, otherwise check the permissions
+        file_prepare_directory($PNG_TEMP_DIR, FILE_CREATE_DIRECTORY);
+
+        $text = $account->uid;//$_GET['user'];
+        $errorCorrectionLevel = "M";
+        $matrixPointSize = 8;
+
+        // user data
+        $filename = $PNG_TEMP_DIR.'/'.md5($text.'|'.$errorCorrectionLevel.'|'.$matrixPointSize).'.png';
+        QRcode::png($text, $filename, $errorCorrectionLevel, $matrixPointSize, 2);  
+
+        $currentDate = date("Ymd");
+        $name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
+        $image = file_get_contents($filename); 
+        //Saves a file to the specified destination and creates a database entry.
+        $file = klovers_file_save_data($account->uid, $image, 'public://qrcode/' . $name, FILE_EXISTS_RENAME);
+        
+        // Delete file ที่  QRCode  สร้างขึ้นมาเพราะว่าเราเก็บเข้าระบบแล้ว
+        unlink($filename);
+        // Gen QRCode
+
+        // dpm($account);
+
+        // Create Profile2
+        // Where 'main' is your profile2 type machine name.
+        $profile = profile2_create(array('type' => 'main', 'uid' => $account->uid));
+
+        // add field name
+        $profile->field_profile_name[LANGUAGE_NONE][0]['value'] = $account->name;
+
+        // add field my_qrcode
+        $profile->field_profile_my_qrcode[LANGUAGE_NONE][0] = (array)$file;
+
+        // Save the profile2 to the user account.
+        profile2_save($profile);
+
+
+        // register parse
+
+        // session_start();
+
+        // Parse\ParseClient::initialize('X5hlsQoD2uY0Za2zQUyy', 'X3eX9XwzzJpkmMfjLR8E', 'GhgoqbRnKkHN9ctsPAYu');
+        // Parse\ParseClient::setServerURL('https://iheart-parse-server.herokuapp.com/parse');
+
+
+        // $user = new Parse\ParseUser();
+        // $user->set("username", "myname55567");
+        // $user->set("password", "mypass55567");
+        // $user->set("email", "email55567@example.com");
+
+
+        // try {
+        //   var_dump($user->signUp());
+        //   // Hooray! Let them use the app now.
+        // } catch (ParseException $ex) {
+        //   // Show the error message somewhere and let the user try again.
+        //   echo "Error: " . $ex->getCode() . " " . $ex->getMessage();
+        // }
+
+     
+        
+        /*
+
+        try {
+         if (session_status() == PHP_SESSION_NONE) {
+              session_start();
+          }
+
+          Parse\ParseClient::initialize('X5hlsQoD2uY0Za2zQUyy', 'X3eX9XwzzJpkmMfjLR8E', 'GhgoqbRnKkHN9ctsPAYu');
+          Parse\ParseClient::setServerURL('https://iheart-parse-server.herokuapp.com/parse');
+          
+       
+       try { 
+  $query = new Parse\ParseQuery("_User");
+  $query->limit(10);
+  $results = $query->find();
+// foreach ( $results as $result ) {
+//     // echo user Usernames
+//   // var_dump($result->get('location2'));
+//   echo "<pre>";
+//   var_dump($result);
+//   echo "</pre>";
+//     echo  '<br/>';
+// }
+  dpm($results);
+
+
+  throw new Exception();
+} catch (Exception $e) {
+  print "something went wrong\n";
+} finally {
+  print "This part is always executed\n";
+}
+*/
+
+
+          // $user = new Parse\ParseUser();
+          // $user->set("username", $account->mail);
+          // $user->set("password", "KLOVERSORG");
+          // $user->set("email", $account->mail);
+
+          // // dpm($user);
+
+          // try {
+          //   // $user->signUp();
+          //   // Hooray! Let them use the app now.
+          // } catch (ParseException $ex) {
+          //   // Show the error message somewhere and let the user try again.
+          //   // echo "Error: " . $ex->getCode() . " " . $ex->getMessage();
+
+          //   watchdog(TAG, 'Error : Parse Login xx = %uid', array('%uid' => $ex->getMessage()), WATCHDOG_INFO);
+          // }
+          
+
+
+          // watchdog(TAG, 'Parse Login', array(), WATCHDOG_INFO);
+
+          // try { 
+          //   $query = new ParseQuery("_User");
+          //   $query->limit(10);
+          //   $results = $query->find();
+          //   foreach ( $results as $result ) {
+          //       // echo user Usernames
+          //     // var_dump($result->get('location2'));
+          //     // echo "<pre>";
+          //     // var_dump($result);
+          //     // echo "</pre>";
+          //     //   echo  '<br/>';
+
+          //     // watchdog(TAG, 'Parse Login xx = ', array(), WATCHDOG_INFO);
+
+          //     dpm($result);
+          //   }
+
+          // } catch (Exception $e) {
+          //     watchdog(TAG, 'Parse Login : something went wrong\n', array(), WATCHDOG_INFO);
+          // } finally {
+          //     watchdog(TAG, 'Parse Login : This part is always executed\n', array(), WATCHDOG_INFO);
+          // }
+
+
+          // \Parse\ParseUser::logIn("a@Klovers.org", "KLOVERSORG");
+
+          // $currentUser = \Parse\ParseUser::getCurrentUser();
+          // dpm($currentUser);
+
+
+/*
+          $user = new \Parse\ParseUser();
+          $user->set("username", "myname");
+          $user->set("password", "mypass");
+          $user->set("email", "email@example.com");
+
+          // other fields can be set just like with ParseObject
+          // $user->set("phone", "415-392-0202");
+
+          dpm($user);
+
+          try {
+            $user->signUp();
+            // Hooray! Let them use the app now.
+          } catch (ParseException $e) {
+            // Try again using drupal_realpath()
+            // ...
+
+            dpm($e);
+          }
+          */
+
+          // use Parse\ParseUser;
+          // use Parse\ParseClient;
+
+// ParseClient::initialize('***', '***', '***');
+
+          // https://api.drupal.org/api/drupal/includes%21common.inc/function/drupal_http_request/7.x
+
+
+          $data = 'email=' . $account->mail;
+
+          $options = array(
+                'method' => 'POST',
+                'data' => $data,
+                'timeout' => 15,
+                'headers' => array('Content-Type' => 'application/x-www-form-urlencoded'),
+          );
+
+          $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || 
+          $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+          $domainName = $_SERVER['HTTP_HOST'];
+          // return $protocol.$domainName;
+
+          $result = drupal_http_request($protocol.$domainName . '/ext/iparse/parse_register.php', $options);
+        
+
+// $user = new \Parse\ParseUser();
+// $user->set("username", "superuser");
+// $user->set("password", "superpass");
+// $user->set("email", "super@user.com");
+
+// dpm($user);
+
+// try {
+//   $user.signUp();
+//    //  $user->signUp();
+//     // Hooray! Let them use the app now.
+// } catch (ParseException $ex) {
+//     // Show the error message somewhere and let the user try again.
+//     // echo "Error: " . $ex->getCode() . " " . $ex->getMessage();
+
+//     watchdog(TAG, 'Error : Parse Login xx = %uid', array('%uid' => $ex->getMessage()), WATCHDOG_INFO);
+// }
+
+
+          // https://github.com/ParsePlatform/parse-server/issues/124
+          // Init parse: app_id, rest_key, master_key
+          // ParseClient::initialize('X5hlsQoD2uY0Za2zQUyy', 'X3eX9XwzzJpkmMfjLR8E', 'GhgoqbRnKkHN9ctsPAYu');
+
+          // ParseClient::setServerURL('https://iheart-parse-server.herokuapp.com/parse');
+
+
+          // $query = new ParseQuery("_User");
+          // $query->limit(10);
+          // $results = $query->find();
+
+          // dpm($results);
+          // foreach ( $results as $result ) {
+          //     // echo user Usernames
+          //   // var_dump($result->get('location2'));
+          //   echo "<pre>";
+          //   var_dump($result);
+          //   echo "</pre>";
+          //     echo  '<br/>';
+          // }
+
+
+         //  watchdog(TAG, 'Parse Login xx = %uid', array('%uid' => $user), WATCHDOG_INFO);
+
+          // $user = \Parse\ParseUser::logIn("myname", "mypass");
+          // Do stuff after successful login.
+
+        // } catch (Exception $e) {
+        //   //echo 'Caught exception: ',  $e->getMessage(), "\n";
+
+        //   watchdog(TAG, 'Parse Login = %uid', array('%uid' => $e->getMessage()), WATCHDOG_INFO);
+        // }
+
+
+        // watchdog(TAG, 'Parse Login', WATCHDOG_INFO);
+
+        // $user = \Parse\ParseUser::getCurrentUser();
+
+        // // var_dump($user);
+
+        // if ($user) {
+
+
+        // }else{
+
+          // try {
+          //     ;
+
+          //     // echo "<pre>";
+          //     // echo "User Object ID : " . $user->getObjectId();
+          //     // echo "</pre>";
+
+              
+
+          //     // watchdog(TAG, 'Parse Login = %uid', array('%uid' => $user), WATCHDOG_INFO);
+          // } catch (Exception $e) {
+          //     // The login failed. Check error to see why.  
+          // }
+        // }
+
+
+        // register parse
+
+    } catch (Exception $e) {
+          echo 'Caught exception: ',  $e->getMessage(), "\n";
+    }
+}
+
+/*
+ *  hook_user_update()
+ *  this hook triggered when update user
+*/
+function klovers_user_update(&$edit, $account, $category) {
+  // dpm('klovers user update');
+
+  watchdog(TAG, 'User Update = %uid', array('%uid' => $account->uid), WATCHDOG_INFO);
+}
+
+
+/*
+ * function hook_profile2_update($profile) {
+ *
+*/
+function klovers_profile2_update($profile) {
+
+  watchdog(TAG, 'Profile2 Update = %uid', array('%uid' => $profile->uid), WATCHDOG_INFO);
+}
+
+/*
+ * Implemantation of hook_services_resources()
+ * 
+*/
+function klovers_services_resources()
+{
+  $services = array(
+    'klovers_user_logout'=>array(
+      'create' =>array(
+        'help'=>'Services Custom User logout',
+        'callback'=>'_klovers_user_logout',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+        /* กรณีที่เราต้องการ pass parameter */
+        'args' => array(
+          array(
+              'name' => 'uid',
+              'type' => 'string',
+              'description' => 'A valid username',
+              'source' => array('data' => 'uid'),
+              'optional' => FALSE,
+            ),
+        ),
+      ),
+    ), 
+    'klovers_fetch_profile'=>array(
+      'create' =>array(
+        'help'=>'Services Custom User logout',
+        'callback'=>'_klovers_fetch_profile',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+        /* กรณีที่เราต้องการ pass parameter */
+        'args' => array(
+          array(
+              'name' => 'uid',
+              'type' => 'string',
+              'description' => 'A valid username',
+              'source' => array('data' => 'uid'),
+              'optional' => FALSE,
+            ),
+        ),
+      ),
+    ),
+    'klovers_update_profile'=>array(
+      'create' =>array(
+        'help'=>'Services Custom User logout',
+        'callback'=>'_klovers_update_profile',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+        /* กรณีที่เราต้องการ pass parameter */
+        'args' => array(
+          array(
+           'name' => 'parameters',
+           'type' => 'array',
+           'description' => '',
+           'source' => 'param',
+           'optional' => TRUE,
+           'default value' => array(),
+          ),
+        ),
+      ),
+    ),
+    'list_friend_recommendation'=>array(
+      'create' =>array(
+        'help'=>'Services list Friend recommendation',
+        'callback'=>'_list_friend_recommendation',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+        /* กรณีที่เราต้องการ pass parameter 
+        'args' => array(
+          array(
+           'name' => 'parameters',
+           'type' => 'array',
+           'description' => '',
+           'source' => 'param',
+           'optional' => TRUE,
+           'default value' => array(),
+          ),
+        ),
+        */
+      ),
+    ),
+  );
+  
+  return $services;
+}
+
+
+function _klovers_mail()
+{
+    $to = "mr.simajarn@gmail.com";
+    $subject = "Hi!";
+    $body = "Hi,\n\nHow are you?";
+    if (mail($to, $subject, $body)) {
+            echo("<p>Message successfully sent!</p>");
+    } else {
+            echo("<p>Message delivery failed...</p>");
+    }
+
+  return "_klovers_mail";
+
+}
+
+/**
+ * Callback function for returning form with themed table
+ http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
+ */
+function _klovers_test() {
+	global $user;
+
+	// $uid = 1;
+
+    // เป็นการ โหลด profile เพือเราจะหา pid ของ user นั้นๆ
+	$profile2_load_by_user = profile2_load_by_user($user, NULL);
+
+	dpm($profile2_load_by_user);
+
+    // เช็กว่า user นี้มีการสร้าง profile ไว้หรือเปล่า ถ้ามีจะ > 0 
+	if (count($profile2_load_by_user) > 0) {
+		# code...
+
+		// $file = file_save_data(file_get_contents($image_url), file_default_scheme().'://products_images/'.basename($image_url));
+
+
+		// Load Profile ขึ้นมาเพือจะทำการแก้ไข
+		$profile =  profile2_load($profile2_load_by_user['main']->pid);
+		// Name
+		$profile->field_profile_name[LANGUAGE_NONE][0]['value'] = 'update Software Engg';
+
+		// Subname
+		$profile->field_profile_subname[LANGUAGE_NONE][0]['value'] = 'update Software Engg 2';
+
+		// Picture 
+		$profile->field_profile_image[LANGUAGE_NONE][0] = array(
+          'fid' => 5,
+          'uid' => 1,
+          'filename' => '',
+          'uri' => '',
+          'status' => 1
+      	);
+
+		// Address
+		$profile->field_profile_address[LANGUAGE_NONE][0]['value'] = 'Address';
+
+		profile2_save($profile);
+		
+
+		
+
+		return "Yes";
+	}
+
+  	return "_klovers_test";
+}
+
+function _klovers_upload_file()
+{
+
+  /*
+	  //Create the directory if it does not already exist, otherwise check the permissions
+    $directory = 'public://my-image-folder';
+    file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+
+    //Saves a file to the specified destination and creates a database entry.
+    $file = file_save_data($image, 'public://my-image-folder/im.png', FILE_EXISTS_RENAME);
+
+    //Set the file status to permanent so it is not deleted in next cron run
+    $file->status = FILE_STATUS_PERMANENT;
+    file_save($file);
+
+    dpm((array)$file);
+  */
+
+  dpm(___test());
+    
+	return "_klovers_upload_file";
+}
+
+function _klovers_user_logout($uid)
+{
+  	$result = array();
+
+	if ($uid > 0 && $uid != "") {
+	  	# code...
+	  	$user_fields = user_load($uid);
+
+	  	if (!$user_fields->uid) {
+	    	// User is not logged in
+	    	//services_error(t('User is not logged in.'), 406);
+
+	    	$result['result'] = FALSE;
+  			$result['output'] = "uid not match is user";
+	  	}
+
+	  	watchdog('user', 'Service : Session closed for %name.', array('%name' => $user_fields->name));
+
+	  	// Destroy the current session.
+	 	module_invoke_all('user_logout', $user_fields);
+	  	session_destroy();
+
+  		// Load the anonymous user.
+  		// $user_fields = drupal_anonymous_user();
+
+  		$result['result'] = TRUE;
+  		$result['output'] = "";
+  	}else{
+
+  		$result['result'] = FALSE;
+  		$result['output'] = "$uid > 0 && $uid != '' == FALSE";
+  	}
+	return $result;
+}
+
+function _klovers_fetch_profile($uid)
+{
+
+  $result = array();
+
+  // เป็นการ โหลด profile เพือเราจะหา pid ของ user นั้นๆ
+  $profile2_load_by_user = profile2_load_by_user($uid, NULL);
+
+  $result['result'] = TRUE;
+
+  $profile = $profile2_load_by_user['main'];
+
+  $result['name']         = $profile->field_profile_name[LANGUAGE_NONE][0]['value']; 
+  $result['subname']      = $profile->field_profile_subname[LANGUAGE_NONE][0]['value']; 
+  $result['address']      = $profile->field_profile_address[LANGUAGE_NONE][0]['value']; 
+
+  $url_image = "";
+  if(!is_null($profile->field_profile_image[LANGUAGE_NONE][0]['uri'])){
+    $url_image = file_create_url($profile->field_profile_image[LANGUAGE_NONE][0]['uri']); 
+  }else{
+    $url_image = "";
+  }
+  $result['url_picture']  = $url_image;
+
+  $result['uid']    = $uid;
+   
+  return $result;
+}
+
+function _klovers_update_profile($data)
+{
+	$result = array();
+
+  try {
+
+    $image = $_REQUEST['image'];
+
+    // http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
+    $binary = base64_decode($image);
+
+    //Create the directory if it does not already exist, otherwise check the permissions
+    $directory = 'public://services_image';
+    file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+
+    $currentDate = date("Ymd");
+    $name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
+    
+    //Saves a file to the specified destination and creates a database entry.
+    $file = klovers_file_save_data($_POST['uid'], $binary, $directory. '/' . $name, FILE_EXISTS_RENAME);
+
+    $result['message'] = "klovers_update_profile";
+    $result['file'] = (array)$file ;
+
+    $result['data'] = $data;
+    $result['333'] = $variableOne    = $_POST['variableOne'];
+
+    // klovers_file_save_data();
+
+  }catch (Exception $e) {
+    $result['message'] = 'Caught exception: '.  $e->getMessage(). "\n";
+  }
+
+  return $result;
+}
+
+function _list_friend_recommendation()
+{
+  $result = array();
+
+  $uids = db_select('users', 'ur')
+        ->fields('ur', array('uid'))
+        ->condition('ur.uid', $_POST['uid'], '!=')
+        ->condition('ur.uid', 0, '!=')
+        ->execute()
+        ->fetchCol();
+
+  $users =  user_load_multiple($uids);
+
+  $arr_users = array();
+  foreach ($users as $account) {
+    # code...
+    
+    $tmp['uid'] = $account->uid;
+    $tmp['name'] = $account->name;
+    $tmp['mail'] = $account->mail;
+
+    // $path= file_create_url($uri)  uri
+    if(!is_null($account->picture)){
+      $tmp['url_image'] = file_create_url($account->picture->uri); 
+    }else{
+      $tmp['url_image'] = "";
+    }
+
+    $arr_users[] = $tmp;
+  }
+
+  $result['function'] = "_list_friend_recommendation";
+  $result['uid'] = $_POST['uid'];
+  $result['users'] = $uids;
+  $result['data']  = user_load_multiple($uids);
+  $result['arr_users'] = $arr_users;
+  return $result;
+}
+
