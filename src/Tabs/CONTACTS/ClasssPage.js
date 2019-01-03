@@ -226,7 +226,7 @@ class ClasssPage extends React.Component{
                         /> */}
 
                       <ImageWithDefault 
-                        source={{uri: Constant.API_URL + item.image_url}}
+                        source={{uri: item.image_url}}
                         style={{width: 60, height: 60, borderRadius: 10}}
                       />
                     </TouchableOpacity>

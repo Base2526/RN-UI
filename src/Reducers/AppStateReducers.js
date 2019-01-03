@@ -1,7 +1,51 @@
+import firebase from 'react-native-firebase';
 import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-appstate';
 
+// fb = (state, action) =>{
+//     console.log(action)
+//     console.log(state)
+//     console.log("1, update ")
+//     if(state.type == 'persist/REHYDRATE'){
+//         // if(!action.hasOwnProperty('payload')){
+//         //     return;
+//         // }
+//         console.log("2, update " )
+//         let payload = state.payload
+//         if(payload._persist.rehydrated){
+
+//             console.log("3, update ")
+//             let auth = payload.auth
+//             if(auth.isLogin){
+//                 // track to firebase status
+
+//                 var updateRef = firebase.database().ref('idna/user/1/profiles/device_access/1121030/');
+                
+
+//                 switch(action.type){
+//                     case FOREGROUND:{
+//                         updateRef.update({ 'online': '1'});
+//                         break;
+//                     } 
+//                     case BACKGROUND:{
+//                         updateRef.update({ 'online': '0'});
+//                         break;
+//                     }
+//                     case INACTIVE:{
+//                         updateRef.update({ 'online': '0'});
+//                         break;
+//                     }
+//                 }
+
+//                 console.log("update")
+//             }
+//         }
+//     }
+// }
+
 export default (state= {status:''}, action)=>{
-    console.log(action)
+    // console.log(action)
+    // this.fb(state, action)
+    /*
     switch(action.type){
         case FOREGROUND:{
             return {...state, 
@@ -21,4 +65,7 @@ export default (state= {status:''}, action)=>{
         default:
             return state
     }
+    */
+
+    return state
 }

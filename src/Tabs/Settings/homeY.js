@@ -23,11 +23,15 @@ const { RNTwitterSignIn } = NativeModules
 const FBSDK = require('react-native-fbsdk');
 const { LoginManager } = FBSDK;
 
+import firebase from 'react-native-firebase';
+
 import Styles from '../../styles';
 import Constant from '../../Utils/Constant'
 import {loadAsyncStorage, removeAsyncStorageByKey} from '../../Utils/Helpers'
-import * as actions from '../../Actions';
+// import * as actions from '../../Actions';
+import { actionLogout } from '../../Actions';
 
+// import {watchTaskEvent, watchTaskAddedEvent} from '../Actions'
 
 // import {group_deleteAll, groupDetail_deleteAll} from '../../Utils/DB'
 
@@ -59,7 +63,7 @@ class homeY extends React.Component {
   }) 
 
   componentDidMount() {
-    console.log(this.props)
+    // console.log(this.props.dispatch)
   }
 
   onLogout = () =>{
@@ -78,7 +82,7 @@ class homeY extends React.Component {
       LoginManager.logOut()
     }
 
-    this.props.actionLogout(v=>{
+    this.props.actionLogout(this.props.dispatch, v=>{
       if(!v.status){
         console.log('Error logout')
       }else{
@@ -158,6 +162,26 @@ class homeY extends React.Component {
               onPress={()=>{
                 this.props.navigation.navigate("google_search_company")
               }} />
+
+
+            <Cell 
+              cellStyle="Basic" 
+              title="Test check firebase : ON" 
+              accessory="DisclosureIndicator"
+              onPress={()=>{
+                // this.props.navigation.navigate("google_search_company")
+              }} />
+
+            <Cell 
+              cellStyle="Basic" 
+              title="Test check firebase : OFF" 
+              accessory="DisclosureIndicator"
+              onPress={()=>{
+                // this.props.navigation.navigate("google_search_company")
+             
+                // firebase.database().ref('idna/user/1').off()
+                // console.log('off')
+             }} />
             <Cell 
               cellStyle="Basic" 
               title="Logout" 
@@ -251,5 +275,22 @@ const mapStateToProps = (state) => {
   }
 }
 
+// watchTaskOff
 
-export default connect(mapStateToProps, actions)(homeY);
+const mapDispatchToProps = (dispatch, ownProps) => {
+  // watchTaskAddEvent(dispatch)
+  // watchTaskChangedEvent(dispatch)
+  // watchTaskRemovedEvent(dispatch)
+
+  // watchTaskEvent(dispatch)
+
+  // console.log(dispatch)
+  // console.log(ownProps)
+  // watchTaskAddedEvent(dispatch)
+
+  return { dispatch, actionLogout }
+}
+
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(homeY);

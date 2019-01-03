@@ -1,3 +1,7 @@
+// var utf8 = require('utf8');
+import {Platform} from 'react-native'
+import DeviceInfo from 'react-native-device-info';
+
 // let API_URL = 'http://139.59.228.56';
 
 let API_URL = 'http://128.199.149.168';
@@ -26,11 +30,11 @@ module.exports = {
         'system_name': 'system_name',
         'device_name': 'device_name',
         'bundle_identifier': 'bundle_identifier',
-        'platform': 'ios',
-        'version_application': '1.0',
-        'udid': 'udid',
+        'platform': Platform.OS,
+        'version_application': DeviceInfo.getVersion(),
+        'udid': DeviceInfo.getUniqueID(),
         'model_number': 'model_number',
-        'build': '1',
+        'build': DeviceInfo.getBuildNumber(),
         'token_notification': 'token_notification',
         'token_pushkit': 'token_pushkit',
     },
@@ -45,8 +49,6 @@ module.exports = {
     },
     TWITTER_COMSUMER_KEY: "a7SsmDvq3XwzSN0za5uokCiBT",
     TWITTER_CONSUMER_SECRET: "765FrNfImzNSWGKjbQSId3wI86EdiD7QxQKeJWSbhvqMMPTmCf",
-
-
 
     /*
     #define _FRIEND_STATUS_FRIEND            @"10"

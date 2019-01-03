@@ -233,7 +233,7 @@ class GroupsPage extends React.Component{
                       /> */}
 
                       <ImageWithDefault 
-                        source={{uri: Constant.API_URL + item.detail.image_url}}
+                        source={{uri: item.detail.image_url}}
                         style={{width: 60, height: 60, borderRadius: 10}}
                       />
                   </TouchableHighlight>

@@ -184,7 +184,7 @@ class Welcome extends React.Component {
     return (
       <View style={{flex: 1, backgroundColor:'white'}} >
         {/* <FBButton navigator={this.props.navigation} /> */}
-        {this.renderFB()}
+        {/* {this.renderFB()} */}
         {/* <TwitterButton navigator={this.props.navigation}  /> */}
         {/* {this.renderTwitter()} */}
         <View style={{padding:10}}>

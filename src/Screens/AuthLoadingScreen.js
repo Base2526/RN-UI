@@ -1,7 +1,5 @@
 import React from 'react';
 import {
-    ActivityIndicator,
-    AsyncStorage,
     StatusBar,
     StyleSheet,
     View,
@@ -21,45 +19,15 @@ class AuthLoadingScreen extends React.Component {
         super(props);
     }
 
-    componentWillMount(){
-        console.log('---- componentWillMount > _bootstrapAsync()')
-    }
-
     componentDidMount() {
-        console.log('---- componentDidMount > _bootstrapAsync()')
         this._bootstrapAsync();
     }
 
-    componentWillReceiveProps({ _persist }) {
-        console.log('---- componentWillReceiveProps > _bootstrapAsync()')
-    }
-
-    // Fetch the token from storage then navigate to our appropriate place
     _bootstrapAsync = () => {
 
-        /*
-        this.props.watchTaskAddEvent()
-        this.props.watchTaskChangedEvent()
-        this.props.watchTaskRemovedEvent()
-
-        this.props.actionCheckUserLogin().then((data) => {
-            console.log(data)
-            if(data.status){
-                this.props.navigation.navigate('App');
-            }else{
-                this.props.navigation.navigate('Auth');
-            }
-        })
-        .catch(error => {
-            console.log(error)
-        })
-        */
-
-        console.log('---- _bootstrapAsync()')
-
-        console.log(this.props)
-
         if(this.props.auth.isLogin){
+            // console.log(this.props.uid)
+            this.props.watchTaskEvent(this.props.uid, this.props.dispatch)
             this.props.navigation.navigate('App');
         }else{
             this.props.navigation.navigate('Auth');
@@ -68,18 +36,6 @@ class AuthLoadingScreen extends React.Component {
 
     // Render any loading content that you like here
     render() {
-
-        // console.log(this.props)
-        // if(!this.props.hasOwnProperty('auth')){
-        //     return <View style={{flex: 1}}><Text>Loading 1</Text></View>
-        // }
-
-        // if(!this.props.hasOwnProperty('navigation')){
-        //     return <View style={{flex: 1}}><Text>Loading 2</Text></View>
-        // }
-
-        // this._bootstrapAsync();
-
         return (
             <View style={styles.container}>
                 {/* <ActivityIndicator /> */}
@@ -100,31 +56,24 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => {
     console.log(state)
-
     if(!state._persist.rehydrated){
         return {}
     }
 
-    return {
-        auth:state.auth
+    if(state.auth.user !== null){
+        return {
+            auth:state.auth,
+            uid:state.auth.user.user.user.uid
+        }
+    }else{
+        return {
+            auth:state.auth
+        }
     }
 }
 
-// watchTaskEvent
-
-// const mapDispatchToProps = dispatch => ({
-//     // getUserToken: () => dispatch(getUserToken()),
-// });
-
-const mapDispatchToProps = (dispatch) => {
-    // watchTaskAddEvent(dispatch)
-    // watchTaskChangedEvent(dispatch)
-    // watchTaskRemovedEvent(dispatch)
-
-    watchTaskEvent(dispatch)
-
-    return {}
+const mapDispatchToProps = (dispatch, ownProps) => {
+    return { dispatch, watchTaskEvent }
 }
-//   export default connect(mapStateToProps, mapDispatchToProps)(FriendsPage);
 
 export default connect(mapStateToProps, mapDispatchToProps)(AuthLoadingScreen);

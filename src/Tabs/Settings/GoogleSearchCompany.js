@@ -7,12 +7,14 @@ import {SafeAreaView,
         FlatList,
         Linking} from 'react-native'
 import Spinner from 'react-native-loading-spinner-overlay';
-import FastImage from 'react-native-fast-image'
+// import FastImage from 'react-native-fast-image'
 // var Locale = require('react-native-locale');
 
 import DeviceInfo from 'react-native-device-info';
 
 import {search_google} from '../../Utils/Services'
+
+import ImageWithDefault from '../../Utils/ImageWithDefault'
 
 export default class GoogleSearchCompany extends React.Component{
 
@@ -96,13 +98,12 @@ export default class GoogleSearchCompany extends React.Component{
 
     renderItem(item){
 
-        console.log(item)
-        console.log(item.item.title)
+        // console.log(item)
+        // console.log(item.item.title)
         // console.log(item.pagemap.cse_thumbnail)
 
-        let url_image = 'https://unsplash.it/400/400?image=1'
-        console.log(item.item.pagemap)
-
+        let url_image = ''
+        
         if(item.hasOwnProperty('item')){
             if(item.item.hasOwnProperty('pagemap')){
                 if(item.item.pagemap.hasOwnProperty('cse_image')){
@@ -118,7 +119,7 @@ export default class GoogleSearchCompany extends React.Component{
         //     // url_image = item.item.pagemap.cse_image[0].src
         // }
         return(
-            // <TouchableOpacity key={{}} onPress={() => console.log('--')}>
+            <TouchableOpacity key={{}} onPress={() => console.log('--')}>
               <View
                 style={{
                   alignItems: 'center', 
@@ -135,10 +136,14 @@ export default class GoogleSearchCompany extends React.Component{
                               borderRadius: 10}}
                     onPress={()=> /*'google_search_company_detail'*/
 
+                        {
+                        // alert('g')
                         this.props.navigation.navigate("google_search_company_detail", {
-                            item: item,
+                            item,
                           }) 
+                          
                         // console.log(this)
+                        }
                     }          
                     >
                       {/* <Image
@@ -146,7 +151,7 @@ export default class GoogleSearchCompany extends React.Component{
                           source={{uri: 
                   'https://www.planwallpaper.com/static/images/9-credit-1.jpg'
                       }}/> */}
-                      <FastImage
+                      {/* <FastImage
                           style={{width: 60, height: 60, borderRadius: 10}}
                           source={{
                           uri: url_image,
@@ -154,6 +159,11 @@ export default class GoogleSearchCompany extends React.Component{
                           priority: FastImage.priority.normal,
                           }}
                           resizeMode={FastImage.resizeMode.contain}
+                      /> */}
+
+                    <ImageWithDefault 
+                        source={{uri: url_image}}
+                        style={{width: 60, height: 60, borderRadius: 10}}
                       />
                   </TouchableOpacity>
                   <View style={{paddingLeft: 10}}>
@@ -173,7 +183,7 @@ export default class GoogleSearchCompany extends React.Component{
                     </TouchableOpacity>
                   </View>
               </View>
-            // </TouchableOpacity>
+             </TouchableOpacity>
         )
     }
 

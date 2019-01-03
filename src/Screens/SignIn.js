@@ -7,22 +7,8 @@ import { Card, Button, FormLabel, FormInput } from "react-native-elements";
 import Spinner from 'react-native-loading-spinner-overlay';
 import { connect } from 'react-redux';
 
-import Constant from '../Utils/Constant'
-import {saveAsyncStorage} from '../Utils/Helpers'
-
-import {login} from '../Utils/Services'
-
 import * as actions from '../Actions'
 
-import {LOADING} from '../Actions/types'
-
-// import {group_all, 
-//         groupDetail_all, 
-//         group_update, 
-//         groupDetail_update} from '../Utils/DB'
-
-
-// export default ({navigation}) =>
 class SignIn extends React.Component{
   constructor(props){
     super(props)
@@ -32,113 +18,29 @@ class SignIn extends React.Component{
       email:'',
       password:''
     }
-
-    /*
-    group_all(v=>{
-      console.log(v)
-    })
-
-    groupDetail_all(v=>{
-      console.log(v)
-    })
-    */
   }
 
-  /*
-   // login("admin", "1234").then(data => {
-    //   console.log('Print list of movies:', data);
-    // })
-   */
-
   onLogin(){
-    // console.log('email : ' + this.state.email + " , password : " + this.state.password)
-
     let _email    = this.state.email.trim()
     let _password = this.state.password.trim()
 
     if(_email === '' && _password === ''){
-      alert("Email and Password is empty.")
+      alert("Name or Email and Password is empty.")
     }else if(_email === ''){
-      alert("Email is empty.")
+      alert("Name or Email is empty.")
     }else if(_password === ''){
       alert("Password is empty.")
     }else{
-
-      /*
-      this.setState({loading:true})
-      login(this.state.email, this.state.password).then(data => {
-        this.setState({isShowSpinner:false})
-        if((data instanceof Array)){
-          // error message
-          alert(data[0])
-          return;
-        }else{
-          // console.log(data)
-          if(!data.result){
-            alert(data.message)
-          }else{
-
-            // console.log(data.data.friend_profiles)
-            // console.log(data.data.user)
-            // console.log(data.data.user_profile)
-
-            saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.EMAIL}).then((v)=>{
-              if(v.status){
-                this.props.navigation.navigate("Main") 
-              }
-            }).catch((error)=>{
-              console.log(error)
-            })
-          }
-        }
-      })
-      */
-
       this.setState({loading:true})
       this.props.actionLogin({email:_email, password:_password}).then((result) => {
-        console.log(result)
-
+        // console.log(result)
         this.setState({loading:false})
         if(result.status){
-
-          /*
-          let {user_profile} = result.data
-          console.log(user_profile)
-          Object.keys(user_profile).forEach((key)=>{
-            console.log(key); // key
-            switch(key){
-              case 'friends':{
-                Object.keys(user_profile[key]).forEach((friend_id)=>{
-                  console.log(friend_id)
-                  console.log({...user_profile[key][friend_id], ...{'friend_id':friend_id}})
-                })
-                break;
-              }
-              case 'groups':{
-                // console.log(user_profile[key]); // value
-
-                Object.keys(user_profile[key]).forEach((group_id)=>{
-                  console.log(user_profile[key][group_id])
-
-                  let value = user_profile[key][group_id]
-                  groupDetail_update({'group_id':group_id, 'value':value}, v=>{
-                    console.log(v)
-                  })
-
-                  group_update({'group_id':group_id,'value':{'item_id':value.item_id, 'status': value.status}}, v=>{
-                    console.log(v)
-                  })
-                })
-
-                break;
-              }
-            }
-          });
-          */
-         
           this.props.navigation.navigate("AuthLoading") 
         }else{
-
+          setTimeout(() => {
+            alert(result.error_message)
+          }, 100);
         }
       })
     }
@@ -146,10 +48,6 @@ class SignIn extends React.Component{
 
   render(){
     let {navigation, isLogin} = this.props
-
-    // if(isLogin){
-    //   navigation.navigate("Main")
-    // }
 
     return (
     <SafeAreaView style={{flex:1}}>
@@ -162,9 +60,9 @@ class SignIn extends React.Component{
           textStyle={{color: '#FFF'}}
           overlayColor={'rgba(0,0,0,0.5)'}
         />
-        <FormLabel>Email</FormLabel>
+        <FormLabel>Name or Email</FormLabel>
         <FormInput 
-          placeholder="email..." 
+          placeholder="name or email..." 
           ref= {(el) => { this.email = el; }}
           onChangeText={(email) => this.setState({email})}
           value={this.state.email}/>
@@ -236,7 +134,7 @@ class SignIn extends React.Component{
 }
 
 const mapStateToProps = (state) => {
-  // console.log(state)
+  console.log(state)
   return({
       loading:state.auth.loading,
       isLogin:state.auth.isLogin

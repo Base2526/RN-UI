@@ -18,8 +18,8 @@ export default () => {
 //   let store = createStore(persistedReducer)
 
   const store = createStore(persistedReducer, {}, compose(
-    applyAppStateListener(),
     applyMiddleware(ReduxThunk),
+    applyAppStateListener(),
     // autoRehydrate()
   ))
   let persistor = persistStore(store)

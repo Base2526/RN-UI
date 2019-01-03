@@ -23,6 +23,8 @@ import firebase from 'react-native-firebase';
 import { Constants } from 'react-native-navigation';
 // import { stat } from 'fs';
 
+import DeviceInfo from 'react-native-device-info';
+
 import Constant from '../../Utils/Constant'
 // import {watchTaskAddEvent, watchTaskChangedEvent, watchTaskRemovedEvent} from '../../Actions'
 import ImageWithDefault from '../../Utils/ImageWithDefault'
@@ -34,6 +36,8 @@ class FriendsPage extends React.Component{
         this.state = {
           renderContent: false,
         }
+
+        console.log(DeviceInfo.getUniqueID())
     }
     
     componentDidMount() {
@@ -174,7 +178,7 @@ class FriendsPage extends React.Component{
                               borderRadius: 10}}        
                       >
                       <ImageWithDefault 
-                        source={{uri: Constant.API_URL + rowItem.image_url}}
+                        source={{uri: rowItem.image_url}}
                         style={{width: 60, height: 60, borderRadius: 10}}
                       />
                       
@@ -258,9 +262,9 @@ class FriendsPage extends React.Component{
                         }}
                     />
                     */ }
-
+                  
                       <ImageWithDefault 
-                        source={{uri:Constant.API_URL + rowItem.profile.image_url}}
+                        source={{uri:rowItem.profile.image_url}}
                         style={{width: 60, height: 60, borderRadius: 10}}
                       />
                 </TouchableHighlight>
@@ -380,7 +384,7 @@ class FriendsPage extends React.Component{
     }
     
     _btnPress = () => {
-      console.log(this.ExpandableList);
+      // console.log(this.ExpandableList);
       this.ExpandableList.setSectionState(0, false);
     };
     
@@ -399,15 +403,17 @@ class FriendsPage extends React.Component{
           {
             renderContent && 
             <ExpandableList
-                    ref={instance => this.ExpandableList = instance}
-                    dataSource={this.loadData()}
-                    headerKey="title"
-                    memberKey="member"
-                    renderRow={this._renderRow}
-                    headerOnPress={(i, state) => console.log(i, state)}
-                    renderSectionHeaderX={this._renderSection}
-                    openOptions={[0, 1, 2, 3]}
-                />
+              ref={instance => this.ExpandableList = instance}
+              dataSource={this.loadData()}
+              headerKey="title"
+              memberKey="member"
+              renderRow={this._renderRow}
+              headerOnPress={(i, state) => {
+                // console.log(i, state)
+              } }
+              renderSectionHeaderX={this._renderSection}
+              openOptions={[0, 1, 2, 3]}
+            />
           }
           </View>
       );

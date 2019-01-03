@@ -1,340 +1,18 @@
 <?php
-
 require_once ( dirname(__FILE__) . '/includes/configs.inc');
-require_once ( dirname(__FILE__) . '/includes/utility.inc');
-
-// qrcode
-require_once ( dirname(__FILE__) . '/libraries/qrcode/qrlib.php');
-
-// libraries firebase
-require ( dirname(__FILE__) . '/libraries/firebase/vendor/autoload.php'); //'firebase/autoload.php';
-
-// -------- ApnsPHP
-require_once ( dirname(__FILE__) . '/libraries/ApnsPHP/Autoload.php');
 
 $debug;
 $firebase;
 
-/*
- * hook_help()
- * */
-function me_help($path, $arg){
-  switch ($path) {
-    case 'admin/help#me':
-      return t('Module me');
-    default:
-      break;
-  }
-}
-
-/**
- * Implements hook_permission().
- */
-function me_permission() {
-  return array(
-    'me_permission' => array(
-      'title' => t('me permissions'),
-    ),
-    'idna_reset_heart_permission' => array(
-      'title' => t('Reset Heart.'),
-    )
-  );
-}
-
-/*
-* hook_init()
-*/
-function me_init(){
-
-  // $contents = file_get_contents('ls -l');
-  // echo "<pre>";
-  // echo exec('python /home/somkid/fb-id.py  2>&1', $output);
-  // echo $output;
-  // echo "</pre>";
-  // echo "vv";
-
-  // $process = new Process('pwd');
-  // dpm($process->start());
-  // --------- shell_exec ----------
-  /*
-  $output =  shell_exec("python /home/somkid/fb-id.py 'CoCohSmile' 2>&1");
-  dpm($output);
-
-  // เราจะได้ ค่า $output = ['xxxx'] โดยเราจะใช้คำสั่ง preg_match_all เพือดึง 'xxxx' ออกมา
-  preg_match_all('/".*?"|\'.*?\'/', $output, $matches);
-  print_r($matches[0][0]);
-  */
-  // --------- shell_exec ----------
-  
-
-  // $pid = pcntl_fork();
-  // echo "<pre>";
-  // var_dump(user_password(6));
-  // echo "</pre>";
-
-  // $iPod = stripos($_SERVER['HTTP_USER_AGENT'],"iPod");
-  // $iPhone = stripos($_SERVER['HTTP_USER_AGENT'],"iPhone");
-  // $iPad = stripos($_SERVER['HTTP_USER_AGENT'],"iPad");
-  // $Android= stripos($_SERVER['HTTP_USER_AGENT'],"Android");
-
-  // // //check if user is using ipod, iphone or ipad...
-  // if( $iPod || $iPhone || $iPad ){
-  //   echo "$iPod || $iPhone || $iPad";
-  // }else if($Android){
-  //   echo "$Android";
-  // }
-
-  // echo $pid = pcntl_fork();
-
-  // $pid = pcntl_fork(); // fork
-  // if ($pid > 0) { // child
-
-  //     $sid = posix_setsid();
-  //     if ($sid > 0) {
-  //         $daemon->run();
-  //     }
-  // }
-
-  // $pid = pcntl_fork();
-
-  // $firebase = new \Firebase\FirebaseLib(FIREBASE_DEFAULT_URL);
-  
-  // $to = config_pages_get('configure_idna', 'field_config_tag');
-  // dpm($to);
-  
-  // $values = array("profiles"=>array(
-  //                       "name"            => '$account->name',
-  //                       "mail"            => '$account->mail',
-  //                       "udid"            => 'auto-udid',
-  //                       "platform"        => 'auto-platform',
-  //                       "bundleidentifier"=> 'auto-bundleidentifier',
-  //                       "version"         => 'auto-version',
-  //                       "create"          => time(),
-  //                       "update"          => time()
-  //                     ));
-        
-  // dpm($firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . 444 . '/', $values));
-  // $vocabulary = taxonomy_vocabulary_machine_name_load('tags_friend_status');
-  // $terms = entity_load('taxonomy_term', FALSE, array('vid' => $vocabulary->vid));
-
-  // dpm($terms);
-  
-  // define("IS_DEBUG", 1);
-  
-  global $debug;
-  $debug = 1;
-
-  if ($debug) {
-    define("CONFIG_PAGES_TYPE", "configure_idna_development");
-
-    define("TAG", config_pages_get(CONFIG_PAGES_TYPE, 'field_config_tag_dev'));
-    define("DEFUALT_IOS_URL_STORE_IDNA", config_pages_get(CONFIG_PAGES_TYPE, 'field_defualt_ios_url_store_dev'));
-    define("DEFUALT_ANDROID_URL_STORE_IDNA", config_pages_get(CONFIG_PAGES_TYPE, 'field_android_url_store_idna_dev'));
-    define("FIREBASE_URL", config_pages_get(CONFIG_PAGES_TYPE, 'field_firebase_default_url_dev'));
-
-    define("CLOUD_MESSAGEING_KEY", config_pages_get(CONFIG_PAGES_TYPE, 'field_cloud_messaging_key_dev'));
-
-    // field_apn_certificate_dev
-    define("APN_CERTIFICATE", $_SERVER['DOCUMENT_ROOT'] . substr(file_create_url(config_pages_get(CONFIG_PAGES_TYPE, 'field_apn_certificate_dev')['uri']), strlen($GLOBALS['base_url'])));
-  }else{
-    define("CONFIG_PAGES_TYPE", "configure_idna");
-
-    define("TAG", config_pages_get(CONFIG_PAGES_TYPE, 'field_config_tag'));
-    define("DEFUALT_IOS_URL_STORE_IDNA", config_pages_get(CONFIG_PAGES_TYPE, 'field_defualt_ios_url_store_idna'));
-    define("DEFUALT_ANDROID_URL_STORE_IDNA", config_pages_get(CONFIG_PAGES_TYPE, 'field_android_url_store_idna'));
-    define("FIREBASE_URL", config_pages_get(CONFIG_PAGES_TYPE, 'field_firebase_default_url'));
-
-
-    define("CLOUD_MESSAGEING_KEY", config_pages_get(CONFIG_PAGES_TYPE, 'field_cloud_messaging_key'));
-
-    define("APN_CERTIFICATE", $_SERVER['DOCUMENT_ROOT'] . substr(file_create_url(config_pages_get(CONFIG_PAGES_TYPE, 'field_apn_certificate')['uri']), strlen($GLOBALS['base_url'])));
-  }
-
-  define("DEFUALT_PASSWORD", "HEARTIDNA");
-  define("LENGTH_CHAT_ID", "20");
-  define("QRCODE_SECRET_KEY", "aaa04b7e103a0cd8b54763051cef08bc55abe029fdebae5e1d417e2ffb2a00a3");
-  define("QRCODE_SECRET_IV", "bbb04b7e103a0cd8b54763051cef08bc55abe029fdebae5e1d417e2ffb2a00a3");
-  define("PATH_FOLDER_QRCODE", "sites/default/files/qrcode");
-
-  define("FIREBASE_DEFAULT_PATH", '/idna/');
-  define("FIREBASE_LOGIN_PATH", 'user/');
-  define("FIREBASE_MY_APPLIPATIONS_PATH", 'my_applications/');
-  define("FIREBASE_MY_APPLIPATIONS_POSTS_PATH", 'posts/');
-
-  define("FIREBASE_CENTER_CHAT", 'center_chat/'); 
-
-  // comments
-  define("FIREBASE_MY_APPLIPATIONS_POSTS_COMMENTS_PATH", 'comments/');
-
-  define("FIREBASE_CENTER", 'center/'); 
-  define("FIREBASE_CENTER_SLIDE", 'center-slide/'); 
-  define("FIREBASE_VOIP", 'voip/'); 
-
-
-  // Chat groups
-  define("FIREBASE_CHAT_GROUPS", 'chat_groups/'); 
-
-
-  define("PATH_GROUPS", "groups");
-  define("PATH_CLASSS", "classs");
-  define("PATH_FOLLOWING", "following");
-
-
-  // Bundle Identifier  
-  // define("BI_IOS_BASIC", "heart.basic");
-  
-  define("BI_IOS_CHAT", "heart.chat");
-  // define("BI_ANDROID_BASIC", "heart.basic");
-
-
-  // define("BI_IOS_IDNA", "heart.idna");
-  // define("BI_ANDROID_IDNA", "heart.idna");
-
-  define("BUNDLE_IDENTIFIER", "heart.idna");
-
-  // define("DEFUALT_LENGTH_CHAT_ID", 20); 
-
-  // เป็น password ทีใช้ เข้าระบบ string uid ของ user ทีใช้สำหรับสร้าง  QRCode
-  // define("QRCODE_SECRET_KEY", "aaa04b7e103a0cd8b54763051cef08bc55abe029fdebae5e1d417e2ffb2a00a3");
-  // define("QRCODE_SECRET_IV", "bbb04b7e103a0cd8b54763051cef08bc55abe029fdebae5e1d417e2ffb2a00a3");
-
-  define("FRIEND_STATUS_FRIEND", "10");
-  define("FRIEND_STATUS_FRIEND_CANCEL", "13");
-  define("FRIEND_STATUS_FRIEND_REQUEST", "11");  
-  define("FRIEND_STATUS_WAIT_FOR_A_FRIEND", "12");  
-
-
-  if ($debug) {
-    /*
-    mr.simajarn@gmail.com
-
-    FRIENDLY NAME
-    iDNA Development - Video
-
-    SID
-    SK620d550fb90459e6da0fe460e955d800
-
-    KEY TYPE
-    Standard
-
-    SECRET
-    seRvEwi0MvQ991iSCtq8KmxcmYr2SHk6
-    */
-
-    define("TWILIO_ACCOUNT_SID", "ACe35b4dd61ff6875ce26ee0e3ea9dd4dc");
-    define("TWILIO_API_KEY", "SK620d550fb90459e6da0fe460e955d800");
-    define("TWILIO_API_KEY_SECRET", "seRvEwi0MvQ991iSCtq8KmxcmYr2SHk6");
-    define("TWILIO_PUSH_CREDENTIAL_SID", "");
-    define("TWILIO_APP_SID", "AP5a5464cc136a4ac7877886a4f1d3df0c");
-  }else{
-    /*
-    android.somkid@gmail.com
-    */
-    define("TWILIO_ACCOUNT_SID", "AC94429faf5d0c017fdde2eb9347c699e6");
-    define("TWILIO_API_KEY", "SK5b11e67487ccf92915a1ede27b640dfa");
-    define("TWILIO_API_KEY_SECRET", "QuGFTh7pvRKUV9VeFwC6FmIoGjXiFwcC");
-    define("TWILIO_PUSH_CREDENTIAL_SID", "CR6279daf7d3f608853b78f863fd7dc995");
-    define("TWILIO_APP_SID", "AP30c22ca482e1db49ceac6cd2ff19c37c");
-  }
-
-  // define("APN_CERTIFICATE", config_pages_get(CONFIG_PAGES_TYPE, 'field_apn_certificate'));
-  // dpm(config_pages_get(CONFIG_PAGES_TYPE, 'field_apn_certificate'));
-  // $url_apn_certificate = file_create_url(config_pages_get(CONFIG_PAGES_TYPE, 'field_apn_certificate')['uri']);
-  // dpm($url_apn_certificate);
-
-  
-  global $firebase;
-
-  /*
-  เป็นการ load library firebase ในครั้งเท่านั้น
-  *** การใช้งาน
-    เราต้อง ประกาศ global $firebase ถึงเราจะสามารถนําไปใช้งานได้
-  */
-  $firebase = new \Firebase\FirebaseLib(FIREBASE_URL);
-
-  // dpm($firebase->get());
-  /*
-  module_load_include('module', 'opentok', 'opentok');
-
-  $opentok_api_key = variable_get('opentok_api_key', NULL);
-  $sessionId = opentok_create_session("1")->__toString();
-
-  echo "opentok_api_key : " . $opentok_api_key . '</br>';
-  echo "sessionId : " . $sessionId . '</br>';
-  echo "opentok_get_token : " . opentok_get_token($sessionId);
-  */
-
-  // test_image_style_url();
-
-  /*
-  // ffmpeg_video_thumbnail_extract_frame
-  try{
-    // $ffmpeg = php_ffmpeg();
-    // $video = $ffmpeg->open('public:///20180416_693282359.mp4');
-
-    // dpm($video);
-
-    #1
-    $file = file_load('1108603');
-    // $uri = $file->uri;
-
-    //dpm($file->uri);
-
-    dpm(ffmpeg_thumbnail_extract_frame($file));
-    
-
-    #2
-    $ffmpeg = php_ffmpeg();//->create();
-    // dpm($ffmpeg->create());
-    // $video = $ffmpeg->open($file->uri);
-
-    $video = $ffmpeg->open('sites/default/files/video_001.mp4');
-    // $video_stream = $video->getStreams()->videos()->first();
-
-    $at = FFMpeg\Coordinate\TimeCode::fromSeconds(1);
-
-    // dpm($video_stream);
-    // dpm($at);
-
-    $v = $video
-      ->frame($at)
-      ->save('sites/default/files/z.png');
-
-    dpm($v);
-    
-
-    // dpm(get_class_methods($ffmpeg));
-  }
-  catch (Exception $e) {
-    // throw new RuntimeException(t('Error while extracting frame from @file, check php_ffmpeg log.', array('@file' => $file['uri'])), 0, $e);
-    dpm( $e->getMessage() );
-  }
-  */
-
-  // $video = $ffmpeg->open('/sites/default/files/20180415_977316720.mp4');
-  // dpm($video);
-
-  // module_load_include('module', 'ffmpeg_video_thumbnail', 'ffmpeg_video_thumbnail');
-
-  // $path = ffmpeg_video_thumbnail_extract_frame('/sites/default/files/20180415_977316720.mp4', 1);
-  // dpm($path);
-
-
-  // dpm(___test());
-}
-
 /**
  * Implements hook_menu().
  */
-/*
- * hook_menu()
- * */
 function me_menu() { 
   // clear_twilio_outgoing_incomming_call
   $items['idna/clear_twilio_outgoing_incomming_call'] = array(
     'title' => t('ทดสอบ function clear_twilio_outgoing_incomming_call'),
     'page callback' => 'clear_twilio_outgoing_incomming_call',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -342,7 +20,7 @@ function me_menu() {
   $items['idna/test_function'] = array(
     'title' => t('ทดสอบ function test'),
     'page callback' => 'test_function',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -360,7 +38,7 @@ function me_menu() {
   $items['idna/test_add_data'] = array(
     'title' => t('ทดสอบ function add data'),
     'page callback' => 'test_add_data',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -368,7 +46,7 @@ function me_menu() {
   $items['idna/test_create_user'] = array(
     'title' => t('ทดสอบ test create user'),
     'page callback' => 'test_create_user',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -376,7 +54,7 @@ function me_menu() {
   $items['idna/test_create_center'] = array(
     'title' => t('ทดสอบ test create center'),
     'page callback' => 'test_create_center',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -391,7 +69,7 @@ function me_menu() {
 
   $items['qe'] = array(
     'page callback' => 'qe',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -399,7 +77,7 @@ function me_menu() {
   $items['idna/delete_user'] = array(
     'title' => t('ทดสอบ Delete User All'),
     'page callback' => 'delete_user',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -407,7 +85,7 @@ function me_menu() {
   $items['tw/voice_makeCall'] = array(
     'title' => t('Twilio Voice MakeCall : ถูกเรียกจาก twilio โดยจะ $_POST หรือ $_GET ค่ามาให้เรารองรับค่าเพือเอาไปใช้งานต่อ'),
     'page callback' => 'tw_voice_makeCall',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -416,7 +94,7 @@ function me_menu() {
   $items['tw/voice_incoming'] = array(
     'title' => t('Twilio Voice incoming : จะถูกเรียกหลักจาก โทรหาเพือนโดยใช้ api twilio( -tw_voice_placeCall()- )'),
     'page callback' => 'tw_voice_incoming',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -425,7 +103,7 @@ function me_menu() {
   $items['tw/parentStatusCallback'] = array(
     'title' => t('Twilio parentStatusCallback'),
     'page callback' => 'tw_parentStatusCallback',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -433,7 +111,7 @@ function me_menu() {
   $items['tw/clientStatusCallback'] = array(
     'title' => t('Twilio clientStatusCallback'),
     'page callback' => 'tw_clientStatusCallback',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -441,7 +119,7 @@ function me_menu() {
   $items['tw/waitUrl'] = array(
     'title' => t('Twilio waitUr : เสียงรอสาย'),
     'page callback' => 'tw_waitUrl',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -449,7 +127,7 @@ function me_menu() {
   $items['quickstart/twilio_client'] = array(
     'title' => t('Twilio voice - การทดสอบ TwilioClient'),
     'page callback' => 'quickstart_twilio_client',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -457,7 +135,7 @@ function me_menu() {
   $items['twilio/hook_group_rooms'] = array(
     'title' => t('Twilio video - การทดสอบ webhook group rooms [https://www.twilio.com/console/video/configure]'),
     'page callback' => 'hook_group_rooms',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -475,7 +153,7 @@ function me_menu() {
   $items['nginx/live/publish'] = array(
     'title' => t('function nginx/live/publish เป็น hook ที่บอกว่าการเริ่ม live'),
     'page callback' => 'nginx_live_publish',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -484,7 +162,7 @@ function me_menu() {
   $items['nginx/live/publish_done'] = array(
     'title' => t('function nginx/live/publish_done เป็น hook ที่บอกว่าการ live เสด'),
     'page callback' => 'nginx_live_publish_done',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -493,7 +171,7 @@ function me_menu() {
   $items['nginx/live/recorded_done'] = array(
     'title' => t('function nginx/live/recorded_done'),
     'page callback' => 'nginx_live_recorded_done',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -504,7 +182,7 @@ function me_menu() {
   $items['nginx/live_game/publish'] = array(
     'title' => t('function nginx/live_game/publish เป็น hook ที่บอกว่าการเริ่ม live'),
     'page callback' => 'nginx_live_game_publish',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -513,7 +191,7 @@ function me_menu() {
   $items['nginx/live_game/publish_done'] = array(
     'title' => t('function nginx/live_game/publish_done เป็น hook ที่บอกว่าการ live เสด'),
     'page callback' => 'nginx_live_game_publish_done',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -522,7 +200,7 @@ function me_menu() {
   $items['nginx/live_game/recorded_done'] = array(
     'title' => t('function nginx/live_game/recorded_done'),
     'page callback' => 'nginx_live_game_recorded_done',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -533,7 +211,7 @@ function me_menu() {
   $items['nginx/vc/publish'] = array(
     'title' => t('function nginx/vc/publish'),
     'page callback' => 'nginx_vc_publish',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -541,7 +219,7 @@ function me_menu() {
   $items['nginx/vc/connect'] = array(
     'title' => t('function nginx/vc/connect'),
     'page callback' => 'nginx_vc_connect',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -549,7 +227,7 @@ function me_menu() {
   $items['nginx/vc/play'] = array(
     'title' => t('function nginx/vc/play'),
     'page callback' => 'nginx_vc_play',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -557,7 +235,7 @@ function me_menu() {
   $items['nginx/vc/done'] = array(
     'title' => t('function nginx/vc/done'),
     'page callback' => 'nginx_vc_done',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -565,7 +243,7 @@ function me_menu() {
   $items['nginx/vc/record_done'] = array(
     'title' => t('function nginx/vc/record_done'),
     'page callback' => 'nginx_vc_record_done',
-    'access arguments' => array('idna_permission'),
+    'access arguments' => array('me_permission'),
     // 'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
@@ -574,64 +252,6 @@ function me_menu() {
 
   return $items;
 }
-
-/*
-  hook_mail
-  Refer : http://drupal.stackexchange.com/questions/103892/passing-variables-in-drupal-mail
-*/
-function me_mail($key, &$message, $params) {
-  // global $user;
-
-  // Each message is associated with a language, which may or may not be the
-  // current user's selected language, depending on the type of e-mail being
-  // sent. This $options array is used later in the t() calls for subject
-  // and body to ensure the proper translation takes effect.
-  $options = array(
-    'langcode' => LANGUAGE_NONE/*$message['language']->language*/,
-  );
-
-  watchdog(TAG, 'me_mail > key : %key', array('%key'=> $key), WATCHDOG_INFO);
-
-  switch ($key) {
-    // Send a simple message from the contact form.
-    case 'contact_message':{
-      $message['subject'] = t('E-mail sent from @site-name', array('@site-name' => variable_get('site_name', 'Drupal')), $options);
-      // Note that the message body is an array, not a string.
-      $message['body'][] = t('Code verify = @key', array('@key' => $params['verify_key']), $options);
-      $message['body'][] = t('Password    = @key', array('@key' => $params['verify_key']), $options);
-      $message['body'][] = t('--  @site-name team', array('@site-name' => variable_get('site_name', 'Drupal')), $options);
-      // Because this is just user-entered text, we do not need to translate it.
-      // Since user-entered text may have unintentional HTML entities in it like
-      // '<' or '>', we need to make sure these entities are properly escaped,
-      // as the body will later be transformed from HTML to text, meaning
-      // that a normal use of '<' will result in truncation of the message.
-      $message['body'][] = check_plain($params['message']);
-
-      watchdog(TAG, 'idna_mail > contact_message : %message', array('%message'=> serialize($message)), WATCHDOG_INFO);
-    }
-      break;
-
-    case 'user_forgot_password':{
-      $message['subject'] = t('Replacement login information for @name at @site-name', array('@name' => $params['name'], '@site-name' => variable_get('site_name', 'Drupal')), $options);
-      // Note that the message body is an array, not a string.
-      $message['body'][] = t('New Password    = @key', array('@key' => $params['verify_key']), $options);
-      $message['body'][] = t('--  @site-name team', array('@site-name' => variable_get('site_name', 'Drupal')), $options);
-      // Because this is just user-entered text, we do not need to translate it.
-      // Since user-entered text may have unintentional HTML entities in it like
-      // '<' or '>', we need to make sure these entities are properly escaped,
-      // as the body will later be transformed from HTML to text, meaning
-      // that a normal use of '<' will result in truncation of the message.
-      $message['body'][] = check_plain($params['message']);
-
-
-
-      watchdog(TAG, 'me_mail > user_forgot_password : %message', array('%message'=> serialize($message)), WATCHDOG_INFO);
-
-    }
-    break;
-  }
-}
-
 
 /*
   hook_user_login()
@@ -646,13 +266,11 @@ function me_user_login(&$edit, $account) {
 
     watchdog(TAG, 'idna_user_login header: %header', array('%header'=> serialize($getallheaders)), WATCHDOG_INFO);
 
-    
     // เป้น การ load friends ของ uid ขึ้นมาเช็ดว่า friend_id เป้น friend เราอยุ่หรือไม่
     $profile = profile2_by_uid_load($account->uid, 'main');
 
     $flag = TRUE;
 
-    /*
     if(isset($profile->field_device_access[LANGUAGE_NONE])){
       foreach ($profile->field_device_access[LANGUAGE_NONE] as $key => $value) {
         $item_load = field_collection_item_load($value['value']);
@@ -660,9 +278,9 @@ function me_user_login(&$edit, $account) {
         if (strcasecmp($item_load->field_udid[LANGUAGE_NONE][0]['value'], $getallheaders['udid']) == 0) {
 
           $wrapper = entity_metadata_wrapper('field_collection_item', $item_load);
-          if(strcasecmp($item_load->field_device_name[LANGUAGE_NONE][0]['value'], base64_decode($getallheaders['device_name'])) != 0){
-            $wrapper->field_device_name->set(base64_decode($getallheaders['device_name']));
-          }
+          // if(strcasecmp($item_load->field_device_name[LANGUAGE_NONE][0]['value'], base64_decode($getallheaders['device_name'])) != 0){
+          //   $wrapper->field_device_name->set(base64_decode($getallheaders['device_name']));
+          // }
 
           if(strcasecmp($item_load->field_device_access_version[LANGUAGE_NONE][0]['value'], $getallheaders['version_application']) != 0){
             $wrapper->field_device_access_version->set($getallheaders['version_application']);
@@ -672,13 +290,10 @@ function me_user_login(&$edit, $account) {
             $wrapper->field_device_access_build->set($getallheaders['build']);
           }
 
-
-          // field_key_token_notification
           if(strcasecmp($item_load->field_key_token_notification[LANGUAGE_NONE][0]['value'], $getallheaders['token_notification']) != 0){
             $wrapper->field_key_token_notification->set($getallheaders['token_notification']);
           }
 
-          // field_pushkit_token
           if(strcasecmp($item_load->field_pushkit_token[LANGUAGE_NONE][0]['value'], $getallheaders['token_pushkit']) != 0){
             $wrapper->field_pushkit_token->set($getallheaders['token_pushkit']);
           }
@@ -687,12 +302,11 @@ function me_user_login(&$edit, $account) {
           $wrapper->field_online->set("1");
           $wrapper->save();
 
-       
           $val = array(
               "udid"          => $wrapper->field_udid->value(),
               "platform"      => $wrapper->field_platform->value(),
               "bundle_identifier"      => $wrapper->field_bundle_identifier->value(),
-              "device_name"   => base64_decode($getallheaders['device_name']),
+              // "device_name"   => base64_decode($getallheaders['device_name']),
               "model_number"  => $wrapper->field_model_number->value(),
               "version"       => $getallheaders['version_application'],
               "build"         => $getallheaders['build'],
@@ -708,7 +322,7 @@ function me_user_login(&$edit, $account) {
         }
       }
     }
-*/
+
     if ($flag) {
       $values = array();
 
@@ -734,7 +348,7 @@ function me_user_login(&$edit, $account) {
         "udid"              => $getallheaders['udid'],
         "platform"          => $getallheaders['platform'],
         "bundle_identifier" => $getallheaders['bundle_identifier'],
-        "device_name"       => base64_decode($getallheaders['device_name']),
+        // "device_name"       => base64_decode($getallheaders['device_name']),
         "model_number"      => $getallheaders['model_number'],
         "version"           => $getallheaders['version_application'],
         "build"             => $getallheaders['build'],
@@ -744,11 +358,7 @@ function me_user_login(&$edit, $account) {
         "token_pushkit"     => $getallheaders['token_pushkit']
       );
       
-      $ff = $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid . '/profiles/device_access/' . $field_entity->item_id . "/", $values);
-      
-
-      watchdog(TAG, 'ff > idna_user_login header: %header', array('%header'=> serialize($ff)), WATCHDOG_INFO);
-
+      $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid . '/profiles/device_access/' . $field_entity->item_id . "/", $values);
       
       // $chat_id = generateRandomString(config_pages_get(CONFIG_PAGES_TYPE, 'field_defualt_length_chat_id', 20));
 
@@ -821,9 +431,9 @@ function qrcode_login(){
       if (strcasecmp($item_load->field_udid[LANGUAGE_NONE][0]['value'], $getallheaders['udid']) == 0) {
 
         $wrapper = entity_metadata_wrapper('field_collection_item', $item_load);
-        if(strcasecmp($item_load->field_device_name[LANGUAGE_NONE][0]['value'], base64_decode($getallheaders['device_name'])) != 0){
-          $wrapper->field_device_name->set(base64_decode($getallheaders['device_name']));
-        }
+        // if(strcasecmp($item_load->field_device_name[LANGUAGE_NONE][0]['value'], base64_decode($getallheaders['device_name'])) != 0){
+        //   $wrapper->field_device_name->set(base64_decode($getallheaders['device_name']));
+        // }
 
         if(strcasecmp($item_load->field_device_access_version[LANGUAGE_NONE][0]['value'], $getallheaders['version_application']) != 0){
           $wrapper->field_device_access_version->set($getallheaders['version_application']);
@@ -851,7 +461,7 @@ function qrcode_login(){
             "udid"          => $wrapper->field_udid->value(),
             "platform"      => $wrapper->field_platform->value(),
             "bundle_identifier"      => $wrapper->field_bundle_identifier->value(),
-            "device_name"   => base64_decode($getallheaders['device_name']),
+            // "device_name"   => base64_decode($getallheaders['device_name']),
             "model_number"  => $wrapper->field_model_number->value(),
             "version"       => $getallheaders['version_application'],
             "build"         => $getallheaders['build'],
@@ -874,7 +484,7 @@ function qrcode_login(){
     $values['field_udid'][LANGUAGE_NONE][0]['value']              = $getallheaders['udid'];
     $values['field_platform'][LANGUAGE_NONE][0]['value']          = $getallheaders['platform'];
     $values['field_bundle_identifier'][LANGUAGE_NONE][0]['value'] = $getallheaders['bundle_identifier'];
-    $values['field_device_name'][LANGUAGE_NONE][0]['value']       = base64_decode($getallheaders['device_name']);
+    // $values['field_device_name'][LANGUAGE_NONE][0]['value']       = base64_decode($getallheaders['device_name']);
     $values['field_model_number'][LANGUAGE_NONE][0]['value']      = $getallheaders['model_number'];
     $values['field_device_access_version'][LANGUAGE_NONE][0]['value']    = $getallheaders['version_application'];
     $values['field_device_access_build'][LANGUAGE_NONE][0]['value']      = $getallheaders['build'];
@@ -893,7 +503,7 @@ function qrcode_login(){
       "udid"              => $getallheaders['udid'],
       "platform"          => $getallheaders['platform'],
       "bundle_identifier" => $getallheaders['bundle_identifier'],
-      "device_name"       => base64_decode($getallheaders['device_name']),
+      // "device_name"       => base64_decode($getallheaders['device_name']),
       "model_number"      => $getallheaders['model_number'],
       "version"           => $getallheaders['version_application'],
       "build"             => $getallheaders['build'],
@@ -949,7 +559,8 @@ function me_user_insert(&$edit, $account, $category) {
 
           $sound_call_waiting_item_id = setDefualtSoundCallWaiting($profile);
 
-          $url_my_qrcode = substr(file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+          // $url_my_qrcode = substr(file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+          $url_my_qrcode = file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']);
 
           
           // $profile->field_opentok_session_id[LANGUAGE_NONE][0]['value'] = $opentok_session_id;
@@ -1084,7 +695,8 @@ function me_user_insert(&$edit, $account, $category) {
         $sound_call_waiting_item_id = setDefualtSoundCallWaiting($profile);
 
 
-        $url_my_qrcode = substr(file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+        // $url_my_qrcode = substr(file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+        $url_my_qrcode = file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']);
 
         // $profile->field_opentok_session_id[LANGUAGE_NONE][0]['value'] = $opentok_session_id;
         // profile2_save($profile);
@@ -1533,7 +1145,8 @@ function me_node_insert($node){
     }
 
     $items = array("name"       => $node->title,
-                   "url_image"  => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url'])),
+                  //  "url_image"  => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url'])),
+                   "url_image"  => file_create_url(image_style_url('medium', $image_url['uri'])),
                    "link_url"   => $link_url);
 
     $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_CENTER_SLIDE . '/' . $node->nid, $items);
@@ -1564,7 +1177,8 @@ function me_node_update($node){
       }
 
       $items = array("name"       => $node->title,
-                     "url_image"  => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url'])),
+                    //  "url_image"  => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url'])),
+                     "url_image"  => file_create_url(image_style_url('medium', $image_url['uri'])),
                      "link_url"   => $link_url);
 
       $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_CENTER_SLIDE . '/' . $node->nid, $items);
@@ -3468,7 +3082,7 @@ function onLoadProfile($uid, $mode){
         if (isset($profile->field_profile_my_qrcode[LANGUAGE_NONE])) {
           // $profile_url_my_qrcode  = substr(file_create_url(image_style_url('medium', $profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
         
-          $profile_url_my_qrcode  = substr(file_create_url(image_style_url('medium', $profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+          $profile_url_my_qrcode  = file_create_url(image_style_url('medium', $profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']));
 
         }
         
@@ -3502,6 +3116,7 @@ function onLoadProfile($uid, $mode){
 
         // เสียงรอสาย
         $sound_call_waitings = array();
+        /*
         if(isset($profile->field_sound_call_waiting[LANGUAGE_NONE])){
           foreach ($profile->field_sound_call_waiting[LANGUAGE_NONE] as $k_call_waiting => $v_call_waiting) {
             $data_call_waiting = field_collection_item_load($v_call_waiting['value']);
@@ -3516,9 +3131,11 @@ function onLoadProfile($uid, $mode){
                                                                  "title"     => $data_call_waiting_title);
           }
         }
+        */
 
         // Phones
         $phones = array();
+        /*
         if(isset($profile->field_profile_multi_phone[LANGUAGE_NONE])){
           foreach ($profile->field_profile_multi_phone[LANGUAGE_NONE] as $k_phone => $v_phone) {
               $data_item_phone = field_collection_item_load($v_phone['value']);
@@ -3528,6 +3145,7 @@ function onLoadProfile($uid, $mode){
               $phones[$v_phone['value']] = array('name'=>$data_item_phone_phone, 'enabled'=>$data_item_phone_enabled);
           }
         }
+        */
 
         // Emails
         $emails = array();
@@ -3556,7 +3174,8 @@ function onLoadProfile($uid, $mode){
         // image_url
         $profile_image_url;
         if(isset($profile->field_profile_image[LANGUAGE_NONE])){
-          $profile_image_url = substr(file_create_url(image_style_url('medium', $profile->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+          // $profile_image_url = substr(file_create_url(image_style_url('medium', $profile->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+          $profile_image_url = file_create_url(image_style_url('medium', $profile->field_profile_image[LANGUAGE_NONE][0]['uri']));
         }else{
           $profile_image_url =  getDefualtProfilePicture();
         }
@@ -3564,13 +3183,15 @@ function onLoadProfile($uid, $mode){
         // bg_url
         $profile_bg_url;
         if(isset($profile->field_my_app_bg[LANGUAGE_NONE])){
-          $profile_bg_url = substr(file_create_url(image_style_url('medium', $profile->field_my_app_bg[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+          // $profile_bg_url = substr(file_create_url(image_style_url('medium', $profile->field_my_app_bg[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+          $profile_bg_url = file_create_url(image_style_url('medium', $profile->field_my_app_bg[LANGUAGE_NONE][0]['uri']));
         }else{
           $profile_bg_url = getDefualtBackgroundCardPicture();
         }
 
         // device_access
         $device_access = array();
+        /*
         if(isset($profile->field_device_access[LANGUAGE_NONE])){
           foreach ($profile->field_device_access[LANGUAGE_NONE] as $k_device_access => $v_device_access) {
               $data_item_device_access = field_collection_item_load($v_device_access['value']);
@@ -3609,6 +3230,7 @@ function onLoadProfile($uid, $mode){
                                                                 'version'     =>$data_item_device_access_version);
           }
         }
+        */
 
         $friends = array();
         if(isset($profile->field_profile_friends[LANGUAGE_NONE])){
@@ -3630,9 +3252,7 @@ function onLoadProfile($uid, $mode){
                 $item_friends_change_friends_name    =  $item_friends->field_change_friend_name[LANGUAGE_NONE][0]['value'];
               }
 
-
               $item_friends_chat_id  = $item_friends->field_profile_friends_chat_id[LANGUAGE_NONE][0]['value'];
-
 
               $item_friends_class = '';
               if (isset($item_friends->field_profile_friend_classs[LANGUAGE_NONE])) {
@@ -3688,7 +3308,8 @@ function onLoadProfile($uid, $mode){
 
             $item_classs_image_url = "";
             if (isset($item_classs->field_class_image_profile[LANGUAGE_NONE])) {
-              $item_classs_image_url = substr(file_create_url(image_style_url('medium', $item_classs->field_class_image_profile[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+              // $item_classs_image_url = substr(file_create_url(image_style_url('medium', $item_classs->field_class_image_profile[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+              $item_classs_image_url = file_create_url(image_style_url('medium', $item_classs->field_class_image_profile[LANGUAGE_NONE][0]['uri']));
             }
 
             $item_classs_is_default = '0';
@@ -3738,9 +3359,7 @@ function onLoadProfile($uid, $mode){
                                                               "owner_id"   =>$item_following_owner_id,
                                                               "status"     =>$item_following_status,
                                                             );
-            }
-
-            
+            }            
           }
         }
 
@@ -3765,7 +3384,8 @@ function onLoadProfile($uid, $mode){
 
             $groups_detail_node_image_url = '';
             if (isset($groups_detail_node->field_image_chat_group[LANGUAGE_NONE])) {
-              $groups_detail_node_image_url = substr(file_create_url(image_style_url('medium', $groups_detail_node->field_image_chat_group[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+              // $groups_detail_node_image_url = substr(file_create_url(image_style_url('medium', $groups_detail_node->field_image_chat_group[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+              $groups_detail_node_image_url = file_create_url(image_style_url('medium', $groups_detail_node->field_image_chat_group[LANGUAGE_NONE][0]['uri']));
             }
 
             // field_members_group
@@ -3863,11 +3483,13 @@ function onLoadProfile($uid, $mode){
             $application_image_url = '';
             // รูปของ application ที่เรากดคุยด้วย
             if (isset($node->field_my_app_picture[LANGUAGE_NONE])) {
-              $application_image_url = substr(file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+              // $application_image_url = substr(file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+              $application_image_url = file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri']));
             }else{
 
                $_i = (array)getDefualtPictureProfileMyApplication();
-               $application_image_url = substr(file_create_url(image_style_url('medium', $_i['uri'])), strlen($GLOBALS['base_url']));
+              //  $application_image_url = substr(file_create_url(image_style_url('medium', $_i['uri'])), strlen($GLOBALS['base_url']));
+              $application_image_url = file_create_url(image_style_url('medium', $_i['uri']));
             }
             
 
@@ -3877,7 +3499,8 @@ function onLoadProfile($uid, $mode){
 
             $friend_image_url = '';
             if (!empty($friend_profile->field_profile_image[LANGUAGE_NONE])) {
-              $friend_image_url = substr(file_create_url(image_style_url('medium', $friend_profile->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+              // $friend_image_url = substr(file_create_url(image_style_url('medium', $friend_profile->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+              $friend_image_url = file_create_url(image_style_url('medium', $friend_profile->field_profile_image[LANGUAGE_NONE][0]['uri']));
             }
 
 
@@ -3920,10 +3543,12 @@ function onLoadProfile($uid, $mode){
             // image_url
             $my_app_image_url = "";
             if(isset($node->field_my_app_picture[LANGUAGE_NONE])){
-              $my_app_image_url = substr(file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+              // $my_app_image_url = substr(file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+              $my_app_image_url = file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri']));
             }else{
               $_i = (array)getDefualtPictureProfileMyApplication();
-              $my_app_image_url = substr(file_create_url(image_style_url('medium', $_i['uri'])), strlen($GLOBALS['base_url']));
+              // $my_app_image_url = substr(file_create_url(image_style_url('medium', $_i['uri'])), strlen($GLOBALS['base_url']));
+              $my_app_image_url = file_create_url(image_style_url('medium', $_i['uri']));
             }
 
             // category
@@ -3982,8 +3607,12 @@ function onLoadProfile($uid, $mode){
 
                         $uri = $data_item_multi_image->field_image[LANGUAGE_NONE][0]['uri'];
 
-                        $thumbnail_uri  = substr(file_create_url(image_style_url('medium', $uri)), strlen($GLOBALS['base_url']));
-                        $original_uri   = substr(file_create_url($uri), strlen($GLOBALS['base_url']));
+                        // $thumbnail_uri  = substr(file_create_url(image_style_url('medium', $uri)), strlen($GLOBALS['base_url']));
+                        // $original_uri   = substr(file_create_url($uri), strlen($GLOBALS['base_url']));
+
+                        $thumbnail_uri  = file_create_url(image_style_url('medium', $uri));
+                        $original_uri   = file_create_url($uri);
+                        
                         // original_uri
 
                         $my_app_update_images[$v_multi_image['value']] = array("original_uri"=>$original_uri, "thumbnail_uri"=>$thumbnail_uri);
@@ -4027,9 +3656,12 @@ function onLoadProfile($uid, $mode){
                       $comment_image_original_uri = "";
                       $comment_image_thumbnail_uri = "";
                       if(isset($data_item_comment->field_image[LANGUAGE_NONE])){
-                        $comment_image_original_uri = substr(file_create_url($data_item_comment->field_image[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+                        // $comment_image_original_uri = substr(file_create_url($data_item_comment->field_image[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+                        // $comment_image_thumbnail_uri = substr(file_create_url(image_style_url('medium', $data_item_comment->field_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
 
-                        $comment_image_thumbnail_uri = substr(file_create_url(image_style_url('medium', $data_item_comment->field_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+                        $comment_image_original_uri = file_create_url($data_item_comment->field_image[LANGUAGE_NONE][0]['uri']);
+                        $comment_image_thumbnail_uri = file_create_url(image_style_url('medium', $data_item_comment->field_image[LANGUAGE_NONE][0]['uri']));
+                        
                       }
 
                       $comment_likes = array();
@@ -4057,9 +3689,12 @@ function onLoadProfile($uid, $mode){
                           $reply_comments_original_uri = "";
                           $reply_comments_thumbnail_uri = "";
                           if(isset($data_item_reply_comments->field_image[LANGUAGE_NONE])){
-                            $reply_comments_original_uri = substr(file_create_url($data_item_reply_comments->field_image[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+                            // $reply_comments_original_uri = substr(file_create_url($data_item_reply_comments->field_image[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+                            // $reply_comments_thumbnail_uri = substr(file_create_url(image_style_url('medium', $data_item_reply_comments->field_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
 
-                            $reply_comments_thumbnail_uri = substr(file_create_url(image_style_url('medium', $data_item_reply_comments->field_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+
+                            $reply_comments_original_uri = file_create_url($data_item_reply_comments->field_image[LANGUAGE_NONE][0]['uri']);
+                            $reply_comments_thumbnail_uri = file_create_url(image_style_url('medium', $data_item_reply_comments->field_image[LANGUAGE_NONE][0]['uri']));
                           }
 
                           // 
@@ -4180,7 +3815,8 @@ function onLoadProfile($uid, $mode){
             }
 
             $slide_stores[$slide_store_output_nid] = array("name"       => $slide_store_output_node->title,
-                                                           "url_image"  => substr(file_create_url(image_style_url('medium', $slide_store_output_node->field_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url'])),
+                                                          //  "url_image"  => substr(file_create_url(image_style_url('medium', $slide_store_output_node->field_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url'])),
+                                                           "url_image"  => file_create_url(image_style_url('medium', $slide_store_output_node->field_image[LANGUAGE_NONE][0]['uri'])),
                                                            "link_url"   => $slide_store_output_link_url);
 
           }
@@ -4216,7 +3852,8 @@ function onLoadProfile($uid, $mode){
               $center_uri = $_i['uri'];
             }
 
-            $center_image_url = substr(file_create_url(image_style_url('medium', $center_uri)), strlen($GLOBALS['base_url']));
+            // $center_image_url = substr(file_create_url(image_style_url('medium', $center_uri)), strlen($GLOBALS['base_url']));
+            $center_image_url = file_create_url(image_style_url('medium', $center_uri));
        
             $center_category  = $center_node->field_my_app_category[LANGUAGE_NONE][0]['tid'];
 
@@ -4268,7 +3905,8 @@ function onLoadProfile($uid, $mode){
 
         $profile_url_my_qrcode = "";
         if (isset($profile->field_profile_my_qrcode[LANGUAGE_NONE])) {
-          $profile_url_my_qrcode  = substr(file_create_url(image_style_url('medium', $profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+          // $profile_url_my_qrcode  = substr(file_create_url(image_style_url('medium', $profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+          $profile_url_my_qrcode  = file_create_url(image_style_url('medium', $profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']));
         }
         
         // badges
@@ -4363,7 +4001,8 @@ function onLoadProfile($uid, $mode){
         // image_url
         $profile_image_url;
         if(isset($profile->field_profile_image[LANGUAGE_NONE])){
-          $profile_image_url = substr(file_create_url(image_style_url('medium', $profile->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+          // $profile_image_url = substr(file_create_url(image_style_url('medium', $profile->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+          $profile_image_url = file_create_url(image_style_url('medium', $profile->field_profile_image[LANGUAGE_NONE][0]['uri']));
         }else{
           $profile_image_url =  getDefualtProfilePicture();
         }
@@ -4371,7 +4010,8 @@ function onLoadProfile($uid, $mode){
         // bg_url
         $profile_bg_url;
         if(isset($profile->field_my_app_bg[LANGUAGE_NONE])){
-          $profile_bg_url = substr(file_create_url(image_style_url('medium', $profile->field_my_app_bg[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+          // $profile_bg_url = substr(file_create_url(image_style_url('medium', $profile->field_my_app_bg[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+          $profile_bg_url = file_create_url(image_style_url('medium', $profile->field_my_app_bg[LANGUAGE_NONE][0]['uri']));
         }else{
           $profile_bg_url = getDefualtBackgroundCardPicture();
         }
@@ -4861,7 +4501,8 @@ function taxonomy_get_tree_nested($vid, $parent = 0, $max_depth = NULL, $load_en
 
       if (is_null($image_styles)) {
         # code...
-        $term->field_image = substr(file_create_url(entity_load('taxonomy_term', FALSE, array('vid' => $vid))[$tid]->field_tags_image[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+        // $term->field_image = substr(file_create_url(entity_load('taxonomy_term', FALSE, array('vid' => $vid))[$tid]->field_tags_image[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+        $term->field_image = file_create_url(entity_load('taxonomy_term', FALSE, array('vid' => $vid))[$tid]->field_tags_image[LANGUAGE_NONE][0]['uri']);
       }else{
 
         /*
@@ -4869,7 +4510,8 @@ function taxonomy_get_tree_nested($vid, $parent = 0, $max_depth = NULL, $load_en
   // var_dump(image_style_url('thumbnail', 'public:///20180406_64827038.png'));
         */
         
-        $term->field_image = substr(file_create_url(image_style_url($image_styles, entity_load('taxonomy_term', FALSE, array('vid' => $vid))[$tid]->field_tags_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+        // $term->field_image = substr(file_create_url(image_style_url($image_styles, entity_load('taxonomy_term', FALSE, array('vid' => $vid))[$tid]->field_tags_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+        $term->field_image = file_create_url(image_style_url($image_styles, entity_load('taxonomy_term', FALSE, array('vid' => $vid))[$tid]->field_tags_image[LANGUAGE_NONE][0]['uri']));
       }
 
       if (isset($list[$ptid])) {
@@ -5742,7 +5384,9 @@ function recreate_qrcode(){
   generatorQRCode($account, $platform, $bundleidentifier);
 
   $profile = profile2_by_uid_load($account->uid, 'main');
-  $url_my_qrcode = substr(file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+  // $url_my_qrcode = substr(file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+
+  $url_my_qrcode = file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']);
 
   
   // add profile ให้กับ user
@@ -5870,7 +5514,8 @@ function find_friend(){
 
           $result['name']     = $profile_friend->field_profile_name[LANGUAGE_NONE][0]['value'];
           if(count($profile_friend->field_profile_image) > 0){
-            $result['url_image'] = substr(file_create_url($profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+            // $result['url_image'] = substr(file_create_url($profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+            $result['url_image'] = file_create_url($profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']);
           }else{
             $result['url_image'] = "";
           }
@@ -5975,7 +5620,9 @@ function find_friend(){
 
         $result['name']     = $profile_friend->field_profile_name[LANGUAGE_NONE][0]['value'];
         if(count($profile_friend->field_profile_image) > 0){
-          $result['url_image'] = substr(file_create_url($profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+          // $result['url_image'] = substr(file_create_url($profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+
+          $result['url_image'] = file_create_url($profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']);
         }else{
           $result['url_image'] = "";
         }
@@ -6321,7 +5968,9 @@ function people_you_may_know(){
     $profile_friend = profile2_by_uid_load($account->uid, 'main');
     $tmp['name'] = $profile_friend->field_profile_name[LANGUAGE_NONE][0]['value'];
     if(isset($profile_friend->field_profile_image[LANGUAGE_NONE])){
-      $tmp['url_image'] = substr(file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+      // $tmp['url_image'] = substr(file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+
+      $tmp['url_image'] = file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']));
     }else{
       $tmp['url_image'] = getDefualtProfilePicture();
     }
@@ -7177,7 +6826,8 @@ function list_default_call_waiting()
     // $uid        = $node->uid;
     $nid        = $node->nid;
     $title      = $node->title;
-    $sound_url  = substr(file_create_url($fid['uri']), strlen($GLOBALS['base_url']));
+    // $sound_url  = substr(file_create_url($fid['uri']), strlen($GLOBALS['base_url']));
+    $sound_url  = file_create_url($fid['uri']);
 
     $sound_call_waitings[] = array("nid"=>$nid, "title"=>$title, "sound_url"=>$sound_url);
   } 
@@ -7761,7 +7411,8 @@ function search_application(){
 
       $image_uri = "";
       if (isset($node->field_my_app_picture[LANGUAGE_NONE])) {
-        $image_uri = substr(file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+        // $image_uri = substr(file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+        $image_uri = file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri']));
       }
 
       $owner_profile = profile2_by_uid_load($node->uid, 'main');
@@ -7852,7 +7503,9 @@ function center_create_chat(){
 
   $application_name = $node->title;//$node->field_my_app_name[LANGUAGE_NONE][0]['value'];
   // รูปของ application ที่เรากดคุยด้วย
-  $application_image_url = substr(file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+  // $application_image_url = substr(file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+
+  $application_image_url = file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri']));
 
 
   $chat_id = generateRandomString(LENGTH_CHAT_ID);
@@ -7879,7 +7532,8 @@ function center_create_chat(){
 
     $friend_image_url = '';
     if (!empty($friend_profile->field_profile_image[LANGUAGE_NONE])) {
-      $friend_image_url = substr(file_create_url(image_style_url('medium', $friend_profile->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+      // $friend_image_url = substr(file_create_url(image_style_url('medium', $friend_profile->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+      $friend_image_url = file_create_url(image_style_url('medium', $friend_profile->field_profile_image[LANGUAGE_NONE][0]['uri']));
     }
     
     $v = array(
@@ -7926,7 +7580,9 @@ function center_create_chat(){
 
     $friend_image_url = '';
     if (!empty($friend_profile->field_profile_image[LANGUAGE_NONE])) {
-      $friend_image_url = substr(file_create_url(image_style_url('medium', $friend_profile->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+      // $friend_image_url = substr(file_create_url(image_style_url('medium', $friend_profile->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+
+      $friend_image_url = file_create_url(image_style_url('medium', $friend_profile->field_profile_image[LANGUAGE_NONE][0]['uri']));
     }
     
     $v = array(
@@ -7993,7 +7649,9 @@ function center_get_detail_application(){
   
   $image_url  = "";
   if (isset($node->field_my_app_picture[LANGUAGE_NONE])) {
-    $image_url = substr(file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+    // $image_url = substr(file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+
+    $image_url = file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri']));
   }
 
   $emails = array();
@@ -8068,8 +7726,11 @@ function center_get_detail_application(){
 
                 $uri = $item_image->field_image[LANGUAGE_NONE][0]['uri'];
 
-                $thumbnail_uri  = substr(file_create_url(image_style_url('medium', $uri)), strlen($GLOBALS['base_url']));
-                $original_uri   = substr(file_create_url($uri), strlen($GLOBALS['base_url']));
+                // $thumbnail_uri  = substr(file_create_url(image_style_url('medium', $uri)), strlen($GLOBALS['base_url']));
+                // $original_uri   = substr(file_create_url($uri), strlen($GLOBALS['base_url']));
+
+                $thumbnail_uri  = file_create_url(image_style_url('medium', $uri));
+                $original_uri   = file_create_url($uri);
                 
 
                 $images[$v_image['value']] = array("thumbnail_uri"=>$thumbnail_uri, "original_uri"=>$original_uri);
@@ -8098,8 +7759,11 @@ function center_get_detail_application(){
                 if (isset($item_comment->field_image[LANGUAGE_NONE])) {
                   $uri_comment = $item_comment->field_image[LANGUAGE_NONE][0]['uri'];
 
-                  $original_uri_comment  = substr(file_create_url($uri_comment), strlen($GLOBALS['base_url']));
-                  $thumbnail_uri_comment = substr(file_create_url(image_style_url('medium', $uri_comment)), strlen($GLOBALS['base_url']));
+                  // $original_uri_comment  = substr(file_create_url($uri_comment), strlen($GLOBALS['base_url']));
+                  // $thumbnail_uri_comment = substr(file_create_url(image_style_url('medium', $uri_comment)), strlen($GLOBALS['base_url']));
+
+                  $original_uri_comment  = file_create_url($uri_comment);
+                  $thumbnail_uri_comment = file_create_url(image_style_url('medium', $uri_comment));
                 }
 
                 $reply_comments = array();
@@ -8118,8 +7782,11 @@ function center_get_detail_application(){
                     if (isset($item_reply_comment->field_image[LANGUAGE_NONE])) {
                       $uri_reply_comment = $item_reply_comment->field_image[LANGUAGE_NONE][0]['uri'];
 
-                      $original_uri_reply_comment  = substr(file_create_url($uri_reply_comment), strlen($GLOBALS['base_url']));
-                      $thumbnail_uri_reply_comment = substr(file_create_url(image_style_url('medium', $uri_reply_comment)), strlen($GLOBALS['base_url']));
+                      // $original_uri_reply_comment  = substr(file_create_url($uri_reply_comment), strlen($GLOBALS['base_url']));
+                      // $thumbnail_uri_reply_comment = substr(file_create_url(image_style_url('medium', $uri_reply_comment)), strlen($GLOBALS['base_url']));
+
+                      $original_uri_reply_comment  = file_create_url($uri_reply_comment);
+                      $thumbnail_uri_reply_comment = file_create_url(image_style_url('medium', $uri_reply_comment));
                     }
 
                     $reply_likes = array();
@@ -9161,7 +8828,8 @@ function add_friend(){
         if (isset($profile_user->field_profile_image)) {
           # code...
           if (!empty($profile_user->field_profile_image[LANGUAGE_NONE])) {
-            $friend_url_image = substr(file_create_url($profile_user->field_profile_image[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+            // $friend_url_image = substr(file_create_url($profile_user->field_profile_image[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
+            $friend_url_image = file_create_url($profile_user->field_profile_image[LANGUAGE_NONE][0]['uri']);
           }
         }
 
@@ -9435,7 +9103,9 @@ function update_my_application_profile(){
     $node_wrapper->field_my_app_picture->set($image_url);
     
 
-    $uri = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+    // $uri = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+
+    $uri = file_create_url(image_style_url('medium', $image_url['uri']));
     $data_update = array(
       "image_url"  => $uri
     );
@@ -9572,7 +9242,8 @@ function update_picture_profile(){
 
   // $image_url['uri']
   //   // dpm(image_style_url('medium',$uri));
-  $url = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+  // $url = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+  $url = file_create_url(image_style_url('medium', $image_url['uri']));
   // $url = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
 
   // Firebase : update image url profile
@@ -9667,6 +9338,7 @@ function update_picture_profile2(){
 
   if($image != ""){
 
+    /*
     // http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
     $binary = base64_decode($image);
 
@@ -9692,7 +9364,8 @@ function update_picture_profile2(){
 
     // $image_url['uri']
     //   // dpm(image_style_url('medium',$uri));
-    $url = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+    // $url = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+    $url = file_create_url(image_style_url('medium', $image_url['uri']));
     // $url = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
 
     // Firebase : update image url profile
@@ -9709,6 +9382,9 @@ function update_picture_profile2(){
     $result['result']          = TRUE;  
     $result['image_url']       = $url;
     $result['execution_times'] = $time;
+    return $result;
+    */
+    $result['result']          = TRUE;  
     return $result;
   }else{
 
@@ -9912,6 +9588,7 @@ function update_picture_bg(){
 
   if($image != ""){
 
+    /*
     // http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
     $binary = base64_decode($image);
 
@@ -9932,7 +9609,8 @@ function update_picture_bg(){
 
     profile2_save($profile);
    
-    $url = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+    // $url = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+    $url = file_create_url(image_style_url('medium', $image_url['uri']));
 
     // Firebase : update image url profile
     $data_update = array(
@@ -9940,6 +9618,7 @@ function update_picture_bg(){
     );
     $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/profiles/", $data_update);
     // Firebase : update image url profile
+    */
 
     $result['result'] = TRUE;  
     $result['url']    = $url;
@@ -10915,7 +10594,8 @@ function create_defualt_application($uid){
       "category"    => $category,
       "subcategory" => $subcategory,
       "status"      => "0",
-      "image_url"   => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
+      // "image_url"   => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
+      "image_url"   => file_create_url(image_style_url('medium', $image_url['uri']))
   );
   $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/" . FIREBASE_MY_APPLIPATIONS_PATH . $node->nid, $data_update);
 
@@ -11034,7 +10714,9 @@ function create_my_application(){
       "status"      => "0",
 
       // $url = substr(file_create_url(image_style_url('medium',$image_url['uri'])), strlen($GLOBALS['base_url']));
-      "image_url"   => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
+      
+      // "image_url"   => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
+      "image_url"   => file_create_url(image_style_url('medium', $image_url['uri']))
   );
   $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/" . FIREBASE_MY_APPLIPATIONS_PATH . $node->nid, $data_update);
 
@@ -11559,7 +11241,8 @@ function update_my_applications(){
   if (array_key_exists("follow", $data)) {
     $app_node_id   = $node->nid;
     $app_name      = $node->title;
-    $app_image_url = substr(file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+    // $app_image_url = substr(file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+    $app_image_url = file_create_url(image_style_url('medium', $node->field_my_app_picture[LANGUAGE_NONE][0]['uri']));
 
 
     $owner_profile = profile2_by_uid_load($uid, 'main');
@@ -12580,8 +12263,11 @@ function update_my_applications(){
             // $uri = file_load($arr_file['fid'])->uri;
             // $image_url = substr(file_create_url(image_style_url('medium', $uri)), strlen($GLOBALS['base_url']));
       
-            $thumbnail_uri  = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
-            $original_uri   = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
+            // $thumbnail_uri  = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+            // $original_uri   = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
+      
+            $thumbnail_uri  = file_create_url(image_style_url('medium', $image_url['uri']));
+            $original_uri   = file_create_url($image_url['uri']);
       
       
             $value = array(                     
@@ -12684,8 +12370,10 @@ function add_reply_comment_child(){
 
 
       // $uri = file_load($arr_file['fid'])->uri;
-      $thumbnail_uri  = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
-      $original_uri   = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
+      // $thumbnail_uri  = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+      // $original_uri   = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
+      $thumbnail_uri  = file_create_url(image_style_url('medium', $image_url['uri']));
+      $original_uri   = file_create_url($image_url['uri']);
 
       //dpm($field_entity->item_id);
 
@@ -12802,8 +12490,11 @@ function edit_comment_parent(){
       // $uri = file_load($arr_file['fid'])->uri;
       // $image_url = substr(file_create_url(image_style_url('medium', $uri)), strlen($GLOBALS['base_url']));
 
-      $thumbnail_uri  = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
-      $original_uri   = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
+      // $thumbnail_uri  = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+      // $original_uri   = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
+
+      $thumbnail_uri  = file_create_url(image_style_url('medium', $image_url['uri']));
+      $original_uri   = file_create_url($image_url['uri']);
 
 /*
   $value = array(                     
@@ -12933,8 +12624,11 @@ function add_comment_parent(){
 
 
       // $uri = file_load($arr_file['fid'])->uri;
-      $thumbnail_uri  = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
-      $original_uri   = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
+      // $thumbnail_uri  = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+      // $original_uri   = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
+
+      $thumbnail_uri  = file_create_url(image_style_url('medium', $image_url['uri']));
+      $original_uri   = file_create_url($image_url['uri']);
 
 
       $value = array(                     
@@ -13044,8 +12738,11 @@ function add_post(){
       $multi_image_field_entity->setHostEntity('field_multi_image', $my_app_update);
       $multi_image_field_entity->save();
 
-      $thumbnail_uri = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
-      $original_uri = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
+      // $thumbnail_uri = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+      // $original_uri = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
+
+      $thumbnail_uri = file_create_url(image_style_url('medium', $image_url['uri']));
+      $original_uri = file_create_url($image_url['uri']);
 
       $images[$multi_image_field_entity->item_id] = array("thumbnail_uri" => $thumbnail_uri, "original_uri" => $original_uri);
     }
@@ -13178,8 +12875,10 @@ function edit_post(){
 
         // $uri = file_load($image_url['fid'])->uri;
 
-        $thumbnail_uri = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
-        $original_uri = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
+        // $thumbnail_uri = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+        // $original_uri = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
+        $thumbnail_uri = file_create_url(image_style_url('medium', $image_url['uri']));
+        $original_uri = file_create_url($image_url['uri']);
 
         // $images[$multi_image_field_entity->item_id] = array("thumbnail_uri" => $thumbnail_uri, "original_uri" => $original_uri);
 
@@ -13822,7 +13521,8 @@ function getNameImageURLFriend($friend_id){
 
   $friend_profile_image_url = "";
   if(isset($friend_profile->field_profile_image[LANGUAGE_NONE])){
-    $friend_profile_image_url = substr(file_create_url(image_style_url('medium', $friend_profile->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+    // $friend_profile_image_url = substr(file_create_url(image_style_url('medium', $friend_profile->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+    $friend_profile_image_url = file_create_url(image_style_url('medium', $friend_profile->field_profile_image[LANGUAGE_NONE][0]['uri']));
   }
 
   return array('friend_id'=>$friend_id, 'friend_name'=>$friend_profile_name, 'friend_image_url'=>$friend_profile_image_url);
@@ -14066,7 +13766,9 @@ function create_chat_group(){
                   "name"       => $param_name,
                   "creator_id" => $param_uid,
                   "members"    => $f_members,
-                  "image_url"  => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url'])));
+                  // "image_url"  => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
+                  "image_url"  => file_create_url(image_style_url('medium', $image_url['uri']))
+                );
 
   $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_CHAT_GROUPS . '/' . $node->nid, $f_item);
 
@@ -14237,7 +13939,8 @@ function create_group_chat_1(){
       $value = array(
         "chat_id"  => $chat_id,               // เป็น chat_id ของ group           
         "name"     => $name,
-        "image_url"=> substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url'])),
+        // "image_url"=> substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url'])),
+        "image_url"=> file_create_url(image_style_url('medium', $image_url['uri'])),
         "group_id" => $friend_group_id,
         "owner_id" => $uid,
         "status"   => 'active'
@@ -14284,7 +13987,8 @@ function create_group_chat_1(){
       "chat_id"  => $chat_id,               // เป็น chat_id ของ group           
       "name"     => $name,
       // เราจะไม่เอา path host เราจะเอาเฉพาะ ex. /sites/default/files/20171003_570645200.png
-      "image_url"=> substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url'])),
+      // "image_url"=> substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url'])),
+      "image_url"=> file_create_url(image_style_url('medium', $image_url['uri'])),
       "members"  => $members,
       "owner_id" => $uid,
       "status"   => 'active'
@@ -14299,1179 +14003,3 @@ function create_group_chat_1(){
 
   return  $result;
 }
-
-/*
-  สร้าง Class ของแต่ละ Account
-*/
-function create_class(){
-  $result = array();
-
-  if (!check_header()) {
-    $result['result'] = FALSE;
-    $result['message']= "check_header()";
-    return $result;
-  }
-
-  if (empty($_REQUEST['uid']) || empty($_REQUEST['fction'])|| empty($_REQUEST['name']) ) {
-    $result['result'] = FALSE;
-    $result['message']  = "function : create_class, parameter";
-    $result['_REQUEST'] = $_REQUEST;
-    return $result;
-  }
-
-  global $firebase;
-
-  $uid    = $_REQUEST['uid'];
-  $fction = $_REQUEST['fction'];
-  $item_id= $_REQUEST['item_id'];
-  $name   = $_REQUEST['name'];
-  // $image  = $_REQUEST['image'];
-
-  switch ($fction) {
-    case 'add':{
-        $profile = profile2_by_uid_load($uid, 'main');
-
-        $values = array();
-        $values['field_name'] = 'field_field_my_class'; 
-
-        /*
-        $image_url = array();
-        if($image != ""){
-
-          // http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
-          $binary = base64_decode($image);
-
-          //Create the directory if it does not already exist, otherwise check the permissions
-          $directory = 'public://';
-          file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
-
-          $currentDate = date("Ymd");
-          $file_name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
-          
-          //Saves a file to the specified destination and creates a database entry.
-          $image_url= (array)klovers_file_save_data($uid, $binary, $directory. '/' . $file_name, FILE_EXISTS_RENAME);
-        */
-
-        $image_url = array();
-        if(!empty($_FILES["idna"])){
-          // http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
-          $binary =  file_get_contents($_FILES["idna"]["tmp_name"]);//base64_decode($image);
-
-          //Create the directory if it does not already exist, otherwise check the permissions
-          $directory = 'public://';
-          file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
-
-          $currentDate = date("Ymd");
-          $file_name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
-          
-          //Saves a file to the specified destination and creates a database entry.
-          $image_url = (array)klovers_file_save_data($uid, $binary, $directory. '/' . $file_name, FILE_EXISTS_RENAME);
-
-          // save รูป profile
-          // $profile->field_profile_image[LANGUAGE_NONE][0] = (array)$file;
-
-          // #1 field_name_group
-          $values['field_class_name'][LANGUAGE_NONE][0]['value'] = $name;
-
-          // #2 field_class_image_profile
-          $values['field_class_image_profile'][LANGUAGE_NONE][0] = $image_url;
-
-          $values['field_is_default'][LANGUAGE_NONE][0]['value'] = "0";
-          
-      
-          // Create the field collection entry and associate it with the profile
-          $field_entity = entity_create('field_collection_item', $values);
-          $field_entity->setHostEntity('profile2', $profile);
-          $field_entity->save();
-         
-          // เป็น node id ของ group
-          $item_id = $field_entity->item_id;
-
-          // $url = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
-          $value = array(      
-              "name"     => $name,
-              "is_defualt"=>"0",
-              "image_url"=> substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
-          );
-
-          $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $uid . '/' . PATH_CLASSS . '/' . $item_id . '/' , $value);
-
-          $result['result'] = TRUE;
-          $result['item_id']= $item_id;
-          $result['value']  = $value;
-          $result['fction'] = $fction;
-
-          return  $result;
-
-        }else{
-          $result['result'] = FALSE;
-          return  $result;
-        }
-      }
-      break;
-
-    case 'edit':{
-        // field_field_my_class
-
-        $item_load = field_collection_item_load($item_id);
-        if ($item_load) {
-          $wrapper = entity_metadata_wrapper('field_collection_item', $item_load);
-
-          if(strcmp($item_load->field_class_name[LANGUAGE_NONE][0]['value'], $name) !== 0){
-            $wrapper->field_class_name->set($name);
-          }   
-
-          $value = array();
-
-          $value["name"]    = $name;
-
-          /*
-          if($image != ""){
-            // http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
-            $binary = base64_decode($image);
-
-            //Create the directory if it does not already exist, otherwise check the permissions
-            $directory = 'public://';
-            file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
-
-            $currentDate = date("Ymd");
-            $name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
-            
-            //Saves a file to the specified destination and creates a database entry.
-            $image_url= (array)klovers_file_save_data($uid, $binary, $directory. '/' . $name, FILE_EXISTS_RENAME);
-            */
-
-          $image_url = array();
-          if(!empty($_FILES["idna"])){
-            // http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
-            $binary =  file_get_contents($_FILES["idna"]["tmp_name"]);//base64_decode($image);
-
-            //Create the directory if it does not already exist, otherwise check the permissions
-            $directory = 'public://';
-            file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
-
-            $currentDate = date("Ymd");
-            $file_name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
-            
-            //Saves a file to the specified destination and creates a database entry.
-            $image_url = (array)klovers_file_save_data($uid, $binary, $directory. '/' . $file_name, FILE_EXISTS_RENAME);
-
-            // save รูป profile
-            // $profile->field_profile_image[LANGUAGE_NONE][0] = (array)$file;
-
-            $wrapper->field_class_image_profile->set($image_url);
-            $value['image_url'] =  substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
-
-          }
-
-          $wrapper->save();
-            
-          $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $uid . '/' . PATH_CLASSS . '/' . $item_id .'/' , $value);
-
-          $result['result'] = TRUE;
-          $result['item_id']= $item_id;
-          $result['value']  = $value;
-          $result['fction'] = $fction;
-          return  $result;
-        }
-      }
-      break;
-    
-    default:
-      # code...
-      break;
-  }
-
-}
-
-
-/**
- ถุกเรียกใช้ firebase เท่านั้น
-*/
-function update_user_chat_group(){
-  $result = array();
-
-  if (!check_header()) {
-    $result['result'] = FALSE;
-    $result['message']= "check_header()";
-    return $result;
-  }
-
-  /*
-  if (empty($_REQUEST['uid']) || empty($_REQUEST['group_id']) || empty($_REQUEST['data'])) {
-    $result['result'] = FALSE;
-    $result['message']  = "function : update_user_chat_group, parameter";
-    return $result;
-  }
-  */
-
-  $param = json_decode(file_get_contents('php://input'), true);
-  if (empty($param['uid']) || empty($param['chat_group_id']) || empty($param['data'])) {
-    $result['result'] = FALSE;
-    $result['message'] = "function update_user_chat_group : parameter";
-    return $result;
-  }
-
-  global $firebase;
-  $uid      = $param['uid'];
-  $chat_group_id = $param['chat_group_id'];
-  $data     = $param['data'];
-
-  
-  // การ Update Profile types > field_chat_group > field_mg_status
-  $chat_group_item = field_collection_item_load($data['item_id']);
-  $chat_group_wrapper = entity_metadata_wrapper('field_collection_item', $chat_group_item);
-  $chat_group_wrapper->field_mg_status->set($data['status']);
-  $chat_group_wrapper->save();
-
-  // Update node {chat_group} > field_members_group > field_mg_status
-
-// field_members_group
-  $i = array();
-  $path = '';
-  $chat_group_node = node_load($chat_group_id);
-  foreach ($chat_group_node->field_members_group[LANGUAGE_NONE] as $chat_group_k => $chat_group_v) {
-    $i[] = $chat_group_v['value'];
-    $chat_group_item_load = field_collection_item_load($chat_group_v['value']);
-    if (strcasecmp($chat_group_item_load->field_members_group_friend_id[LANGUAGE_NONE][0]['value'], $uid) == 0) {
-      $chat_group_item_load_wrapper = entity_metadata_wrapper('field_collection_item', $chat_group_item_load);
-      $chat_group_item_load_wrapper->field_mg_status->set($data['status']);
-      $chat_group_item_load_wrapper->save();
-
-      // Update firebase idna > chat_groups > {node_id} > members > {item_id} > status = $data['status']
-      $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_CHAT_GROUPS . '/' . $chat_group_id .'/members/'. $chat_group_v['value'] .'/', array('status'=>$data['status']));
-
-      $path  = FIREBASE_DEFAULT_PATH . FIREBASE_CHAT_GROUPS . '/' . $chat_group_id .'/members/'. $chat_group_v['value'] .'/';
-
-      break;
-    }
-  }
-
-  $result['path'] =$path;
-  $result['i']    =$i;
-
-  $result['result'] = TRUE;
-  $result['$param'] = $param;
-  return  $result;
-}
-
-/**
- ถุกเรียกใช้จาก firebase เท่านั้น
- แก้ไข, เพิ่มเติม field friend ของ user
-*/
-function user_for_friend_editupdate(){
-  $result = array();
-
-  if (!check_header()) {
-    $result['result'] = FALSE;
-    $result['message']= "check_header()";
-    return $result;
-  }
-
-  /*
-  if (empty($_REQUEST['uid']) || empty($_REQUEST['friend_id']) || empty($_REQUEST['data'])) {
-    $result['result'] = FALSE;
-    $result['message']  = "function : user_for_friend_editupdate, parameter";
-    return $result;
-  }
-
-  global $firebase;
-
-  $uid        = $_REQUEST['uid'];
-  $friend_id  = $_REQUEST['friend_id'];
-  $data     = $_REQUEST['data'];
-  */
-
-  $param = json_decode(file_get_contents('php://input'), true);
-  if (empty($param['uid']) || empty($param['friend_id']) || empty($param['data'])) {
-    $result['result'] = FALSE;
-    $result['message'] = "function update_friend_of_user : parameter";
-    return $result;
-  }
-
-  $uid        = $param['uid'];
-  $friend_id  = $param['friend_id'];
-  $data       = $param['data'];
-
-  /*
-  // ลบ group ออกตาม group id
-  $data_item_load = field_collection_item_load($_REQUEST['group_id']);
-
-  $wrapper = entity_metadata_wrapper('field_collection_item', $data_item_load);    
-  entity_delete_multiple('field_collection_item', array($wrapper->getIdentifier()));
-  */
-
-  if (!array_key_exists("item_id", $data)) {
-    # code...
-    $result['result'] = FALSE;
-    return $result;
-  }
-
-  $item_id = $data['item_id'];
-
-  $data_item = field_collection_item_load($item_id);
-  if ($data_item) {
-      $wrapper = entity_metadata_wrapper('field_collection_item', $data_item);
-
-      if (array_key_exists('block', $data)) {
-        if (strcmp($wrapper->field_profile_friends_is_block->value(), $data['block']) != 0) {
-          $wrapper->field_profile_friends_is_block->set($data['block']);
-          $wrapper->save();
-        }
-      }else{
-        $wrapper->field_profile_friends_is_block->set("0");
-        $wrapper->save();
-      }
-
-      if (array_key_exists('hide', $data)) {
-        if (strcmp($wrapper->field_profile_friends_is_hide->value(), $data['hide']) != 0) {
-          $wrapper->field_profile_friends_is_hide->set($data['hide']);
-          $wrapper->save();
-        }
-      }else{
-        $wrapper->field_profile_friends_is_hide->set("0");
-        $wrapper->save();
-      }
-
-      if (array_key_exists('change_friends_name', $data)) {
-        if (strcmp($wrapper->field_change_friend_name->value(), $data['change_friends_name']) != 0) {
-          $wrapper->field_change_friend_name->set($data['change_friends_name']);
-          $wrapper->save();
-        }
-      }else{
-        $wrapper->field_change_friend_name->set("");
-        $wrapper->save();
-      }
-
-
-      if (array_key_exists('classs', $data)) {
-        if (strcmp($wrapper->field_profile_friend_classs->value(), $data['classs']) != 0) {
-          $wrapper->field_profile_friend_classs->set($data['classs']);
-          $wrapper->save();
-        }
-      }else{
-        $wrapper->field_profile_friend_classs->set("");
-        $wrapper->save();
-      }
-
-      if (array_key_exists('status', $data)) {
-
-        // watchdog(TAG, '<< ||| >> : %account', array('%account'=> $wrapper->field_friend_status->value()->tid), WATCHDOG_INFO);
-
-       if (strcmp($wrapper->field_friend_status->value()->tid, $data['status']) != 0) {
-          $wrapper->field_friend_status->set($data['status']);
-          $wrapper->save();
-
-
-          /*
-          เราต้องมาวิเคราะห์ status ด้วย
-
-          มาถึงขั้นตอนนี้เรา ต้องการ update 2 จุด คือ update database ของเพือน และ firebase ของเพือน
-               
-          switch ($data['status']) {
-            case FRIEND_STATUS_FRIEND:{
-
-                  // load profile ของเพือนขึ้นมา
-                  $profile_friend = profile2_by_uid_load($friend_id, 'main');
-
-                  foreach ($profile_friend->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
-                    // Build array of field collection values.
-
-                    $val = field_collection_item_load($value['value']);
-
-                    // จะดึงที่ field_friend_uid = $uid แก้ใข friend status
-                    if($val->field_friend_uid[LANGUAGE_NONE][0]['value'] == $_POST['uid_friend']){
-                      $wrapper = entity_metadata_wrapper('field_collection_item', $val);
-                      $wrapper->field_friend_status->set($data['status']);
-                      $wrapper->save();
-
-                      $values = array(
-                          "status" => FRIEND_STATUS_FRIEND,
-                          "update" => time()
-                        );
-                      $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $friend_id . '/friends/', $values);
-                    }
-                  }
-              }
-              break;
-            
-            default:
-              # code...
-              break;
-          }
-          */
-
-          
-        }
-      }
-
-      if (array_key_exists('favorite', $data)) {
-        if (strcmp($wrapper->field_profile_friends_favorite->value(), $data['favorite']) != 0) {
-          $wrapper->field_profile_friends_favorite->set($data['favorite']);
-          $wrapper->save();
-        }
-      }
-  }
-
-  $result['result'] = TRUE;
-  return  $result;
-}
-
-/**
- ถุกเรียกใช้จาก firebase เท่านั้น
- ลบเพือน
-*/
-function user_for_friend_delete(){
-  $result = array();
-
-  if (!check_header()) {
-    $result['result'] = FALSE;
-    $result['message']= "check_header()";
-    return $result;
-  }
-
-  // watchdog(TAG, 'user_for_friend_delete header: %header', array('%header'=> serialize($_REQUEST)), WATCHDOG_INFO);
-
-
-  if (empty($_REQUEST['uid']) || empty($_REQUEST['friend_id'])) {
-    $result['result'] = FALSE;
-    $result['message']  = "function : user_for_friend_delete, parameter";
-    return $result;
-  }
-
-  global $firebase;
-  $uid        = $_REQUEST['uid'];
-  $friend_id  = $_REQUEST['friend_id'];
-
-  // # 1 -- เป็นการลบเพือนของเราที่ friend_id ตรงกัน
-  $profile = profile2_by_uid_load($uid, 'main');
-  foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
-    // ดึงเพือนมาทั้งหมด
-    $data_item_load = field_collection_item_load($value['value']);
-    if (strcmp($data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'], $friend_id) == 0) {
-      $wrapper = entity_metadata_wrapper('field_collection_item', $data_item_load);    
-      entity_delete_multiple('field_collection_item', array($wrapper->getIdentifier()));
-      break;
-    }
-  }
-  // # 1 -- เป็นการลบเพือนของเราที่ friend_id ตรงกัน
-
-  // # 2 -- เป็นการลบเพือนของเพือนที่ uid ตรงกัน
-  $profile = profile2_by_uid_load($friend_id, 'main');
-  foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
-    // ดึงเพือนมาทั้งหมด
-    $data_item_load = field_collection_item_load($value['value']);
-    if (strcmp($data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'], $uid) == 0) {
-      $wrapper = entity_metadata_wrapper('field_collection_item', $data_item_load);    
-      entity_delete_multiple('field_collection_item', array($wrapper->getIdentifier()));
-      break;
-    }
-  }
-
-  // # 2 -- เป็นการลบเพือนของเพือนที่ uid ตรงกัน
-
-  $result['result']   = TRUE;
-  return $result;
-}
-
-/** 
- ถุกเรียกใช้ firebase เท่านั้น. delete_member_group_chat
-*/
-function delete_chat_group(){
-  $result = array();
-
-  if (!check_header()) {
-    $result['result'] = FALSE;
-    $result['message']= "check_header()";
-    return $result;
-  }
-
-  /*
-  if (empty($_REQUEST['uid']) || empty($_REQUEST['group_id'])) { // 
-    $result['result'] = FALSE;
-    $result['message']  = "function : delete_chat_group, parameter";
-    return $result;
-  }
-
-  $uid = $_REQUEST['uid'];
-  $group_id = $_REQUEST['group_id'];
-
-  // ลบ group ออกตาม group id
-  $data_item_load = field_collection_item_load($group_id);
-
-  $wrapper = entity_metadata_wrapper('field_collection_item', $data_item_load);    
-  entity_delete_multiple('field_collection_item', array($wrapper->getIdentifier()));
-  */
-
-  $param = json_decode(file_get_contents('php://input'), true);
-  if (empty($param['chat_group_id']) || empty($param['data']) ) {
-    $result['result'] = FALSE;
-    $result['message'] = "function delete_chat_group : parameter";
-    return $result;
-  }
-
-  global $firebase;
-  $chat_group_id= $param['chat_group_id'];
-  $data         = $param['data'];
-
-
-  node_delete($chat_group_id);
-  watchdog(TAG, 'node_delete > delete_chat_group chat_group_id : %chat_group_id', array('%chat_group_id'=>$chat_group_id), WATCHDOG_INFO);  
-
-  $data_members = $data['members'];
-  foreach ($data_members as $data_members_key => $data_members_value) {
-    $firebase->delete(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $data_members_value['friend_id'] . '/'. PATH_GROUPS .'/' . $chat_group_id);
-  }
-
-  $query    = new EntityFieldQuery();
-  $entities = $query->entityCondition('entity_type', 'field_collection_item')
-                ->entityCondition('bundle', 'field_chat_group')
-                ->fieldCondition('field_group_id', 'value', $chat_group_id, '=')
-                ->execute();
-
-  if (!empty($entities['field_collection_item'])) {
-    // $item_id = array_keys($entities['field_collection_item'])[0];
-    // $data_item = field_collection_item_load($item_id);
-
-    // $wrapper = entity_metadata_wrapper('field_collection_item', $data_item);
-    // $wrapper->field_twilio_room_sid->set($RoomSid);
-    // $wrapper->field_twilio_room_status->set($_REQUEST['StatusCallbackEvent']);
-    // $wrapper->save();
-
-    $items =  array_keys($entities['field_collection_item']);
-    foreach ($items as $key => $value) {
-      entity_delete_multiple('field_collection_item', array($value));
-    }
-  }
-
-  // ลบ ข้อมูล Conversation
-  $conversations_query  = new EntityFieldQuery();
-  $conversations_result = $conversations_query->entityCondition('entity_type', 'node')
-                          ->entityCondition('bundle', 'conversation')
-                          ->propertyCondition('title', $data['chat_id'], '=')
-                          // ->propertyCondition('status', 1)
-                          ->execute();
-
-  $conversations = array();
-  if (!empty($conversations_result['node'])) {
-    $conversations_nids = array_keys($conversations_result['node']);
-
-    foreach ($conversations_nids as $conversations_key => $conversations_nid) { 
-      node_delete($conversations_nid);  
-
-      watchdog(TAG, 'node_delete > delete_chat_group conversations_nid : %conversations_nid', array('%conversations_nid'=>$conversations_nid), WATCHDOG_INFO);   
-    }
-  }
-  // ลบ ข้อมูล Conversation
-
-
-  // chat_groups
-  $firebase->delete('conversation/' . $data['chat_id']);
-
-
-  $result['result'] = TRUE;
-  $result['param']  = $param;
-  $result['path']   = 'conversation/' . $data['chat_id'];
-  return  $result;
-}
-
-/** 
- ถุกเรียกใช้ firebase เท่านั้น. delete_member_group_chat
-*/
-function delete_member_group_chat(){
-  $result = array();
-
-  if (!check_header()) {
-    $result['result'] = FALSE;
-    $result['message']= "check_header()";
-    return $result;
-  }
-
-  if (empty($_REQUEST['uid']) || empty($_REQUEST['group_id']) || empty($_REQUEST['member_id'])) { // 
-    $result['result'] = FALSE;
-    $result['message']  = "function : delete_member_group_chat, parameter";
-    return $result;
-  }
-
-  $uid = $_REQUEST['uid'];
-  $group_id = $_REQUEST['group_id'];
-  $member_id = $_REQUEST['member_id'];
-
-  // ลบ group ออกตาม group id
-  $data_item_load = field_collection_item_load($member_id);
-
-  $wrapper = entity_metadata_wrapper('field_collection_item', $data_item_load);    
-  entity_delete_multiple('field_collection_item', array($wrapper->getIdentifier()));
-
-  $result['result'] = TRUE;
-  
-  return  $result;
-}
-
-function delete_classs(){
-  $result = array();
-
-  if (!check_header()) {
-    $result['result'] = FALSE;
-    $result['message']= "check_header()";
-    return $result;
-  }
-
-  $param = json_decode(file_get_contents('php://input'), true);
-  if (empty($param['uid']) || empty($param['item_id'])) {
-    $result['result'] = FALSE;
-    $result['message'] = "function delete_center_chat : parameter";
-    return $result;
-  }
-
-  global $firebase;
-  $uid        = $param['uid'];
-  $item_id    = $param['item_id'];
-
-  $profile = profile2_by_uid_load($uid, 'main');
-  foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $profile_key => $profile_value) {
-    $profile_item_load = field_collection_item_load($profile_value['value']);
-
-    if (strcasecmp($profile_item_load->field_profile_friend_classs[LANGUAGE_NONE][0]['value'], $item_id) == 0) {
-      $profile_wrapper = entity_metadata_wrapper('field_collection_item', $profile_item_load);
-      $profile_wrapper->field_profile_friend_classs->set('');
-      $profile_wrapper->save();
-
-
-      $firebase->delete(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $uid . '/friends/' . $profile_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] .'/classs');
-    }
-  }
-
-
-  // ลบ group ออกตาม group id
-  $item_load = field_collection_item_load($item_id);
-  if ($item_load) {
-    # code...
-    $wrapper = entity_metadata_wrapper('field_collection_item', $item_load);    
-    entity_delete_multiple('field_collection_item', array($wrapper->getIdentifier()));
-  }
-
-  $result['result'] = TRUE;
-  return  $result;
-}
-
-function update_picture_chat_group(){ 
-  $result = array();
-  if (!check_header()) {
-    $result['result'] = FALSE;
-    $result['message']= "check_header()";
-    return $result;
-  }
-
-  if (empty($_REQUEST['uid']) || empty($_REQUEST['group_id']) || empty($_FILES["idna"]["tmp_name"])) {
-    $result['result']   = FALSE;
-    $result['message']  = "function : update_picture_chat_group, parameter";
-    $result['_REQUEST'] = $_REQUEST;
-    $result['_FILES']   = $_FILES;
-    return $result;
-  }
-  global $firebase;
-
-  $uid      = $_REQUEST['uid'];
-  $group_id = $_REQUEST['group_id'];
-
-  $time_start = microtime(true);
-
-  // http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
-  $binary =  file_get_contents($_FILES["idna"]["tmp_name"]);//base64_decode($image);
-
-  //Create the directory if it does not already exist, otherwise check the permissions
-  $directory = 'public://';
-  file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
-
-  $currentDate = date("Ymd");
-  $file_name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
-    
-    //Saves a file to the specified destination and creates a database entry.
-  $image_url = (array)klovers_file_save_data($uid, $binary, $directory. '/' . $file_name, FILE_EXISTS_RENAME);
-
-
-  $node         = node_load($group_id);  
-  $node_wrapper = entity_metadata_wrapper('node', $node);
-  $node_wrapper->field_image_chat_group->set($image_url);
-  $node_wrapper->save();
-
-  $uri = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
-  
-  $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_CHAT_GROUPS . '/' . $group_id, array("image_url"=> $uri));
-
-
-  $time_end = microtime(true);
-  $execution_times = number_format(($time_end - $time_start), 2);
-
-  $result['result']     = TRUE;  
-  $result['image_url']  = $uri;
-  $result['execution_times'] = $execution_times;
-
-  return $result;
-}
-
-function group_invite_new_members(){
-  $result = array();
-
-  if (!check_header()) {
-    $result['result'] = FALSE;
-    $result['message']= "check_header()";
-    return $result;
-  }
-
-  if (empty($_REQUEST['uid']) || empty($_REQUEST['group_id']) || empty($_REQUEST['members'])) {
-    $result['result'] = FALSE;
-    $result['message']  = "function : group_invite_new_members, parameter";
-    return $result;
-  }
-
-  global $firebase;
-  $param_uid      = $_REQUEST['uid'];
-  $param_group_id = $_REQUEST['group_id'];
-  $param_members  = (array)json_decode($_REQUEST['members']);
-
-  $time_start     = microtime(true);
-
-  $members_group_node = node_load($param_group_id);
-  // $node_wrapper = entity_metadata_wrapper('node', $node);
-  // $node_wrapper->field_key_token_notification->set($token);
-
-
-  // $node_wrapper->save();
-
-  // 
-  $f_members = array();
-
-  $members   = array_keys($param_members);
-  foreach ($members as $members_key => $members_friend_id){
-    $flag = FALSE;
-    if (!empty($members_group_node->field_members_group[LANGUAGE_NONE])) {
-      foreach ($members_group_node->field_members_group[LANGUAGE_NONE] as $members_group_k => $members_group_v) {
-        $members_group_item_load = field_collection_item_load($members_group_v['value']);
-        if (strcasecmp($members_group_item_load->field_members_group_friend_id[LANGUAGE_NONE][0]['value'], $members_friend_id) == 0) {
-          $flag = TRUE;
-          break;
-        }
-      }
-    }
-
-    if (!$flag) {
-      
-      $m_profile = getNameImageURLFriend($members_friend_id);
-      // $m_profile['status'] = '35';
-      // $f_members[$member_field_entity->item_id] = $m_profile;
-
-      $member_v = array();
-      $member_v['field_name'] = 'field_members_group';
-      $member_v['field_members_group_friend_id'][LANGUAGE_NONE][0]['value']  = $members_friend_id;
-      $member_v['field_members_group_friend_name'][LANGUAGE_NONE][0]['value']= $m_profile['friend_name'];
-      $member_v['field_path_uri'][LANGUAGE_NONE][0]['value']                 = $m_profile['friend_image_url'];
-      $member_v['field_mg_status'][LANGUAGE_NONE][0]['tid']                  = '35';
-
-      $member_field_entity = entity_create('field_collection_item', $member_v);
-      $member_field_entity->setHostEntity('node', $members_group_node);
-      $member_field_entity->save();
-
-
-
-
-
-  // โหลดเพือนขึ้นมาเพือบันทึก field_chat_group
-      $members_friend_profile = profile2_by_uid_load($members_friend_id, 'main');
-
-      $members_friend_v = array();
-      $members_friend_v['field_name'] = 'field_chat_group';
-      $members_friend_v['field_group_id'][LANGUAGE_NONE][0]['value']  = $param_group_id;
-      $members_friend_v['field_mg_status'][LANGUAGE_NONE][0]['tid']   = '35';
-
-      // Create the field collection entry and associate it with the profile
-      $members_friend_field_entity = entity_create('field_collection_item', $members_friend_v);
-      $members_friend_field_entity->setHostEntity('profile2', $members_friend_profile);
-      $members_friend_field_entity->save();
-
-
-      $f_v = array( "item_id"  => $member_field_entity->item_id,
-                    "status"   => '35'
-              );
-
-      // เป็นการ insert /idna/user/{friend_id}}/groups/{group_id}
-      $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $members_friend_id . '/' . PATH_GROUPS . '/' . $param_group_id . '/' , $f_v);
-
-      // เป็นการ update members /idna/chat_groups/{node_id}/
-      $m_profile['status'] = '35';
-      $f_members[$member_field_entity->item_id] = $m_profile;
-
-      $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_CHAT_GROUPS . '/' . $param_group_id .'/members/' . $member_field_entity->item_id .'/', $m_profile);
-
-
-
-      /// send notification
-
-      $user_profile   = profile2_by_uid_load($members_group_node->uid, 'main');
-      $friend_profile = profile2_by_uid_load($members_friend_id, 'main');
-
-      foreach ($friend_profile->field_device_access[LANGUAGE_NONE] as $k => $v) {
-        $item_load_device_access = field_collection_item_load($v['value']);
-
-        // $result['token_notification'] = $item_load_device_access->field_key_token_notification[LANGUAGE_NONE][0]['value'];
-
-        if($item_load_device_access->field_key_token_notification[LANGUAGE_NONE][0]['value'] != ""){
-          // $item_load_device_access->field_key_token_notification[LANGUAGE_NONE][0]['value'];
-
-          if (empty($friend_profile->field_profile_badge[LANGUAGE_NONE][0]['value'])) {
-            # code...
-            $badge = '1';
-          }else{
-            $badge = $friend_profile->field_profile_badge[LANGUAGE_NONE][0]['value'] + 1;
-          }
-
-          // update บันทึก badge
-          // $wrapper = entity_metadata_wrapper('field_collection_item', $item_load_device_access);
-          // $wrapper->field_profile_badge->set($badge);   
-          // $wrapper->save();
-
-          $friend_profile->field_profile_badge[LANGUAGE_NONE][0]['value'] = $badge;
-          profile2_save($friend_profile);
-
-
-          $friend_name = $user_profile->field_profile_display_name[LANGUAGE_NONE][0]['value'];
-
-          $message = $friend_name .' send request group ' . $members_group_node->title. '.';
-
-          $sval = array('type'=>'request_group',
-                        'friend_id'=>$members_group_node->uid,
-                        'friend_name'=>$friend_name);
-
-          send_push_notification($item_load_device_access->field_key_token_notification[LANGUAGE_NONE][0]['value'], '', $message, $sval, $badge);
-
-        }
-      }
-      /// send notification
-    }
-  }
-
-  $time_end       = microtime(true);
-  $execution_time = number_format(($time_end - $time_start), 2);
-
-  $result['result']          = TRUE;
-  $result['new_members']     = $f_members;
-  $result['execution_time']  = $execution_time;
-  return  $result;
-}
-
-/*
-  สร้าง QRCode &  profile ที่ firebase ให้แต่ละ user โดยแต่ละ application (heart, dna)
-
-  $account : user account
-  $bundleidentifier : heart.idna or heart.dna
-  $url     : url app store[heart, dna](ios), play store[heart, dna](android)
-*/
-function generatorQRCode($account, $platform, $bundleidentifier){
-  try {
-    $file = array();
-        
-    // Gen QRCode
-    //set it to writable location, a place for temp generated PNG files
-    $PNG_TEMP_DIR = PATH_FOLDER_QRCODE;//config_pages_get(CONFIG_PAGES_TYPE, 'field_path_folder_qrcode'); 
-
-    //Create the directory if it does not already exist, otherwise check the permissions
-    file_prepare_directory($PNG_TEMP_DIR, FILE_CREATE_DIRECTORY);
-
-    $text     = dec_enc('encrypt', $account->uid);
-    $errorCorrectionLevel = "M";
-    $matrixPointSize = 8;
-
-    // Create Profile2
-    // Where 'main' is your profile2 type machine name.
-    $profile = profile2_create(array('type' => 'main', 'uid' => $account->uid));
-
-    // add field name
-    $profile->field_profile_name[LANGUAGE_NONE][0]['value'] = $account->name;
-
-    // Display name
-    $profile->field_profile_display_name[LANGUAGE_NONE][0]['value'] = $account->name;
-
-    // จำนวน heart
-    // $profile->field_profile_heart[LANGUAGE_NONE][0]['value'] = DEFUALT_NUMBER_HEART;
-
-    // status message
-    $profile->field_profile_status_message[LANGUAGE_NONE][0]['value'] = 'status message';
-
-    /*
-    เราจะแยกออกกัน ระหว่าง heart, dna เพราะว่าต้อง scan qrcode มันต้องวิ่งไปเปด store ถูกเพราะว่าเราแยก app กัน
-    */
-    switch ($bundleidentifier) {
-      // iDNA
-      case BUNDLE_IDENTIFIER:
-      {
-        // ios
-        $filename = $PNG_TEMP_DIR.'/'.md5($text.'|'.$errorCorrectionLevel.'|'.$matrixPointSize).'.png';
-        QRcode::png(URL_SERVER() . "/qe?&bi=" . dec_enc('encrypt', BUNDLE_IDENTIFIER)  . "&bii=" . $text, $filename, $errorCorrectionLevel, $matrixPointSize, 2);  
-
-        $currentDate = date("Ymd");
-        $name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
-        $image = file_get_contents($filename); 
-        //Saves a file to the specified destination and creates a database entry.
-        $file = klovers_file_save_data($account->uid, $image, 'public://qrcode/' . $name, FILE_EXISTS_RENAME);
-        
-        // Delete file ที่  QRCode  สร้างขึ้นมาเพราะว่าเราเก็บเข้าระบบแล้ว
-        unlink($filename);
-        // Gen QRCode
-
-        $profile->field_profile_my_qrcode[LANGUAGE_NONE][0] = (array)$file;
-
-
-        /*
-        // android 
-        $filename = $PNG_TEMP_DIR.'/'.md5($text.'|'.$errorCorrectionLevel.'|'.$matrixPointSize).'.png';
-        QRcode::png(URL_SERVER() . "/qe?&bi=" . dec_enc('encrypt',BI_ANDROID_IDNA) . "&bii=" . $text, $filename, $errorCorrectionLevel, $matrixPointSize, 2);  
-
-        $currentDate = date("Ymd");
-        $name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
-        $image = file_get_contents($filename); 
-        //Saves a file to the specified destination and creates a database entry.
-        $file = klovers_file_save_data($account->uid, $image, 'public://qrcode/' . $name, FILE_EXISTS_RENAME);
-        
-        // Delete file ที่  QRCode  สร้างขึ้นมาเพราะว่าเราเก็บเข้าระบบแล้ว
-        unlink($filename);
-        // Gen QRCode
-        */
-
-        // $profile->field_profile_my_qrcode_dna_andr[LANGUAGE_NONE][0] = (array)$file;
-        
-        break;
-      }
-      
-      default:
-        # code...
-        break;
-    }
-
-    $value['field_name'] = 'field_profile_multi_email'; // field collection name
-    $value['field_email_text'][LANGUAGE_NONE][0]['value'] = $account->mail;
-
-    // Create the field collection entry and associate it with the profile
-    $field_entity = entity_create('field_collection_item', $value);
-    $field_entity->setHostEntity('profile2', $profile);
-    $field_entity->save();
-
-    // Save the profile2 to the user account.
-    profile2_save($profile); 
-  } catch (Exception $e) {
-    watchdog("idna", 'Erorr = %message', array('%message' => $e->getMessage()), WATCHDOG_ERROR);
-  }
-}
-
-
-
-/*
- เป็นการ redirect url store
-*/ 
-function qe(){
-  $detect = mobile_detect_get_object();
-  switch (dec_enc('decrypt', $_REQUEST['bi'])) {
-      case BUNDLE_IDENTIFIER:{  // 
-        if($detect->is('iPod') || $detect->is('iPhone') || $detect->is('iPad')){
-          header('Location: ' . DEFUALT_IOS_URL_STORE_IDNA); // <-apple store link here
-        }else if($detect->is('Android')){ 
-          header('Location: ' . DEFUALT_ANDROID_URL_STORE_IDNA); // <-play store link here
-        }
-        break;
-      }
-      
-      default:{
-        header('Location: ' . $GLOBALS['base_url']); 
-      }
-        break;
-  }
-}
-
-// การกำหนด my id
-function setDefualtMyID($profile, $my_id){
-  $value = array();
-  $value['field_name'] = 'field_profile_my_id'; // field collection name
-
-  $value['field_profile_my_id_value'][LANGUAGE_NONE][0]['value'] = $my_id;
-  $value['field_profile_my_id_is_edit'][LANGUAGE_NONE][0]['value'] = "1";
-
-  // Create the field collection entry and associate it with the profile
-  $field_entity = entity_create('field_collection_item', $value);
-  $field_entity->setHostEntity('profile2', $profile);
-  $field_entity->save();
-
-  return $field_entity->item_id;
-}
-
-// sound_call_waiting
-function setDefualtSoundCallWaiting($profile){
-  $value = array();
-  $value['field_name'] = 'field_sound_call_waiting';
-  $value['field_sound_call_waiting_item_id'][LANGUAGE_NONE][0]['value'] = '396';
-  $value['field_sound_call_waiting_title'][LANGUAGE_NONE][0]['value']    = "Default Sound Call waiting";
-  $value['field_sound_call_waiting_uri'][LANGUAGE_NONE][0]['value']     = "/sites/default/files/sound_call_waiting/sexiest_romantic_mp3.mp3";
-
-  $field_entity = entity_create('field_collection_item', $value);
-  $field_entity->setHostEntity('profile2', $profile);
-  $field_entity->save();
-
-  return $field_entity->item_id;
-}
-
-function setDefualtBadges($profile){
-  $values = array();
-  $values['field_name'] = 'field_profile_badges';
-  $values['field_profile_badge_contact'][LANGUAGE_NONE][0]['value'] = "0";
-  $values['field_profile_badge_recent'][LANGUAGE_NONE][0]['value']  = "0";
-  $values['field_profile_badge_center'][LANGUAGE_NONE][0]['value']  = "0";
-  $values['field_profile_badge_setting'][LANGUAGE_NONE][0]['value'] = "0";
-
-  $field_entity = entity_create('field_collection_item', $values);
-  $field_entity->setHostEntity('profile2', $profile);
-  $field_entity->save();
-
-  return $field_entity->item_id;
-}
-
-/* 
- การสร้าง defualt classs ให้แต่ละ user โดยจะดึงมาจาก node content_type == 'defualt_classs', status == 1
-*/
-function setDefualtClasss($profile){
-  global $firebase;
-
-  $content_type = "defualt_classs";
-
-  $query  = new EntityFieldQuery();
-  $result = $query->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', $content_type)
-    ->propertyCondition('status', 1)
-    ->execute();
-
-  if (!empty($result['node'])) {
-    $nids = array_keys($result['node']);
-    foreach ($nids as $key => $nid) {
-      $node = node_load($nid);
-
-      $image_arr = (array)file_load($node->field_class_image_profile[LANGUAGE_NONE][0]['fid']);
-
-
-      $values = array();
-      $values['field_name'] = 'field_field_my_class'; // field_field_my_class
-      $values['field_class_name'][LANGUAGE_NONE][0]['value'] = $node->title;
-      $values['field_class_image_profile'][LANGUAGE_NONE][0] = $image_arr;
-      $values['field_is_default'][LANGUAGE_NONE][0]['value'] = "1";
-
-
-      // Create the field collection entry and associate it with the profile
-      $field_entity = entity_create('field_collection_item', $values);
-      $field_entity->setHostEntity('profile2', $profile);
-      $field_entity->save();
-     
-      // เป็น node id ของ group
-      $item_id = $field_entity->item_id;
-
-      // 
-      $value_classs = array(      
-          "nid"      => $nid,
-          "name"     => $node->title,
-          "is_default" => "1",
-          "image_url"=> substr(file_create_url(image_style_url('medium', $image_arr['uri'])), strlen($GLOBALS['base_url']))
-      );
-
-      $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $profile->uid . '/' . PATH_CLASSS . '/' . $item_id . '/' , $value_classs);
-
-      // watchdog(TAG, '2. DefualtClasss header : %profile', array('%profile'=>serialize($profile)), WATCHDOG_INFO);
-
-    }
-  }
-}
-
-
-function getDefualtPictureProfileMyApplication(){
-  $info = field_info_field('field_my_app_picture');
-  if (!empty($info) && $info['settings']['default_image'] > 0) {
-      $default_img_fid  = $info['settings']['default_image'];
-      return file_load($default_img_fid);
-
-      // return substr(file_create_url(image_style_url('medium', $default_img_file->uri)), strlen($GLOBALS['base_url']));
-  }
-
-  return;
-}
-
-
-function getDefualtProfilePicture(){
-  $info = field_info_field('field_profile_image');
-  if (!empty($info) && $info['settings']['default_image'] > 0) {
-      $default_img_fid  = $info['settings']['default_image'];
-      $default_img_file = file_load($default_img_fid);
-
-      return substr(file_create_url(image_style_url('medium', $default_img_file->uri)), strlen($GLOBALS['base_url']));
-  }
-
-  return;
-}
-
-// card_background
-function getDefualtBackgroundCardPicture(){
-  $info = field_info_field('field_picture_bg');
-  if (!empty($info) && $info['settings']['default_image'] > 0) {
-      $default_img_fid  = $info['settings']['default_image'];
-      $default_img_file = file_load($default_img_fid);
-
-      return substr(file_create_url(image_style_url('medium', $default_img_file->uri)), strlen($GLOBALS['base_url']));
-  }
-
-  return;
-}
-
-/*
-  $tid เราจะ fix ลงไป
-  34 : รูป family class
-  33 : รูป friend class
-  32 : รูปแอพพลิเคชั่น
-  30 : รูปโปรไฟล์
-  31 : รูปพื้นหลังของนามบัตร
-*/
-function get_defualt_picture($tid){
-  watchdog(TAG, 'get_defualt_picture ', array(), WATCHDOG_INFO);
-  $tree = taxonomy_get_tree(taxonomy_vocabulary_machine_name_load('defualt_picture')->vid);
-  foreach ($tree as $term) {
-    if ($term->tid == $tid) {
-      $term = taxonomy_term_load($term->tid);
-      return file_load($term->field_image[LANGUAGE_NONE][0]['fid']);
-    }
-  }
-  return;
-}
-
-function get_creator($entity, $uid){
-  if (!IsNullOrEmptyString($uid)) {
-    $profile = profile2_by_uid_load($uid, 'main');
-
-    $name    = $profile->field_profile_name[LANGUAGE_NONE][0]['value'];
-
-    $image_url = "";
-    if(isset($profile->field_profile_image[LANGUAGE_NONE])){
-      $image_url = substr(file_create_url(image_style_url('medium', $profile->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
-    }
-
-    $time = (string)time();
-
-    $val = array();
-    $val['field_name'] = 'field_creator';
-    $val['field_creator_uid'][LANGUAGE_NONE][0]['value']         = $uid;
-    $val['field_creator_name'][LANGUAGE_NONE][0]['value']        = $name;
-    $val['field_creator_image_uri'][LANGUAGE_NONE][0]['value']   = $image_url;
-    $val['field_creator_time_create'][LANGUAGE_NONE][0]['value'] = $time;
-    $val['field_creator_time_update'][LANGUAGE_NONE][0]['value'] = $time;
-    $multi_image_field_entity = entity_create('field_collection_item', $val);
-    $multi_image_field_entity->setHostEntity('field_creator', $entity);
-    $multi_image_field_entity->save();
-
-    return array("user_id"=>$uid, "name"=>$name, "image_url"=>$image_url, "create"=>$time, "update"=>$time);
-  }
-  return;
-}
-
-

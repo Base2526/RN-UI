@@ -51,19 +51,19 @@ export const actionLogin = ({email, password}) => dispatch => {
 
         // dispatch({ type: LOADING, isLoading:false})
 
-        // console.log(data)
+        console.log(data)
         if((data instanceof Array)){
             // error message
             // alert(data[0])
             dispatch({ type: USER_LOGIN_FAIL, provider: Constant.PROVIDERS.USER, error: data[0] });
 
-            return {'status':false, 'message': data.message}
+            return {'status':false, 'error_message': data[0]}
         }else{
             if(!data.result){
                 // alert(data.message)
                 dispatch({ type: USER_LOGIN_FAIL, provider: Constant.PROVIDERS.USER, error: data.message });
         
-                return {'status':false, 'message': data.message}
+                return {'status':false, 'error_message': data.message}
             }else{
                 // console.log(data.data.friend_profiles)
                 // console.log(data.data.user)
@@ -127,10 +127,12 @@ export const loginWithFacebook = () => {
     }
 }
 
-export const actionLogout = (callback) => dispatch => {
-    console.log('actionLogout')
-    dispatch({ type: USER_LOGOUT});
+export const actionLogout = (dispatch, callback) => {
+    // console.log('actionLogout')
 
+    firebase.database().ref('idna/user/1').off()
+
+    dispatch({ type: USER_LOGOUT});
     callback({'status':true})
 }
 
@@ -295,14 +297,53 @@ export const actionCreateClass = (uid, class_name, uri) => dispatch =>{
     })
 }
 
-export const watchTaskEvent = () => (dispatch) => {
-    firebase.database().ref('/').on('child_added', (snap) => {
+// export const watchTaskEvent = () => {
+//     console.log('-------------- watchTaskEvent()')
+//     firebase.database().ref('idna/user/1').on('value', (snap) => {
+//         // dispatch(addTask(snap.val()));
+
+//         // console.log('value')
+//         console.log(snap.val())
+//     });
+
+    
+
+//     // value' event
+// }
+
+export function watchTaskEvent(uid, dispatch) {
+    // console.log('-------------- watchTaskEvent()')
+    
+    firebase.database().ref('idna/user/' + uid).once('value', (snap) => {
         // dispatch(addTask(snap.val()));
 
-        console.log('child_added')
-        console.log(snap)
+        // console.log('value')
+        console.log(snap.val())
+    });
+
+    firebase.database().ref('idna/user/' + uid).on('child_changed', (snap) => {
+        //   dispatch(addTask(snap.val()));
+
+        console.log(snap.val())
+    });
+
+    // line_id
+    firebase.database().ref('idna/user/' + uid + '/profiles/line_id').on('child_added', (snap) => {
+        //   dispatch(addTask(snap.val()));
+
+        console.log(snap.val())
+    });
+
+    firebase.database().ref('idna/user/' + uid + '/profiles/line_id').on('child_changed', (snap) => {
+        //   dispatch(addTask(snap.val()));
+
+        console.log(snap.val())
     });
 }
+
+// export const watchTaskOff = () => {
+//     firebase.database().ref('idna/user/1').off()
+// }
 
 /*
 export const watchTaskChangedEvent = () => (dispatch) => {

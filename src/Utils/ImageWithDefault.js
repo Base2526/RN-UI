@@ -17,10 +17,12 @@ export default class ImageWithDefault extends React.Component {
         default: {uri:Constant.DEFAULT_AVATARSOURCE_URI}
       };
     }
+
     _onError = (e) => {
-        console.log(e)
+        // console.log(e)
         this.setState({ failed: true });
     }
+    
     render() {
     
       // imageStyle
