@@ -1,4 +1,4 @@
-package com.rn2;
+package idna.ui;
 
 import android.content.Intent;
 import android.os.Bundle;

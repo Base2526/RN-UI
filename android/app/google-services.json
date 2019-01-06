@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:372495115726:android:dba177a0b1ce773a",
         "android_client_info": {
-          "package_name": "com.rn2"
+          "package_name": "idna.ui"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "372495115726-qgumg6cf5nei8sheeoto8hhf18t6kjjg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.rn2",
+            "package_name": "idna.ui",
             "certificate_hash": "d3c57045963bbfd6384850ed0f0b839c781c9c21"
           }
         },
@@ -47,7 +47,7 @@
               "client_id": "372495115726-62g14r8s4rj7d1igi4lfa5k63vveiltk.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.rn2"
+                "bundle_id": "idna.ui"
               }
             }
           ]
