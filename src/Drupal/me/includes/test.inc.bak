@@ -1,0 +1,70 @@
+<?php
+// require 'vendor/autoload.php';
+use Google\Cloud\Firestore\FirestoreClient;
+
+
+function _test_firebase(){
+    $DEFAULT_URL = 'https://rn-ui-a37a1.firebaseio.com';
+    $DEFAULT_TOKEN = 'AIzaSyDvYSOBwJBAuOEBB1NBRq70W9QCy2QDxmo';
+    $DEFAULT_PATH = '/firebase/example';
+    
+    $firebase = new \Firebase\FirebaseLib('https://rn-ui-a37a1.firebaseio.com');
+
+    
+
+    // --- storing an array ---
+    $test = [
+        'foo' => 'bar',
+        'i_love' => 'lamp',
+        'id' => 42
+    ];
+    $dateTime = new DateTime();
+    $i1 = $firebase->set($DEFAULT_PATH . '/' . $dateTime->format('c'), $test);
+
+    // --- storing a string ---
+    $i2 = $firebase->set($DEFAULT_PATH . '/name/contact001', 'John Doe');
+
+    // --- reading the stored string ---
+    $name = $firebase->get($DEFAULT_PATH . '/name/contact001');
+
+    return [$i1, $i2, $name];
+}
+
+function test_function(){
+
+    $db = new FirestoreClient();
+    dpm($db);
+    return t("test_function");
+}
+
+function recheck_sync(){
+
+    $uids = db_select('users', 'ur')
+    ->fields('ur', array('uid'))
+    // ->condition('ur.uid', $uid, '!=')
+    // ->condition('ur.uid', 0, '!=')
+    // ->condition('ur.uid', 1, '!=')
+    ->condition('ur.uid', 0, '!=')
+    ->condition('ur.uid', 1, '!=')
+    // ->condition('ur.uid', $uid, '!=')
+    ->execute()
+    ->fetchCol();
+
+    $mul_users =  user_load_multiple($uids);
+    // dpm($mul_users);
+
+    foreach ($mul_users as $account) {
+        $user_fields = user_load($account->uid);
+        if (!$user_fields->uid) {
+            continue;
+        }
+
+    //   dpm($user_fields->uid);
+
+        dpm(profile2_by_uid_load($user_fields->uid, 'main'));
+    //   dpm(profile2_load());
+    }
+
+    return t('recheck_sync');
+}
+?>

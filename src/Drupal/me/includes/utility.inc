@@ -71,12 +71,11 @@ function klovers_file_save_data($uid, $data, $destination = NULL, $replace = FIL
   return FALSE;
 }
 
+// function ___test()
+// {
 
-function ___test()
-{
-
-	return "test___" . CONFIG_PAGES_TYPE;
-}
+// 	return "test___" . CONFIG_PAGES_TYPE;
+// }
 
 // https://firebase.google.com/docs/cloud-messaging/http-server-ref
 // https://github.com/adocwang/mipush/blob/f604c5353d73720282094e2f21b325a5c029069a/xmpush/DevTools.php ส่งแยกตาม package name

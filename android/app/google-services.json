@@ -1,35 +1,27 @@
 {
   "project_info": {
-    "project_number": "372495115726",
-    "firebase_url": "https://rn-ui-a37a1.firebaseio.com",
-    "project_id": "rn-ui-a37a1",
-    "storage_bucket": "rn-ui-a37a1.appspot.com"
+    "project_number": "771859830598",
+    "firebase_url": "https://rnui-227606.firebaseio.com",
+    "project_id": "rnui-227606",
+    "storage_bucket": "rnui-227606.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:372495115726:android:dba177a0b1ce773a",
+        "mobilesdk_app_id": "1:771859830598:android:89b5d81da536c952",
         "android_client_info": {
           "package_name": "idna.ui"
         }
       },
       "oauth_client": [
         {
-          "client_id": "372495115726-qgumg6cf5nei8sheeoto8hhf18t6kjjg.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "idna.ui",
-            "certificate_hash": "d3c57045963bbfd6384850ed0f0b839c781c9c21"
-          }
-        },
-        {
-          "client_id": "372495115726-2edbncq5f45aqh73dkk8ck918unk6p13.apps.googleusercontent.com",
+          "client_id": "771859830598-c6ua1v3kg54ij0951qfq6a8msdq47nq9.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBdHmHvidi5wz-s_0MI9FVjRTtEWfId5kQ"
+          "current_key": "AIzaSyDmOL2450iCYgBnJ0-pTVU8flK_w-1xu58"
         }
       ],
       "services": {
@@ -37,20 +29,8 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "372495115726-2edbncq5f45aqh73dkk8ck918unk6p13.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "372495115726-62g14r8s4rj7d1igi4lfa5k63vveiltk.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "idna.ui"
-              }
-            }
-          ]
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2

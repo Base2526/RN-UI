@@ -1,5 +1,5 @@
 <?php
-require_once ( dirname(__FILE__) . '/includes/configs.inc');
+require_once ( dirname(__FILE__) . '/includes/functions.inc');
 
 $debug;
 $firebase;
@@ -530,6 +530,7 @@ function qrcode_login(){
 function me_user_insert(&$edit, $account, $category) {
   global $firebase;
 
+  $badges = array("contact"=>"0", "recent"=>"0", "center"=>"0", "setting"=>"0");
   if (check_header()) {
     # code...
     $getallheaders = nginx_getallheaders();
@@ -544,8 +545,7 @@ function me_user_insert(&$edit, $account, $category) {
     // module_load_include('module', 'opentok', 'opentok');
     // $opentok_session_id = opentok_create_session($account->uid)->__toString();
 
-    $badges = array("contact"=>"0", "recent"=>"0", "center"=>"0", "setting"=>"0");
-
+    
     switch ($platform) {
       case 'ios':
       case 'android':{
@@ -599,12 +599,13 @@ function me_user_insert(&$edit, $account, $category) {
           
           /*
            #1 : บันทึก profile ตัวเองไว้ที่ firebase
-          */
           $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid . '/', $values);
-
 
           setDefualtClasss($profile);
           // setDefualtBadges($profile);
+          */
+
+          ___user_insert($profile, $values);
 
           /*
           Load เพือนทั้งหมดขึ้นมาก่อน
@@ -733,11 +734,13 @@ function me_user_insert(&$edit, $account, $category) {
                             "badges"          => array($badges_item_id=>$badges),
                           ));
             
+        /*
         $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid . '/', $values);
-
-
         setDefualtClasss($profile);
         // setDefualtBadges($profile);
+        */
+
+        ___user_insert($profile, $values);
 
         // Check is Friend ?, if is not is add friend 
         /*
@@ -800,7 +803,7 @@ function me_user_insert(&$edit, $account, $category) {
       }
   }
 
-  create_defualt_application($account->uid);
+  // create_defualt_application($account->uid);
 }
 
 /*
@@ -836,11 +839,15 @@ function me_user_delete($account) {
       }
 
       // ลบ เราที่เป้นเพือน ของเพือน ออกด้วย
-      $firebase->delete(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $friend_id . '/friends/' . $account->uid);
+      // $firebase->delete(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $friend_id . '/friends/' . $account->uid);
+
+      firestore_db()->collection(FIRESTORE_USERS)->document($friend_id)->document($account->uid)->delete();
     }
   }
 
-  $firebase->delete(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid);
+  // $firebase->delete(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid);
+
+  firestore_db()->collection(FIRESTORE_USERS)->document($account->uid)->delete();
 }
 
 /*
