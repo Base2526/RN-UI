@@ -3,6 +3,8 @@ import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-ap
 
 import DeviceInfo from 'react-native-device-info';
 
+var _ = require('lodash');
+
 import {USER_LOGIN_SUCCESS,
         USER_LOGIN_FAIL,
         USER_LOGOUT}  from '../Actions/types'
@@ -17,17 +19,47 @@ const INITIAL_STATE = {users:null,
 _online = (state, online) =>{
     
     // console.log(action)
-    console.log(state)
-    console.log(DeviceInfo.getUniqueID())
+    // console.log(state)
+    // console.log(DeviceInfo.getUniqueID())
     // if(state.isLogin){
-        // console.log(action)
-        // console.log(state)
+    // console.log(action)
+    // console.log(state)
 
-        if(state.user === null){
-            // console.log('state.user')
-            return
+    if(state.users === null){
+        // console.log('state.user')
+        return
+    }
+
+    let device_access = state.users.profiles.device_access
+    
+    let key = 0
+    _.each(device_access, function(_v, _k) { 
+        if(_v.udid === DeviceInfo.getUniqueID()){
+            key = _k
         }
+    });
 
+    if(key === 0){
+        return;
+    }
+
+    let uid = state.users.user.uid;
+
+    // console.log(key +' | '+ uid)
+
+    let userRef = firebase.firestore().collection('users').doc(uid)
+    userRef.set({
+        profiles: {
+            device_access:{
+                [key]:{
+                    online
+                }
+            }
+        }
+    },{ merge: true });
+
+
+    // console.log(userRef)
         /*
         let uid = state.users.user.uid
         // console.log(uid)
@@ -93,12 +125,16 @@ export default (state= INITIAL_STATE, action)=>{
         //     return { ...state, password: action.payload}
         // }
         case USER_LOGIN_SUCCESS: {
-            return {...state, 
+            state = {...state, 
                     // user: action.user, 
                     provider: action.provider,
                     isLogin: true,
-                    users: action.users
+                    users: action.users,
+                    online: '1',
                     }
+
+            this._online(state, '1')
+            return state
         } 
         case USER_LOGIN_FAIL: {
             return {...state,
@@ -122,31 +158,42 @@ export default (state= INITIAL_STATE, action)=>{
             if(!action.payload.hasOwnProperty('auth')){
                 return INITIAL_STATE
             }
-            return {...state, 
-                // user : action.payload.auth.user,
-                users: action.payload.auth.users,
-                isLogin: action.payload.auth.isLogin,
-                provider: action.payload.auth.provider,
-                online: action.payload.auth.online}
+
+            state = {...state, 
+                    // user : action.payload.auth.user,
+                    users: action.payload.auth.users,
+                    isLogin: action.payload.auth.isLogin,
+                    provider: action.payload.auth.provider,
+                    online: action.payload.auth.online}
+
+            this._online(state, '1')
+
+            return state
         }
 
         // online
         case FOREGROUND:{
-            this._online(state, '1')
-            return {...state,
+            state = {...state,
                     online:'1'}
+
+            this._online(state, '1')
+            return state
         } 
         
-        case INACTIVE:{
-            this._online(state, '0')
-            return {...state,
+        case INACTIVE:{   
+            state = {...state,
                     online:'0'}
+
+            this._online(state, '0')
+            return state
         }
 
         case BACKGROUND:{
+            state = {...state,
+                online:'-1'}
+
             this._online(state, '-1')
-            return {...state,
-                    online:'-1'}
+            return state
         }
         
         default:

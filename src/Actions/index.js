@@ -72,7 +72,7 @@ export const actionLogin = ({email, password}) => dispatch => {
 
                 // console.log(data.data.users)
 
-                dispatch({ type: USER_LOGIN_SUCCESS, provider: Constant.PROVIDERS.USER, user: data.data, users: data.data.users });
+                dispatch({ type: USER_LOGIN_SUCCESS, provider: Constant.PROVIDERS.USER, users: data.data.users });
                 return {'status':true, 'data': data.data}
             }
         }
@@ -407,11 +407,11 @@ export function watchTaskEvent(uid, dispatch) {
 
             console.log("#--- " , change.type);
             if (change.type === "added") {
-                console.log("added");
+                // console.log("added");
             }else if (change.type === "modified") {
-                console.log("modified");
+                // console.log("modified");
             }else if (change.type === "removed") {
-                console.log("removed");
+                // console.log("removed");
             }
 
             console.log(change.doc.data());

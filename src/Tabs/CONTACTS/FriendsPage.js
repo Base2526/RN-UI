@@ -36,13 +36,11 @@ class FriendsPage extends React.Component{
         this.state = {
           renderContent: false,
         }
-
-        console.log(DeviceInfo.getUniqueID())
+        // console.log(DeviceInfo.getUniqueID())
     }
     
     componentDidMount() {
       setTimeout(() => {this.setState({renderContent: true})}, 0);
-
 
       // group_all(v=>{
       //   console.log(v)

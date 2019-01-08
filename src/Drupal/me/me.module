@@ -278,9 +278,9 @@ function me_user_login(&$edit, $account) {
         if (strcasecmp($item_load->field_udid[LANGUAGE_NONE][0]['value'], $getallheaders['udid']) == 0) {
 
           $wrapper = entity_metadata_wrapper('field_collection_item', $item_load);
-          // if(strcasecmp($item_load->field_device_name[LANGUAGE_NONE][0]['value'], base64_decode($getallheaders['device_name'])) != 0){
-          //   $wrapper->field_device_name->set(base64_decode($getallheaders['device_name']));
-          // }
+          if(strcasecmp($item_load->field_device_name[LANGUAGE_NONE][0]['value'], $getallheaders['device_name']) != 0){
+            $wrapper->field_device_name->set($getallheaders['device_name']);
+          }
 
           if(strcasecmp($item_load->field_device_access_version[LANGUAGE_NONE][0]['value'], $getallheaders['version_application']) != 0){
             $wrapper->field_device_access_version->set($getallheaders['version_application']);
@@ -306,7 +306,7 @@ function me_user_login(&$edit, $account) {
               "udid"          => $wrapper->field_udid->value(),
               "platform"      => $wrapper->field_platform->value(),
               "bundle_identifier"      => $wrapper->field_bundle_identifier->value(),
-              // "device_name"   => base64_decode($getallheaders['device_name']),
+              "device_name"   => $getallheaders['device_name'],
               "model_number"  => $wrapper->field_model_number->value(),
               "version"       => $getallheaders['version_application'],
               "build"         => $getallheaders['build'],
@@ -332,7 +332,7 @@ function me_user_login(&$edit, $account) {
       $values['field_udid'][LANGUAGE_NONE][0]['value']              = $getallheaders['udid'];
       $values['field_platform'][LANGUAGE_NONE][0]['value']          = $getallheaders['platform'];
       $values['field_bundle_identifier'][LANGUAGE_NONE][0]['value'] = $getallheaders['bundle_identifier'];
-      // $values['field_device_name'][LANGUAGE_NONE][0]['value']       = base64_decode($getallheaders['device_name']);
+      $values['field_device_name'][LANGUAGE_NONE][0]['value']       = $getallheaders['device_name'];
       $values['field_model_number'][LANGUAGE_NONE][0]['value']      = $getallheaders['model_number'];
       $values['field_device_access_version'][LANGUAGE_NONE][0]['value']    = $getallheaders['version_application'];
       $values['field_device_access_build'][LANGUAGE_NONE][0]['value']      = $getallheaders['build'];
@@ -350,7 +350,7 @@ function me_user_login(&$edit, $account) {
         "udid"              => $getallheaders['udid'],
         "platform"          => $getallheaders['platform'],
         "bundle_identifier" => $getallheaders['bundle_identifier'],
-        // "device_name"       => base64_decode($getallheaders['device_name']),
+        "device_name"       => $getallheaders['device_name'],
         "model_number"      => $getallheaders['model_number'],
         "version"           => $getallheaders['version_application'],
         "build"             => $getallheaders['build'],
@@ -435,9 +435,9 @@ function qrcode_login(){
       if (strcasecmp($item_load->field_udid[LANGUAGE_NONE][0]['value'], $getallheaders['udid']) == 0) {
 
         $wrapper = entity_metadata_wrapper('field_collection_item', $item_load);
-        // if(strcasecmp($item_load->field_device_name[LANGUAGE_NONE][0]['value'], base64_decode($getallheaders['device_name'])) != 0){
-        //   $wrapper->field_device_name->set(base64_decode($getallheaders['device_name']));
-        // }
+        if(strcasecmp($item_load->field_device_name[LANGUAGE_NONE][0]['value'], $getallheaders['device_name']) != 0){
+          $wrapper->field_device_name->set($getallheaders['device_name']);
+        }
 
         if(strcasecmp($item_load->field_device_access_version[LANGUAGE_NONE][0]['value'], $getallheaders['version_application']) != 0){
           $wrapper->field_device_access_version->set($getallheaders['version_application']);
@@ -465,7 +465,7 @@ function qrcode_login(){
             "udid"          => $wrapper->field_udid->value(),
             "platform"      => $wrapper->field_platform->value(),
             "bundle_identifier"      => $wrapper->field_bundle_identifier->value(),
-            // "device_name"   => base64_decode($getallheaders['device_name']),
+            "device_name"   => $getallheaders['device_name'],
             "model_number"  => $wrapper->field_model_number->value(),
             "version"       => $getallheaders['version_application'],
             "build"         => $getallheaders['build'],
@@ -488,7 +488,7 @@ function qrcode_login(){
     $values['field_udid'][LANGUAGE_NONE][0]['value']              = $getallheaders['udid'];
     $values['field_platform'][LANGUAGE_NONE][0]['value']          = $getallheaders['platform'];
     $values['field_bundle_identifier'][LANGUAGE_NONE][0]['value'] = $getallheaders['bundle_identifier'];
-    // $values['field_device_name'][LANGUAGE_NONE][0]['value']       = base64_decode($getallheaders['device_name']);
+    $values['field_device_name'][LANGUAGE_NONE][0]['value']       = $getallheaders['device_name'];
     $values['field_model_number'][LANGUAGE_NONE][0]['value']      = $getallheaders['model_number'];
     $values['field_device_access_version'][LANGUAGE_NONE][0]['value']    = $getallheaders['version_application'];
     $values['field_device_access_build'][LANGUAGE_NONE][0]['value']      = $getallheaders['build'];
@@ -507,7 +507,7 @@ function qrcode_login(){
       "udid"              => $getallheaders['udid'],
       "platform"          => $getallheaders['platform'],
       "bundle_identifier" => $getallheaders['bundle_identifier'],
-      // "device_name"       => base64_decode($getallheaders['device_name']),
+      "device_name"       => $getallheaders['device_name'],
       "model_number"      => $getallheaders['model_number'],
       "version"           => $getallheaders['version_application'],
       "build"             => $getallheaders['build'],
@@ -3205,7 +3205,6 @@ function onLoadProfile($uid, $mode){
 
         // device_access
         $device_access = array();
-        /*
         if(isset($profile->field_device_access[LANGUAGE_NONE])){
           foreach ($profile->field_device_access[LANGUAGE_NONE] as $k_device_access => $v_device_access) {
               $data_item_device_access = field_collection_item_load($v_device_access['value']);
@@ -3244,7 +3243,7 @@ function onLoadProfile($uid, $mode){
                                                                 'version'     =>$data_item_device_access_version);
           }
         }
-        */
+        
 
         $friends = array();
         if(isset($profile->field_profile_friends[LANGUAGE_NONE])){
