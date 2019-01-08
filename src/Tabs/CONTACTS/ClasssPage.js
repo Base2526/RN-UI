@@ -272,15 +272,11 @@ const mapStateToProps = (state) => {
   if(!state._persist.rehydrated){
     return {}
   }
-
-  // this.props.auth.user.user_profile
   // groups
   return{
     // auth:state.auth
-    classs:state.auth.user.user_profile.classs
+    classs:state.auth.users.classs
   }
-
-  // console.log(this.props.auth.user.user_profile.groups)
 }
 
 export default connect(mapStateToProps, actions)(ClasssPage);

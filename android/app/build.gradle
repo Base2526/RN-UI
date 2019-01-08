@@ -110,6 +110,14 @@ android {
 //            universalApk false  // If true, also generate a universal APK
             abiFilters "armeabi-v7a", "x86"
         }
+
+        // because of firestore:
+        multiDexEnabled true
+    }
+
+    // because of firestore:
+    dexOptions {
+        javaMaxHeapSize "4g"
     }
 
 //     build production
@@ -208,15 +216,14 @@ dependencies {
 
 
     implementation project(':react-native-sqlite-storage')
+    implementation project(':react-native-device-info')
+    implementation "com.google.firebase:firebase-firestore:17.0.2"
 
 
     // Firebase dependencies
     implementation "com.google.android.gms:play-services-base:16.0.1"
     implementation "com.google.firebase:firebase-core:16.0.4"
     implementation "com.google.firebase:firebase-database:16.0.4"
-
-
-    implementation project(':react-native-device-info')
 }
 
 // Run this once to be able to run the application with BUCK

@@ -9,6 +9,7 @@ target 'RN_UI' do
 
   pod 'Firebase/Core'
   pod 'Firebase/Database'
+  pod 'Firebase/Firestore'
   
   # Add these to your Podfile
   pod 'React', :path => '../node_modules/react-native'

@@ -21,16 +21,13 @@ const { RNTwitterSignIn } = NativeModules
 const FBSDK = require('react-native-fbsdk');
 const { LoginButton, AccessToken, LoginManager } = FBSDK;
 
+import firebase from 'react-native-firebase'
+
 import Constant from '../Utils/Constant'
 import {saveAsyncStorage} from '../Utils/Helpers'
-
-// import TwitterButton from './TwitterButton';
-
-// import Database from '../Utils/DB'
-
-
-
 import * as actions from '../Actions'
+
+// import {watchTaskEvent} from '../Actions'
 
 class Welcome extends React.Component {
   constructor(props) {
@@ -39,6 +36,30 @@ class Welcome extends React.Component {
       loading: false,
       arg1: {}
     };
+
+    this.unsubscribe = null;
+
+    this.ref = firebase.firestore().collection('users')
+
+    // console.log(this.ref);
+    // let doc = this.ref.doc('548894').get()
+    // if (doc.exists) {
+    //   console.log(doc.data())
+    // }
+  }
+
+  async load(id) {
+    const doc = await this.ref.doc(id).get()
+    if (doc.exists) {
+      return doc.data()
+    } else {
+      const defaultDoc = {
+        name: "ABC",
+        age: 2
+      }
+      await this.ref.doc(id).set(defaultDoc)
+      return doc
+    }
   }
 
   // errorCB(err) {
@@ -53,7 +74,28 @@ class Welcome extends React.Component {
   //   console.log("Database OPENED");
   // }
 
+  onCollectionUpdate = (querySnapshot) => {
+    console.log(querySnapshot)
+  }
+
   componentDidMount(){
+
+    // this.unsubscribe = this.ref.onSnapshot(this.onCollectionUpdate)
+
+    // this.load('548894').then(data=>{
+    //   console.log(data)
+    // })
+
+    // this.props.watchTaskEvent('12', this.props.dispatch)
+
+    // addSnapshotListener
+    // this.ref.doc(id).onSnapshot
+
+    // this.ref.get().then(snapshot => {
+    //   console.log(snapshot)
+    // })
+
+
     // console.log("off firebase 001")
     // firebase.database().ref('/items').off()
 
@@ -98,8 +140,6 @@ class Welcome extends React.Component {
     this.setState({
       loading:!this.state.loading
     })
-
-    // console.log("isShow : " + isShow)
   }
 
   _facebookSignIn = () => {
@@ -210,13 +250,16 @@ class Welcome extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  // console.log(state)
   return({
       email:state.auth.email,
       password:state.auth.password,
       loading:state.auth.loading
   })
 }
+
+// const mapDispatchToProps = (dispatch, ownProps) => {
+//   return { dispatch, watchTaskEvent }
+// }
 
 export default connect(mapStateToProps, actions)(Welcome)
 

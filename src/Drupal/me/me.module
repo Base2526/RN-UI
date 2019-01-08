@@ -315,7 +315,9 @@ function me_user_login(&$edit, $account) {
               "token_notification" => $getallheaders['token_notification'],
               "token_pushkit" => $getallheaders['token_pushkit']
             );
-          $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid . '/profiles/device_access/' . $value['value'] . "/", $val);
+          // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid . '/profiles/device_access/' . $value['value'] . "/", $val);
+
+          ___user_login($account->uid, $value['value'], $val);
 
           $flag = FALSE;
           break;
@@ -358,8 +360,10 @@ function me_user_login(&$edit, $account) {
         "token_pushkit"     => $getallheaders['token_pushkit']
       );
       
-      $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid . '/profiles/device_access/' . $field_entity->item_id . "/", $values);
+      // $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid . '/profiles/device_access/' . $field_entity->item_id . "/", $values);
       
+      ___user_login($account->uid, $field_entity->item_id, $values);
+
       // $chat_id = generateRandomString(config_pages_get(CONFIG_PAGES_TYPE, 'field_defualt_length_chat_id', 20));
 
       // // เป็นการเพือนให้ตัวเรา
@@ -595,7 +599,8 @@ function me_user_insert(&$edit, $account, $category) {
                           "sound_call_waiting"  => $sound_call_waiting_value,
                           "badge"           => '0',
                           "badges"          => array($badges_item_id=>$badges),
-                        ));
+                        ),
+                        "uid"=>$profile->uid);
           
           /*
            #1 : บันทึก profile ตัวเองไว้ที่ firebase
@@ -732,7 +737,8 @@ function me_user_insert(&$edit, $account, $category) {
                             "sound_call_waiting"  => $sound_call_waiting_value,
                             "badge"           => '0',
                             "badges"          => array($badges_item_id=>$badges),
-                          ));
+                          ),
+                          "uid"=>$profile->uid);
             
         /*
         $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid . '/', $values);
@@ -811,9 +817,8 @@ function me_user_insert(&$edit, $account, $category) {
  *  this hook triggered when delete user
 */
 function me_user_delete($account) {  
-  watchdog('user', 'me_user_delete : %userid deleted, Firebase Delete User', array('%userid' => $account->uid), WATCHDOG_NOTICE, $link = NULL);
-
-  global $firebase;
+  watchdog('user', 'Deleted : %userid', array('%userid' => $account->uid), WATCHDOG_NOTICE, $link = NULL);
+  // global $firebase;
 
   $profile = profile2_by_uid_load($account->uid, 'main');
   foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
@@ -3050,6 +3055,8 @@ function onLoadDataUser($user){
 
     $result['user']             = (object)$user;
     $result['user_profile']     = (object)$user_profile['data'];
+
+    $result['users']   = (object) array_merge((array) $user, (array) $user_profile['data']);
     // $result['friend_profiles']  = (object)$friend_profiles;
     /*
     $result['data'] = array('user'           =>(object)$user, 

@@ -278,14 +278,12 @@ const mapStateToProps = (state) => {
     return {}
   }
 
-  // this.props.auth.user.user_profile
   // groups
   return{
     // auth:state.auth
-    groups:state.auth.user.user_profile.groups
+    groups:state.auth.users.groups
   }
 
-  // console.log(this.props.auth.user.user_profile.groups)
 }
 
 export default connect(mapStateToProps, actions)(GroupsPage);

@@ -1292,4 +1292,18 @@ function ___user_insert($profile, $data){
 		create_defualt_application($profile->uid);
 	}
 }
+
+/*
+* ___user_login($uid, $nid, $data);
+*/
+function ___user_login($uid, $nid, $data){
+
+	// $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid . '/profiles/device_access/' . $value['value'] . "/", $val);
+
+	$userRef = firestore_db()->collection(FIRESTORE_USERS)->document($uid);
+	$snapshot = $userRef->snapshot();
+	if ($snapshot->exists()) {
+		$userRef->set(array("profiles" => array("device_access"=>array($nid=>$data))), array('merge' => true));
+	}
+}
 ?>

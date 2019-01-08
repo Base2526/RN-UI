@@ -78,9 +78,9 @@ class FriendsPage extends React.Component{
           title: 'Profile',
           member: [
             {
-              name: this.props.auth.user.user_profile.profiles.name,
-              status: this.props.auth.user.user_profile.profiles.status_message,
-              image_url: this.props.auth.user.user_profile.profiles.image_url,
+              name: this.props.auth.users.profiles.name,
+              status: this.props.auth.users.profiles.status_message,
+              image_url: this.props.auth.users.profiles.image_url,
             }
           ]
         }
@@ -88,10 +88,10 @@ class FriendsPage extends React.Component{
         // console.log(friend_profiles)
         let friendRequestSent_member = []
         let friend_member = []
-        for (var key in this.props.auth.user.user_profile.friends) {
+        for (var key in this.props.auth.users.friends) {
           // console.log()
 
-          let friend =  this.props.auth.user.user_profile.friends[key]
+          let friend =  this.props.auth.users.friends[key]
 
           // let friend_profile = {};//friend_profiles[key]
           // console.log(friend)
@@ -153,7 +153,7 @@ class FriendsPage extends React.Component{
 
     _renderRow = (rowItem, rowId, sectionId) => {
 
-        console.log(rowItem)
+        // console.log(rowItem)
         
         if(rowId == 0 && sectionId == 0){
           return (

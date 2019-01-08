@@ -204,12 +204,11 @@ class AddGroupsPage extends React.Component{
         //       {"key":5, "name":'A5'}]
         // )
 
-         // return [this.props.auth.user.user_profile.groups]
 
       let friend_member = [{"key":99, "name":'00'}]
-      for (var key in this.props.auth.user.user_profile.friends) {
+      for (var key in this.props.auth.users.friends) {
     
-        let friend =  this.props.auth.user.user_profile.friends[key]
+        let friend =  this.props.auth.users.friends[key]
         // let friend_profile = friend_profiles[key]
 
         switch(friend.status){

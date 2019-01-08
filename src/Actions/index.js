@@ -70,7 +70,9 @@ export const actionLogin = ({email, password}) => dispatch => {
                 // console.log(data.data.user_profile)
                 // saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.USER, "user": data.data});
 
-                dispatch({ type: USER_LOGIN_SUCCESS, provider: Constant.PROVIDERS.USER, user: data.data });
+                // console.log(data.data.users)
+
+                dispatch({ type: USER_LOGIN_SUCCESS, provider: Constant.PROVIDERS.USER, user: data.data, users: data.data.users });
                 return {'status':true, 'data': data.data}
             }
         }
@@ -130,7 +132,8 @@ export const loginWithFacebook = () => {
 export const actionLogout = (dispatch, callback) => {
     // console.log('actionLogout')
 
-    firebase.database().ref('idna/user/1').off()
+    // firebase.database().ref('idna/user/1').off()
+    unsubscribe();
 
     dispatch({ type: USER_LOGOUT});
     callback({'status':true})
@@ -311,9 +314,12 @@ export const actionCreateClass = (uid, class_name, uri) => dispatch =>{
 //     // value' event
 // }
 
+let unsubscribe = null;
+
 export function watchTaskEvent(uid, dispatch) {
-    // console.log('-------------- watchTaskEvent()')
+    console.log('-------------- watchTaskEvent()')
     
+    /*
     firebase.database().ref('idna/user/' + uid).once('value', (snap) => {
         // dispatch(addTask(snap.val()));
 
@@ -339,10 +345,86 @@ export function watchTaskEvent(uid, dispatch) {
 
         console.log(snap.val())
     });
+    */
+
+    // 548899
+
+    let ref = firebase.firestore().collection('users').where("uid", '==', uid)
+    unsubscribe = ref.onSnapshot((querySnapshot) => {
+        // console.log(unsubscribe)
+
+    //    querySnapshot.documentChanges.forEach((change) => {
+    //     // Do something with change
+    //   });
+
+        // console.log(querySnapshot.metadata)
+
+    //    querySnapshot.forEach((doc) => {
+    //     console.log(doc)
+    //    })
+
+        // Object.keys(querySnapshot).map(function(key) {
+        //     // return <option value={key}>{tifs[key]}</option>
+        //     console.log(querySnapshot[key].doc())
+        // });
+
+        // const items = querySnapshot.docs.map(doc => ({ 
+        //     id: doc.id,
+        //     fromCache: doc.metadata.fromCache,
+        //     hasPendingWrites: doc.metadata.hasPendingWrites,
+        //     title: doc.data().title,
+        // }));
+
+        // console.log(items)
+
+        // const numChanged = querySnapshot.docChanges;
+        
+        // // let docs = querySnapshot;
+        // console.log(numChanged)
+
+        // let docs = querySnapshot.docs;
+        // let size = querySnapshot.size;
+
+        // console.log(docs.length)
+        // console.log(size)
+
+        /*
+            แสดงว่า user uid นี้โดนลบออกจากระบบแล้ว โดยมีการ login ค้างไว้
+        */
+        if(querySnapshot.docs.length === 0) {
+            actionLogout(dispatch, ()=>{
+                // console.log(this)                
+                this.navigation.navigate("AuthLoading")
+            })
+            return;
+        }
+
+        querySnapshot.docChanges.forEach(function(change) {
+            // if (change.type === "removed") {
+            //     console.log("Removed city: ", change.doc.data());
+            // }
+            // console.log(change)
+
+            console.log("#--- " , change.type);
+            if (change.type === "added") {
+                console.log("added");
+            }else if (change.type === "modified") {
+                console.log("modified");
+            }else if (change.type === "removed") {
+                console.log("removed");
+            }
+
+            console.log(change.doc.data());
+        });
+    }, (error) => {
+        //...
+        console.log(error)
+    })
 }
 
-// export const watchTaskOff = () => {
-//     firebase.database().ref('idna/user/1').off()
+// Firestore unsubscribe to updates
+// export const unsubscribe = () => {
+//     unsubscribe()
 // }
 
 /*

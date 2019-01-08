@@ -8,7 +8,7 @@ export const getUid = (state) =>{
     if(!state._persist.rehydrated){
         return -1
     }
-    return state.auth.user.user.user.uid
+    return state.auth.users.user.uid
 }
 
 export async function loadAsyncStorage(key) {

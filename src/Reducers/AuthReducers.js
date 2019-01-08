@@ -7,7 +7,7 @@ import {USER_LOGIN_SUCCESS,
         USER_LOGIN_FAIL,
         USER_LOGOUT}  from '../Actions/types'
 
-const INITIAL_STATE = {user:null,
+const INITIAL_STATE = {users:null,
                        provider:'',
                        isLogin: false,
                        online: '-1',
@@ -28,7 +28,8 @@ _online = (state, online) =>{
             return
         }
 
-        let uid = state.user.user.user.uid
+        /*
+        let uid = state.users.user.uid
         // console.log(uid)
 
         var updateRef = firebase.database().ref('idna/user/1/profiles/device_access/1121038/');
@@ -50,6 +51,7 @@ _online = (state, online) =>{
         //     }
         // }
     // }
+    */
 }
 
 /*
@@ -92,9 +94,10 @@ export default (state= INITIAL_STATE, action)=>{
         // }
         case USER_LOGIN_SUCCESS: {
             return {...state, 
-                    user: action.user, 
+                    // user: action.user, 
                     provider: action.provider,
                     isLogin: true,
+                    users: action.users
                     }
         } 
         case USER_LOGIN_FAIL: {
@@ -120,7 +123,8 @@ export default (state= INITIAL_STATE, action)=>{
                 return INITIAL_STATE
             }
             return {...state, 
-                user : action.payload.auth.user,
+                // user : action.payload.auth.user,
+                users: action.payload.auth.users,
                 isLogin: action.payload.auth.isLogin,
                 provider: action.payload.auth.provider,
                 online: action.payload.auth.online}

@@ -55,15 +55,15 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state) => {
-    console.log(state)
+    // console.log(state)
     if(!state._persist.rehydrated){
         return {}
     }
 
-    if(state.auth.user !== null){
+    if(state.auth.users !== null){
         return {
             auth:state.auth,
-            uid:state.auth.user.user.user.uid
+            uid:state.auth.users.user.uid
         }
     }else{
         return {
