@@ -3,6 +3,9 @@ import firebase from 'react-native-firebase';
 const FBSDK = require('react-native-fbsdk');
 const { LoginButton, AccessToken, LoginManager } = FBSDK;
 
+import DeviceInfo from 'react-native-device-info';
+var _ = require('lodash');
+
 import {USER_LOGIN_SUCCESS,
     USER_LOGIN_FAIL,
     USER_LOGOUT} from './types'
@@ -127,6 +130,46 @@ export const loginWithFacebook = () => {
             }
         );
     }
+}
+
+export const updateIsLogin = (users, callback) => {
+
+    let uid = users.user.uid
+    let device_access = users.device_access
+
+    let key = 0
+    _.each(device_access, function(_v, _k) { 
+        if(_v.udid === DeviceInfo.getUniqueID()){
+            key = _k
+        }
+    });
+
+    if(key === 0){
+        callback({'status':false})
+    }
+
+    firebase.firestore().collection('users').doc(uid).collection('device_access').doc(key).set({is_login:'0', online:'0'},{ merge: true })
+    callback({'status':true})
+    /*
+    check before set เพราะจะมีกรณีที่ user ลบ ออกจากระบบแล้ว 
+    */
+    // const doc = userRef.get()
+    // doc.then(v=>{
+    //    if(v.exists){
+    //        userRef.set({
+    //            profiles: {
+    //                device_access:{
+    //                    [key]:{
+    //                     is_login:'0',
+    //                     online:'0'
+    //                    }
+    //                }
+    //            }
+    //        },{ merge: true });
+
+    //        callback({'status':true})
+    //    }
+    // })    
 }
 
 export const actionLogout = (dispatch, callback) => {
@@ -317,7 +360,7 @@ export const actionCreateClass = (uid, class_name, uri) => dispatch =>{
 let unsubscribe = null;
 
 export function watchTaskEvent(uid, dispatch) {
-    console.log('-------------- watchTaskEvent()')
+    // console.log('-------------- watchTaskEvent()')
     
     /*
     firebase.database().ref('idna/user/' + uid).once('value', (snap) => {
@@ -347,11 +390,25 @@ export function watchTaskEvent(uid, dispatch) {
     });
     */
 
-    // 548899
 
-    let ref = firebase.firestore().collection('users').where("uid", '==', uid)
-    unsubscribe = ref.onSnapshot((querySnapshot) => {
-        // console.log(unsubscribe)
+    // firebase.firestore().collection('users').doc(uid).collection('test001').where("uid", '==', '1234').onSnapshot((querySnapshot) => {
+
+    //     querySnapshot.docChanges.forEach(function(change) {
+    //         console.log(change)
+    //     })
+    // })
+
+    // track profile
+    unsubscribe = firebase.firestore().collection('profiles').doc(uid).onSnapshot((docSnapshot) => {
+        console.log(docSnapshot.data());
+
+        if(docSnapshot.data() === undefined){
+            actionLogout(dispatch, ()=>{
+                // console.log(this)                
+                this.navigation.navigate("AuthLoading")
+            })
+        }
+
 
     //    querySnapshot.documentChanges.forEach((change) => {
     //     // Do something with change
@@ -391,34 +448,80 @@ export function watchTaskEvent(uid, dispatch) {
         /*
             แสดงว่า user uid นี้โดนลบออกจากระบบแล้ว โดยมีการ login ค้างไว้
         */
-        if(querySnapshot.docs.length === 0) {
-            actionLogout(dispatch, ()=>{
-                // console.log(this)                
-                this.navigation.navigate("AuthLoading")
-            })
-            return;
-        }
+        // if(querySnapshot.docs.length === 0) {
+        //     actionLogout(dispatch, ()=>{
+        //         // console.log(this)                
+        //         this.navigation.navigate("AuthLoading")
+        //     })
+        //     // return;
+        // }
 
+        /*
         querySnapshot.docChanges.forEach(function(change) {
             // if (change.type === "removed") {
             //     console.log("Removed city: ", change.doc.data());
             // }
-            // console.log(change)
+            console.log(change.type)
 
-            console.log("#--- " , change.type);
+            // console.log("#--- " , change.type);
             if (change.type === "added") {
                 // console.log("added");
             }else if (change.type === "modified") {
                 // console.log("modified");
             }else if (change.type === "removed") {
                 // console.log("removed");
+
+                firebase.firestore().collection('users').doc(change.doc.data().uid).delete();
             }
 
             console.log(change.doc.data());
         });
+        */
     }, (error) => {
         //...
         console.log(error)
+    })
+
+    // track device access
+    firebase.firestore().collection('users').doc(uid).collection('device_access').where('udid', '==', DeviceInfo.getUniqueID()).onSnapshot((querySnapshot) => {
+        // console.log(querySnapshot);
+
+        let _this = this
+        querySnapshot.docChanges.forEach(function(change) {
+            // if (change.type === "removed") {
+            //     console.log("Removed city: ", change.doc.data());
+            // }
+            // console.log(change.type)
+            // console.log(change.doc.data());
+
+            let data = change.doc.data()
+            console.log(data)
+            // console.log(_this)
+
+            if (change.type === "added" || change.type === "modified") {
+                /**
+                 * check ว่ามีการ force logout จากระบบหรือไม่
+                 */
+                if(data.is_login == 0){
+                    actionLogout(dispatch, ()=>{
+                        // console.log(this)                
+                        _this.navigation.navigate("AuthLoading")
+                    })
+                }
+            }else if (change.type === "removed") {
+                // console.log("removed");
+
+                let uid = _this.auth.users.user.uid
+                let device_access = _this.auth.users.device_access
+
+                Object.keys(device_access).map((key, index) => {
+                    firebase.firestore().collection('users').doc(uid).collection('device_access').doc(key).delete();
+                    return;
+                })
+                
+                // firebase.firestore().collection('users').doc(change.doc.data().uid).delete();
+            }            
+        });
     })
 }
 

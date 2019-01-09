@@ -983,7 +983,7 @@ function generatorQRCode($account, $platform, $bundleidentifier){
 	  // $profile->field_profile_heart[LANGUAGE_NONE][0]['value'] = DEFUALT_NUMBER_HEART;
   
 	  // status message
-	  $profile->field_profile_status_message[LANGUAGE_NONE][0]['value'] = 'status message';
+	  $profile->field_profile_status_message[LANGUAGE_NONE][0]['value'] = '';
   
 	  /*
 	  เราจะแยกออกกัน ระหว่าง heart, dna เพราะว่าต้อง scan qrcode มันต้องวิ่งไปเปด store ถูกเพราะว่าเราแยก app กัน
@@ -1165,8 +1165,11 @@ function setDefualtClasss($profile){
 				"image_url"=> file_create_url(image_style_url('medium', $image_arr['uri']))
 			);
 		
-			$firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $profile->uid . '/' . PATH_CLASSS . '/' . $item_id . '/' , $value_classs);
+			// $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $profile->uid . '/' . PATH_CLASSS . '/' . $item_id . '/' , $value_classs);
 		
+			firestore_db()->collection(FIRESTORE_USERS)->document($profile->uid)->collection(FIRESTORE_CLASSS)->document($item_id)->set($value_classs);
+
+
 			// watchdog(TAG, '2. DefualtClasss header : %profile', array('%profile'=>serialize($profile)), WATCHDOG_INFO);
 	  }
 	}
@@ -1282,7 +1285,8 @@ function me_update_7100() {
 /*
 * Insert user register firestore
 */
-function ___user_insert($profile, $data){
+function ___insert_profiles($profile, $data){
+	/*
 	$userRef = firestore_db()->collection(FIRESTORE_USERS)->document($profile->uid);
 	$snapshot = $userRef->snapshot();
 	if (!$snapshot->exists()) {
@@ -1291,19 +1295,24 @@ function ___user_insert($profile, $data){
 		setDefualtClasss($profile);
 		create_defualt_application($profile->uid);
 	}
+	*/
+
+	firestore_db()->collection(FIRESTORE_PROFILES)->document($profile->uid)->set($data);
+	setDefualtClasss($profile);
+	create_defualt_application($profile->uid);
 }
 
 /*
 * ___user_login($uid, $nid, $data);
 */
 function ___user_login($uid, $nid, $data){
-
 	// $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid . '/profiles/device_access/' . $value['value'] . "/", $val);
+	// $userRef = firestore_db()->collection(FIRESTORE_USERS)->document($uid);
+	// $snapshot = $userRef->snapshot();
+	// if ($snapshot->exists()) {
+	// 	$userRef->set(array("profiles" => array("device_access"=>array($nid=>$data))), array('merge' => true));
+	// }
 
-	$userRef = firestore_db()->collection(FIRESTORE_USERS)->document($uid);
-	$snapshot = $userRef->snapshot();
-	if ($snapshot->exists()) {
-		$userRef->set(array("profiles" => array("device_access"=>array($nid=>$data))), array('merge' => true));
-	}
+	firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_DEVICE_ACCESS)->document($nid)->set($data);
 }
 ?>

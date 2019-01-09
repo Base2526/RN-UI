@@ -12,8 +12,15 @@ import FastImage from 'react-native-fast-image'
 
 export default class MyProfilePage extends React.Component{
 
+    /*
+    static navigationOptions = { headerStyle:{ position: 'absolute', backgroundColor: 'transparent', zIndex: 100, top: 0, left: 0, right: 0 } };
+     */
+    
     static navigationOptions = ({ navigation }) => ({
         title: "Contacts",
+        headerTransparent: true,
+        // header:{ style:{ position: 'absolute', backgroundColor: 'transparent', zIndex: 100, top: 0, left: 0, right: 0 } },
+        // headerStyle: {style:{ position: 'absolute', backgroundColor: 'transparent', zIndex: 100, top: 0, left: 0, right: 0 }},
         headerRight: (
             <TouchableOpacity
                 // style={Styles.headerButton}
@@ -28,6 +35,9 @@ export default class MyProfilePage extends React.Component{
             </TouchableOpacity>
           ),
     });
+    
+
+//    static navigationOptions = ({navigation}) => { return { headerTitle: <Text style={{color: 'white', fontSize: 18}}>Test</Text>, headerTransparent: true, headerStyle: { borderBottomWidth: 0, } } }
 
     constructor(){
         super();
@@ -211,7 +221,7 @@ export default class MyProfilePage extends React.Component{
 const styles = StyleSheet.create({
     
     MainContainer :{
-        
+    backgroundColor: 'green',
     justifyContent: 'center',
     flex:1,
     // paddingTop: (Platform.OS === 'iOS') ? 20 : 0

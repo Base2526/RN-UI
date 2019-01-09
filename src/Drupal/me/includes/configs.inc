@@ -191,6 +191,11 @@ function me_init(){
 	
 	// Firestore
 	define("FIRESTORE_USERS", "users");
+	define("FIRESTORE_PROFILES", "profiles");
+	define("FIRESTORE_DEVICE_ACCESS", "device_access");
+
+	define("FIRESTORE_MY_APPLIPATIONS", 'my_applications');
+	define("FIRESTORE_CLASSS", "classs");
   
 	if ($debug) {
 	  /*
@@ -320,7 +325,7 @@ function me_init(){
 
 	
   
-	// dpm(___test());
+	dpm(___test());
 
 
 	// $db = firestore_db();
@@ -400,8 +405,8 @@ function ___test(){
 	// }
 
 
-	$profile = profile2_by_uid_load(1, 'main');
-	// dpm($profile->uid);
+	// $profile = profile2_by_uid_load(548955, 'main');
+	// dpm($profile);
 
 	return "__test_";
 }

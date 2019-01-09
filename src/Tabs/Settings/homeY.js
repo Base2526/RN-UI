@@ -19,6 +19,10 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import { connect } from 'react-redux';
 
+import DeviceInfo from 'react-native-device-info';
+
+var _ = require('lodash');
+
 const { RNTwitterSignIn } = NativeModules
 const FBSDK = require('react-native-fbsdk');
 const { LoginManager } = FBSDK;
@@ -29,7 +33,7 @@ import Styles from '../../styles';
 import Constant from '../../Utils/Constant'
 import {loadAsyncStorage, removeAsyncStorageByKey} from '../../Utils/Helpers'
 // import * as actions from '../../Actions';
-import { actionLogout } from '../../Actions';
+import { actionLogout, updateIsLogin } from '../../Actions';
 
 // import {watchTaskEvent, watchTaskAddedEvent} from '../Actions'
 
@@ -67,8 +71,12 @@ class homeY extends React.Component {
   }
 
   onLogout = () =>{
-    let {provider} = this.props.auth
+    let {provider, users} = this.props.auth
 
+    this.props.updateIsLogin(users, v=>{
+      // console.log(v)
+    })
+    
     if(provider == Constant.PROVIDERS.USER){
       console.log("Logout User")
     }else if(provider == Constant.PROVIDERS.TWITTER){
@@ -81,8 +89,9 @@ class homeY extends React.Component {
       console.log("Logout Facebook")
       LoginManager.logOut()
     }
-
+    
     this.props.actionLogout(this.props.dispatch, v=>{
+      // console.log(v)
       if(!v.status){
         console.log('Error logout')
       }else{
@@ -288,7 +297,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   // console.log(ownProps)
   // watchTaskAddedEvent(dispatch)
 
-  return { dispatch, actionLogout }
+  return { dispatch, actionLogout, updateIsLogin }
 }
 
 

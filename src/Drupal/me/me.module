@@ -563,6 +563,7 @@ function me_user_insert(&$edit, $account, $category) {
 
           $sound_call_waiting_item_id = setDefualtSoundCallWaiting($profile);
 
+          $status_message = $profile->field_profile_status_message[LANGUAGE_NONE][0]['value'];
           // $url_my_qrcode = substr(file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
           $url_my_qrcode = file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']);
 
@@ -590,7 +591,7 @@ function me_user_insert(&$edit, $account, $category) {
           
 
           // add profile ให้กับ user
-          $values = array("profiles"=>array(
+          $values = array(
                           "name"            => $account->name,
                           "url_my_qrcode"   => $url_my_qrcode,
                           "image_url"       => getDefualtProfilePicture(),
@@ -599,8 +600,8 @@ function me_user_insert(&$edit, $account, $category) {
                           "sound_call_waiting"  => $sound_call_waiting_value,
                           "badge"           => '0',
                           "badges"          => array($badges_item_id=>$badges),
-                        ),
-                        "uid"=>$profile->uid);
+                          "status_message"  => $status_message,
+                        );
           
           /*
            #1 : บันทึก profile ตัวเองไว้ที่ firebase
@@ -610,7 +611,7 @@ function me_user_insert(&$edit, $account, $category) {
           // setDefualtBadges($profile);
           */
 
-          ___user_insert($profile, $values);
+          ___insert_profiles($profile, $values);
 
           /*
           Load เพือนทั้งหมดขึ้นมาก่อน
@@ -701,6 +702,8 @@ function me_user_insert(&$edit, $account, $category) {
         $sound_call_waiting_item_id = setDefualtSoundCallWaiting($profile);
 
 
+        $status_message = $profile->field_profile_status_message[LANGUAGE_NONE][0]['value'];
+
         // $url_my_qrcode = substr(file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
         $url_my_qrcode = file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']);
 
@@ -728,17 +731,17 @@ function me_user_insert(&$edit, $account, $category) {
         // $bg_url = substr(file_create_url($defualt_card_background['uri']), strlen($GLOBALS['base_url']));
           
         // add profile ให้กับ user
-        $values = array("profiles"=>array(
-                            "name"            => $account->name,
-                            "url_my_qrcode"   => $url_my_qrcode,
-                            "image_url"       => getDefualtProfilePicture(),
-                            "bg_url"          => getDefualtBackgroundCardPicture(),
-                            "my_id"           => $mid_value,
-                            "sound_call_waiting"  => $sound_call_waiting_value,
-                            "badge"           => '0',
-                            "badges"          => array($badges_item_id=>$badges),
-                          ),
-                          "uid"=>$profile->uid);
+        $values = array(
+                        "name"            => $account->name,
+                        "url_my_qrcode"   => $url_my_qrcode,
+                        "image_url"       => getDefualtProfilePicture(),
+                        "bg_url"          => getDefualtBackgroundCardPicture(),
+                        "my_id"           => $mid_value,
+                        "sound_call_waiting"  => $sound_call_waiting_value,
+                        "badge"           => '0',
+                        "badges"          => array($badges_item_id=>$badges),
+                        "status_message"  => $status_message
+                        );
             
         /*
         $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid . '/', $values);
@@ -746,7 +749,7 @@ function me_user_insert(&$edit, $account, $category) {
         // setDefualtBadges($profile);
         */
 
-        ___user_insert($profile, $values);
+        ___insert_profiles($profile, $values);
 
         // Check is Friend ?, if is not is add friend 
         /*
@@ -846,12 +849,39 @@ function me_user_delete($account) {
       // ลบ เราที่เป้นเพือน ของเพือน ออกด้วย
       // $firebase->delete(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $friend_id . '/friends/' . $account->uid);
 
+      // FIRESTORE_PROFILES
       firestore_db()->collection(FIRESTORE_USERS)->document($friend_id)->document($account->uid)->delete();
+    }
+  }
+
+  if(isset($profile->field_device_access[LANGUAGE_NONE])){
+    foreach ($profile->field_device_access[LANGUAGE_NONE] as $key => $value) {
+      firestore_db()->collection(FIRESTORE_USERS)->document($account->uid)->collection(FIRESTORE_DEVICE_ACCESS)->document($value['value'])->delete();
+    }
+  }
+
+  if (isset($profile->field_field_my_class[LANGUAGE_NONE])) {
+    foreach ($profile->field_field_my_class[LANGUAGE_NONE] as $key => $value) {
+      firestore_db()->collection(FIRESTORE_USERS)->document($account->uid)->collection(FIRESTORE_CLASSS)->document($value['value'])->delete();
+    }
+  }
+
+  $my_applications_query  = new EntityFieldQuery;
+  $my_applications_output = $my_applications_query->entityCondition('entity_type', 'node')
+                  ->entityCondition('bundle', "application")
+                  ->propertyCondition('uid', array($account->uid))
+                  ->execute();
+
+  if (!empty($my_applications_output['node'])) {
+    $my_applications_nids = array_keys($my_applications_output['node']);
+    foreach ($my_applications_nids as $k => $my_applications_nid) {
+      firestore_db()->collection(FIRESTORE_USERS)->document($account->uid)->collection(FIRESTORE_MY_APPLIPATIONS)->document($my_applications_nid)->delete();
     }
   }
 
   // $firebase->delete(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid);
 
+  firestore_db()->collection(FIRESTORE_PROFILES)->document($account->uid)->delete();
   firestore_db()->collection(FIRESTORE_USERS)->document($account->uid)->delete();
 }
 
@@ -3244,7 +3274,6 @@ function onLoadProfile($uid, $mode){
           }
         }
         
-
         $friends = array();
         if(isset($profile->field_profile_friends[LANGUAGE_NONE])){
           foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $k_friends => $v_friends) {
@@ -3889,6 +3918,7 @@ function onLoadProfile($uid, $mode){
 
         $result['result'] = TRUE;
         $result['data']   = array('profiles'       =>(object)$profiles,
+                                'device_access'  => (object)$device_access,
                                 'my_applications'=>(object)$my_applications,
                                 'friends'        =>(object)$friends,
                                 'groups'         =>(object)$groups,
@@ -10599,7 +10629,6 @@ function create_defualt_application($uid){
   $node = node_submit($node);
   node_save($node);
 
-
   $data_update = array(
       "owner_id"    => $uid,
       "is_defualt"  => "1",
@@ -10610,7 +10639,9 @@ function create_defualt_application($uid){
       // "image_url"   => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
       "image_url"   => file_create_url(image_style_url('medium', $image_url['uri']))
   );
-  $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/" . FIREBASE_MY_APPLIPATIONS_PATH . $node->nid, $data_update);
+  // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/" . FIREBASE_MY_APPLIPATIONS_PATH . $node->nid, $data_update);
+
+  firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_MY_APPLIPATIONS)->document($node->nid)->set($data_update);
 
   $result['result']   = TRUE;
   return $result; 

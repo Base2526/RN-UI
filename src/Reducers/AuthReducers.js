@@ -17,9 +17,8 @@ const INITIAL_STATE = {users:null,
                        }
 
 _online = (state, online) =>{
-    
     // console.log(action)
-    // console.log(state)
+    console.log(state)
     // console.log(DeviceInfo.getUniqueID())
     // if(state.isLogin){
     // console.log(action)
@@ -30,7 +29,8 @@ _online = (state, online) =>{
         return
     }
 
-    let device_access = state.users.profiles.device_access
+    // let device_access = state.users.profiles.device_access
+    let device_access = state.users.device_access
     
     let key = 0
     _.each(device_access, function(_v, _k) { 
@@ -45,19 +45,52 @@ _online = (state, online) =>{
 
     let uid = state.users.user.uid;
 
-    // console.log(key +' | '+ uid)
-
-    let userRef = firebase.firestore().collection('users').doc(uid)
-    userRef.set({
-        profiles: {
-            device_access:{
-                [key]:{
-                    online
-                }
-            }
+    let userRef = firebase.firestore().collection('users').doc(uid).collection('device_access').doc(key)
+    /*
+        check is_login == 1 หรือไม่ ก่อนทำงาน 
+        จะมีกรณีถูก forelogout จะมีการ update online : 1 โดยความเป็นจิงไม่ควรเป็นแบบนั้น
+        
+        *** เราสามารถข้างการเช็ดได้เลย{เพราะจะเสียเวลาวิ่งไปดึงข้อมูลทุกครั้งก่อนเสมอ} แต่ตอนนี้ใช้การเช็ด
+    */
+    const doc = userRef.get()
+    doc.then(v=>{
+        // console.log(v.data())
+        let data = v.data()
+        if(data.is_login == 1){
+            userRef.set({online},{ merge: true })
+        }else{
+            console.log('not login')
         }
-    },{ merge: true });
+    })
+    
+    /*
+    check before set เพราะจะมีกรณีที่ user ลบ ออกจากระบบแล้ว 
+    */
+    // const doc = userRef.get()
+    // doc.then(v=>{
+    //     console.log(v)
+        
+    //     if(v.exists){
+    //         userRef.set({
+    //             profiles: {
+    //                 device_access:{
+    //                     [key]:{
+    //                         online
+    //                     }
+    //                 }
+    //             }
+    //         },{ merge: true });
+    //     }
+    // })
 
+    // const doc = await userRef.get()
+    // console.log(doc.exists)
+    // if(doc.exists){
+        
+    // }else{
+    //     console.log('user lost')
+    // }
+    
 
     // console.log(userRef)
         /*
@@ -190,9 +223,9 @@ export default (state= INITIAL_STATE, action)=>{
 
         case BACKGROUND:{
             state = {...state,
-                online:'-1'}
+                online:'0'}
 
-            this._online(state, '-1')
+            this._online(state, '0')
             return state
         }
         
