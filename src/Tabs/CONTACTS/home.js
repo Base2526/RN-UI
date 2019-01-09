@@ -5,7 +5,8 @@ import { View,
         TouchableOpacity, 
         StyleSheet,
         FlatList, 
-        Dimensions,  } from 'react-native';
+        Dimensions,
+        Image,  } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Styles from '../../styles';
 import ScrollableTabView, {ScrollableTabBar, DefaultTabBar} from 'react-native-scrollable-tab-view';
@@ -24,6 +25,22 @@ import * as actions from '../../Actions'
 // import {profile_get, 
 //         profile_update, 
 //         profile_delete,} from '../../Utils/DB'
+
+const Header = props => (
+    <View style={{justifyContent: 'flex-end'}}>
+      <Text style={{color: 'white', fontSize: 25}}>COMPANY LOGO</Text>
+    </View>
+  );
+
+const ImageHeader = props => (
+    <View style={{ backgroundColor: '#eee', height: 89 }}>
+      <Image
+        style={StyleSheet.absoluteFill}
+        source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/3/36/Hopetoun_falls.jpg' }}
+      />
+      <Header {...props} style={{ backgroundColor: 'transparent' }}/>
+    </View>
+);
 
 const formatData = (data, numColumns) => {
     // เป้นการ ลบ item ที่มี ​field ออกทั้งหมด เพราะว่าเรารองรับการ orientation srceen ด้วย
@@ -49,7 +66,7 @@ class ContactsHome extends Component {
     static navigationOptions = ({ navigation }) => ({
         title: "Contacts",
         tabBarVisible: false,
-
+        // header: props => <ImageHeader {...props} />,
         headerLeft: (
             <TouchableOpacity
                 style={Styles.headerButton}

@@ -58,7 +58,7 @@ const index = createStackNavigator({
     'MyProfilePage': {
       screen: MyProfilePage,
       navigationOptions: {
-        title: 'MyProfile',
+        title: 'My Profile',
       }
     },
     'FriendProfilePage': {

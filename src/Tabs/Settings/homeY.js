@@ -27,11 +27,11 @@ const { RNTwitterSignIn } = NativeModules
 const FBSDK = require('react-native-fbsdk');
 const { LoginManager } = FBSDK;
 
-import firebase from 'react-native-firebase';
+// import firebase from 'react-native-firebase';
 
 import Styles from '../../styles';
 import Constant from '../../Utils/Constant'
-import {loadAsyncStorage, removeAsyncStorageByKey} from '../../Utils/Helpers'
+// import {loadAsyncStorage, removeAsyncStorageByKey} from '../../Utils/Helpers'
 // import * as actions from '../../Actions';
 import { actionLogout, updateIsLogin } from '../../Actions';
 

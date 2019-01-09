@@ -25,6 +25,7 @@
     "react-native-image-pan-zoom": "^2.1.11",
     "react-native-image-picker": "^0.27.1",
     "react-native-image-progress": "^1.1.1",
+    "react-native-iphone-x-helper": "^1.2.0",
     "react-native-loading-spinner-overlay": "^1.0.1",
     "react-native-modalbox": "^1.6.0",
     "react-native-nav": "^2.0.2",
