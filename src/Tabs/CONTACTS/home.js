@@ -21,23 +21,92 @@ import ClasssPage from './ClasssPage'
 
 import * as actions from '../../Actions'
 
+import {getHeaderInset} from '../../Utils/Helpers'
 
 // import {profile_get, 
 //         profile_update, 
 //         profile_delete,} from '../../Utils/DB'
 
+// import FastImage from 'react-native-fast-image'
+
 const Header = props => (
-    <View style={{justifyContent: 'flex-end'}}>
-      <Text style={{color: 'white', fontSize: 25}}>COMPANY LOGO</Text>
+    <View style={{flex:1, alignItems:'flex-end', flexDirection:'row'}}>
+        <View style={{flex:1}}>
+            <TouchableOpacity
+                style={{marginBottom:10}}
+                onPress={() => {
+                    props.navigation.openDrawer()
+                }}>
+                <Icon name="bars" size={25} color="white" />
+            </TouchableOpacity>
+        </View>
+
+        <View style={{flex:1, flexDirection:'row', marginBottom:10, justifyContent: 'flex-end'}}>
+            <TouchableOpacity
+                style={{height: 25,
+                        width: 30,
+                        alignItems:'center',
+                        marginRight:5}}
+                onPress={() => {
+                    // const { params = {} } = props.navigation.state
+                    let {params = {}} = props.navigation.state.routes[0]
+
+                    params.handleHeaderRightContactsSearch()
+                } }>
+                <Icon name="search" size={25} color="white"/>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={{height: 25,
+                        width: 30,
+                        alignItems:'center',
+                        marginRight:5}}
+                onPress={() => {
+                    // const { params = {} } = navigation.state
+                    let {params = {}} = props.navigation.state.routes[0]
+                    params.handleHeaderRight()
+                } }>
+                <Icon name="plus" size={25} color="white"/>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={{height: 25,
+                        width: 30,
+                        alignItems:'center',
+                        marginRight:5}}
+                onPress={() => {
+                    // const { params = {} } = navigation.state
+                    let {params = {}} = props.navigation.state.routes[0]
+                    params.handleHeaderRightContactsMenu()
+                } }>
+                {/* <Icon name="allergies" size={20} /> */}
+
+                {/* <FastImage
+                    style={{width: 35, height: 25}}
+                    source={require('../../Images/collapse_down_menu.png')}
+                    resizeMode={FastImage.resizeMode.contain}
+                />  */}
+                <Icon name="caret-down" size={25} color="white"/>
+
+            </TouchableOpacity>
+        </View>
     </View>
   );
 
 const ImageHeader = props => (
-    <View style={{ backgroundColor: '#eee', height: 89 }}>
-      <Image
+    <View style={{ backgroundColor: '#eee', height: getHeaderInset(true) }}>
+      {/* <Image
         style={StyleSheet.absoluteFill}
         source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/3/36/Hopetoun_falls.jpg' }}
-      />
+      /> */}
+      <FastImage
+        style={StyleSheet.absoluteFill}
+
+        source={{
+        uri: 'https://wallpaper.wiki/wp-content/uploads/2017/05/wallpaper.wiki-Beautiful-Full-HD-Wallpapers-PIC-WPE0011747.jpg',
+        headers:{ Authorization: 'someAuthToken' },
+        priority: FastImage.priority.normal,
+        }}
+        resizeMode={FastImage.resizeMode.cover}
+    />
       <Header {...props} style={{ backgroundColor: 'transparent' }}/>
     </View>
 );
@@ -66,7 +135,7 @@ class ContactsHome extends Component {
     static navigationOptions = ({ navigation }) => ({
         title: "Contacts",
         tabBarVisible: false,
-        // header: props => <ImageHeader {...props} />,
+        header: (navigation) => <ImageHeader {...navigation} />,
         headerLeft: (
             <TouchableOpacity
                 style={Styles.headerButton}
@@ -115,7 +184,7 @@ class ContactsHome extends Component {
                     /> 
                 </TouchableOpacity>
             </View>
-          ),
+        ),
     });
 
     constructor(props){
@@ -186,6 +255,11 @@ class ContactsHome extends Component {
         //     console.log(tx)
         // })
     }
+
+    saveDetails() {
+        alert('Save Details');
+    }
+
 
     componentDidMount () {
         setTimeout(() => {this.setState({renderContent: true})}, 0);

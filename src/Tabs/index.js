@@ -38,6 +38,7 @@ const SettingsTabs = createBottomTabNavigator({
             )
         }
     }, // <Icon name="ios-person" size={30} color="#4F8EF7" />
+    /*
     Recent: {
         screen: RecentScreen,
         navigationOptions: {
@@ -60,6 +61,8 @@ const SettingsTabs = createBottomTabNavigator({
             )
         }
     },
+    */
+   
     iDNA: {
         screen: iDNAScreen,
         navigationOptions: {

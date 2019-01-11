@@ -177,7 +177,7 @@ class FriendsPage extends React.Component{
                       >
                       <ImageWithDefault 
                         source={{uri: rowItem.image_url}}
-                        style={{width: 60, height: 60, borderRadius: 10}}
+                        style={{width: 60, height: 60, borderRadius: 10, borderColor:'red'}}
                       />
                       
                   </TouchableOpacity>

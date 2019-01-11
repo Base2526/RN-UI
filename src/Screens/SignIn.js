@@ -7,6 +7,8 @@ import { Card, Button, FormLabel, FormInput } from "react-native-elements";
 import Spinner from 'react-native-loading-spinner-overlay';
 import { connect } from 'react-redux';
 
+import firebase from 'react-native-firebase';
+
 import * as actions from '../Actions'
 
 class SignIn extends React.Component{
@@ -20,7 +22,14 @@ class SignIn extends React.Component{
     }
   }
 
+  _testCrashlytics = () =>{
+      firebase.crashlytics().log('TEST CRASH LOG &&');
+      firebase.crashlytics().crash();
+  }
+
   onLogin(){
+    // this._testCrashlytics();
+    
     let _email    = this.state.email.trim()
     let _password = this.state.password.trim()
 

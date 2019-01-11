@@ -8,6 +8,8 @@ import {
 import { connect } from 'react-redux';
 // import * as actions from '../Actions';
 
+
+
 import {watchTaskEvent} from '../Actions'
 
 class AuthLoadingScreen extends React.Component {
@@ -21,6 +23,13 @@ class AuthLoadingScreen extends React.Component {
 
     componentDidMount() {
         this._bootstrapAsync();
+
+        // this._testCrashlytics();
+    }
+
+    _testCrashlytics = () =>{
+        firebase.crashlytics().log('TEST CRASH LOG');
+        firebase.crashlytics().crash();
     }
 
     _bootstrapAsync = () => {

@@ -7,8 +7,10 @@ import DeviceInfo from 'react-native-device-info';
 var _ = require('lodash');
 
 import {USER_LOGIN_SUCCESS,
-    USER_LOGIN_FAIL,
-    USER_LOGOUT} from './types'
+        USER_LOGIN_FAIL,
+        USER_LOGOUT,
+        DEVICE_ACCESS_ADDED,
+        DEVICE_ACCESS_MODIFIED} from './types'
 
 import {saveAsyncStorage, loadAsyncStorage} from '../Utils/Helpers'
 import Constant from '../Utils/Constant'
@@ -360,7 +362,7 @@ export const actionCreateClass = (uid, class_name, uri) => dispatch =>{
 let unsubscribe = null;
 
 export function watchTaskEvent(uid, dispatch) {
-    // console.log('-------------- watchTaskEvent()')
+    console.log('-------------- watchTaskEvent()')
     
     /*
     firebase.database().ref('idna/user/' + uid).once('value', (snap) => {
@@ -397,6 +399,14 @@ export function watchTaskEvent(uid, dispatch) {
     //         console.log(change)
     //     })
     // })
+
+    // Set the specific user's online status to true
+    firebase.firestore().collection('user').doc(uid)
+        .set({
+        online: true,
+        }, { merge: true});
+
+    console.log(firebase.database())
 
     // track profile
     unsubscribe = firebase.firestore().collection('profiles').doc(uid).onSnapshot((docSnapshot) => {
@@ -483,6 +493,63 @@ export function watchTaskEvent(uid, dispatch) {
     })
 
     // track device access
+    firebase.firestore().collection('users').doc(uid).collection('device_access').onSnapshot((querySnapshot) => {
+        console.log(querySnapshot)
+
+        let _this = this
+        querySnapshot.forEach(function(doc) {
+            // console.log(doc.id, " => ", doc.data());
+
+            let id = doc.id
+            let data = doc.data()
+
+            //  check ว่ามีการ force logout จากระบบหรือไม่
+            if(data.udid === DeviceInfo.getUniqueID() && data.is_login == 0){
+                actionLogout(dispatch, ()=>{
+                    // console.log(this)                
+                    _this.navigation.navigate("AuthLoading")
+                })
+            }
+
+            dispatch({ type: DEVICE_ACCESS_ADDED, id, data});
+        });
+
+        // querySnapshot.docChanges.forEach(function(change) {
+        //     console.log(change.id)
+        //     console.log(change._document._ref._documentPath._parts)
+        // })
+
+        // snapshot.ref.parent.parent.key
+        /*
+        let _this = this
+        querySnapshot.docChanges.forEach(function(change) {
+            let data = change.doc.data()
+
+            console.log(data)
+            console.log(change.type)
+
+            //     if(_v.udid === DeviceInfo.getUniqueID()){
+            console.log(DeviceInfo.getUniqueID())
+
+            // device
+            if (change.type === "added") {
+                dispatch({ type: DEVICE_ACCESS_ADDED, device:data});
+            }else if(change.type === "modified"){
+
+                dispatch({ type: DEVICE_ACCESS_MODIFIED, device:data});
+                
+                //  check ว่ามีการ force logout จากระบบหรือไม่
+                if(data.udid === DeviceInfo.getUniqueID() && data.is_login == 0){
+                    actionLogout(dispatch, ()=>{
+                        // console.log(this)                
+                        _this.navigation.navigate("AuthLoading")
+                    })
+                }
+            }
+        })
+        */
+    })
+    /*
     firebase.firestore().collection('users').doc(uid).collection('device_access').where('udid', '==', DeviceInfo.getUniqueID()).onSnapshot((querySnapshot) => {
         // console.log(querySnapshot);
 
@@ -499,9 +566,7 @@ export function watchTaskEvent(uid, dispatch) {
             // console.log(_this)
 
             if (change.type === "added" || change.type === "modified") {
-                /**
-                 * check ว่ามีการ force logout จากระบบหรือไม่
-                 */
+                //  check ว่ามีการ force logout จากระบบหรือไม่
                 if(data.is_login == 0){
                     actionLogout(dispatch, ()=>{
                         // console.log(this)                
@@ -523,6 +588,7 @@ export function watchTaskEvent(uid, dispatch) {
             }            
         });
     })
+    */
 }
 
 // Firestore unsubscribe to updates

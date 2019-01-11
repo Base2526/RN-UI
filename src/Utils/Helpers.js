@@ -3,6 +3,9 @@ import {AsyncStorage} from 'react-native'
 import { Dimensions, DeviceInfo, Platform, StatusBar } from 'react-native';
 import { Header } from 'react-navigation';
 
+
+import { isIphoneX } from 'react-native-iphone-x-helper';
+
 export const getUid = (state) =>{
     // console.log(state)
     if(!state._persist.rehydrated){
@@ -194,4 +197,60 @@ export function getStatusBarHeight(skipAndroid: boolean = false): number {
         android: skipAndroid ? 0 : StatusBar.currentHeight,
         default: 0
     })
+}
+
+// https://github.com/react-navigation/react-navigation/blob/master/examples/NavigationPlayground/js/StackWithTranslucentHeader.js
+// Inset to compensate for navigation bar being transparent.
+// And improved abstraction for this will be built in to react-navigation
+// at some point.
+export function    getHeaderInset() {
+    const NOTCH_HEIGHT = isIphoneX() ? 25 : 0;
+
+    // $FlowIgnore: we will remove the HEIGHT static soon enough
+    const BASE_HEADER_HEIGHT = Header.HEIGHT;
+
+    const HEADER_HEIGHT =
+        Platform.OS === 'ios'
+        ? BASE_HEADER_HEIGHT + NOTCH_HEIGHT
+        : BASE_HEADER_HEIGHT + getStatusBarHeight(true);
+
+        console.log("HEADER_HEIGHT : " , HEADER_HEIGHT)
+        return HEADER_HEIGHT
+    return Platform.select({
+        ios: {
+        contentInset: { top: HEADER_HEIGHT },
+        contentOffset: { y: -HEADER_HEIGHT },
+        },
+        android: {
+        contentContainerStyle: {
+            paddingTop: HEADER_HEIGHT,
+        },
+        },
+    });
+}
+
+export function isEquivalent2Object(a, b) {
+    // Create arrays of property names
+    var aProps = Object.getOwnPropertyNames(a);
+    var bProps = Object.getOwnPropertyNames(b);
+
+    // If number of properties is different,
+    // objects are not equivalent
+    if (aProps.length != bProps.length) {
+        return false;
+    }
+
+    for (var i = 0; i < aProps.length; i++) {
+        var propName = aProps[i];
+
+        // If values of same property are not equal,
+        // objects are not equivalent
+        if (a[propName] !== b[propName]) {
+            return false;
+        }
+    }
+
+    // If we made it this far, objects
+    // are considered equivalent
+    return true;
 }

@@ -11,6 +11,9 @@ target 'RN_UI' do
   pod 'Firebase/Database'
   pod 'Firebase/Firestore'
   
+  pod 'Fabric'
+  pod 'Crashlytics'
+  
   # Add these to your Podfile
   pod 'React', :path => '../node_modules/react-native'
   pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga'

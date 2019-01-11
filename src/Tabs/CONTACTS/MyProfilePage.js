@@ -31,26 +31,35 @@ export default class MyProfilePage extends React.Component{
      */
     
     static navigationOptions = ({ navigation }) => ({
-        title: "Contacts",
+        // title: "Contacts",
         headerTransparent: true,
         headerTitleStyle:{color:'white'},
+        headerTintColor: 'white',
         // header:{ style:{ position: 'absolute', backgroundColor: 'transparent', zIndex: 100, top: 0, left: 0, right: 0 } },
         // headerStyle: {style:{ position: 'absolute', backgroundColor: 'transparent', zIndex: 100, top: 0, left: 0, right: 0 }},
-        /*
+    
         headerRight: (
-            <TouchableOpacity
-                // style={Styles.headerButton}
-                style={{marginRight:5}}
-                onPress={() => {
-                    // const { params = {} } = navigation.state
-                    // params.handleHeaderRight()
+            // <TouchableOpacity
+            //     // style={Styles.headerButton}
+            //     style={{marginRight:5}}
+            //     onPress={() => {
+            //         // const { params = {} } = navigation.state
+            //         // params.handleHeaderRight()
 
-                    alert('share')
-                } }>
-                <Icon name="share-alt-square" size={25} />
-            </TouchableOpacity>
+            //         alert('share')
+            //     } }>
+            //     <Icon name="share-alt-square" size={25} />
+            // </TouchableOpacity>
+
+            <View style={{flexDirection:'row', flex:1}}>
+                <TouchableOpacity style={{paddingRight:10}}>
+                    <Text style={{color:'white', fontSize:16}}>EDIT</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={{paddingRight:10}}>
+                    <Text style={{color:'white', fontSize:16}}>SHARE</Text>
+                </TouchableOpacity>
+            </View>
         ),
-        */
     });
 
 //    static navigationOptions = ({navigation}) => { return { headerTitle: <Text style={{color: 'white', fontSize: 18}}>Test</Text>, headerTransparent: true, headerStyle: { borderBottomWidth: 0, } } }

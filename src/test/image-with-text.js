@@ -6,17 +6,20 @@ import {
   Text,
   Platform,
   TouchableOpacity,
+  StyleSheet
 } from 'react-native';
 
 import { Header } from 'react-navigation';
 
 import { isIphoneX } from 'react-native-iphone-x-helper';
 
+import FastImage from 'react-native-fast-image'
+
 import {getStatusBarHeight} from '../Utils/Helpers'
 
 import ImageWithDefault from '../Utils/ImageWithDefault'
 
-const remote = 'https://images.unsplash.com/photo-1532974297617-c0f05fe48bff?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80';
+const remote = 'http://s1.bwallpapers.com/wallpapers/2014/05/09/blue-full-hd-desktop-wallpapers_034316171.jpg';
 
 // https://thekevinscott.com/background-images-in-react-native/
 export default class BackgroundImage extends Component {
@@ -55,29 +58,30 @@ export default class BackgroundImage extends Component {
     const text = 'This is some text inlaid in an <Image />';
 
     return (
-      <ImageBackground
-        style={{
-          backgroundColor: '#ccc',
-          flex: 1,
-          resizeMode,
-        //   position: 'absolute',
-          width: '100%',
-          height: '100%',
-          justifyContent: 'center',
-        }}
-        source={{ uri: remote }}
-      >
-        {/* <Text
-          style={{
-            backgroundColor: 'transparent',
-            textAlign: 'center',
-            fontSize: 30,
-            paddingTop: this.getHeaderInset(),
-          }}
-        >
-          {text}
-        </Text> */}
+      // <ImageBackground
+      //   style={{
+      //     backgroundColor: '#ccc',
+      //     flex: 1,
+      //     resizeMode,
+      //   //   position: 'absolute',
+      //     width: '100%',
+      //     height: '100%',
+      //     justifyContent: 'center',
+      //   }}
+      //   source={{ uri: remote }}
+      // >
+
+      
         <View style={{flex:1, paddingTop: this.getHeaderInset(), flexDirection:'row'}}>
+            <FastImage
+              style={StyleSheet.absoluteFill}
+              source={{
+              uri: 'https://wallpaper.wiki/wp-content/uploads/2017/05/wallpaper.wiki-Beautiful-Full-HD-Wallpapers-PIC-WPE0011747.jpg',
+              headers:{ Authorization: 'someAuthToken' },
+              priority: FastImage.priority.normal,
+              }}
+              resizeMode={FastImage.resizeMode.cover}
+          />
             <TouchableOpacity
                 style={{height:60,
                         width: 60,
@@ -91,16 +95,15 @@ export default class BackgroundImage extends Component {
                     style={{width: 60, height: 60, borderRadius: 30, }}
                 />      
             </TouchableOpacity>
-            <View style={{flexDirection:'row', flex:1, justifyContent:'flex-end'}}>
+            {/* <View style={{flexDirection:'row', flex:1, justifyContent:'flex-end'}}>
                 <TouchableOpacity style={{margin:5}}>
                     <Text style={{color:'white'}}>EDIT</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{margin:5}}>
                     <Text style={{color:'white'}}>SHARE</Text>
                 </TouchableOpacity>
-            </View>
+            </View> */}
         </View>
-      </ImageBackground>
     );
   }
 }

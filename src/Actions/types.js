@@ -11,3 +11,6 @@ export const USER_LOGOUT        = 'user_logout'
 // export const LOADING = 'loading'
 
 export const PROFILES = 'profiles'
+
+export const DEVICE_ACCESS_ADDED = "device_access_added"
+export const DEVICE_ACCESS_MODIFIED = "device_access_modified"

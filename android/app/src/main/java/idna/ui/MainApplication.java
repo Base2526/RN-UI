@@ -31,6 +31,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
+import io.invertase.firebase.fabric.crashlytics.RNFirebaseCrashlyticsPackage;
 import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
 
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
@@ -71,7 +72,8 @@ public class MainApplication extends Application implements ReactApplication {
             new VectorIconsPackage(),
             new RNDeviceInfo(),
             new SQLitePluginPackage(),
-              new RNFirebaseFirestorePackage()
+              new RNFirebaseFirestorePackage(),
+              new RNFirebaseCrashlyticsPackage()
       );
     }
 

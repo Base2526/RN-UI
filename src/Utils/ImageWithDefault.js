@@ -26,7 +26,7 @@ export default class ImageWithDefault extends React.Component {
     render() {
     
       // imageStyle
-      const defaultImage = <Image source={this.state.default} imageStyle={this.props.style}/>;
+      const defaultImage = <Image source={this.state.default} imageStyle={this.props.style} />;
 
       if (this.state.failed) return defaultImage;
   
@@ -46,7 +46,6 @@ export default class ImageWithDefault extends React.Component {
                 borderWidth: 0,
                 color: 'rgba(150, 150, 150, 1)',
                 unfilledColor: 'rgba(200, 200, 200, 0.2)',
-            
             }}
             onError={(e) => { 
                 this._onError(e)

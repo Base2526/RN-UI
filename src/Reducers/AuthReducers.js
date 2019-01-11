@@ -3,11 +3,15 @@ import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-ap
 
 import DeviceInfo from 'react-native-device-info';
 
+import deepDiffer from 'react-native/lib/deepDiffer'
+
 var _ = require('lodash');
 
 import {USER_LOGIN_SUCCESS,
         USER_LOGIN_FAIL,
-        USER_LOGOUT}  from '../Actions/types'
+        USER_LOGOUT,
+        DEVICE_ACCESS_ADDED,
+        DEVICE_ACCESS_MODIFIED}  from '../Actions/types'
 
 const INITIAL_STATE = {users:null,
                        provider:'',
@@ -15,6 +19,8 @@ const INITIAL_STATE = {users:null,
                        online: '-1',
                        error_message:''
                        }
+
+import {isEquivalent2Object} from '../Utils/Helpers'
 
 _online = (state, online) =>{
     // console.log(action)
@@ -228,6 +234,111 @@ export default (state= INITIAL_STATE, action)=>{
             this._online(state, '0')
             return state
         }
+
+        /*
+        DEVICE_ACCESS_ADDED,
+        DEVICE_ACCESS_MODIFIED
+        */
+        case DEVICE_ACCESS_ADDED:
+        case DEVICE_ACCESS_MODIFIED:{
+            if(state.users === null){
+                return state
+            }
+
+            let device_access = state.users.device_access
+            // console.log(device_access)
+
+            let key = 0
+            let value = null
+            _.each(device_access, function(_v, _k) { 
+                if(_v.udid === action.data.udid){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            // console.log(value)
+            // console.log(action.device)
+            // console.log(isEquivalent2Object(value, action.device))
+
+            if(key == 0){
+                // console.log("#0")
+                // มีเครื่องใหม่ เข้าใช้งานระบบ
+
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        device_access : {
+                            ...state.users.device_access,
+                            [action.id]:action.data
+                        }
+                    }
+                }
+                // console.log(v)
+                return v
+            }else{
+                // console.log("#1")
+                // เป็นการ compare ก่อน update 
+
+                // console.log(value)
+                // console.log(action.device)
+                // console.log(isEquivalent2Object(value, action.device))
+                if(!isEquivalent2Object(value, action.data)){
+                    // console.log(key)
+                    // console.log(value)
+                    // console.log(action.device)
+
+                    // let _t = {...device_access, [key]:action.device}
+                    // console.log(_t)
+
+                    // console.log(state)
+
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            device_access : {
+                                ...state.users.device_access,
+                                [key]:action.data
+                            }
+                        }
+                    }
+                    // console.log(v)
+                    return v
+                }
+            }
+
+            return state
+        }
+
+        /*
+        case DEVICE_ACCESS_MODIFIED:{
+            let device_access = state.users.device_access
+            // console.log(device_access)
+
+            let key = 0
+            let value = null
+            _.each(device_access, function(_v, _k) { 
+                if(_v.udid === DeviceInfo.getUniqueID()){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            console.log(value)
+            console.log(action.device)
+            if (isEquivalent2Object(value, action.device)) {
+                console.log(true)
+            }else{
+                console.log(false)
+            }
+
+            // console.log(deepDiffer(value, action.device))
+
+            return state
+        }
+        */
         
         default:
             return state

@@ -54,7 +54,7 @@ const index =  createStackNavigator({
     'manage_force_logout': {
         screen: SettingListForceLogout,
         navigationOptions: {
-          title: 'Manage Force Logout'
+          title: 'Force Logout'
         },
     },
     'manage_customize_tab_menus': {

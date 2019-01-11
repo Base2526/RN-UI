@@ -850,7 +850,7 @@ function me_user_delete($account) {
       // $firebase->delete(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $friend_id . '/friends/' . $account->uid);
 
       // FIRESTORE_PROFILES
-      firestore_db()->collection(FIRESTORE_USERS)->document($friend_id)->document($account->uid)->delete();
+      // firestore_db()->collection(FIRESTORE_USERS)->document($friend_id)->document($account->uid)->delete();
     }
   }
 
