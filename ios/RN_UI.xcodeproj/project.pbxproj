@@ -2002,7 +2002,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = idna.ui;
+				PRODUCT_BUNDLE_IDENTIFIER = th.dna;
 				PRODUCT_NAME = RN_UI;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2043,7 +2043,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = idna.ui;
+				PRODUCT_BUNDLE_IDENTIFIER = th.dna;
 				PRODUCT_NAME = RN_UI;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";

@@ -1327,6 +1327,15 @@ function me_services_resources()
 {
   $services = array(
     // 
+    'api_test'=>array(
+      'create' =>array(
+        'help'=>'Services api_test',
+        'callback'=>'api_test',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+      ),
+    ),
     'login'=>array(
       'create' =>array(
         'help'=>'Services : Login',
@@ -10048,8 +10057,6 @@ function ___update_image_url_of_user($uid, $image_url){
   }
   // การ query creator ทั้งระบบของ uid ขึ้นมาเพือทำการ update field_creator_image_uri, และข้อมูลที่ firebase ด้วย
 }
-
-
 
 /*
   เป็น function ที่ใช้ update profile ที่โดนเรียกใช้ cloud function firebase

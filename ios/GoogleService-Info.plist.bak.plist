@@ -7,34 +7,34 @@
 	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
 	<string>ca-app-pub-3940256099942544/4411468910</string>
 	<key>CLIENT_ID</key>
-	<string>775677002088-1rn8940fkoaf6iqk38u2nan4iofdjgl2.apps.googleusercontent.com</string>
+	<string>771859830598-fgak3j4n50bg1lfj6hbgvad45os1oc7t.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.775677002088-1rn8940fkoaf6iqk38u2nan4iofdjgl2</string>
+	<string>com.googleusercontent.apps.771859830598-fgak3j4n50bg1lfj6hbgvad45os1oc7t</string>
 	<key>API_KEY</key>
-	<string>AIzaSyBe7YkWADQDtjIrM13w2dr285Fh4eZSNzo</string>
+	<string>AIzaSyB_ZwigQJe7WF4jjrVONxF9qiyXCDcivjo</string>
 	<key>GCM_SENDER_ID</key>
-	<string>775677002088</string>
+	<string>771859830598</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>th.dna</string>
+	<string>idna.ui</string>
 	<key>PROJECT_ID</key>
-	<string>project-dna-943ab</string>
+	<string>rnui-227606</string>
 	<key>STORAGE_BUCKET</key>
-	<string>project-dna-943ab.appspot.com</string>
+	<string>rnui-227606.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_APPINVITE_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_GCM_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:775677002088:ios:745ae7d0b91819d0</string>
+	<string>1:771859830598:ios:89b5d81da536c952</string>
 	<key>DATABASE_URL</key>
-	<string>https://project-dna-943ab.firebaseio.com</string>
+	<string>https://rnui-227606.firebaseio.com</string>
 </dict>
 </plist>

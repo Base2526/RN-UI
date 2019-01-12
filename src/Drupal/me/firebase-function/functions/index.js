@@ -1,56 +1,90 @@
-// // const functions = require('firebase-functions');
-
-// // // // Create and Deploy Your First Cloud Functions
-// // // // https://firebase.google.com/docs/functions/write-firebase-functions
-// // //
-// // exports.heyWorld = functions.https.onRequest((request, response) => {
-// //  response.send("Hello from Firebase!");
-// // });
-
-// const Firestore = require('@google-cloud/firestore');
-
-// const firestore = new Firestore({
-//   projectId: 'rnui-227606',
-//   keyFilename: 'RNUI-9bc729e9c0a0.json',
-// });
-
-// const document = firestore.doc('users/WmhvONYMrH9o1OiP0DYk');
-
-// // Enter new data into the document.
-// document.set({
-//     title: 'Welcome to Firestore',
-//     body: 'Hello World',
-//   }).then(() => {
-//     // Document created successfully.
-//     console.log('Document created successfully.')
-//     return true;
-//   }).catch((err) => {
-//     console.log('Failed with error info: ${err}');
-//     return err;
-//   });
-
-
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-admin.initializeApp(functions.config().firebase);
+admin.initializeApp(functions.config().firestore);
 
+const firestoreDB = admin.firestore().settings({ timestampsInSnapshots: true }); 
 
-exports.someMethod = functions.https.onRequest((req, res) => {
-    var stuff = [];
-    var db = admin.firestore();
-    db.collection("users").get().then(snapshot => {
+/*
+เป็นส่วน call api Drupal
+*/
+var request = require('request');
 
-        snapshot.forEach(doc => {
-            var newelement = {
-                "id": doc.id,
-                "xxxx": doc.data().xxx,
-                "yyy": doc.data().yyy
+const config = require('./config');
+
+// exports.helloWorld = functions.https.onRequest((request, response) => {
+//  response.send("Hello from Firebase! > " + config.headers);
+// });
+
+// classs
+exports.updateClasss = functions.firestore
+    .document('users/{userId}/classs/{classId}')
+    .onUpdate((change, context) => {
+
+    const newValue = change.after.data();
+
+    // กรณี profile user มีการ edit | Update
+    request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PATH_API_TEST, form: {value:newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+        /* ... */
+        // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+        var objectValue = JSON.parse(body);
+        console.log(objectValue);
+        if (!objectValue.result) {
+            // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+        }
+    });
+
+    return true;
+    
+});
+
+// 
+exports.updateMyApplications = functions.firestore
+    .document('users/{userId}/my_applications/{my_applicationsId}')
+    .onUpdate((change, context) => {
+
+    const newValue = change.after.data();
+
+    // กรณี profile user มีการ edit | Update
+    request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PATH_API_TEST, form: {value:newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+        /* ... */
+        // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+        var objectValue = JSON.parse(body);
+        console.log(objectValue);
+        if (!objectValue.result) {
+            // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+        }
+    });
+
+    return true;
+    
+});
+
+exports.updateProfiles = functions.firestore
+    .document('profiles/{userId}')
+    .onUpdate((change, context) => {
+        // Get an object representing the document
+        // e.g. {'name': 'Marie', 'age': 66}
+        const newValue = change.after.data();
+
+        // ...or the previous value before this update
+        const previousValue = change.before.data();
+
+        // access a particular field as you would any JS property
+        const name = newValue.name;
+
+        // perform desired operations ...
+        console.log(change);
+
+        // กรณี profile user มีการ edit | Update
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PATH_API_TEST, form: {value:newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
             }
-            stuff = stuff.concat(newelement);
         });
-        res.send(stuff)
-        return "";
-    }).catch(reason => {
-        res.send(reason)
-    })
+
+        return true;
 });

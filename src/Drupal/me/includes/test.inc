@@ -55,4 +55,14 @@ function test_function(){
     // dpm(dirname(__FILE__) . '/RNUI-ff2d34405d3d.json');
     return "test_function";
 }
+
+function api_test(){
+    // $param = json_decode(file_get_contents('php://input'), true);
+
+    watchdog(TAG, 'api_test =%v', array('%v'=> serialize($_REQUEST) ), WATCHDOG_INFO);
+    
+    $result['result'] = TRUE;
+    $result['resparamult'] = $_REQUEST;
+    return $result;
+}
 ?>
