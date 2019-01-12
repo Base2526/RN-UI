@@ -100,7 +100,7 @@ android {
     buildToolsVersion '28.0.3'
 
     defaultConfig {
-        applicationId "idna.ui"
+        applicationId "th.dna"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 3

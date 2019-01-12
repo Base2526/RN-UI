@@ -1,16 +1,9 @@
-package idna.ui;
+package th.dna;
 
 import android.content.Intent;
-import android.os.Bundle;
 
 import com.facebook.react.ReactActivity;
-import com.facebook.react.ReactInstanceManager;
-import com.facebook.react.ReactRootView;
-import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
-import com.facebook.react.shell.MainReactPackage;
-
-import org.pgsqlite.SQLitePluginPackage;
 
 //import org.pgsqlite.SQLitePluginPackage;
 

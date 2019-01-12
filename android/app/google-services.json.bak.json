@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "775677002088",
-    "firebase_url": "https://project-dna-943ab.firebaseio.com",
-    "project_id": "project-dna-943ab",
-    "storage_bucket": "project-dna-943ab.appspot.com"
+    "project_number": "771859830598",
+    "firebase_url": "https://rnui-227606.firebaseio.com",
+    "project_id": "rnui-227606",
+    "storage_bucket": "rnui-227606.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:775677002088:android:745ae7d0b91819d0",
+        "mobilesdk_app_id": "1:771859830598:android:89b5d81da536c952",
         "android_client_info": {
-          "package_name": "th.dna"
+          "package_name": "idna.ui"
         }
       },
       "oauth_client": [
         {
-          "client_id": "775677002088-tkjtipbbb5qmvlaafdbcsi2km46jabeb.apps.googleusercontent.com",
+          "client_id": "771859830598-c6ua1v3kg54ij0951qfq6a8msdq47nq9.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBRt2vVBqJzvsMJzKg-vxIcaVluiOpGATM"
+          "current_key": "AIzaSyDmOL2450iCYgBnJ0-pTVU8flK_w-1xu58"
         }
       ],
       "services": {

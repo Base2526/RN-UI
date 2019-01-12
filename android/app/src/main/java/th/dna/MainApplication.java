@@ -1,4 +1,4 @@
-package idna.ui;
+package th.dna;
 
 import android.app.Application;
 
@@ -16,15 +16,9 @@ import com.dylanvann.fastimage.FastImageViewPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 import org.reactnative.camera.RNCameraPackage;
+
 import io.invertase.firebase.RNFirebasePackage;
 
-import com.facebook.reactnative.androidsdk.FBSDKPackage;
-import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
-import com.rt2zz.reactnativecontacts.ReactNativeContacts;
-import org.reactnative.camera.RNCameraPackage;
-import com.imagepicker.ImagePickerPackage;
-import com.dylanvann.fastimage.FastImageViewPackage;
-import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -33,8 +27,6 @@ import com.facebook.soloader.SoLoader;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import io.invertase.firebase.fabric.crashlytics.RNFirebaseCrashlyticsPackage;
 import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
-
-import com.learnium.RNDeviceInfo.RNDeviceInfo;
 
 import java.util.Arrays;
 import java.util.List;
