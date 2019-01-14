@@ -10,7 +10,11 @@ import {USER_LOGIN_SUCCESS,
         USER_LOGIN_FAIL,
         USER_LOGOUT,
         DEVICE_ACCESS_ADDED,
-        DEVICE_ACCESS_MODIFIED} from './types'
+        DEVICE_ACCESS_MODIFIED,
+        UPDATE_PROFILE,
+        ADD_FRIEND,
+        FRIEND_PROFILE,
+        UPDATE_STATUS_FRIEND} from './types'
 
 import {saveAsyncStorage, loadAsyncStorage} from '../Utils/Helpers'
 import Constant from '../Utils/Constant'
@@ -345,19 +349,25 @@ export const actionCreateClass = (uid, class_name, uri) => dispatch =>{
     })
 }
 
-// export const watchTaskEvent = () => {
-//     console.log('-------------- watchTaskEvent()')
-//     firebase.database().ref('idna/user/1').on('value', (snap) => {
-//         // dispatch(addTask(snap.val()));
+export const actionUpdateStatusFriend = (uid, friend_id, status, callback) => dispatch=>{
+    // console.log('-------------- actionAcceptFriend()')
 
-//         // console.log('value')
-//         console.log(snap.val())
-//     });
+    // return {'status':true}
 
-    
+    // console.log(dispatch)
+    //  UPDATE_STATUS_FRIEND
 
-//     // value' event
-// }
+    // update status เพือ่นของเรา
+    firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).update({status})
+
+    // update status เราของเพือน
+    firebase.firestore().collection('users').doc(friend_id).collection('friends').doc(uid).update({status})
+
+    // status
+    dispatch({ type: UPDATE_STATUS_FRIEND, friend_id, status});
+
+    callback({'status':true})
+}
 
 let unsubscribe = null;
 
@@ -401,16 +411,18 @@ export function watchTaskEvent(uid, dispatch) {
     // })
 
     // Set the specific user's online status to true
+    /*
     firebase.firestore().collection('user').doc(uid)
         .set({
         online: true,
         }, { merge: true});
 
     console.log(firebase.database())
+    */
 
     // track profile
     unsubscribe = firebase.firestore().collection('profiles').doc(uid).onSnapshot((docSnapshot) => {
-        console.log(docSnapshot.data());
+        // console.log(docSnapshot.data());
 
         if(docSnapshot.data() === undefined){
             actionLogout(dispatch, ()=>{
@@ -419,6 +431,7 @@ export function watchTaskEvent(uid, dispatch) {
             })
         }
 
+        dispatch({ type: UPDATE_PROFILE, data:docSnapshot.data()});
 
     //    querySnapshot.documentChanges.forEach((change) => {
     //     // Do something with change
@@ -492,9 +505,50 @@ export function watchTaskEvent(uid, dispatch) {
         console.log(error)
     })
 
+    // track friends
+    firebase.firestore().collection('users').doc(uid).collection('friends').onSnapshot((querySnapshot) => {
+        // console.log(querySnapshot)
+
+        querySnapshot.forEach(function(doc) {
+            // console.log(doc)
+            // console.log(doc.id, " => ", doc.data());
+
+            dispatch({ type: ADD_FRIEND, id:doc.id, data:doc.data()});
+
+            // let id = doc.id
+            // let data = doc.data()
+
+            // ADD_FRIEND FRIEND_PROFILE
+
+            /*
+            firebase.firestore().collection('profiles').doc(doc.id)
+            .get()
+            .then(snapshot => {
+                // console.log(doc)
+                console.log(doc.id, " => ", doc.data());
+                console.log(snapshot.data())
+                // snapshot.docs.forEach(doc => {
+                //     console.log(JSON.parse(doc._document.data.toString()))
+                // });
+
+                let v = {...doc.data(), profile:snapshot.data()}
+                console.log(v)
+            });
+            */
+
+           firebase.firestore().collection('profiles').doc(doc.id).onSnapshot((docSnapshot) => {
+                // console.log(docSnapshot.id) 
+                // doc.id จะมีค่าเท่ากันกับ  docSnapshot.id 
+                // console.log(docSnapshot.id, " => ", docSnapshot.data());
+
+                dispatch({ type: FRIEND_PROFILE, id:docSnapshot.id, data:docSnapshot.data()});
+           })
+        })
+    })
+
     // track device access
     firebase.firestore().collection('users').doc(uid).collection('device_access').onSnapshot((querySnapshot) => {
-        console.log(querySnapshot)
+        // console.log(querySnapshot)
 
         let _this = this
         querySnapshot.forEach(function(doc) {
@@ -549,6 +603,7 @@ export function watchTaskEvent(uid, dispatch) {
         })
         */
     })
+
     /*
     firebase.firestore().collection('users').doc(uid).collection('device_access').where('udid', '==', DeviceInfo.getUniqueID()).onSnapshot((querySnapshot) => {
         // console.log(querySnapshot);

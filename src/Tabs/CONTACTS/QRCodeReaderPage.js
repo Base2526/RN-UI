@@ -12,6 +12,16 @@ import {
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
 export default class QRCodeReaderPage extends Component {
+
+  static navigationOptions = ({ navigation }) => ({
+    title: "QR code reader",
+    // header: (props) => <ImageHeader {...props} />,
+    headerStyle: {
+      backgroundColor: 'rgba(186, 53, 100, 1.0)',
+      shadowColor: 'transparent',
+    },
+  })
+
   onSuccess(e) {
     // Linking
     //   .openURL(e.data)

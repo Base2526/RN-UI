@@ -1,11 +1,21 @@
 import React from 'react'
-import {View, Text, FlatList} from 'react-native'
+import {View, Text, FlatList, TouchableOpacity} from 'react-native'
 import Contacts from 'react-native-contacts';
 import { ListItem } from "react-native-elements";
 import {Platform, PermissionsAndroid} from 'react-native'; 
+import Icon from 'react-native-vector-icons/FontAwesome5';
+
+import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
 export default class InviteFriendForContactPage extends React.Component{
-    
+
+    static navigationOptions = ({ navigation }) => ({
+        title: "Add Friends",
+        headerStyle: {
+            backgroundColor: 'rgba(186, 53, 100, 1.0)',
+        },
+    })
+
     constructor(props){
         super(props)
         this.state ={

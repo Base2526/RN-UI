@@ -196,6 +196,7 @@ function me_init(){
 
 	define("FIRESTORE_MY_APPLIPATIONS", 'my_applications');
 	define("FIRESTORE_CLASSS", "classs");
+	define("FIRESTORE_FRIENDS", "friends");
   
 	if ($debug) {
 	  /*

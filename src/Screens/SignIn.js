@@ -28,9 +28,8 @@ class SignIn extends React.Component{
   }
 
   onLogin(){
-    this._testCrashlytics();
+    // this._testCrashlytics();
     
-    /*
     let _email    = this.state.email.trim()
     let _password = this.state.password.trim()
 
@@ -54,7 +53,6 @@ class SignIn extends React.Component{
         }
       })
     }
-    */
   }
 
   render(){

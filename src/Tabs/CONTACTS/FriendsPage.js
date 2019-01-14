@@ -15,6 +15,9 @@ import DictStyle from './dictStyle'
 
 import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+
+import Spinner from 'react-native-loading-spinner-overlay';
 
 import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-appstate';
 
@@ -29,37 +32,24 @@ import Constant from '../../Utils/Constant'
 // import {watchTaskAddEvent, watchTaskChangedEvent, watchTaskRemovedEvent} from '../../Actions'
 import ImageWithDefault from '../../Utils/ImageWithDefault'
 
+import {getUid} from '../../Utils/Helpers'
+
 class FriendsPage extends React.Component{
 
     constructor(props){
         super(props)
         this.state = {
           renderContent: false,
+          loading: false,
         }
         // console.log(DeviceInfo.getUniqueID())
     }
     
     componentDidMount() {
       setTimeout(() => {this.setState({renderContent: true})}, 0);
-
-      // group_all(v=>{
-      //   console.log(v)
-      // })
-      
-      // groupDetail_all(v=>{
-      //   console.log(v)
-      // })
-
-      // FastImage.preload([
-      //   {
-      //     uri: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii0xMS41IC0xMC4yMzE3NCAyMyAyMC40NjM0OCI+CiAgPHRpdGxlPlJlYWN0IExvZ288L3RpdGxlPgogIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIyLjA1IiBmaWxsPSIjNjFkYWZiIi8+CiAgPGcgc3Ryb2tlPSIjNjFkYWZiIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiPgogICAgPGVsbGlwc2Ugcng9IjExIiByeT0iNC4yIi8+CiAgICA8ZWxsaXBzZSByeD0iMTEiIHJ5PSI0LjIiIHRyYW5zZm9ybT0icm90YXRlKDYwKSIvPgogICAgPGVsbGlwc2Ugcng9IjExIiByeT0iNC4yIiB0cmFuc2Zvcm09InJvdGF0ZSgxMjApIi8+CiAgPC9nPgo8L3N2Zz4K',
-      //     headers: { Authorization: 'someAuthToken' },
-      //   }
-      // ])
     }
 
     componentWillReceiveProps(nextProps){
-      
       /* 
       check ว่ามี property auth ถ้าไม่มีแสดงข้อมูลอาจผิดพลาดเราจะไม่ทำอะไร
       */
@@ -67,8 +57,8 @@ class FriendsPage extends React.Component{
         return;
       }
 
-      console.log('componentWillReceiveProps : auth')
-      console.log(nextProps)
+      // console.log('componentWillReceiveProps : auth')
+      // console.log(nextProps)
     }
 
     loadData=()=>{
@@ -85,9 +75,10 @@ class FriendsPage extends React.Component{
 
         // console.log(friend_profiles)
         let friendRequestSent_member = []
+        let friendRequest_member = [];
         let friend_member = []
         for (var key in this.props.auth.users.friends) {
-          // console.log()
+          // console.log(key)
 
           let friend =  this.props.auth.users.friends[key]
 
@@ -101,7 +92,7 @@ class FriendsPage extends React.Component{
             case Constant.FRIEND_STATUS_FRIEND:{
               // console.log('1, --' + key)
               
-              friend_member.push(friend);
+              friend_member.push({...friend, friend_id:key});
               break
             }
 
@@ -112,6 +103,7 @@ class FriendsPage extends React.Component{
 
             case Constant.FRIEND_STATUS_FRIEND_REQUEST:{
               // console.log('3, --' + key)
+              friendRequest_member.push({...friend, friend_id:key}); 
               break
             }
 
@@ -119,7 +111,7 @@ class FriendsPage extends React.Component{
               // console.log('4, --' + key)
               // console.log()
 
-              friendRequestSent_member.push(friend);  
+              friendRequestSent_member.push({...friend, friend_id:key});  
               break
             }
           }
@@ -127,6 +119,11 @@ class FriendsPage extends React.Component{
 
         // console.log(friendRequestSent_member)
         // console.log(friend_member)
+
+        let friendRequest = {
+          title:'Friend Request',
+          member: friendRequest_member
+        }
 
         let friendRequestSent = {
           title: 'Friend Request Sent',
@@ -138,26 +135,30 @@ class FriendsPage extends React.Component{
         }
 
         // console.log([profile, friends, friendRequestSent])
-        return [profile, friendRequestSent, friends];        
+        return [profile, friendRequest, friendRequestSent, friends];        
     }
 
-    _itemOnPress(rowId, sectionId){
+    _itemOnPress(item, rowId, sectionId){
       if(rowId == 0 && sectionId == 0){
         this.props.params.navigation.navigate("MyProfilePage")
       }else{
-        this.props.params.navigation.navigate("FriendProfilePage")
+        this.props.params.navigation.navigate("FriendProfilePage",{'friend_id': item.friend_id})
       }
+    }
+
+    _y = props =>{
+      
     }
 
     _renderRow = (rowItem, rowId, sectionId) => {
 
         // console.log(rowItem)
-        
+
         if(rowId == 0 && sectionId == 0){
           return (
             <TouchableOpacity 
               key={ rowId } 
-              onPress={this._itemOnPress.bind(this, rowId, sectionId)}
+              onPress={this._itemOnPress.bind(this, rowItem, rowId, sectionId)}
               onLongPress={()=>alert("MyProfile onLongPress")}
               >
               <View
@@ -177,7 +178,7 @@ class FriendsPage extends React.Component{
                       >
                       <ImageWithDefault 
                         source={{uri: rowItem.image_url}}
-                        style={{width: 60, height: 60, borderRadius: 10, borderColor:'red'}}
+                        style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}
                       />
                       
                   </TouchableOpacity>
@@ -200,29 +201,88 @@ class FriendsPage extends React.Component{
           )
         }
 
-        var swipeoutBtns = [
-          {
-            text: 'Delete',
-            backgroundColor: 'red',
-            onPress: () => { alert("Delete Click") }
-          },{
-            text: 'Hide',
-            backgroundColor: '#3c33ff',
-            onPress: () => { alert("Hide Click") }
-          },{
-            text: 'Block',
-            backgroundColor: '#22ff1a',
-            onPress: () => { alert("Block Click") }
+        var swipeoutRight = []
+
+        let swipeoutLeft  = []
+
+        if(rowItem.profile === undefined){
+          return(<View></View>);
+        }
+
+        console.log(rowItem.status)
+        switch(rowItem.status){
+          case Constant.FRIEND_STATUS_FRIEND:{
+            // console.log('1, --' + key)
+            
+            // friend_member.push({...friend, friend_id:key});
+            swipeoutRight = [
+              {
+                text: 'Delete',
+                backgroundColor: 'red',
+                onPress: () => { alert("Delete Click") }
+              },{
+                text: 'Hide',
+                backgroundColor: '#3c33ff',
+                onPress: () => { alert("Hide Click") }
+              },{
+                text: 'Block',
+                backgroundColor: '#22ff1a',
+                onPress: () => { alert("Block Click") }
+              }
+            ]
+
+            swipeoutLeft  = [
+              {
+                component:<View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'rgba(186, 53, 100, 1.0)'}}>
+                            <Icon raised color='white'containerStyle={{backgroundColor: '#FF5722'}} name={rowId% 2 === 0 ? 'volume-up': 'volume-mute'} size={40}/>
+                          </View>
+                ,
+                onPress: () => console.log("Do something"),
+              },
+            ]
+            break
           }
-        ]
+
+          case Constant.FRIEND_STATUS_FRIEND_CANCEL:{
+            // console.log('2, --' + key)
+            break
+          }
+
+          case Constant.FRIEND_STATUS_FRIEND_REQUEST:{
+            // console.log('3, --' + key)
+            // swipeoutRight = [
+            //   {
+            //     text: 'Cancel',
+            //     backgroundColor: 'gray',
+            //     onPress: () => { alert("Block Click") }
+            //   }
+            // ]  
+            break
+          }
+
+          case Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND:{
+            // console.log('4, --' + key)
+            // console.log()
+
+            // swipeoutRight = [
+            //   {
+            //     text: 'Cancel',
+            //     backgroundColor: 'gray',
+            //     onPress: () => { alert("Block Click") }
+            //   }
+            // ]  
+            break
+          }
+        }
 
         return (
           <Swipeout 
             style={{backgroundColor:'white'}} 
-            right={swipeoutBtns}>
+            right={swipeoutRight}
+            left={swipeoutLeft}>
           <TouchableOpacity 
             key={ rowId } 
-            onPress={this._itemOnPress.bind(this, rowId, sectionId)}
+            onPress={this._itemOnPress.bind(this, rowItem, rowId, sectionId)}
             onLongPress={()=>alert("Friend onLongPress")}>
             <View
               style={{
@@ -232,39 +292,15 @@ class FriendsPage extends React.Component{
                 // borderWidth: 0.5, 
                 borderColor: DictStyle.colorSet.lineColor,
                 flexDirection: 'row',
-              }}
-            >
+              }}>
                 <TouchableHighlight 
                     style={{height:60,
                             width: 60,
-                            borderRadius: 10}}        
-                    >
-                    { /*}
-                    <FastImage
-                        style={{width: 60, height: 60, borderRadius: 10}}
-                        source={{
-                        uri: rowItem.profile.image_url === "" ? Constant.DEFAULT_AVATARSOURCE_URI : Constant.API_URL + rowItem.profile.image_url,
-                        // uri: 'https://cdn-images-1.medium.com/max/1600/1*-CY5bU4OqiJRox7G00sftw.gif',
-                        headers:{ Authorization: 'someAuthToken' },
-                        priority: FastImage.priority.normal,
-                        }}
-                        resizeMode={FastImage.resizeMode.contain}
-
-                        onLoadStart={()=>{
-                          console.log('onLoadStart')
-                        }}
-                        onProgress={e => console.log(e.nativeEvent.loaded / e.nativeEvent.total)}
-
-                        onLoadEnd={()=>{
-                          console.log('onLoadEnd')
-                        }}
-                    />
-                    */ }
-                  
+                            borderRadius: 10}}>
                       <ImageWithDefault 
                         source={{uri:rowItem.profile.image_url}}
-                        style={{width: 60, height: 60, borderRadius: 10}}
-                      />
+                        // source={{uri: 'https://cdn-images-1.medium.com/max/1600/1*-CY5bU4OqiJRox7G00sftw.gif'}}
+                        style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/>
                 </TouchableHighlight>
                 <View>
                     <Text style={{fontSize: 18, 
@@ -272,14 +308,58 @@ class FriendsPage extends React.Component{
                                   color: DictStyle.colorSet.normalFontColor,
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
-                        Name : {rowItem.profile.name}
+                         Name : {rowItem.profile.name}
                     </Text>
                     <Text style={{fontSize: DictStyle.fontSet.mSize, 
                                 color: DictStyle.colorSet.normalFontColor,
                                 paddingLeft: 10}}>
-                        Status : {rowItem.profile.status}
+                        Status : {rowItem.profile.status_message}
                     </Text>
+                </View>
+                { rowItem.status === Constant.FRIEND_STATUS_FRIEND_REQUEST ?
+                <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
+                  <View style={{borderColor:'green', borderWidth:1, borderRadius:10, padding:5}}>
+                    <TouchableOpacity
+                    onPress={()=>{
+                      this.setState({loading:true})
+                      this.props.actionUpdateStatusFriend(this.props.uid, rowItem.friend_id, Constant.FRIEND_STATUS_FRIEND, (data)=>{
+                        this.setState({loading:false})
+                      })
+                    }}>
+                      <Text style={{color:'green'}}>Accept</Text>
+                    </TouchableOpacity>
                   </View>
+                  <View style={{borderColor:'red', borderWidth:1, borderRadius:10, padding:5, marginLeft:5}}>
+                    <TouchableOpacity
+                    onPress={()=>{
+                      this.setState({
+                        loading:true
+                      })
+
+                    }}>
+                      <Text style={{color:'red'}}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                : null
+                }
+
+                { rowItem.status === Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND ?
+                <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
+                  <View style={{borderColor:'red', borderWidth:1, borderRadius:10, padding:5, marginLeft:5}}>
+                    <TouchableOpacity
+                    onPress={()=>{
+                      this.setState({
+                        loading:true
+                      })
+
+                    }}>
+                      <Text style={{color:'red'}}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                : null
+                }
             </View>
           </TouchableOpacity>
           </Swipeout>
@@ -388,6 +468,8 @@ class FriendsPage extends React.Component{
     
     render() {
 
+      console.log(this.props)
+
       let {
         renderContent
       } = this.state;
@@ -398,6 +480,12 @@ class FriendsPage extends React.Component{
 
       return (
           <View style={{flex: 1}}>
+          <Spinner
+            visible={this.state.loading}
+            textContent={'Wait...'}
+            textStyle={{color: '#FFF'}}
+            overlayColor={'rgba(0,0,0,0.5)'}
+          />
           {
             renderContent && 
             <ExpandableList
@@ -408,6 +496,7 @@ class FriendsPage extends React.Component{
               renderRow={this._renderRow}
               headerOnPress={(i, state) => {
                 // console.log(i, state)
+                // alert('headerOnPress')
               } }
               renderSectionHeaderX={this._renderSection}
               openOptions={[0, 1, 2, 3]}
@@ -417,7 +506,6 @@ class FriendsPage extends React.Component{
       );
     }
 }
-
 
 const mapStateToProps = (state) => {
   console.log(state)
@@ -429,15 +517,16 @@ const mapStateToProps = (state) => {
   }
 
   return{
+    uid:getUid(state),
     auth:state.auth
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
-  // watchTaskAddEvent(dispatch)
-  // watchTaskChangedEvent(dispatch)
-  // watchTaskRemovedEvent(dispatch)
-  return {}
-}
+// const mapDispatchToProps = (dispatch) => {
+//   // watchTaskAddEvent(dispatch)
+//   // watchTaskChangedEvent(dispatch)
+//   // watchTaskRemovedEvent(dispatch)
+//   return {actionAcceptFriend}
+// }
 
-export default connect(mapStateToProps, mapDispatchToProps)(FriendsPage);
+export default connect(mapStateToProps, actions)(FriendsPage);

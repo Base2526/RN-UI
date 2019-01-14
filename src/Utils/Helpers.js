@@ -3,6 +3,7 @@ import {AsyncStorage} from 'react-native'
 import { Dimensions, DeviceInfo, Platform, StatusBar } from 'react-native';
 import { Header } from 'react-navigation';
 
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import { isIphoneX } from 'react-native-iphone-x-helper';
 
@@ -214,7 +215,7 @@ export function    getHeaderInset() {
         ? BASE_HEADER_HEIGHT + NOTCH_HEIGHT
         : BASE_HEADER_HEIGHT + getStatusBarHeight(true);
 
-        console.log("HEADER_HEIGHT : " , HEADER_HEIGHT)
+        // console.log("HEADER_HEIGHT : " , HEADER_HEIGHT)
         return HEADER_HEIGHT
     return Platform.select({
         ios: {
@@ -254,3 +255,4 @@ export function isEquivalent2Object(a, b) {
     // are considered equivalent
     return true;
 }
+

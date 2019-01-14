@@ -20,14 +20,7 @@ import GroupsPage from './GroupsPage'
 import ClasssPage from './ClasssPage'
 
 import * as actions from '../../Actions'
-
-import {getHeaderInset} from '../../Utils/Helpers'
-
-// import {profile_get, 
-//         profile_update, 
-//         profile_delete,} from '../../Utils/DB'
-
-// import FastImage from 'react-native-fast-image'
+import {getHeaderInset, isEquivalent2Object} from '../../Utils/Helpers'
 
 const Header = props => (
     <View style={{flex:1, alignItems:'flex-end', flexDirection:'row'}}>
@@ -91,25 +84,28 @@ const Header = props => (
     </View>
   );
 
-const ImageHeader = props => (
-    <View style={{ backgroundColor: '#eee', height: getHeaderInset(true) }}>
-      {/* <Image
-        style={StyleSheet.absoluteFill}
-        source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/3/36/Hopetoun_falls.jpg' }}
-      /> */}
+const ImageHeader = (props) => {
+    let bg_url = '';
+    if(props.navigation.state.routes[0].params !== undefined){
+        if(props.navigation.state.routes[0].params.hasOwnProperty('bg_url')){
+            bg_url = props.navigation.state.routes[0].params.bg_url;
+        }
+    }
+
+    return(<View style={{ backgroundColor: '#eee', height: getHeaderInset(true) }}>
       <FastImage
         style={StyleSheet.absoluteFill}
 
         source={{
-        uri: 'https://wallpaper.wiki/wp-content/uploads/2017/05/wallpaper.wiki-Beautiful-Full-HD-Wallpapers-PIC-WPE0011747.jpg',
+        uri: bg_url,
         headers:{ Authorization: 'someAuthToken' },
         priority: FastImage.priority.normal,
         }}
         resizeMode={FastImage.resizeMode.cover}
     />
       <Header {...props} style={{ backgroundColor: 'transparent' }}/>
-    </View>
-);
+    </View>)
+}
 
 const formatData = (data, numColumns) => {
     // เป้นการ ลบ item ที่มี ​field ออกทั้งหมด เพราะว่าเรารองรับการ orientation srceen ด้วย
@@ -132,10 +128,77 @@ const formatData = (data, numColumns) => {
 
 class ContactsHome extends Component {
 
-    static navigationOptions = ({ navigation }) => ({
+    static navigationOptions = ({ navigation }) => {
+        // const { bg_url } = navigation.params
+        // const { bg_url } =navigation.state.params;
+
+        if(navigation.state.params !== undefined){
+            // console.log(navigation.state.params)
+            const { bg_url } =navigation.state.params;
+            // console.log(bg_url)
+        }
+
+        // if(!this.props.hasOwnProperty('auth') 
+        
+        return {
+            title: "Contacts",
+            tabBarVisible: false,
+            header: (props) => <ImageHeader {...props} />,
+            headerLeft: (
+                <TouchableOpacity
+                    style={Styles.headerButton}
+                    onPress={() => navigation.openDrawer()}>
+                    <Icon name="bars" size={25} />
+                </TouchableOpacity>
+            ),
+            headerRight: (
+                <View style={{flexDirection:'row'}}>
+                    <TouchableOpacity
+                        style={{height: 20,
+                                width: 30,
+                                alignItems:'center'}}
+                        onPress={() => {
+                            const { params = {} } = navigation.state
+                            params.handleHeaderRightContactsSearch()
+
+                            // navigation.navigate('Search')
+                        } }>
+                        <Icon name="search" size={20} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={{height: 20,
+                                width: 30,
+                                alignItems:'center'}}
+                        onPress={() => {
+                            const { params = {} } = navigation.state
+                            params.handleHeaderRight()
+                        } }>
+                        <Icon name="plus" size={20} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={{height: 20,
+                                width: 30,
+                                alignItems:'center'}}
+                        onPress={() => {
+                            const { params = {} } = navigation.state
+                            params.handleHeaderRightContactsMenu()
+                        } }>
+                        
+                        <FastImage
+                            style={{width: 35, height: 20}}
+                            source={require('../../Images/collapse_down_menu.png')}
+                            resizeMode={FastImage.resizeMode.contain}
+                        /> 
+                    </TouchableOpacity>
+                </View>
+            ),
+        }
+    }
+    
+    /*({
         title: "Contacts",
         tabBarVisible: false,
-        header: (navigation) => <ImageHeader {...navigation} />,
+        header: (props) => <ImageHeader {...props} />,
         headerLeft: (
             <TouchableOpacity
                 style={Styles.headerButton}
@@ -175,8 +238,7 @@ class ContactsHome extends Component {
                         const { params = {} } = navigation.state
                         params.handleHeaderRightContactsMenu()
                     } }>
-                    {/* <Icon name="allergies" size={20} /> */}
-
+                    
                     <FastImage
                         style={{width: 35, height: 20}}
                         source={require('../../Images/collapse_down_menu.png')}
@@ -186,6 +248,7 @@ class ContactsHome extends Component {
             </View>
         ),
     });
+    */
 
     constructor(props){
         super(props)
@@ -260,16 +323,29 @@ class ContactsHome extends Component {
         alert('Save Details');
     }
 
-
     componentDidMount () {
         setTimeout(() => {this.setState({renderContent: true})}, 0);
         this.props.navigation.setParams({ handleHeaderRight: this.handleHeaderRight })
         this.props.navigation.setParams({ handleHeaderRightContactsSearch: this.handleHeaderRightContactsSearch })
         this.props.navigation.setParams({ handleHeaderRightContactsMenu: this.handleHeaderRightContactsMenu })
+        // this.props.navigation.setParams({ state: this.state })
     }
 
     componentWillUnmount(){
         // console.log('9999 --> componentWillUnmount')
+    }
+
+    componentWillReceiveProps(nextProps) {
+        // console.log(nextProps.auth.users);
+        if(nextProps.auth.users === null){
+            return;
+        }
+        // console.log(nextProps.auth.users.profiles.bg_url);
+        // console.log(this.props.navigation.getParam('bg_url', 'NO-ID'));
+        if (nextProps.auth.users.profiles.bg_url !== this.props.navigation.getParam('bg_url', 'NO-ID')) {
+            // console.log('----- 09')
+            this.props.navigation.setParams({ bg_url: nextProps.auth.users.profiles.bg_url });
+        }
     }
 
     onLayout(e) {
@@ -458,10 +534,13 @@ let style = StyleSheet.create({
 
 const mapStateToProps = (state) => {
     // console.log(state)
-    return({
-        // loading:state.auth.loading,
-        // isLogin:state.auth.isLogin
-    })
+    if(!state._persist.rehydrated){
+        return {}
+    }
+    
+    return{
+    auth:state.auth
+    }
 }
 
 export default connect(mapStateToProps, actions)(ContactsHome);

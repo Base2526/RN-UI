@@ -22,17 +22,16 @@ import ImageWithDefault from '../Utils/ImageWithDefault'
 const remote = 'http://s1.bwallpapers.com/wallpapers/2014/05/09/blue-full-hd-desktop-wallpapers_034316171.jpg';
 
 // https://thekevinscott.com/background-images-in-react-native/
-export default class BackgroundImage extends React.Component {
+export default class FriendBackgroundImage extends React.Component {
 
     componentDidMount(){
-      // console.log(this.props.auth.users.profiles.bg_url)
-
+      console.log(this.props.friend)
     }
 
-// https://github.com/react-navigation/react-navigation/blob/master/examples/NavigationPlayground/js/StackWithTranslucentHeader.js
-    // Inset to compensate for navigation bar being transparent.
-    // And improved abstraction for this will be built in to react-navigation
-    // at some point.
+  // https://github.com/react-navigation/react-navigation/blob/master/examples/NavigationPlayground/js/StackWithTranslucentHeader.js
+  // Inset to compensate for navigation bar being transparent.
+  // And improved abstraction for this will be built in to react-navigation
+  // at some point.
   getHeaderInset() {
     const NOTCH_HEIGHT = isIphoneX() ? 25 : 0;
 
@@ -44,17 +43,16 @@ export default class BackgroundImage extends React.Component {
         ? BASE_HEADER_HEIGHT + NOTCH_HEIGHT
         : BASE_HEADER_HEIGHT + getStatusBarHeight();
 
-    return HEADER_HEIGHT    
+    return HEADER_HEIGHT
   }
 
   render() {
     const resizeMode = 'center';
     const text = 'This is some text inlaid in an <Image />';
 
+    // console.log(this.props.friend.profile)
 
-    console.log(this.props.auth.users.profiles)
-
-    let{name, image_url, bg_url} = this.props.auth.users.profiles;
+    let{name, image_url, bg_url} = this.props.friend.profile //this.props.auth.users.profiles;
 
     return (
       // <ImageBackground
@@ -101,17 +99,7 @@ export default class BackgroundImage extends React.Component {
                 <Text style={{fontSize:22, marginLeft:10, color:'white'}}>{name}</Text>
               </View>
             </View>
-            {/* <View style={{flexDirection:'row', flex:1, justifyContent:'flex-end'}}>
-                <TouchableOpacity style={{margin:5}}>
-                    <Text style={{color:'white'}}>EDIT</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{margin:5}}>
-                    <Text style={{color:'white'}}>SHARE</Text>
-                </TouchableOpacity>
-            </View> */}
         </View>
     );
   }
 }
-
-// AppRegistry.registerComponent('BackgroundImage', () => BackgroundImage);

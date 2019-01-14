@@ -20,9 +20,21 @@ exports.updateClasss = functions.firestore
     .document('users/{userId}/classs/{classId}')
     .onUpdate((change, context) => {
 
+    console.log(context);
+
     const newValue = change.after.data();
 
-    // กรณี profile user มีการ edit | Update
+    // const timestamp = functions.firestore.FieldValue.serverTimestamp();
+
+    // console.log(admin.database.ServerValue.TIMESTAMP);
+
+    // Using Cloud Firestore
+    // console.log(admin.firestore.FieldValue.serverTimestamp());
+
+    // Using Realtime Database
+    // admin.database.ServerValue.TIMESTAMP
+
+    // กรณี 
     request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PATH_API_TEST, form: {value:newValue}, headers: config.headers}, function(err,httpResponse,body){ 
         /* ... */
         // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
@@ -42,6 +54,7 @@ exports.updateMyApplications = functions.firestore
     .document('users/{userId}/my_applications/{my_applicationsId}')
     .onUpdate((change, context) => {
 
+    // context.params.userId
     const newValue = change.after.data();
 
     // กรณี profile user มีการ edit | Update
@@ -56,7 +69,6 @@ exports.updateMyApplications = functions.firestore
     });
 
     return true;
-    
 });
 
 exports.updateProfiles = functions.firestore
@@ -66,17 +78,18 @@ exports.updateProfiles = functions.firestore
         // e.g. {'name': 'Marie', 'age': 66}
         const newValue = change.after.data();
 
+        // console.log(newValue);
+
         // ...or the previous value before this update
-        const previousValue = change.before.data();
+        // const previousValue = change.before.data();
 
         // access a particular field as you would any JS property
-        const name = newValue.name;
+        // const name = newValue.name;
 
         // perform desired operations ...
-        console.log(change);
+        // console.log(change);
 
-        // กรณี profile user มีการ edit | Update
-        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PATH_API_TEST, form: {value:newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.UPDATE_PROFILE, form: {newValue, context}, headers: config.headers}, function(err,httpResponse,body){ 
             /* ... */
             // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
             var objectValue = JSON.parse(body);
@@ -85,6 +98,28 @@ exports.updateProfiles = functions.firestore
                 // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
             }
         });
-
         return true;
 });
+
+// UpdateStatusFriend
+exports.updateStatusFriend = functions.firestore
+    .document('users/{userId}/friends/{friendId}')
+    .onUpdate((change, context) =>{
+
+    const newValue = change.after.data();
+    console.log(newValue);
+
+    // user_for_friend_editupdate
+
+    request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.UPDATE_FOR_FRIEND_EDITUPDATE, form: {newValue, context}, headers: config.headers}, function(err,httpResponse,body){ 
+        /* ... */
+        // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+        var objectValue = JSON.parse(body);
+        console.log(objectValue);
+        if (!objectValue.result) {
+            // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+        }
+    });
+
+    return true;
+})

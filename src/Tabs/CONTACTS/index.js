@@ -13,7 +13,7 @@ import ManageGroupPage from './ManageGroupPage';
 import ListClassUserPage from './ListClassUserPage'
 
 import QRCodeReaderPage from './QRCodeReaderPage'
-import AddFriendByIdPage from './AddFriendByIdPage'
+import FindFriendPage from './FindFriendPage'
 import InviteFriendForContactPage from './InviteFriendForContactPage'
 
 import ContactsSearch from './ContactsSearch'
@@ -52,7 +52,7 @@ const index = createStackNavigator({
     'AddGroupsPage': {
         screen: AddGroupsPage,
         navigationOptions: {
-          title: 'Add Groups',
+          // title: 'Add Groups',
         },
     },
     'MyProfilePage': {
@@ -64,7 +64,7 @@ const index = createStackNavigator({
     'FriendProfilePage': {
       screen: FriendProfilePage,
       navigationOptions: {
-        title: 'Friend Profile',
+        // title: 'Friend Profile',
       }
     },
     'ManageGroupPage': {
@@ -82,13 +82,13 @@ const index = createStackNavigator({
     'QRCodeReaderPage': {
       screen: QRCodeReaderPage,
       navigationOptions: {
-        title: 'QRCode Reader',
+        // title: 'QRCode Reader',
       }
     },
-    'AddFriendByIdPage': {
-      screen: AddFriendByIdPage,
+    'FindFriendPage': { 
+      screen: FindFriendPage,
       navigationOptions: {
-        title: 'By Id',
+        // title: 'By Id',
       }
     },
     'InviteFriendForContactPage': {
@@ -132,7 +132,7 @@ index.navigationOptions = ({ navigation }) => {
         routeName === 'ManageGroupPage' ||
         routeName === 'ListClassUserPage' ||
         routeName === 'QRCodeReaderPage' ||
-        routeName === 'AddFriendByIdPage' ||
+        routeName === 'FindFriendPage' ||
         routeName === 'InviteFriendForContactPage' ||
         routeName === 'ChatPage' ||
         routeName === 'ContactsSearch') {

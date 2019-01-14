@@ -43,7 +43,7 @@ const options = {
 class AddGroupsPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
-        title: "Create Groups",
+        title: "Create Group",
         // headerLeft: (
         //     <TouchableOpacity
         //         style={Styles.headerButton}
@@ -51,6 +51,10 @@ class AddGroupsPage extends React.Component{
         //         <Icon name="bars" size={25} />
         //     </TouchableOpacity>
         // ),
+        headerStyle: {
+          backgroundColor: 'rgba(186, 53, 100, 1.0)',
+          borderBottomWidth: 0,
+        },
         headerRight: (
             <TouchableOpacity
                 style={{paddingRight:10}}
@@ -96,19 +100,6 @@ class AddGroupsPage extends React.Component{
         loading: false,
         refreshing: false
       });
-
-
-      // group_update({group_id:'1287', value:{'test':1}}, v=>{
-      //   console.log(v)
-      // })
-
-      // group_all(v=>{
-      //   console.log(v)
-      // })
-      
-      // groupDetail_all(v=>{
-      //   console.log(v)
-      // })
     }
 
     handleCreateGroup = () => {
@@ -132,7 +123,6 @@ class AddGroupsPage extends React.Component{
   
         // console.log(RNFetchBlob.wrap(this.state.avatarSource.uri.replace('file://', '')))
         
-
         this.setState({loading:true})
 
         // ImgToBase64.getBase64String(this.state.avatarSource.uri)
@@ -166,50 +156,19 @@ class AddGroupsPage extends React.Component{
 
           }
         })
-
-        // })
-        // .catch(err => {
-        //   console.log(err)
-        // });
-
-        /*
-        
-        this.setState({loading:true})
-        // uid, group_name, members, uri)
-
-        this.props.actionCreateGroup({uid:this.props.uid, group_name:groupName, members: seleteds, uri:this.state.avatarSource.uri.replace('file:///', '')}).then((result) => {
-          console.log(result)
-
-          this.setState({loading:false})
-          if(result.status){
-            // this.props.navigation.navigate("App") 
-          }else{
-
-          }
-        })
-        */
-        
-        
-        
       }
     }
 
     loadData=()=>{
-        // return(
-        //     [ {"key":99, "name":'00'},
-        //       {"key":1, "name":'A1'}, 
-        //       {"key":2, "name":'A2'}, 
-        //       {"key":3, "name":'A3'}, 
-        //       {"key":4, "name":'A4'}, 
-        //       {"key":5, "name":'A5'}]
-        // )
+      let friend_member = []
 
-
-      let friend_member = [{"key":99, "name":'00'}]
+      // console.log(this.props.auth.users.friends)
       for (var key in this.props.auth.users.friends) {
     
         let friend =  this.props.auth.users.friends[key]
         // let friend_profile = friend_profiles[key]
+
+        console.log(friend)
 
         switch(friend.status){
           case Constant.FRIEND_STATUS_FRIEND:{
@@ -300,12 +259,11 @@ class AddGroupsPage extends React.Component{
     renderHeader = () => {
       // return <SearchBar placeholder="Type Here..." lightTheme round />;
       return(
-        <View style={{flexDirection:'row', justifyContent:'center'}}>
+        <View style={{flexDirection:'row', justifyContent:'center', padding:10, backgroundColor:'rgba(186, 53, 100, 1.0)'}}>
             <TouchableOpacity 
               style={{height:80,
                       width: 80,
-                      borderRadius: 10,
-                      margin:10}}
+                      borderRadius: 40}}
                 onPress={()=>{
 
                   /**
@@ -336,27 +294,25 @@ class AddGroupsPage extends React.Component{
                   });
                 }}>
               <FastImage
-                  style={{width: 80, height: 80, borderRadius: 10}}
+                  style={{width: 80, height: 80, borderRadius: 40, borderColor:'gray', borderWidth:1}}
                   source={{
                   uri: this.state.avatarSource.uri === "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.avatarSource.uri,
                   headers:{ Authorization: 'someAuthToken' },
                   priority: FastImage.priority.normal,
                   }}
-                  resizeMode={FastImage.resizeMode.contain}
+                  resizeMode={FastImage.resizeMode.normal}
               />
             </TouchableOpacity>
-            <TextInput style = {{margin: 15,
-                                height: 40,
-                                width:120,
-                                borderColor: 'gray',
-                                borderWidth: 1}}
-                underlineColorAndroid = "transparent"
-                placeholder = "Group Name"
-                placeholderTextColor = "gray"
-                autoCapitalize = "none"
-                ref= {(el) => { this.groupName = el; }}
-                onChangeText = {this.handleEmail}
-                value={this.state.groupName}/>
+            <View style={{justifyContent:'center', flex:1, marginLeft:5}}>
+              <TextInput style = {{fontSize:22}}
+                  underlineColorAndroid = "transparent"
+                  placeholder = "Input group name"
+                  placeholderTextColor = "gray"
+                  autoCapitalize = "none"
+                  ref= {(el) => { this.groupName = el; }}
+                  onChangeText = {this.handleEmail}
+                  value={this.state.groupName}/>
+            </View>
         </View>)
     };
   
@@ -478,7 +434,7 @@ class AddGroupsPage extends React.Component{
     
     render() {
 
-        console.log(this.state.seleteds)
+        // console.log(this.state.data) 
 
         // let swipeBtns = [{
         //   text: 'Delete',
@@ -495,27 +451,19 @@ class AddGroupsPage extends React.Component{
     
         return (
           <View style={{flex:1, backgroundColor: 'white'}}>
+          {this.renderHeader()}
           {
             renderContent &&
+            
             <FlatList
+              style={{flex:1}}
               data={this.state.data}
-              // renderItem={({ item }) => (
-              //   <ListItem
-              //     roundAvatar
-              //     title={`${item.name.first} ${item.name.last}`}
-              //     subtitle={item.email}
-              //     avatar={{ uri: item.picture.thumbnail }}
-              //     containerStyle={{ borderBottomWidth: 0 }}
-              //     onPress={()=>console.log("item click")}
-              //   />
-              // )}
-
               
               renderItem={this.renderItem.bind(this)}
               // keyExtractor={(item) =>item}
               keyExtractor = { (item, index) => index.toString() }
               ItemSeparatorComponent={this.renderSeparator}
-              ListHeaderComponent={this.renderHeader}
+              // ListHeaderComponent={this.renderHeader}
               ListFooterComponent={this.renderFooter}
               // onRefresh={this.handleRefresh}
               // refreshing={this.state.refreshing}
@@ -523,6 +471,9 @@ class AddGroupsPage extends React.Component{
               renderSectionHeader={this.renderSectionHeader}
               onEndReachedThreshold={50}
               extraData={this.state}
+              ListHeaderComponent={() => (!this.state.data.length ? 
+                <Text style={{textAlign:'left', fontSize:22}}>No Friend.</Text>
+                : null)}
             />
           }
           </View>

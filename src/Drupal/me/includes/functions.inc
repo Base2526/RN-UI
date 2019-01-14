@@ -367,8 +367,24 @@ function user_for_friend_editupdate(){
 	$data     = $_REQUEST['data'];
 	*/
   
-	$param = json_decode(file_get_contents('php://input'), true);
-	if (empty($param['uid']) || empty($param['friend_id']) || empty($param['data'])) {
+	// $param = json_decode(file_get_contents('php://input'), true);
+	// if (empty($param['uid']) || empty($param['friend_id']) || empty($param['data'])) {
+	//   $result['result'] = FALSE;
+	//   $result['message'] = "function update_friend_of_user : parameter";
+	//   return $result;
+	// }
+	// $result['result'] = TRUE;
+	// $result['param'] = $param;
+	// $result['_REQUEST'] = $_REQUEST;
+
+	// $newValue = $_REQUEST['newValue'];
+	// $data = $_REQUEST['context']['params']; // userId, friendId
+	// // context
+	// return $result;
+
+	$param = $_REQUEST['context']['params'];
+
+	if (empty($param['uid']) || empty($param['friend_id'])) {
 	  $result['result'] = FALSE;
 	  $result['message'] = "function update_friend_of_user : parameter";
 	  return $result;
@@ -376,7 +392,7 @@ function user_for_friend_editupdate(){
   
 	$uid        = $param['uid'];
 	$friend_id  = $param['friend_id'];
-	$data       = $param['data'];
+	$data       = $_REQUEST['newValue'];
   
 	/*
 	// ลบ group ออกตาม group id

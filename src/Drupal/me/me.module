@@ -8829,8 +8829,10 @@ function add_friend(){
       "item_id"      => $field_entity->item_id,
       // "classs"       => $user_classs_item_id
     );
-    $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $uid . '/friends/' . $friend_id . "/", $values);
+    // $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $uid . '/friends/' . $friend_id . "/", $values);
     
+    firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_FRIENDS)->document($friend_id)->set($values);
+
     $result['values']  = $values;  
 
 
@@ -8866,7 +8868,9 @@ function add_friend(){
       "chat_id"      => $chat_id,
       "item_id"      => $field_entity->item_id,
     );
-    $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $friend_id . '/friends/' . $uid . "/", $values);
+    // $firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $friend_id . '/friends/' . $uid . "/", $values);
+
+    firestore_db()->collection(FIRESTORE_USERS)->document($friend_id)->collection(FIRESTORE_FRIENDS)->document($uid)->set($values);
 
     foreach ($friend_profile->field_device_access[LANGUAGE_NONE] as $k => $v) {
       $item_load = field_collection_item_load($v['value']);
@@ -8874,7 +8878,6 @@ function add_friend(){
       if($item_load->field_key_token_notification[LANGUAGE_NONE][0]['value'] != ""){
         $friend_name = $profile_user->field_profile_display_name[LANGUAGE_NONE][0]['value'];
         $message =  $friend_name . ' send friend request.';
-
 
         $friend_url_image = '';
         if (isset($profile_user->field_profile_image)) {
@@ -10074,22 +10077,37 @@ function update_profile(){
     return $result;
   }
 
+  /*
+  $result['result'] = TRUE;
+  $result['newValue'] = $_REQUEST['newValue']['name'];
+  $result['userId'] = $_REQUEST['context']['params']['userId'];
+
+  return $result;
+  */
   // if (empty($_REQUEST['uid']) || empty($_REQUEST['data'])) {
   //   $result['result'] = FALSE;
   //   $result['message']  = "function : update_profile, parameter";
   //   return $result;
   // }
 
+  /*
   $param = json_decode(file_get_contents('php://input'), true);
   if (empty($param['uid']) || empty($param['data'])) {
     $result['result'] = FALSE;
     $result['message'] = "function update_profile : parameter";
     return $result;
   }
+  */
+
+  if (empty($_REQUEST['context']['params']['userId']) || empty($_REQUEST['newValue'])) {
+    $result['result'] = FALSE;
+    $result['message'] = "function update_profile : parameter";
+    return $result;
+  }
 
   global $firebase;
-  $uid    = $param['uid'];
-  $data   = $param['data'];
+  $uid    = $_REQUEST['context']['params']['userId'];
+  $data   = $_REQUEST['newValue'];
 
   // Load Profile ขึ้นมาเพือจะทำการแก้ไข
   $profile = profile2_by_uid_load($uid, 'main');

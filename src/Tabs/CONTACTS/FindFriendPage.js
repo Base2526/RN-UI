@@ -1,11 +1,12 @@
 import React from 'react'
 
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, TouchableHighlight } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { connect } from 'react-redux';
 import { List, ListItem, SearchBar } from "react-native-elements";
 import FastImage from 'react-native-fast-image'
 import Spinner from 'react-native-loading-spinner-overlay';
+
 
 import Styles from '../../styles';
 import DictStyle from './dictStyle';
@@ -41,7 +42,7 @@ const ImageHeader = (props) => {
         </View>)
 }
 
-class AddFriendsPage extends React.Component{
+class FindFriendPage extends React.Component{
 
   static navigationOptions = ({ navigation }) => ({
       title: "Add Friends",
@@ -49,14 +50,13 @@ class AddFriendsPage extends React.Component{
       headerStyle: {
         backgroundColor: 'rgba(186, 53, 100, 1.0)',
 
-        // ios navigationoptions underline hide
-        borderBottomWidth: 0,
+         // ios navigationoptions underline hide
+         borderBottomWidth: 0,
 
-        // android navigationoptions underline hide
-        elevation: 0,
-        shadowOpacity: 0
+         // android navigationoptions underline hide
+         elevation: 0,
+         shadowOpacity: 0
       },
-    //   style: { },
   })
 
   constructor(props) {
@@ -83,7 +83,7 @@ class AddFriendsPage extends React.Component{
 
     this.props.actionPeopleYouMayKhow().then((result) => {
       if(result.status){
-        this.setState({data:result.data.data});
+        // this.setState({data:result.data.data});
       }else{
 
       }
@@ -150,71 +150,19 @@ class AddFriendsPage extends React.Component{
   renderHeader = () => {
     // return <SearchBar placeholder="Type Here..." lightTheme round />;
     return(
-      <View style={{flexDirection:'row', justifyContent:'center', backgroundColor:'rgba(186, 53, 100, 1.0)'}}>
-          <TouchableOpacity 
-                    style={{height:40,
-                            width: 40,
-                            borderRadius: 10,
-                            margin:10}}
-                      onPress={()=>{
-                        this.props.navigation.navigate("InviteFriendForContactPage")
-                      }}>
-                    <FastImage
-                        style={{width: 40, height: 40, borderRadius: 10}}
-                        source={{
-                        uri: 'https://cdn0.iconfinder.com/data/icons/thin-communication-messaging/57/thin-328_phone_book_number_contact-512.png',
-                        headers:{ Authorization: 'someAuthToken' },
-                        priority: FastImage.priority.normal,
-                        }}
-                        resizeMode={FastImage.resizeMode.contain}
-                    />                      
-          </TouchableOpacity>
-          <TouchableOpacity 
-                    style={{height:40,
-                            width: 40,
-                            borderRadius: 10,
-                            margin:10}}
-                      onPress={()=>{
-          
-                        this.props.navigation.navigate("QRCodeReaderPage")
-                      }}>
-                      <Icon name="qrcode" size={40} />
-          </TouchableOpacity>
-          <TouchableOpacity 
-                    style={{height:40,
-                            width: 40,
-                            borderRadius: 10,
-                            margin:10}}
-                      onPress={()=>{
-                        this.props.navigation.navigate("FindFriendPage")
-                      }}>
-                      <Icon name="search" size={40} />
-                    {/* <FastImage
-                        style={{width: 40, height: 40, borderRadius: 10}}
-                        source={{
-                        uri: 'http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/user-id-icon.png',
-                        headers:{ Authorization: 'someAuthToken' },
-                        priority: FastImage.priority.normal,
-                        }}
-                        resizeMode={FastImage.resizeMode.contain}
-                    /> */}
-          </TouchableOpacity>
-          {/* <TouchableOpacity 
-                    style={{height:40,
-                            width: 40,
-                            borderRadius: 10,
-                            margin:10}}
-                  onPress={()=>alert("4")}>
-                    <FastImage
-                        style={{width: 40, height: 40, borderRadius: 10}}
-                        source={{
-                        uri: 'https://unsplash.it/400/400?image=1',
-                        headers:{ Authorization: 'someAuthToken' },
-                        priority: FastImage.priority.normal,
-                        }}
-                        resizeMode={FastImage.resizeMode.contain}
-                    />
-          </TouchableOpacity> */}
+      <View style={{flexDirection:'row', backgroundColor:'rgba(186, 53, 100, 1.0)', padding:20}}>
+          <View style={{flex:1}}>
+            <TextInput
+              style={{height: 40, borderColor: 'gray', borderWidth: 1, backgroundColor:'gray'}}
+              onChangeText={(text) => this.setState({text})}
+              value={this.state.text}
+            />
+          </View>
+          <View style={{justifyContent: 'center', alignItems: 'center', marginLeft:10, padding:5 }}>
+            <TouchableOpacity>
+              <Text style={{}}>Search</Text>
+            </TouchableOpacity>
+          </View>
       </View>)
   };
 
@@ -282,8 +230,7 @@ class AddFriendsPage extends React.Component{
                       </Text>
                     </TouchableOpacity>
                   </View>
-                  {/* <View style={{flex:2}}> */}
-                  {/*
+                  <View style={{flex:2}}>
                     <TouchableOpacity
                         style={{
                             borderRadius:10,
@@ -331,53 +278,7 @@ class AddFriendsPage extends React.Component{
                           }>
                         <Text style={{color:'red', fontSize:14}}>Add Friend</Text>
                     </TouchableOpacity>
-                        */}
-
-                    <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
-                      <View style={{borderColor:'green', borderWidth:1, borderRadius:10, padding:5}}>
-                        <TouchableOpacity
-                        onPress={()=>{
-
-                          let uid = this.props.uid
-                          let friend_id = item.uid
-
-                          this.setState({loading:true})
-                          this.props.actionAddFriend(uid, friend_id).then((result) => {
-                            console.log(result)
-
-                            console.log('uid : ' + uid)
-                            console.log('friend_id : ' + friend_id)
-
-                            this.setState({loading:false})
-                            // this.setState({loading: false})
-                            if(result.status){
-                              // this.props.navigation.navigate("App") 
-                              // this.setState({data:result.data.data});
-
-                              switch(result.data.friend_status){
-                                case 99:{
-                                  
-                                }
-                                case -1:{
-
-                                }
-                              }
-                            }else{
-                      
-                            }
-                          })
-                        }}>
-                          <Text style={{color:'green'}}>Add friend</Text>
-                        </TouchableOpacity>
-                      </View>
-                      <View style={{borderColor:'red', borderWidth:1, borderRadius:10, padding:5, marginLeft:5}}>
-                        <TouchableOpacity
-                        onPress={()=>alert('Cancel')}>
-                          <Text style={{color:'red'}}>Cancel</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  {/* </View> */}
+                  </View>
                 </View>
           )
       }
@@ -404,12 +305,7 @@ class AddFriendsPage extends React.Component{
   
       return (
         <View style={{flex:1, backgroundColor: 'white'}}>
-        <Spinner
-            visible={this.state.loading}
-            textContent={'Wait...'}
-            textStyle={{color: '#FFF'}}
-            overlayColor={'rgba(0,0,0,0.5)'}
-          />
+        {this.renderHeader()}
         {
         renderContent && 
           
@@ -428,7 +324,7 @@ class AddFriendsPage extends React.Component{
             renderItem={this.renderItem.bind(this)}
             keyExtractor={item => item.name}
             ItemSeparatorComponent={this.renderSeparator}
-            ListHeaderComponent={this.renderHeader}
+            // ListHeaderComponent={this.renderHeader}
             ListFooterComponent={this.renderFooter}
             // onRefresh={this.handleRefresh}
             // refreshing={this.state.refreshing}
@@ -457,4 +353,4 @@ const mapStateToProps = (state) => {
   })
 }
 
-export default connect(mapStateToProps, actions)(AddFriendsPage);
+export default connect(mapStateToProps, actions)(FindFriendPage);
