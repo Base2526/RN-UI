@@ -27,7 +27,7 @@ export default class ChatPage extends React.Component{
         // ),
         headerRight: (
             <TouchableOpacity
-                style={Styles.headerButton}
+                style={{paddingRight:10}}
                 onPress={() => {
                     const { params = {} } = navigation.state
                     params.handleHeaderRight()

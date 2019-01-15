@@ -20,9 +20,10 @@ import ContactsSearch from './ContactsSearch'
 
 import ChatPage from '../RECENT/ChatPage'
 
-// import SearchLayout from 'react-navigation-addon-search-layout';
+import ListGroupMemberPage from './ListGroupMemberPage'
 
-// import SearchLayout from '../../Utils/SearchLayout'
+
+import MyCustomTransition from '../../test/MyCustomTransition'
 
 const index = createStackNavigator({
     'Home': {
@@ -70,7 +71,7 @@ const index = createStackNavigator({
     'ManageGroupPage': {
       screen: ManageGroupPage,
       navigationOptions: {
-        title: 'Manage Group',
+        // title: 'Manage Group',
       }
     },
     'ListClassUserPage': {
@@ -109,14 +110,13 @@ const index = createStackNavigator({
         title: 'Search',
       }
     },
-    // 'Search': {
-    //   screen: () => (
-    //     <SearchLayout
-    //       searchInputUnderlineColorAndroid="#fff"
-    //       renderResults={q => <Text>{q}</Text>}
-    //     />
-    //   ),
-    // },
+    'ListGroupMemberPage': {
+      screen: ListGroupMemberPage,
+    },
+},{
+//   initialRouteName: 'Base',
+// headerMode: "screen",
+  transitionConfig: TransitionConfiguration
 });
 
 index.navigationOptions = ({ navigation }) => {
@@ -135,7 +135,8 @@ index.navigationOptions = ({ navigation }) => {
         routeName === 'FindFriendPage' ||
         routeName === 'InviteFriendForContactPage' ||
         routeName === 'ChatPage' ||
-        routeName === 'ContactsSearch') {
+        routeName === 'ContactsSearch' ||
+        routeName === 'ListGroupMemberPage') {
       navigationOptions.tabBarVisible = false;
     }
 
@@ -143,5 +144,70 @@ index.navigationOptions = ({ navigation }) => {
 };
 
 // index.swipeEnabled= false
+
+
+//////////
+
+let TransitionConfiguration = () => {
+  // return {
+  //     // Define scene interpolation, eq. custom transition
+  //     screenInterpolator: (sceneProps) => {
+
+  //         const {position, scene} = sceneProps;
+  //         const {index, route} = scene;
+  //         const params = route.params || {};
+  //         const transition = params.transition || 'default'; 
+          
+  //         console.log('TransitionConfiguration')
+
+  //         return {
+  //                 myCustomTransition: MyCustomTransition(index, position),
+  //                 default: MyCustomTransition(index, position),
+  //         }[transition];
+  //     }
+  // }
+
+  return {
+    transitionSpec: {
+      duration: 750,
+      easing: Easing.out(Easing.poly(4)),
+      timing: Animated.timing,
+      useNativeDriver: true,
+    },
+    screenInterpolator: (sceneProps) => {
+      const { layout, position, scene } = sceneProps;
+      const width = layout.initWidth;
+      const { index, route } = scene
+      const params = route.params || {}; // <- That's new
+      const transition = params.transition || 'default'; // <- That's new
+      return {
+                          myCustomTransition: MyCustomTransition(index, position),
+                  default: MyCustomTransition(index, position),
+      }[transition];
+    },
+  }
+};
+
+let MyTransition = (index, position) => {
+  const inputRange = [index - 1, index, index + 1];
+  const outputRange = [.8, 1, 1];
+  const opacity = position.interpolate({
+      inputRange,
+      outputRange,
+  });
+
+  const scaleY = position.interpolate({
+      inputRange,
+      outputRange,
+  });
+
+  return {
+  opacity,
+      transform: [
+          {scaleY}
+      ]
+  };
+};
+//////////
 
 export default index

@@ -4,8 +4,6 @@ import {
     View,
     Text,
     TouchableOpacity,
-    AppRegistry,
-    Button,
     TouchableHighlight,
     Image
 } from 'react-native'

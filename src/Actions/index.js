@@ -14,7 +14,9 @@ import {USER_LOGIN_SUCCESS,
         UPDATE_PROFILE,
         ADD_FRIEND,
         FRIEND_PROFILE,
-        UPDATE_STATUS_FRIEND} from './types'
+        UPDATE_STATUS_FRIEND,
+        ADD_GROUP,
+    DELETE_GROUP} from './types'
 
 import {saveAsyncStorage, loadAsyncStorage} from '../Utils/Helpers'
 import Constant from '../Utils/Constant'
@@ -604,6 +606,34 @@ export function watchTaskEvent(uid, dispatch) {
         */
     })
 
+    // track grouds
+    firebase.firestore().collection('users').doc(uid).collection('groups').onSnapshot((querySnapshot) => {
+
+        let _this = this
+        querySnapshot.forEach(function(doc) {
+            console.log(doc.id, " => ", doc.data());
+
+            // let id = doc.id
+            // let data = doc.data()
+
+            firebase.firestore().collection('groups').doc(doc.id).onSnapshot((docSnapshot) => {
+                // console.log(docSnapshot.id) 
+                // doc.id จะมีค่าเท่ากันกับ  docSnapshot.id 
+
+                if(docSnapshot.data() !== undefined){
+                    console.log(docSnapshot.id, " => ", docSnapshot.data());
+
+                    let v = {...doc.data(), group_profile:docSnapshot.data()}
+
+                    dispatch({ type: ADD_GROUP, group_id:docSnapshot.id, data:v });
+                }else{
+
+                    /** จะมีบั๊ก ไม่รู้ว่าตอนไหนจะมีการ insert object ลงไปเราต้องลบออก ค่อยมาไล่เช็ดทีหลัง */
+                    dispatch({ type: DELETE_GROUP, group_id:docSnapshot.id});
+                }
+           })
+        })
+    })
     /*
     firebase.firestore().collection('users').doc(uid).collection('device_access').where('udid', '==', DeviceInfo.getUniqueID()).onSnapshot((querySnapshot) => {
         // console.log(querySnapshot);

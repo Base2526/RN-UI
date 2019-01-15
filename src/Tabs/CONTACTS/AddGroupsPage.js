@@ -19,6 +19,8 @@ import Constant from '../../Utils/Constant'
 
 import {getUid} from '../../Utils/Helpers'
 
+import ImageWithDefault from '../../Utils/ImageWithDefault'
+
 // import {group_all, 
 //         groupDetail_all, 
 //         group_get,
@@ -195,7 +197,7 @@ class AddGroupsPage extends React.Component{
         }
       }
 
-      console.log(friend_member)
+      // console.log(friend_member)
       return friend_member
     }
 
@@ -358,93 +360,63 @@ class AddGroupsPage extends React.Component{
       }
     }
 
-    renderItem = ({item, index}) => {
-        
-        switch(index){
-            case 0:{
-                return(<View><Text>Select friend</Text></View>)
-            }
-            break
-            default:{
-                
-                let check = null
-                var __ = this.state.seleteds.find(function(element) { 
-                  return element === item.friend_id; 
-                }); 
+    renderItem = ({item, index}) => {        
+      let check = null
+      var __ = this.state.seleteds.find(function(element) { 
+        return element === item.friend_id; 
+      }); 
 
-                if(__ !== undefined){
-                  check = <Icon name="check" size={15} />
-                }
+      if(__ !== undefined){
+        check = <Icon name="check" size={15} />
+      }
 
-                return(
-                      <View
-                        style={{
-                          alignItems: 'center', 
-                          padding: 10,
-                          borderColor: DictStyle.colorSet.lineColor,
-                          flexDirection: 'row',
-                          backgroundColor: 'white'
-                        }}
-                      >
-                        <View style={{flex:1, alignItems:'center'}}>
-                          <TouchableOpacity 
-                              style={{height: 40,
-                                      width: 40,
-                                      borderRadius: 10}}
-                              onPress={
-                                ()=>this.props.navigation.navigate("FriendProfilePage")
-                              }>
-                              <FastImage
-                                  style={{width: 40, height: 40, borderRadius: 10}}
-                                  source={{
-                                  uri: item.profile.image_url ==='' ? Constant.DEFAULT_AVATARSOURCE_URI : Constant.API_URL + item.profile.image_url,
-                                  headers:{ Authorization: 'someAuthToken' },
-                                  priority: FastImage.priority.normal,
-                                  }}
-                                  resizeMode={FastImage.resizeMode.contain}
-                              /> 
-                          </TouchableOpacity>
-                        </View>
-                        <View style={{flex:5}}>
-                          <TouchableOpacity 
-                            onPress={()=>{
-                              this._check(item.friend_id)
-                            }}
-                            style={{flex:1, justifyContent:'center'}}>
-                            <Text style={{
-                                        fontSize: 16, 
-                                        fontWeight: '600',
-                                        color: DictStyle.colorSet.normalFontColor,
-                                        
-                                        paddingLeft: 10}}>
-                                {item.profile.name}
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                        <View style={{flex:1, alignItems:'center'}}>
-                          <TouchableOpacity >
-                            {check}
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                )
-            }
-        }
+      return(
+            <View
+              style={{
+                alignItems: 'center', 
+                padding: 10,
+                borderColor: DictStyle.colorSet.lineColor,
+                flexDirection: 'row',
+                backgroundColor: 'white'
+              }}
+            >
+              <View style={{flex:1, alignItems:'center'}}>
+              <TouchableOpacity 
+                  style={{height:60,
+                          width: 60,
+                          borderRadius: 10}}
+                  onPress={()=>this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.friend_id})}>
+                    <ImageWithDefault 
+                      source={{uri:item.profile.image_url}}
+                      style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/>
+              </TouchableOpacity>
+              </View>
+              <View style={{flex:5}}>
+                <TouchableOpacity 
+                  onPress={()=>{
+                    this._check(item.friend_id)
+                  }}
+                  style={{flex:1, justifyContent:'center'}}>
+                  <Text style={{
+                              fontSize: 16, 
+                              fontWeight: '600',
+                              color: DictStyle.colorSet.normalFontColor,
+                              
+                              paddingLeft: 10}}>
+                      {item.profile.name}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={{flex:1, alignItems:'center'}}>
+                <TouchableOpacity >
+                  {check}
+                </TouchableOpacity>
+              </View>
+            </View>
+      )
     }
     
     render() {
-
-        // console.log(this.state.data) 
-
-        // let swipeBtns = [{
-        //   text: 'Delete',
-        //   backgroundColor: 'red',
-        //   underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
-        //   onPress: () => { this.deleteNote(rowData) }
-        // }];
-
-        // console.log(this.state.avatarSource.uri)
-
         let {
           renderContent
         } = this.state;

@@ -13839,7 +13839,9 @@ function create_chat_group(){
                   "image_url"  => file_create_url(image_style_url('medium', $image_url['uri']))
                 );
 
-  $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_CHAT_GROUPS . '/' . $node->nid, $f_item);
+  // FIRESTORE_GROUPS
+  // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_CHAT_GROUPS . '/' . $node->nid, $f_item);
+  firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->set($f_item);
 
   $result['result']       = TRUE;
   $result['group_detail'] = $f_item;
@@ -13847,14 +13849,17 @@ function create_chat_group(){
 
   /*
   การที่เราเก้บเอามา วน loop สร้างหลังจาก /idna/chat_groups/{node_id}  เพราะว่าเราตั้งใจ เพราะเครื่อง client จะ tack chat_groupd ไม่เจอเราจึ่งแก้ปัญหาแบบนี้ไปก่อน
-  */ 
+  */
   foreach ($t as $t_key => $t_value){
     foreach ($t_value as $tt_key => $tt_value) {
       // $tt[] = FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $t_key . '/' . PATH_GROUPS . '/' . $tt_key . '/';
 
-      $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $t_key . '/' . PATH_GROUPS . '/' . $tt_key . '/' , $tt_value);
+      // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $t_key . '/' . PATH_GROUPS . '/' . $tt_key . '/' , $tt_value);
+
+      firestore_db()->collection(FIRESTORE_USERS)->document($t_key)->collection(FIRESTORE_GROUPS)->document($tt_key)->set($tt_value);
     }
   }
+
 
   // $result['tt']            = $tt;
   return  $result;

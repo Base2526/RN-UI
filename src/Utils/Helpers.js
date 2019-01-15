@@ -204,7 +204,7 @@ export function getStatusBarHeight(skipAndroid: boolean = false): number {
 // Inset to compensate for navigation bar being transparent.
 // And improved abstraction for this will be built in to react-navigation
 // at some point.
-export function    getHeaderInset() {
+export function  getHeaderInset() {
     const NOTCH_HEIGHT = isIphoneX() ? 25 : 0;
 
     // $FlowIgnore: we will remove the HEIGHT static soon enough

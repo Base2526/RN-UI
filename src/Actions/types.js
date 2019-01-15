@@ -17,6 +17,8 @@ export const DEVICE_ACCESS_MODIFIED = "device_access_modified"
 
 export const UPDATE_PROFILE = "update_profile"
 
-export const ADD_FRIEND = "add_friend"
-export const FRIEND_PROFILE = "friend_profile"
-export const UPDATE_STATUS_FRIEND = "update_status_friend" 
+export const ADD_FRIEND             = "add_friend"
+export const FRIEND_PROFILE         = "friend_profile"
+export const UPDATE_STATUS_FRIEND   = "update_status_friend" 
+export const ADD_GROUP              = "add_group" 
+export const DELETE_GROUP           = "delete_group"

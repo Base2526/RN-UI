@@ -96,12 +96,12 @@ function create_class(){
 	  return $result;
 	}
   
-	if (empty($_REQUEST['uid']) || empty($_REQUEST['fction'])|| empty($_REQUEST['name']) ) {
+	// if (empty($_REQUEST['uid']) || empty($_REQUEST['fction'])|| empty($_REQUEST['name']) ) {
 	  $result['result'] = FALSE;
 	  $result['message']  = "function : create_class, parameter";
 	  $result['_REQUEST'] = $_REQUEST;
 	  return $result;
-	}
+	// }
   
 	global $firebase;
   

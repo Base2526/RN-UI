@@ -260,63 +260,6 @@ class ContactsHome extends Component {
             orientation:'PORTRAIT',
             numMenuColumns:4,
         }
-
-        // profile_get(v=>{
-        //     console.log(v)
-        // })
-
-        /*
-        let date = new Date()
-        console.log(date)
-
-        const timestamp = Math.floor(date / 1000);
-        console.log(timestamp)
-
-        var t = new Date(timestamp * 1000);
-        console.log(t.toLocaleDateString())
-        */
-
-        // profile_delete(v=>{
-        //     console.log(v)
-        // })
-
-        // console.log(JSON.stringify({'test':'`😍'}))
-        // let encode = utf8.encode(JSON.stringify({'test':'`😍'}))
-        // console.log(encode)
-        // let decode = utf8.decode(encode)
-        // console.log(decode)
-
-        // profile_update({'test':'`☹️🙁😠😡😞😟😣😖$ %  &  #   !'}, v=>{
-        //     console.log(v)
-        // })
-        // profile_get(v=>{
-        //     console.log(v)
-
-        //     // console.log(JSON.parse(v.data).test);
-        // })
-
-        // console.log(test())
-
-        // profile_update({'test':'11'}, v=>{
-        //     console.log(v)
-        // })
-
-        // profile_delete(v=>{
-        //     console.log(v)
-        // })
-
-        // DB.tableAll(v=>{
-        //     console.log(v)
-        // })
-
-        // DB.insert(v=>{
-        //     console.log(v)
-        // })
-
-        // Database.Database.getConnection().transaction((tx) => {
-        //     // ...query
-        //     console.log(tx)
-        // })
     }
 
     saveDetails() {

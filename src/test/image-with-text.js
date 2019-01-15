@@ -113,5 +113,3 @@ export default class BackgroundImage extends React.Component {
     );
   }
 }
-
-// AppRegistry.registerComponent('BackgroundImage', () => BackgroundImage);
