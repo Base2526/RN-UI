@@ -53,7 +53,10 @@ class ListGroupMemberPage extends React.Component{
     }
 
     handleInvite = () => {
-        this.props.navigation.navigate("GroupMemberInvite")
+        const { navigation } = this.props;
+        const group = navigation.getParam('group', null);
+        
+        this.props.navigation.navigate("GroupMemberInvite", {'group':group})
     }
 
     componentWillMount(){
