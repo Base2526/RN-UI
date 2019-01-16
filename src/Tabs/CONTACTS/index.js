@@ -25,6 +25,11 @@ import ListGroupMemberPage from './ListGroupMemberPage'
 
 import MyCustomTransition from '../../test/MyCustomTransition'
 
+import GroupsQRcode from './GroupsQRcode'
+
+import GroupSettingsPage from './GroupSettingsPage'
+import GroupMemberInvite from './GroupMemberInvite'
+
 const index = createStackNavigator({
     'Home': {
         screen: Home,
@@ -113,101 +118,100 @@ const index = createStackNavigator({
     'ListGroupMemberPage': {
       screen: ListGroupMemberPage,
     },
+    // 'GroupsQRcode':{
+    //   screen: GroupsQRcode
+    // }
 },{
 //   initialRouteName: 'Base',
 // headerMode: "screen",
-  transitionConfig: TransitionConfiguration
+  // transitionConfig: TransitionConfiguration
+  
+    // mode: 'modal',
+    // headerMode: 'none',
+  
 });
 
-index.navigationOptions = ({ navigation }) => {
-    let { routeName } = navigation.state.routes[navigation.state.index];
-    let navigationOptions = {};
+// index.navigationOptions = ({ navigation }) => {
+//     let { routeName } = navigation.state.routes[navigation.state.index];
+//     let navigationOptions = {};
   
-    // set tabbar visible
-    if (routeName === 'AddFriendsPage' || 
-        routeName === 'AddClasssPage' || 
-        routeName === 'AddGroupsPage' ||
-        routeName === 'MyProfilePage' ||
-        routeName === 'FriendProfilePage' ||
-        routeName === 'ManageGroupPage' ||
-        routeName === 'ListClassUserPage' ||
-        routeName === 'QRCodeReaderPage' ||
-        routeName === 'FindFriendPage' ||
-        routeName === 'InviteFriendForContactPage' ||
-        routeName === 'ChatPage' ||
-        routeName === 'ContactsSearch' ||
-        routeName === 'ListGroupMemberPage') {
+//     // set tabbar visible
+//     if (routeName === 'AddFriendsPage' || 
+//         routeName === 'AddClasssPage' || 
+//         routeName === 'AddGroupsPage' ||
+//         routeName === 'MyProfilePage' ||
+//         routeName === 'FriendProfilePage' ||
+//         routeName === 'ManageGroupPage' ||
+//         routeName === 'ListClassUserPage' ||
+//         routeName === 'QRCodeReaderPage' ||
+//         routeName === 'FindFriendPage' ||
+//         routeName === 'InviteFriendForContactPage' ||
+//         routeName === 'ChatPage' ||
+//         routeName === 'ContactsSearch' ||
+//         routeName === 'ListGroupMemberPage'
+//         ) {
+//       navigationOptions.tabBarVisible = false;
+//     }
+
+//     return navigationOptions;
+// };
+
+// https://github.com/react-navigation/react-navigation/issues/707#issuecomment-299859578
+const MainModalNavigator = createStackNavigator(
+  {
+    'index': { screen: index },
+    'GroupsQRcode': { screen: GroupsQRcode },
+    // 'ListGroupMemberPage': { screen: ListGroupMemberPage,},
+    // 'ListClassUserPageX': {
+    //   screen: ListClassUserPage,
+      
+    // },
+    'GroupSettingsPage': {screen: GroupSettingsPage},
+    'GroupMemberInvite': {screen: GroupMemberInvite}
+  },
+  {
+    mode: 'modal',
+    headerMode: 'none',
+  },
+);
+
+MainModalNavigator.navigationOptions = ({ navigation }) => {
+  // let { routeName, routes } = navigation.state.routes[navigation.state.index];
+  let { routeName, routes } = navigation.state.routes[navigation.state.index];
+  let navigationOptions = {};
+
+  if(routes === undefined){
+    // console.log(routeName)
+    if(routeName === 'GroupsQRcode' || 
+       routeName === 'GroupSettingsPage' ||
+       routeName === 'GroupMemberInvite'){
       navigationOptions.tabBarVisible = false;
+      return navigationOptions;
     }
-
-    return navigationOptions;
-};
-
-// index.swipeEnabled= false
-
-
-//////////
-
-let TransitionConfiguration = () => {
-  // return {
-  //     // Define scene interpolation, eq. custom transition
-  //     screenInterpolator: (sceneProps) => {
-
-  //         const {position, scene} = sceneProps;
-  //         const {index, route} = scene;
-  //         const params = route.params || {};
-  //         const transition = params.transition || 'default'; 
-          
-  //         console.log('TransitionConfiguration')
-
-  //         return {
-  //                 myCustomTransition: MyCustomTransition(index, position),
-  //                 default: MyCustomTransition(index, position),
-  //         }[transition];
-  //     }
-  // }
-
-  return {
-    transitionSpec: {
-      duration: 750,
-      easing: Easing.out(Easing.poly(4)),
-      timing: Animated.timing,
-      useNativeDriver: true,
-    },
-    screenInterpolator: (sceneProps) => {
-      const { layout, position, scene } = sceneProps;
-      const width = layout.initWidth;
-      const { index, route } = scene
-      const params = route.params || {}; // <- That's new
-      const transition = params.transition || 'default'; // <- That's new
-      return {
-                          myCustomTransition: MyCustomTransition(index, position),
-                  default: MyCustomTransition(index, position),
-      }[transition];
-    },
+    return;
   }
+
+  routeName = routes[navigation.state.routes[navigation.state.index].index].routeName;
+
+  // set tabbar visible
+  if (routeName === 'AddFriendsPage' || 
+      routeName === 'AddClasssPage' || 
+      routeName === 'AddGroupsPage' ||
+      routeName === 'MyProfilePage' ||
+      routeName === 'FriendProfilePage' ||
+      routeName === 'ManageGroupPage' ||
+      routeName === 'ListClassUserPage' ||
+      routeName === 'QRCodeReaderPage' ||
+      routeName === 'FindFriendPage' ||
+      routeName === 'InviteFriendForContactPage' ||
+      routeName === 'ChatPage' ||
+      routeName === 'ContactsSearch' ||
+      routeName === 'ListGroupMemberPage'
+      ) {
+    navigationOptions.tabBarVisible = false;
+  }
+  return navigationOptions;
 };
 
-let MyTransition = (index, position) => {
-  const inputRange = [index - 1, index, index + 1];
-  const outputRange = [.8, 1, 1];
-  const opacity = position.interpolate({
-      inputRange,
-      outputRange,
-  });
 
-  const scaleY = position.interpolate({
-      inputRange,
-      outputRange,
-  });
-
-  return {
-  opacity,
-      transform: [
-          {scaleY}
-      ]
-  };
-};
-//////////
-
-export default index
+export default MainModalNavigator

@@ -27,26 +27,10 @@ import * as actions from '../../Actions'
 class ManageGroupPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
-        // title: "Contacts",
         headerTransparent: true,
         headerTitleStyle:{color:'white'},
         headerTintColor: 'white',
-        // header:{ style:{ position: 'absolute', backgroundColor: 'transparent', zIndex: 100, top: 0, left: 0, right: 0 } },
-        // headerStyle: {style:{ position: 'absolute', backgroundColor: 'transparent', zIndex: 100, top: 0, left: 0, right: 0 }},
-    
         headerRight: (
-            // <TouchableOpacity
-            //     // style={Styles.headerButton}
-            //     style={{marginRight:5}}
-            //     onPress={() => {
-            //         // const { params = {} } = navigation.state
-            //         // params.handleHeaderRight()
-
-            //         alert('share')
-            //     } }>
-            //     <Icon name="share-alt-square" size={25} />
-            // </TouchableOpacity>
-
             <View style={{flexDirection:'row', flex:1}}>
                 <TouchableOpacity 
                     style={{paddingRight:10}}
@@ -68,20 +52,11 @@ class ManageGroupPage extends React.Component{
         ),
     });
 
-//    static navigationOptions = ({navigation}) => { return { headerTitle: <Text style={{color: 'white', fontSize: 18}}>Test</Text>, headerTransparent: true, headerStyle: { borderBottomWidth: 0, } } }
-
     constructor(){
         super();
     
         this.state = { 
             renderContent: false,
-            FlatListItems: [
-                {key: '1'},
-                {key: '2'},
-                {key: '3'},
-                {key: '4'},
-                {key: '5'}
-            ]
         }
     }
 
@@ -99,7 +74,7 @@ class ManageGroupPage extends React.Component{
         let group = null
         _.each(groups, function(_v, _k) { 
             if(group_id === _k){
-                group = _v
+                group = {group_id:_k, ..._v}
             }
         });
 
@@ -152,29 +127,7 @@ class ManageGroupPage extends React.Component{
                                     </View>
                                 }
                                 onPress={() => {
-                                    // console.log("Members")
-                                    // this.props.navigation.navigate("ListGroupMemberPage",  { transition: 'vertical' })
-                                
-                                    console.log(this)
-                                    this.props.navigation.navigate(
-                                        'ListGroupMemberPage'
-                                    )
-
-                                    // , { transition: 'collapseExpand' })
-
-                                    // this.props.navigate({
-                                    //     routeName: 'SceneTwo',
-                                    //     params: {
-                                    //         transition: 'myCustomTransition'
-                                    //     }
-                                    // })
-                                /*
-                                this.props.navigate({
-    routeName: 'SceneTwo',
-    params: {
-        transition: 'myCustomTransition'
-    }
-}) */
+                                    this.props.navigation.navigate('ListGroupMemberPage', {'group': group})
                                 }}
                             />
                             <Cell
@@ -194,7 +147,11 @@ class ManageGroupPage extends React.Component{
                                         </Text>
                                     </View>
                                 }
-                                onPress={() => console.log("QR code")}
+                                onPress={() => {
+                                    // console.log("QR code")
+
+                                    this.props.navigation.navigate('GroupsQRcode')
+                                }}
                             />
                             <Cell
                                 cellStyle="Basic"
@@ -212,7 +169,9 @@ class ManageGroupPage extends React.Component{
                                         </Text>
                                     </View>
                                 }
-                                onPress={() => console.log("Settings")}
+                                onPress={() => {
+                                    this.props.navigation.navigate('GroupSettingsPage')
+                                }}
                             />
                         </Section>
                       </TableView>

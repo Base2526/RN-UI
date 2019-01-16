@@ -1,10 +1,16 @@
 import React from 'react'
-import {View, Text, FlatList, ActivityIndicator, TouchableOpacity, TouchableHighlight} from 'react-native'
+import {View, 
+        Alert, 
+        Text, 
+        FlatList, 
+        ActivityIndicator, 
+        TouchableOpacity, 
+        TouchableHighlight} from 'react-native'
 
 import { List, ListItem, SearchBar } from "react-native-elements";
 import { connect } from 'react-redux';
 
-// import FastImage from 'react-native-fast-image'
+import Swipeout from 'react-native-swipeout'
 
 import DictStyle from './dictStyle';
 
@@ -197,7 +203,31 @@ class GroupsPage extends React.Component{
             data={this.state.data}
             renderItem={({item, key}) =>{
 
+              let swipeoutRight = [
+                {
+                  // text: 'Leave group',
+                  component: <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}><Text style={{color:'white'}}>Leave group</Text></View>,
+                  backgroundColor: 'red',
+                  onPress: () => { 
+
+                    Alert.alert(
+                      '',
+                      'If you leave this group, you\'ll no longer be able to see its member list or chat history Continue?',
+                      [
+                      //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                        {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                        {text: 'OK', onPress: () => console.log('OK Pressed')},
+                      ],
+                      { cancelable: false }
+                    )
+                   }
+                }
+              ]
+
             return(
+              <Swipeout 
+              style={{backgroundColor:'white'}} 
+              right={swipeoutRight}>
             <TouchableOpacity key={item.item_id} onPress={() => this.props.params.navigation.navigate("ManageGroupPage", {'group_id': item.group_id}) }>
               <View
                 style={{
@@ -229,7 +259,8 @@ class GroupsPage extends React.Component{
                     
                   </View>
               </View>
-            </TouchableOpacity>)
+            </TouchableOpacity>
+            </Swipeout>)
             }
             }
             keyExtractor={item => item.item_id}
