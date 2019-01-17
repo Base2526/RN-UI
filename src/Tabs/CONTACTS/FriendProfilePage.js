@@ -166,7 +166,6 @@ class FriendProfilePage extends React.Component{
 
     renderListItem = ({ item }) => {
         console.log(item)
-        
 
         switch(item.key){
             case '1':
@@ -399,7 +398,7 @@ class FriendProfilePage extends React.Component{
                                     style={{flex:1, fontSize: 18,  }}>
                                     Basic Info
                                     </Text>
-                                    <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
+                                    {/* <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
                                         <TouchableOpacity
                                         onPress={()=>alert('edit')}>
                                             <Text
@@ -409,7 +408,7 @@ class FriendProfilePage extends React.Component{
                                                 EDIT
                                             </Text>
                                         </TouchableOpacity>
-                                    </View>
+                                    </View> */}
                                 </View>
                             }
                             />
@@ -449,27 +448,37 @@ class FriendProfilePage extends React.Component{
                                     </View>
                                 }
                             />
-
-                            <Cell
-                                cellStyle="Basic"
-                                accessory="DisclosureIndicator"
-                                contentContainerStyle={{ padding:10 }} 
+                             <Cell
+                                // title="Help / FAQ"
+                                cellStyle="Subtitle"
+                                titleTextColor="#007AFF"
                                 hideSeparator={true} 
+                                onPress={() => {
+                                    alert
+                                }}
                                 cellContentView={
-                                    <View style={{flex:1}}>
-                                        <View >
-                                            <Text style={{ fontSize:18 }}>
-                                                QR code
+                                <View style={{flex:1, flexDirection:'row'}}>
+                                    <Text
+                                    // allowFontScaling
+                                    // numberOfLines={1}
+                                    style={{flex:1, fontSize: 18,  }}>
+                                    Classs
+                                    </Text>
+                                    <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
+                                        <TouchableOpacity
+                                        onPress={()=>alert('edit')}>
+                                            <Text
+                                                // allowFontScaling
+                                                // numberOfLines={1}
+                                                style={{ fontSize: 14, }}>
+                                                Friend
                                             </Text>
-                                            {/* <Text style={{ fontSize:18 }}>
-                                                Male
-                                            </Text> */}
-                                        </View>
-                                        
+                                        </TouchableOpacity>
                                     </View>
-                                }
+                                </View>
+                            }
                             />
-
+                            
                             <Cell
                                 cellStyle="Basic"
                                 contentContainerStyle={{ padding:10 }} 
@@ -569,7 +578,7 @@ class FriendProfilePage extends React.Component{
                                         style={{flex:1, fontSize: 18,  }}>
                                         Contact Info
                                         </Text>
-                                        <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
+                                        {/* <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
                                             <TouchableOpacity
                                             onPress={()=>alert('edit')}>
                                                 <Text
@@ -579,7 +588,7 @@ class FriendProfilePage extends React.Component{
                                                     EDIT
                                                 </Text>
                                             </TouchableOpacity>
-                                        </View>
+                                        </View> */}
                                     </View>
                                 }
                             />

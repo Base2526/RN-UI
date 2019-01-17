@@ -51,7 +51,12 @@ class AddClasssPage extends React.Component{
         title: "Add Classs",
         headerStyle: {
           backgroundColor: 'rgba(186, 53, 100, 1.0)',
+          // ios navigationoptions underline hide
           borderBottomWidth: 0,
+
+          // android navigationoptions underline hide
+          elevation: 0,
+          shadowOpacity: 0
         },
         headerRight: (
           <TouchableOpacity

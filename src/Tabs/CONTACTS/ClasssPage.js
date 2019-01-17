@@ -142,15 +142,8 @@ class ClasssPage extends React.Component{
         </View>
       );
     };
-  
-    render() {
-      let {
-        renderContent
-      } = this.state;
 
-      if(!this.props.hasOwnProperty('classs')){
-        return <View style={{flex: 1}}></View>
-      }
+    renderItem = ({ item, index }) => {
 
       var swipeoutBtns = [
         {
@@ -176,6 +169,67 @@ class ClasssPage extends React.Component{
           }
         }
       ]
+      
+      return (<Swipeout 
+        style={{backgroundColor:'white'}} 
+        right={swipeoutBtns}>
+          <TouchableOpacity key={ item.name } onPress={() => {
+            this.props.params.navigation.navigate("ManageClasssPage")
+          }}>
+            <View
+              style={{
+                alignItems: 'center', 
+                // margin: 5, 
+                padding: 10,
+                // borderWidth: 0.5, 
+                borderColor: DictStyle.colorSet.lineColor,
+                flexDirection: 'row'
+              }}
+            >
+                <TouchableOpacity 
+                    style={{height:60,
+                            width: 60,
+                            borderRadius: 10}}>
+                    
+                    {/* <FastImage
+                        style={{width: 60, height: 60, borderRadius: 10}}
+                        source={{
+                          uri: item.image_url === '' ? Constant.DEFAULT_AVATARSOURCE_URI : Constant.API_URL + item.image_url,
+                        headers:{ Authorization: 'someAuthToken' },
+                        priority: FastImage.priority.normal,
+                        }}
+                        resizeMode={FastImage.resizeMode.contain}
+                    /> */}
+
+                  <ImageWithDefault 
+                    source={{uri: item.image_url}}
+                    style={{width: 60, height: 60, borderRadius: 10}}
+                  />
+                </TouchableOpacity>
+                <View style={{paddingLeft: 10}}>
+                <Text style={{fontSize: 18, 
+                                fontWeight: '600', 
+                                color: DictStyle.colorSet.normalFontColor,
+                                paddingBottom:5
+                              }}>
+                      {item.name}
+                  </Text>
+                  <Text>
+                    3 Users
+                  </Text>
+                </View>
+            </View>
+          </TouchableOpacity>
+        </Swipeout>
+        )
+    }
+  
+    render() {
+      let { renderContent } = this.state;
+
+      if(!this.props.hasOwnProperty('classs')){
+        return <View style={{flex: 1}}></View>
+      }
 
       return (
         <View style={{flex:1}}>
@@ -193,59 +247,8 @@ class ClasssPage extends React.Component{
             //     onPress={()=>console.log("item click")}
             //   />
             // )}
-            renderItem={({item}) =>
-            <Swipeout 
-            style={{backgroundColor:'white'}} 
-            right={swipeoutBtns}>
-              <TouchableOpacity key={ item.name } onPress={() => {
-                this.props.params.navigation.navigate("ListClassUserPage")
-              }}>
-                <View
-                  style={{
-                    alignItems: 'center', 
-                    // margin: 5, 
-                    padding: 10,
-                    // borderWidth: 0.5, 
-                    borderColor: DictStyle.colorSet.lineColor,
-                    flexDirection: 'row'
-                  }}
-                >
-                    <TouchableOpacity 
-                        style={{height:60,
-                                width: 60,
-                                borderRadius: 10}}>
-                        
-                        {/* <FastImage
-                            style={{width: 60, height: 60, borderRadius: 10}}
-                            source={{
-                              uri: item.image_url === '' ? Constant.DEFAULT_AVATARSOURCE_URI : Constant.API_URL + item.image_url,
-                            headers:{ Authorization: 'someAuthToken' },
-                            priority: FastImage.priority.normal,
-                            }}
-                            resizeMode={FastImage.resizeMode.contain}
-                        /> */}
-
-                      <ImageWithDefault 
-                        source={{uri: item.image_url}}
-                        style={{width: 60, height: 60, borderRadius: 10}}
-                      />
-                    </TouchableOpacity>
-                    <View style={{paddingLeft: 10}}>
-                    <Text style={{fontSize: 18, 
-                                    fontWeight: '600', 
-                                    color: DictStyle.colorSet.normalFontColor,
-                                    paddingBottom:5
-                                  }}>
-                          {item.name}
-                      </Text>
-                      <Text>
-                        3 Users
-                      </Text>
-                    </View>
-                </View>
-              </TouchableOpacity>
-            </Swipeout>
-            }
+            renderItem={this.renderItem}
+            
             // keyExtractor={item => item.email}
             keyExtractor = { (item, index) => index.toString() } 
             ItemSeparatorComponent={this.renderSeparator}
@@ -261,8 +264,6 @@ class ClasssPage extends React.Component{
       );
     }
 }
-
-// classs
 
 const mapStateToProps = (state) => {
   console.log(state)

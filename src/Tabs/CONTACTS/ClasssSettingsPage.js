@@ -20,7 +20,7 @@ import * as actions from '../../Actions'
 
 import ImageWithDefault from '../../Utils/ImageWithDefault'
 
-class GroupSettingsPage extends React.Component{
+class ClasssSettingsPage extends React.Component{
     constructor(props) {
         super(props)
     }
@@ -68,11 +68,12 @@ class GroupSettingsPage extends React.Component{
                         cellContentView={
                             <View style={{flex:1, flexDirection:'row'}}>
                                 <Text style={{flex:1, fontSize: 16,  }}>
-                                Group Profile Picture
+                                Classs Profile Picture
                                 </Text>
                             </View>
                         }
                     />
+                    
                     <Cell
                         cellStyle="Basic"
                         titleTextColor="#007AFF"
@@ -108,7 +109,6 @@ class GroupSettingsPage extends React.Component{
                         }
                     />
                 </Section>
-            
                 <Section
                     sectionPaddingTop={5}
                     sectionPaddingBottom={0}
@@ -120,59 +120,7 @@ class GroupSettingsPage extends React.Component{
                         cellContentView={
                             <View style={{flex:1, flexDirection:'row'}}>
                                 <Text style={{flex:1, fontSize: 16,  }}>
-                                Background Photo
-                                </Text>
-                            </View>
-                        }
-                    />
-                    <Cell
-                        cellStyle="Basic"
-                        titleTextColor="#007AFF"
-                        hideSeparator={true}
-                        cellContentView={
-                            <View style={{
-                                        flexDirection:'row', 
-                                        height: 150,
-                                        width: 150}}>
-                                <TouchableOpacity
-                                    onPress={()=>{
-                                        alert('1')
-                                    }}>
-                                    <ImageWithDefault 
-                                        source={{uri: 'https://images.pexels.com/photos/1054289/pexels-photo-1054289.jpeg?auto=compress&cs=tinysrgb&h=350'}}
-                                        style={{height: 150, width: 150}}
-                                    />
-                                </TouchableOpacity>
-                                <TouchableOpacity style={{position:'absolute', 
-                                                            right:0, 
-                                                            bottom:0, 
-                                                            borderRadius:10, 
-                                                            borderColor:'gray', 
-                                                            borderWidth:1,
-                                                            padding:5,
-                                                            margin:5}}
-                                    onPress={()=>{
-                                        alert('2')
-                                    }}>
-                                    <Text style={{color:'gray'}}>EDIT</Text>
-                                </TouchableOpacity>
-                            </View>
-                        }
-                    />
-                </Section>
-
-                <Section
-                    sectionPaddingTop={5}
-                    sectionPaddingBottom={0}
-                    separatorInsetLeft={0}>
-                    <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
-                        hideSeparator={true} 
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <Text style={{flex:1, fontSize: 16,  }}>
-                                Group name
+                                Class name
                                 </Text>
                             </View>
                         }
@@ -181,7 +129,7 @@ class GroupSettingsPage extends React.Component{
                         cellContentView={
                             <TextInput
                             style={{ fontSize: 22, flex: 1 }}
-                            placeholder="input group name"
+                            placeholder="input class name"
                             />
                         }
                         />
@@ -205,4 +153,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps, actions)(GroupSettingsPage);
+export default connect(mapStateToProps, actions)(ClasssSettingsPage);

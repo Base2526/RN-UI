@@ -20,36 +20,36 @@ import { Cell, Section, TableView } from 'react-native-tableview-simple';
 var _ = require('lodash');
 
 import {getStatusBarHeight, getHeaderInset} from '../../Utils/Helpers'
-import GroupBackgroundImage from '../../test/group-image-with-text'
+import GroupBackgroundImage from '../../test/class-image-with-text'
 import ImageWithDefault from '../../Utils/ImageWithDefault'
 import * as actions from '../../Actions'
 
-class ManageGroupPage extends React.Component{
+class ManageClasssPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
         headerTransparent: true,
         headerTitleStyle:{color:'white'},
         headerTintColor: 'white',
-        headerRight: (
-            <View style={{flexDirection:'row', flex:1}}>
-                <TouchableOpacity 
-                    style={{paddingRight:10}}
-                    onPress={()=>{
-                        Alert.alert(
-                            '',
-                            'If you leave this group, you\'ll no longer be able to see its member list or chat history Continue?',
-                            [
-                            //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-                              {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-                              {text: 'OK', onPress: () => console.log('OK Pressed')},
-                            ],
-                            { cancelable: false }
-                          )
-                    }}>
-                    <Text style={{color:'red', fontSize:16, borderWidth: 1, borderColor: 'red', borderRadius: 12, padding: 8, overflow:"hidden",}}>Leave group</Text>
-                </TouchableOpacity> 
-            </View>
-        ),
+        // headerRight: (
+        //     <View style={{flexDirection:'row', flex:1}}>
+        //         <TouchableOpacity 
+        //             style={{paddingRight:10}}
+        //             onPress={()=>{
+        //                 Alert.alert(
+        //                     '',
+        //                     'If you leave this group, you\'ll no longer be able to see its member list or chat history Continue?',
+        //                     [
+        //                     //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+        //                       {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        //                       {text: 'OK', onPress: () => console.log('OK Pressed')},
+        //                     ],
+        //                     { cancelable: false }
+        //                   )
+        //             }}>
+        //             <Text style={{color:'red', fontSize:16, borderWidth: 1, borderColor: 'red', borderRadius: 12, padding: 8, overflow:"hidden",}}>Settings</Text>
+        //         </TouchableOpacity> 
+        //     </View>
+        // ),
     });
 
     constructor(){
@@ -65,51 +65,31 @@ class ManageGroupPage extends React.Component{
     }
 
     render() {
-        const { navigation } = this.props;
-        const group_id = navigation.getParam('group_id', null);
-        // console.log(group_id)
+        // const { navigation } = this.props;
+        // const group_id = navigation.getParam('group_id', null);
+        // // console.log(group_id)
 
-        let groups = this.props.auth.users.groups;
+        // let groups = this.props.auth.users.groups;
 
-        let group = null
-        _.each(groups, function(_v, _k) { 
-            if(group_id === _k){
-                group = {group_id:_k, ..._v}
-            }
-        });
+        // let group = null
+        // _.each(groups, function(_v, _k) { 
+        //     if(group_id === _k){
+        //         group = {group_id:_k, ..._v}
+        //     }
+        // });
 
-        console.log(group)
+        // console.log(group)
         return (
                 <ScrollView style={{ flex: 1,}}>
                 <View style={{flex:1, backgroundColor:'gray'}}>
-                    <GroupBackgroundImage style={{paddingTop:getHeaderInset()}} auth={this.props.auth} group={group} />
+                    <GroupBackgroundImage style={{paddingTop:getHeaderInset()}} auth={this.props.auth} />
                     <View style={{ flex:1}}>
                     <TableView >
                         <Section
                             sectionPaddingTop={5}
                             sectionPaddingBottom={0}
                             separatorInsetLeft={0}>
-                            <Cell
-                                cellStyle="Basic"
-                                accessory="DisclosureIndicator"
-                                contentContainerStyle={{ padding:10 }} 
-                                hideSeparator={false} 
-                                cellContentView={
-                                    <View style={{flex:1, flexDirection:'row'}}>
-                                        <Image
-                                            style={{width: 25, height: 25}}
-                                            source={require('../../Images/chat-icon.png')}
-                                        />
-                                        <Text style={{ fontSize:22 , paddingLeft:10}}>
-                                            Chat
-                                        </Text>
-                                    </View>
-                                }
-                                onPress={() => {
-                                    // console.log("Chat")
-                                    this.props.navigation.navigate("ChatPage")
-                                }}
-                            />
+
                             <Cell
                                 cellStyle="Basic"
                                 accessory="DisclosureIndicator"
@@ -122,35 +102,13 @@ class ManageGroupPage extends React.Component{
                                             source={require('../../Images/member-icon.png')}
                                         />
                                         <Text style={{ fontSize:22 , paddingLeft:10}}>
-                                            Members ({ Object.keys(group.group_profile.members).length })
+                                            Members 
                                         </Text>
                                     </View>
                                 }
-                                onPress={() => {
-                                    this.props.navigation.navigate('ListGroupMemberPage', {'group': group})
-                                }}
-                            />
-                            <Cell
-                                cellStyle="Basic"
-                                // accessory="DisclosureIndicator"
-                                contentContainerStyle={{ padding:10 }} 
-                                hideSeparator={false} 
-                                cellContentView={
-                                    
-                                    <View style={{flex:1, flexDirection:'row'}}>
-                                        <Image
-                                            style={{width: 25, height: 25}}
-                                            source={require('../../Images/qrcode-icon.png')}
-                                        />
-                                        <Text style={{ fontSize:22 , paddingLeft:10}}>
-                                            QR code
-                                        </Text>
-                                    </View>
-                                }
-                                onPress={() => {
-                                    // console.log("QR code")
-
-                                    this.props.navigation.navigate('GroupsQRcode')
+                                onPress={() => { 
+                                    this.props.navigation.navigate('ListClassMemberPage')
+                                    // this.props.navigation.navigate('ListGroupMemberPage', {'group': group})
                                 }}
                             />
                             <Cell
@@ -170,7 +128,7 @@ class ManageGroupPage extends React.Component{
                                     </View>
                                 }
                                 onPress={() => {
-                                    this.props.navigation.navigate('GroupSettingsPage')
+                                    this.props.navigation.navigate('ClasssSettingsPage')
                                 }}
                             />
                         </Section>
@@ -231,4 +189,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps, actions)(ManageGroupPage);
+export default connect(mapStateToProps, actions)(ManageClasssPage);

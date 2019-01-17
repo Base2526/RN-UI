@@ -13,10 +13,23 @@ import FastImage from 'react-native-fast-image'
 
 import Styles from '../../styles';
 
-export default class ListClassUserPage extends React.Component{
+export default class ListClassMemberPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
-        title: "Manage Group",
+        title: "Members",
+        headerRight: (
+            <View style={{flexDirection:'row', flex:1}}>
+                <TouchableOpacity 
+                    style={{paddingRight:10}}
+                    onPress={()=>{
+                        // GroupMemberInvite
+                        const { params = {} } = navigation.state
+                        // params.handleInvite()
+                    }}>
+                    <Text style={{color:'black', fontSize:16}}>Add friend</Text>
+                </TouchableOpacity> 
+            </View>
+        ),
     });
 
     constructor(){

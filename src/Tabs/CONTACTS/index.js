@@ -10,7 +10,7 @@ import AddClasssPage from './AddClasssPage';
 import MyProfilePage from './MyProfilePage';
 import FriendProfilePage from './FriendProfilePage';
 import ManageGroupPage from './ManageGroupPage';
-import ListClassUserPage from './ListClassUserPage'
+import ListClassMemberPage from './ListClassMemberPage'
 
 import QRCodeReaderPage from './QRCodeReaderPage'
 import FindFriendPage from './FindFriendPage'
@@ -29,6 +29,8 @@ import GroupsQRcode from './GroupsQRcode'
 
 import GroupSettingsPage from './GroupSettingsPage'
 import GroupMemberInvite from './GroupMemberInvite'
+import ManageClasssPage from './ManageClasssPage'
+import ClasssSettingsPage from './ClasssSettingsPage'
 
 const index = createStackNavigator({
     'Home': {
@@ -79,10 +81,10 @@ const index = createStackNavigator({
         // title: 'Manage Group',
       }
     },
-    'ListClassUserPage': {
-      screen: ListClassUserPage,
+    'ListClassMemberPage': {
+      screen: ListClassMemberPage,
       navigationOptions: {
-        title: 'List Class User',
+        // title: 'List Class User',
       }
     },
     'QRCodeReaderPage': {
@@ -118,9 +120,9 @@ const index = createStackNavigator({
     'ListGroupMemberPage': {
       screen: ListGroupMemberPage,
     },
-    // 'GroupsQRcode':{
-    //   screen: GroupsQRcode
-    // }
+    'ManageClasssPage':{
+      screen: ManageClasssPage
+    }
 },{
 //   initialRouteName: 'Base',
 // headerMode: "screen",
@@ -167,7 +169,8 @@ const MainModalNavigator = createStackNavigator(
       
     // },
     'GroupSettingsPage': {screen: GroupSettingsPage},
-    'GroupMemberInvite': {screen: GroupMemberInvite}
+    'GroupMemberInvite': {screen: GroupMemberInvite},
+    'ClasssSettingsPage': {screen: ClasssSettingsPage},
   },
   {
     mode: 'modal',
@@ -184,7 +187,8 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
     // console.log(routeName)
     if(routeName === 'GroupsQRcode' || 
        routeName === 'GroupSettingsPage' ||
-       routeName === 'GroupMemberInvite'){
+       routeName === 'GroupMemberInvite' ||
+       routeName === 'ClasssSettingsPage'){
       navigationOptions.tabBarVisible = false;
       return navigationOptions;
     }
@@ -200,13 +204,14 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
       routeName === 'MyProfilePage' ||
       routeName === 'FriendProfilePage' ||
       routeName === 'ManageGroupPage' ||
-      routeName === 'ListClassUserPage' ||
+      routeName === 'ListClassMemberPage' ||
       routeName === 'QRCodeReaderPage' ||
       routeName === 'FindFriendPage' ||
       routeName === 'InviteFriendForContactPage' ||
       routeName === 'ChatPage' ||
       routeName === 'ContactsSearch' ||
-      routeName === 'ListGroupMemberPage'
+      routeName === 'ListGroupMemberPage' ||
+      routeName === 'ManageClasssPage'
       ) {
     navigationOptions.tabBarVisible = false;
   }

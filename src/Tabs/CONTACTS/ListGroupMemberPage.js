@@ -55,7 +55,7 @@ class ListGroupMemberPage extends React.Component{
     handleInvite = () => {
         const { navigation } = this.props;
         const group = navigation.getParam('group', null);
-        
+
         this.props.navigation.navigate("GroupMemberInvite", {'group':group})
     }
 
@@ -277,44 +277,6 @@ class ListGroupMemberPage extends React.Component{
         // let {renderContent, data} = this.state;
 
         return (
-            // <View style={{flex:1, marginTop:getStatusBarHeight()}}>
-            //     <View style={{flexDirection:'row', height:60, }}>
-            //         <TouchableOpacity 
-            //             style={{
-            //                     borderWidth: 1, 
-            //                     borderColor: 'red',
-            //                     borderRadius: 10,
-            //                     height:40, 
-            //                     width:60,
-            //                     justifyContent: 'center', 
-            //                     alignItems: 'center',
-            //                     margin:10
-            //                         }}
-            //             onPress={()=>{
-            //                 this.props.navigation.goBack()
-            //             }}>
-            //             <Text style={{color:'red'}}>Close</Text>
-            //         </TouchableOpacity> 
-
-            //         <TouchableOpacity 
-            //             style={{
-            //                     borderWidth: 1, 
-            //                     borderColor: 'black',
-            //                     borderRadius: 10,
-            //                     height:40, 
-            //                     width:60,
-            //                     justifyContent: 'center', 
-            //                     alignItems: 'center',
-            //                     margin:10,
-            //                     position:'absolute',
-            //                     right:0
-            //                         }}
-            //             onPress={()=>{
-            //                 this.props.navigation.navigate('ListClassUserPage')
-            //             }}>
-            //             <Text style={{color:'black'}}>Invite</Text>
-            //         </TouchableOpacity> 
-            //     </View>
                 <ExpandableList
                     style={{flex:1}}
                     ref={instance => this.ExpandableList = instance}
