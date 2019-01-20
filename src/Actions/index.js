@@ -16,7 +16,9 @@ import {USER_LOGIN_SUCCESS,
         FRIEND_PROFILE,
         UPDATE_STATUS_FRIEND,
         ADD_GROUP,
-    DELETE_GROUP} from './types'
+        DELETE_GROUP,
+        SELECT_ADD_CLASS,
+        CLASS_MEMBERS} from './types'
 
 import {saveAsyncStorage, loadAsyncStorage} from '../Utils/Helpers'
 import Constant from '../Utils/Constant'
@@ -371,6 +373,75 @@ export const actionUpdateStatusFriend = (uid, friend_id, status, callback) => di
     callback({'status':true})
 }
 
+// key, this.props.uid, friend.friend_id
+export const actionSelectClass = (class_id, uid, friend_id, callback) => dispatch=> {
+
+    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').where('friend_id', '==', friend_id).get().then(snapshot => {
+        
+        // console.log(snapshot.docs)
+        // console.log(snapshot.size)
+        if(snapshot.size == 0){
+            firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').add({
+                friend_id,
+                status: true,
+            })
+        }else{
+            snapshot.docs.forEach(doc => {
+                //console.log(JSON.parse(doc._document.data.toString()))
+                // console.log(doc.id)
+                // console.log(doc.data())
+                // firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(doc.id).set({
+                //     status: !doc.data().status
+                // },
+                // { merge: true });
+
+                // https://firebase.google.com/docs/firestore/manage-data/transactions
+                var classsRef = firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(doc.id);
+
+                var transaction = firebase.firestore().runTransaction(t => {
+                return t.get(classsRef)
+                    .then(doc => {
+
+                    // console.log(doc)
+                    // Add one person to the city population
+                    // var newPopulation = doc.data().population + 1;
+                    // t.update(cityRef, {population: newPopulation});
+
+                        t.update(classsRef, {status: !doc.data().status});
+                    });
+                }).then(result => {
+                    console.log('Transaction success!');
+                }).catch(err => {
+                    console.log('Transaction failure:', err);
+                });               
+            });
+        }
+        // querySnapshot.docChanges.forEach(function(change) {
+        //     console.log(change)
+        // })
+
+        // if (querySnapshot.exists) {
+        //     console.log("1, querySnapshot.exists")
+        // }else{
+        //     firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').add({
+        //         friend_id,
+        //         complete: true,
+        //     })
+        // }
+    })
+
+    callback({'status':true, 'uid':uid, 'friend_id': friend_id, 'class_id': class_id})
+}
+
+// Change friend's name
+export const actionChangeFriendsName = (uid, friend_id, name, callback) => dispatch=> {
+    firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
+        change_friend_name: name,
+    }, { merge: true});
+
+    callback({'status':true, uid, friend_id, name})
+}
+
 let unsubscribe = null;
 
 export function watchTaskEvent(uid, dispatch) {
@@ -611,7 +682,7 @@ export function watchTaskEvent(uid, dispatch) {
 
         let _this = this
         querySnapshot.forEach(function(doc) {
-            console.log(doc.id, " => ", doc.data());
+            // console.log(doc.id, " => ", doc.data());
 
             // let id = doc.id
             // let data = doc.data()
@@ -621,7 +692,7 @@ export function watchTaskEvent(uid, dispatch) {
                 // doc.id จะมีค่าเท่ากันกับ  docSnapshot.id 
 
                 if(docSnapshot.data() !== undefined){
-                    console.log(docSnapshot.id, " => ", docSnapshot.data());
+                    // console.log(docSnapshot.id, " => ", docSnapshot.data());
 
                     let v = {...doc.data(), group_profile:docSnapshot.data()}
 
@@ -634,46 +705,28 @@ export function watchTaskEvent(uid, dispatch) {
            })
         })
     })
-    /*
-    firebase.firestore().collection('users').doc(uid).collection('device_access').where('udid', '==', DeviceInfo.getUniqueID()).onSnapshot((querySnapshot) => {
-        // console.log(querySnapshot);
+    
+    // track classs
+    firebase.firestore().collection('users').doc(uid).collection('classs').onSnapshot((qSnapshot) => {
 
         let _this = this
-        querySnapshot.docChanges.forEach(function(change) {
-            // if (change.type === "removed") {
-            //     console.log("Removed city: ", change.doc.data());
-            // }
-            // console.log(change.type)
-            // console.log(change.doc.data());
+        qSnapshot.forEach(function(doc) {
+            // console.log("SELECT_ADD_CLASS ", doc.id, " => ", doc.data());
 
-            let data = change.doc.data()
-            console.log(data)
-            // console.log(_this)
+            dispatch({type: SELECT_ADD_CLASS, class_id:doc.id, class_data:doc.data()})
 
-            if (change.type === "added" || change.type === "modified") {
-                //  check ว่ามีการ force logout จากระบบหรือไม่
-                if(data.is_login == 0){
-                    actionLogout(dispatch, ()=>{
-                        // console.log(this)                
-                        _this.navigation.navigate("AuthLoading")
-                    })
-                }
-            }else if (change.type === "removed") {
-                // console.log("removed");
+            firebase.firestore().collection('users').doc(uid).collection('classs').doc(doc.id).collection('members').onSnapshot((querySnapshot) => {
+            
+                // console.log(doc.id)
+                querySnapshot.forEach(function(pdoc) {
+                    // console.log("CLASS_MEMBERS ", doc.id, " => ", doc.data());
 
-                let uid = _this.auth.users.user.uid
-                let device_access = _this.auth.users.device_access
-
-                Object.keys(device_access).map((key, index) => {
-                    firebase.firestore().collection('users').doc(uid).collection('device_access').doc(key).delete();
-                    return;
+                    // SELECT_CLASS_MEMBERS
+                    dispatch({type: CLASS_MEMBERS, parent_id:doc.id,class_members_id:pdoc.id, class_members_data:pdoc.data()})
                 })
-                
-                // firebase.firestore().collection('users').doc(change.doc.data().uid).delete();
-            }            
-        });
+            })
+        })
     })
-    */
 }
 
 // Firestore unsubscribe to updates

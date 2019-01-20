@@ -207,7 +207,7 @@ class FriendsPage extends React.Component{
           return(<View></View>);
         }
 
-        console.log(rowItem.status)
+        // console.log(rowItem.status)
         switch(rowItem.status){
           case Constant.FRIEND_STATUS_FRIEND:{
             // console.log('1, --' + key)
@@ -306,7 +306,8 @@ class FriendsPage extends React.Component{
                                   color: DictStyle.colorSet.normalFontColor,
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
-                         Name : {rowItem.profile.name}
+
+                         Name : {rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.profile.name}
                     </Text>
                     <Text style={{fontSize: DictStyle.fontSet.mSize, 
                                 color: DictStyle.colorSet.normalFontColor,
@@ -465,8 +466,6 @@ class FriendsPage extends React.Component{
     };
     
     render() {
-
-      console.log(this.props)
 
       let {
         renderContent

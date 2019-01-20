@@ -8,7 +8,9 @@ import {FlatList,
         TouchableOpacity,
         ScrollView,
         SafeAreaView,
-        Image} from 'react-native'
+        Dimensions,
+        Image,
+        TextInput} from 'react-native'
 
 import { Header } from 'react-navigation';
 
@@ -17,6 +19,9 @@ import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
+import Modal from 'react-native-modalbox';
+import { KeyboardAwareScrollView, KeyboardAwareSectionList } from 'react-native-keyboard-aware-scroll-view'
+
 
 var _ = require('lodash');
 
@@ -25,12 +30,10 @@ import FriendBackgroundImage from '../../test/friend-image-with-text'
 import ImageWithDefault from '../../Utils/ImageWithDefault'
 import * as actions from '../../Actions'
 
+import {getUid} from '../../Utils/Helpers'
+
 class FriendProfilePage extends React.Component{
 
-    /*
-    static navigationOptions = { headerStyle:{ position: 'absolute', backgroundColor: 'transparent', zIndex: 100, top: 0, left: 0, right: 0 } };
-     */
-    
     static navigationOptions = ({ navigation }) => ({
         // title: "Contacts",
         headerTransparent: true,
@@ -40,17 +43,6 @@ class FriendProfilePage extends React.Component{
         // headerStyle: {style:{ position: 'absolute', backgroundColor: 'transparent', zIndex: 100, top: 0, left: 0, right: 0 }},
     
         headerRight: (
-            // <TouchableOpacity
-            //     // style={Styles.headerButton}
-            //     style={{marginRight:5}}
-            //     onPress={() => {
-            //         // const { params = {} } = navigation.state
-            //         // params.handleHeaderRight()
-
-            //         alert('share')
-            //     } }>
-            //     <Icon name="share-alt-square" size={25} />
-            // </TouchableOpacity>
             <View style={{flexDirection:'row', flex:1}}>
                 {/* <TouchableOpacity style={{paddingRight:10}}>
                     <Text style={{color:'gray', fontSize:16, borderWidth: 1, borderColor: '#000', borderRadius: 12, padding: 8, overflow:"hidden",}}>EDIT</Text>
@@ -67,9 +59,9 @@ class FriendProfilePage extends React.Component{
     
         this.state = { 
             renderContent: false,
+            friend:null
         }
     }
-
 
     // https://github.com/react-navigation/react-navigation/blob/master/examples/NavigationPlayground/js/StackWithTranslucentHeader.js
     // Inset to compensate for navigation bar being transparent.
@@ -93,6 +85,53 @@ class FriendProfilePage extends React.Component{
     componentDidMount() {
         setTimeout(() => {this.setState({renderContent: true})}, 0);
 
+        const { navigation } = this.props;
+        const friend_id = navigation.getParam('friend_id', null);
+
+        // let {renderContent} = this.state;
+
+        let friends = this.props.auth.users.friends;
+
+        let friend = null
+        _.each(friends, function(_v, _k) { 
+            // console.log(_v," | ",_k)
+            if(friend_id === _k){
+                friend = {..._v, friend_id:friend_id}
+            }
+        });
+
+        this.setState({
+            friend
+        })
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log(nextProps)
+
+        const { navigation } = this.props;
+        const friend_id = navigation.getParam('friend_id', null);
+
+        // let {renderContent} = this.state;
+
+        // console.log(friend_id)
+
+        let friends = nextProps.auth.users.friends;
+
+        let friend = {}
+        _.each(friends, function(_v, _k) { 
+            // console.log(_v," | ",_k)
+            if(friend_id === _k){
+                friend = {..._v, friend_id:friend_id}
+            }
+        });
+
+        // console.log(friends)
+
+        if(friend.hasOwnProperty('profile')){
+            this.setState({
+                friend
+            })
+        }
     }
 
     FlatListItemSeparator = () => {
@@ -165,7 +204,7 @@ class FriendProfilePage extends React.Component{
     };
 
     renderListItem = ({ item }) => {
-        console.log(item)
+        // console.log(item)
 
         switch(item.key){
             case '1':
@@ -231,102 +270,207 @@ class FriendProfilePage extends React.Component{
         }
     }
 
-    render() {
+    /*
+    // ChangeFriendsName
+    // this.changeFriendsName()
+     */
+    changeFriendsName = (friend) => {
+        this.props.navigation.navigate('ChangeFriendsName', {"friend": friend})
+    }
 
-        const { navigation } = this.props;
-        const friend_id = navigation.getParam('friend_id', null);
+    openModal(){
+        this.refs.modal4.open()
+    }
 
-        let {renderContent} = this.state;
+    getHeightListClasss(){
+        let classs = this.props.auth.users.classs
 
-        let friends = this.props.auth.users.friends;
+        /*
+        80 : ความสูงของ item
+        45 : ความสูงของ header x
+        */
+        let height = Object.keys(classs).length * 80 + 45
 
-        let friend = null
-        _.each(friends, function(_v, _k) { 
-            // console.log(_v," | ",_k)
-            if(friend_id === _k){
-                friend = _v
+        if(height > Dimensions.get('window').height){
+            return (Dimensions.get('window').height - 100);
+        }
+
+        return height;
+    }
+
+    icon = (classs, friend, key) =>{
+        let members = classs[key].members
+
+        let icon = null
+        if(members !== undefined){
+            _.each(members, function(_v, _k) { 
+                if(friend.friend_id === _v.friend_id && _v.status){
+                    icon = <Icon name="check" size={25} color="#900" />
+                } 
+            })
+        }
+
+        return icon
+    }
+
+    renderListClasss() {
+        var list = [];
+
+        let classs = this.props.auth.users.classs
+
+        let {friend} = this.state
+
+        // console.log(classs)
+
+        Object.keys(classs).map(key => {
+            list.push(
+                <TouchableOpacity key={ key } onPress={() => {
+                    // this.props.params.navigation.navigate("ManageClasssPage")
+                    // alert(classs[key].name)
+
+                    this.props.actionSelectClass(key, this.props.uid, friend.friend_id, (result)=>{
+
+                        console.log(result)
+                    })
+                  }}>
+                <View
+                  style={{
+                    alignItems: 'center', 
+                    padding: 10,
+                    flexDirection: 'row',
+                    height:80,
+                  }}>
+                    <TouchableOpacity 
+                        style={{height:60,
+                                width: 60,
+                                borderRadius: 10}}>
+                      <ImageWithDefault 
+                        source={{uri: classs[key].image_url}}
+                        style={{width: 60, height: 60, borderRadius: 10}}
+                      />
+                    </TouchableOpacity>
+                    <View style={{paddingLeft: 10}}>
+                        <Text style={{fontSize: 18, 
+                                        fontWeight: '600', 
+                                        paddingBottom:5
+                                    }}>
+                            {classs[key].name}
+                        </Text>
+                    </View>
+                    <View style={{paddingLeft: 10, position:'absolute', right:0, marginRight:10}}>
+                        {this.icon(classs, friend, key)}
+                    </View>
+    
+                    <View
+                        style={{
+                            height: 1,
+                            width: "86%",
+                            backgroundColor: "#CED0CE",
+                            marginLeft: "14%",
+                            position:'absolute',
+                            bottom: 0,
+                            right: 0,
+                        }}
+                    />
+                </View>
+                </TouchableOpacity>
+            )
             }
-        });
+        )
+        return list;
+    }
 
-        console.log(friend)
+    getClasssName=()=>{
 
-        const resizeMode = 'center';
+        let classs = this.props.auth.users.classs
+
+        let {friend_id} = this.state.friend
+
+        // console.log(classs)
+        // console.log(friend_id)
+
+        let n = []
+        _.each(classs, function(_v, _k) { 
+
+            if(_v.members !== undefined){
+                let class_name = _v.name
+                // console.log(_v)
+                // console.log(_k)
+
+                _.each(_v.members, function(_v, _k) { 
+                    if(_v.status && _v.friend_id == friend_id){
+                        n.push(class_name)
+                    }
+                    // console.log(_v)
+                })
+            }
+        })
+
+        if(n.length == 0){
+            return "Not set class"
+        }else{
+            return n.join(", ")
+        }
+    }
+
+    render() {
+        let {friend} = this.state
+
+        if(friend === null){
+            return <View></View>
+        }
+
+        // console.log(friend)
+
         return (
             // <SafeAreaView style={{flex:1}}>
+            <View style={{flex:1}}>
+                <Modal 
+                    style={{zIndex:10, height:this.getHeightListClasss(), borderTopLeftRadius:15, borderTopRightRadius:15}} 
+                    position={"bottom"} 
+                    ref={"modal4"}
+                    backdropPressToClose={false}
+                    // swipeToClose={false}
+                    swipeArea={50}
+                    >
+                    <View 
+                        style={{height:35}}>
+                        <TouchableOpacity 
+                            style={{
+                                    borderWidth: 1, 
+                                    borderColor: 'red',
+                                    borderRadius: 15,
+                                    height:30, 
+                                    width:30,
+                                    justifyContent: 'center', 
+                                    alignItems: 'center',
+                                    position:'absolute',
+                                    right:0,
+                                    margin:5,
+                                    zIndex:10
+                                        }}
+                            onPress={()=>{
+                                this.refs.modal4.close()
+                            }}>
+                            <Text style={{color:'red', fontSize:16}}>X</Text>
+                        </TouchableOpacity>
+                        <View style={{flex:1, marginLeft:10, justifyContent:'center'}}>
+                            <Text style={{fontSize:18}}>Select Class</Text>
+                        </View>
+                    </View>
+                    <ScrollView>
+                        <View
+                            style={{marginLeft:10, marginRight:10, marginBottom:20, marginTop:5, flex:1}}>
+                            {this.renderListClasss()}
+                        </View>
+                    </ScrollView>
+                </Modal>
+
                 <ScrollView style={{ flex: 1,}}>
                 <View style={{flex:1, backgroundColor:'gray'}}>
-                    {/* <ImageBackground source={require('../../Images/__bg.png')}  style={{width: '100%', height: '100%'}}> */}
-                    <FriendBackgroundImage style={{paddingTop:this.getHeaderInset()}} auth={this.props.auth} friend={friend}>
-                        {/* <View style={{height:1200}}> */}
-                        { 
-                            // renderContent &&
-                        // <FlatList
-                        //     data={ this.state.FlatListItems }
-                        //     ItemSeparatorComponent = {this.FlatListItemSeparator}
-                        //     renderItem={this.renderListItem}
-                        //     ListHeaderComponent={this.render_FlatList_header}
-                        //     // ListFooterComponent={this.render_FlatList_footer}
-                        //     />
-                        // <Text>Text</Text>
-                        }
-                        {/* </View> */}
-                    </FriendBackgroundImage>
-                    {/* <FlatList
-                            data={ this.state.FlatListItems }
-                            ItemSeparatorComponent = {this.FlatListItemSeparator}
-                            renderItem={this.renderListItem}
-                            ListHeaderComponent={this.render_FlatList_header}
-                            // ListFooterComponent={this.render_FlatList_footer}
-                            /> */}
+                    <FriendBackgroundImage style={{paddingTop:this.getHeaderInset()}} auth={this.props.auth} friend={friend} />
                     <View style={{ flex:1}}>
                     <TableView >
-
-                        {/* 
-                        
-                        <View style={{position:'absolute', right:0, bottom:0, flexDirection:'row'}}>
-                                            <TouchableOpacity
-                                                style={{height:25,
-                                                        width: 25,
-                                                        borderRadius: 30,
-                                                        margin:5,
-                                                        backgroundColor:'blue'
-                                                        }}        
-                                                >
-                                                <ImageWithDefault 
-                                                    source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
-                                                    style={{width: 25, height: 25, borderRadius: 30, }}
-                                                />      
-                                            </TouchableOpacity>
-                                            <TouchableOpacity
-                                                style={{height:25,
-                                                        width: 25,
-                                                        borderRadius: 30,
-                                                        margin:5,
-                                                        backgroundColor:'blue'
-                                                        }}        
-                                                >
-                                                <ImageWithDefault 
-                                                    source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
-                                                    style={{width: 25, height: 25, borderRadius: 30, }}
-                                                />      
-                                            </TouchableOpacity>
-                                            <TouchableOpacity
-                                                style={{height:25,
-                                                        width: 25,
-                                                        borderRadius: 30,
-                                                        margin:5,
-                                                        backgroundColor:'blue'
-                                                        }}        
-                                                >
-                                                <ImageWithDefault 
-                                                    source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
-                                                    style={{width: 25, height: 25, borderRadius: 30, }}
-                                                />      
-                                            </TouchableOpacity>
-                                        </View>
-                        
-                        */}
-
                         <Section
                             sectionPaddingTop={5}
                             sectionPaddingBottom={0}
@@ -343,15 +487,37 @@ class FriendProfilePage extends React.Component{
                                                     width:60,
                                                     borderRadius: 30,
                                                     margin:5,
-                                                    backgroundColor:'blue'
-                                                    }}        
+                                                    // backgroundColor:'blue'
+                                                    }}   
+                                            onPress={()=>{
+                                                alert('Video call')
+                                            }}     
                                             >
                                             <ImageWithDefault 
-                                                source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
+                                                // source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
+                                                source={require('../../Images/icon-profile-friend-phone.png')}
                                                 style={{width: 60, height: 60, borderRadius: 30, }}
                                             />      
                                         </TouchableOpacity>
                                         <TouchableOpacity
+                                            style={{height:60,
+                                                    width:60,
+                                                    borderRadius: 30,
+                                                    margin:5,
+                                                    // backgroundColor:'blue'
+                                                    }}  
+                                                    
+                                            onPress={()=>{
+                                                this.props.navigation.navigate("ChatPage")
+                                            }}
+                                            >
+                                            <ImageWithDefault  // 
+                                                // source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
+                                                source={require('../../Images/icon-profile-friend-chat.png')}
+                                                style={{width: 60, height: 60, borderRadius: 30, }}
+                                            />      
+                                        </TouchableOpacity>
+                                        {/* <TouchableOpacity
                                             style={{height:60,
                                                     width:60,
                                                     borderRadius: 30,
@@ -363,20 +529,7 @@ class FriendProfilePage extends React.Component{
                                                 source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
                                                 style={{width: 60, height: 60, borderRadius: 30, }}
                                             />      
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={{height:60,
-                                                    width:60,
-                                                    borderRadius: 30,
-                                                    margin:5,
-                                                    backgroundColor:'blue'
-                                                    }}        
-                                            >
-                                            <ImageWithDefault 
-                                                source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
-                                                style={{width: 60, height: 60, borderRadius: 30, }}
-                                            />      
-                                        </TouchableOpacity>
+                                        </TouchableOpacity> */}
                                     </View>
                                 }
                             />
@@ -398,17 +551,6 @@ class FriendProfilePage extends React.Component{
                                     style={{flex:1, fontSize: 18,  }}>
                                     Basic Info
                                     </Text>
-                                    {/* <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
-                                        <TouchableOpacity
-                                        onPress={()=>alert('edit')}>
-                                            <Text
-                                                // allowFontScaling
-                                                // numberOfLines={1}
-                                                style={{ fontSize: 14, }}>
-                                                EDIT
-                                            </Text>
-                                        </TouchableOpacity>
-                                    </View> */}
                                 </View>
                             }
                             />
@@ -420,11 +562,22 @@ class FriendProfilePage extends React.Component{
                                     <View style={{flex:1}}>
                                         <View >
                                             <Text style={{ }}>
-                                            Name Subname
+                                            Name Subname {friend.hasOwnProperty('change_friend_name') ? " (" + friend.profile.name + ")" : '' }
                                             </Text>
                                             <Text style={{ fontSize:18 }}>
-                                                {friend.profile.name}
+                                                {friend.hasOwnProperty('change_friend_name') ? friend.change_friend_name: friend.profile.name }
                                             </Text>
+                                        </View>
+                                        <View style={{position:'absolute', right:0, paddingTop:5}}>
+                                            <TouchableOpacity
+                                                onPress={()=>{
+                                                    this.changeFriendsName(friend)
+                                                }}>
+                                                <Image
+                                                    style={{width: 30, height: 30}}
+                                                    source={require('../../Images/icon-edit.png')}
+                                                />
+                                            </TouchableOpacity>
                                         </View>
                                     </View>
                                 }
@@ -454,25 +607,27 @@ class FriendProfilePage extends React.Component{
                                 titleTextColor="#007AFF"
                                 hideSeparator={true} 
                                 onPress={() => {
-                                    alert
+                                    this.openModal()
                                 }}
                                 cellContentView={
-                                <View style={{flex:1, flexDirection:'row'}}>
+                                
+                                <View style={{flex:1, }}>
                                     <Text
-                                    // allowFontScaling
-                                    // numberOfLines={1}
-                                    style={{flex:1, fontSize: 18,  }}>
-                                    Classs
+                                        style={{flex:1, fontSize: 18,}}>
+                                        Classs
                                     </Text>
-                                    <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
+                                    <Text style={{ fontSize:18 }}>
+                                         {this.getClasssName()}
+                                    </Text>
+                                    <View style={{position:'absolute', right:0, paddingTop:5}}>
                                         <TouchableOpacity
-                                        onPress={()=>alert('edit')}>
-                                            <Text
-                                                // allowFontScaling
-                                                // numberOfLines={1}
-                                                style={{ fontSize: 14, }}>
-                                                Friend
-                                            </Text>
+                                            onPress={()=>{
+                                                this.openModal()
+                                            }}>
+                                            <Image
+                                                style={{width: 30, height: 30}}
+                                                source={require('../../Images/icon-edit.png')}
+                                            />
                                         </TouchableOpacity>
                                     </View>
                                 </View>
@@ -493,7 +648,6 @@ class FriendProfilePage extends React.Component{
                                                 XUASDFOPMNBSSS
                                             </Text>
                                         </View>
-                                        
                                     </View>
                                 }
                             />
@@ -512,7 +666,6 @@ class FriendProfilePage extends React.Component{
                                                 Male
                                             </Text>
                                         </View>
-                                        
                                     </View>
                                 }
                             />
@@ -531,7 +684,6 @@ class FriendProfilePage extends React.Component{
                                                 January 4, 1983
                                             </Text>
                                         </View>
-                                        
                                     </View>
                                 }
                             />
@@ -550,7 +702,6 @@ class FriendProfilePage extends React.Component{
                                                 Women
                                             </Text>
                                         </View>
-                                        
                                     </View>
                                 }
                             />
@@ -578,17 +729,6 @@ class FriendProfilePage extends React.Component{
                                         style={{flex:1, fontSize: 18,  }}>
                                         Contact Info
                                         </Text>
-                                        {/* <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
-                                            <TouchableOpacity
-                                            onPress={()=>alert('edit')}>
-                                                <Text
-                                                    // allowFontScaling
-                                                    // numberOfLines={1}
-                                                    style={{ fontSize: 14, }}>
-                                                    EDIT
-                                                </Text>
-                                            </TouchableOpacity>
-                                        </View> */}
                                     </View>
                                 }
                             />
@@ -608,49 +748,6 @@ class FriendProfilePage extends React.Component{
                                                 0988264820
                                             </Text>
                                         </View>
-                                        { /*
-                                        <View style={{position:'absolute', right:0, bottom:0, flexDirection:'row'}}>
-                                            <TouchableOpacity
-                                                style={{height:25,
-                                                        width: 25,
-                                                        borderRadius: 30,
-                                                        margin:5,
-                                                        backgroundColor:'blue'
-                                                        }}        
-                                                >
-                                                <ImageWithDefault 
-                                                    source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
-                                                    style={{width: 25, height: 25, borderRadius: 30, }}
-                                                />      
-                                            </TouchableOpacity>
-                                            <TouchableOpacity
-                                                style={{height:25,
-                                                        width: 25,
-                                                        borderRadius: 30,
-                                                        margin:5,
-                                                        backgroundColor:'blue'
-                                                        }}        
-                                                >
-                                                <ImageWithDefault 
-                                                    source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
-                                                    style={{width: 25, height: 25, borderRadius: 30, }}
-                                                />      
-                                            </TouchableOpacity>
-                                            <TouchableOpacity
-                                                style={{height:25,
-                                                        width: 25,
-                                                        borderRadius: 30,
-                                                        margin:5,
-                                                        backgroundColor:'blue'
-                                                        }}        
-                                                >
-                                                <ImageWithDefault 
-                                                    source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
-                                                    style={{width: 25, height: 25, borderRadius: 30, }}
-                                                />      
-                                            </TouchableOpacity>
-                                        </View>
-                                        */ }
                                     </View>
                                 }
                             />
@@ -670,49 +767,6 @@ class FriendProfilePage extends React.Component{
                                                 0988264820
                                             </Text>
                                         </View>
-                                        {/*
-                                        <View style={{position:'absolute', right:0, bottom:0, flexDirection:'row'}}>
-                                            <TouchableOpacity
-                                                style={{height:25,
-                                                        width: 25,
-                                                        borderRadius: 30,
-                                                        margin:5,
-                                                        backgroundColor:'blue'
-                                                        }}        
-                                                >
-                                                <ImageWithDefault 
-                                                    source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
-                                                    style={{width: 25, height: 25, borderRadius: 30, }}
-                                                />      
-                                            </TouchableOpacity>
-                                            <TouchableOpacity
-                                                style={{height:25,
-                                                        width: 25,
-                                                        borderRadius: 30,
-                                                        margin:5,
-                                                        backgroundColor:'blue'
-                                                        }}        
-                                                >
-                                                <ImageWithDefault 
-                                                    source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
-                                                    style={{width: 25, height: 25, borderRadius: 30, }}
-                                                />      
-                                            </TouchableOpacity>
-                                            <TouchableOpacity
-                                                style={{height:25,
-                                                        width: 25,
-                                                        borderRadius: 30,
-                                                        margin:5,
-                                                        backgroundColor:'blue'
-                                                        }}        
-                                                >
-                                                <ImageWithDefault 
-                                                    source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
-                                                    style={{width: 25, height: 25, borderRadius: 30, }}
-                                                />      
-                                            </TouchableOpacity>
-                                        </View>
-                                        */ }
                                     </View>
                                 }
                             />
@@ -776,82 +830,11 @@ class FriendProfilePage extends React.Component{
                                 }
                             />
                         </Section>
-                        { /*
-                        <Section
-                            sectionPaddingTop={5}
-                            sectionPaddingBottom={5}
-                            separatorInsetLeft={0}>
-                            <Cell
-                                cellStyle="Basic"
-                                // title="EMAIL"
-                                contentContainerStyle={{ }} 
-                                cellContentView={
-                                    <Text style={{fontSize:18}}>EMAIL</Text>
-                                }/>
-                            <Cell
-                                cellStyle="Basic"
-                                // title="Website"
-                                contentContainerStyle={{ }}
-                                cellContentView={
-                                    <Text style={{fontSize:18}}>Website</Text>
-                                } />
-                            <Cell
-                                cellStyle="Basic"
-                                // title="Address"
-                                contentContainerStyle={{ }} 
-                                cellContentView={
-                                    <Text style={{fontSize:18}}>Address</Text>
-                                } />
-                            <Cell
-                                cellStyle="Basic"
-                                // title="Social"
-                                contentContainerStyle={{ }} 
-                                cellContentView={
-                                    <Text style={{fontSize:18}}>Social</Text>
-                                } />
-                        </Section>
-                        */ }
-                        
-                        {/*
-                        <Section
-                            sectionPaddingTop={5}
-                            sectionPaddingBottom={5}
-                            separatorInsetLeft={0}>
-                            <Cell
-                                cellStyle="Basic"
-                                // title="EMAIL"
-                                contentContainerStyle={{ }} 
-                                cellContentView={
-                                    <Text style={{fontSize:18}}>EMAIL</Text>
-                                }/>
-                            <Cell
-                                cellStyle="Basic"
-                                // title="Website"
-                                contentContainerStyle={{ }}
-                                cellContentView={
-                                    <Text style={{fontSize:18}}>Website</Text>
-                                } />
-                            <Cell
-                                cellStyle="Basic"
-                                // title="Address"
-                                contentContainerStyle={{ }} 
-                                cellContentView={
-                                    <Text style={{fontSize:18}}>Address</Text>
-                                } />
-                            <Cell
-                                cellStyle="Basic"
-                                // title="Social"
-                                contentContainerStyle={{ }} 
-                                cellContentView={
-                                    <Text style={{fontSize:18}}>Social</Text>
-                                } />
-                        </Section>
-                        */ }
                     </TableView>
                     </View>
                 </View>
                 </ScrollView> 
-            // </SafeAreaView>
+            </View>
         );
     }
 }
@@ -859,29 +842,24 @@ class FriendProfilePage extends React.Component{
 const styles = StyleSheet.create({
     
     MainContainer :{
-    
-    justifyContent: 'center',
-    // flex:1,
-    backgroundColor:'red'
-    // paddingTop: (Platform.OS === 'iOS') ? 20 : 0
-        
+        justifyContent: 'center',
+        // flex:1,
+        backgroundColor:'red'
+        // paddingTop: (Platform.OS === 'iOS') ? 20 : 0
     },
         
     FlatList_Item: {
         padding: 10,
         fontSize: 18,
         height: 44,
-        
     },
         
     header_footer_style:{
-        
         width: '100%', 
         height: 44, 
         backgroundColor: '#4CAF50', 
         alignItems: 'center', 
         justifyContent: 'center'
-        
     },
     
     textStyle:{
@@ -899,11 +877,10 @@ const mapStateToProps = (state) => {
     if(!state._persist.rehydrated){
       return {}
     }
-
-    console.log(this)
   
     return{
-      auth:state.auth
+        uid:getUid(state),
+        auth:state.auth
     }
 }
 

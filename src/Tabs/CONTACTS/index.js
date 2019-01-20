@@ -32,6 +32,16 @@ import GroupMemberInvite from './GroupMemberInvite'
 import ManageClasssPage from './ManageClasssPage'
 import ClasssSettingsPage from './ClasssSettingsPage'
 
+import ClasssMemberAddFriend from './ClasssMemberAddFriend'
+import ChangeFriendsName from './ChangeFriendsName'
+import MyQRcode from './MyQRcode'
+import MyProfileEditBasicInfoPage from './MyProfileEditBasicInfoPage'
+import MyProfileEditContactInfoPage from './MyProfileEditContactInfoPage'
+
+import AddAnotherPhone from './AddAnotherPhone'
+import AddAnotherWebsite from './AddAnotherWebsite'
+import AddAnotherEmail from './AddAnotherEmail'
+
 const index = createStackNavigator({
     'Home': {
         screen: Home,
@@ -158,6 +168,26 @@ const index = createStackNavigator({
 //     return navigationOptions;
 // };
 
+// EditBasicInfoPage
+const BasicInfoNavigator = createStackNavigator(
+{
+  'MyProfileEditBasicInfoPage': {screen: MyProfileEditBasicInfoPage},
+},
+{
+  // headerMode: 'none',
+},);
+
+const ContactInfoNavigator = createStackNavigator(
+{
+  'MyProfileEditContactInfoPage': {screen: MyProfileEditContactInfoPage},
+  'AddAnotherPhone': {screen: AddAnotherPhone},
+  'AddAnotherWebsite': {screen: AddAnotherWebsite},
+  'AddAnotherEmail': {screen: AddAnotherEmail},
+},
+{
+  // headerMode: 'none',
+},);
+
 // https://github.com/react-navigation/react-navigation/issues/707#issuecomment-299859578
 const MainModalNavigator = createStackNavigator(
   {
@@ -171,6 +201,12 @@ const MainModalNavigator = createStackNavigator(
     'GroupSettingsPage': {screen: GroupSettingsPage},
     'GroupMemberInvite': {screen: GroupMemberInvite},
     'ClasssSettingsPage': {screen: ClasssSettingsPage},
+    'ClasssMemberAddFriend': {screen: ClasssMemberAddFriend},
+    'ChangeFriendsName': {screen: ChangeFriendsName},
+    'MyQRcode': {screen: MyQRcode},
+    'BasicInfoNavigator': {screen: BasicInfoNavigator},
+
+    'ContactInfoNavigator': {screen: ContactInfoNavigator}
   },
   {
     mode: 'modal',
@@ -184,11 +220,16 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
   let navigationOptions = {};
 
   if(routes === undefined){
-    // console.log(routeName)
+    console.log(routeName)
     if(routeName === 'GroupsQRcode' || 
        routeName === 'GroupSettingsPage' ||
        routeName === 'GroupMemberInvite' ||
-       routeName === 'ClasssSettingsPage'){
+       routeName === 'ClasssSettingsPage' ||
+       routeName === 'ClasssMemberAddFriend' ||
+       routeName === 'ChangeFriendsName' ||
+       routeName === 'MyQRcode' ||
+      //  routeName === 'MyProfileEditBasicInfoPage' ||
+       routeName === 'MyProfileEditContactInfoPage'){
       navigationOptions.tabBarVisible = false;
       return navigationOptions;
     }
@@ -197,6 +238,7 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
 
   routeName = routes[navigation.state.routes[navigation.state.index].index].routeName;
 
+  console.log(routeName)
   // set tabbar visible
   if (routeName === 'AddFriendsPage' || 
       routeName === 'AddClasssPage' || 
@@ -211,12 +253,16 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
       routeName === 'ChatPage' ||
       routeName === 'ContactsSearch' ||
       routeName === 'ListGroupMemberPage' ||
-      routeName === 'ManageClasssPage'
+      routeName === 'ManageClasssPage' ||
+      routeName === 'MyProfileEditContactInfoPage' ||
+      routeName === 'AddAnotherPhone' ||
+      routeName === 'AddAnotherEmail' || 
+      routeName === 'AddAnotherWebsite' ||
+      routeName === 'MyProfileEditBasicInfoPage'
       ) {
     navigationOptions.tabBarVisible = false;
   }
   return navigationOptions;
 };
-
 
 export default MainModalNavigator

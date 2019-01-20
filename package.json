@@ -16,6 +16,7 @@
     "react-native-camera-roll-picker": "file:src/Library/react-native-camera-roll-picker",
     "react-native-comments": "^1.1.1",
     "react-native-contacts": "^2.2.4",
+    "react-native-datepicker": "file:src/Library/react-native-datepicker",
     "react-native-device-info": "^0.24.3",
     "react-native-elements": "^0.19.1",
     "react-native-expandable-section-list": "^1.0.7",

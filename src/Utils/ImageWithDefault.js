@@ -50,6 +50,7 @@ export default class ImageWithDefault extends React.Component {
             onError={(e) => { 
                 this._onError(e)
             }}
+            resizeMode='stretch' 
         />
       );
     }

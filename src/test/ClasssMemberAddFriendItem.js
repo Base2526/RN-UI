@@ -11,14 +11,14 @@ import SubmitButton from 'react-native-submit-button';
 
 import ImageWithDefault from '../Utils/ImageWithDefault'
 
-export default class GroupMemberInviteItem extends React.Component {
+export default class ClasssMemberAddFriendItem extends React.Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
             buttonState: 'normal',
-            buttonText:'Add friend'
+            buttonText:'Invite'
         }
     }
 
@@ -29,7 +29,7 @@ export default class GroupMemberInviteItem extends React.Component {
         //     delay: this.props.index * 350
         // }).start();
 
-        // console.log(this.props)
+        console.log(this.props)
     }
 
     onSubmit = () => {
@@ -51,7 +51,7 @@ export default class GroupMemberInviteItem extends React.Component {
 
         let {profile} = this.props.item
 
-        // console.log(this.props.item)
+        console.log(this.props.item)
 
         return(<View style={{flex:1, 
             height:100, 
@@ -74,17 +74,17 @@ export default class GroupMemberInviteItem extends React.Component {
             </View>
             <View style={{ position:'absolute', right:0}}>
             <SubmitButton 
-                width={100}
-                height={40}
+                width={80}
+                height={35}
                 buttonState={this.state.buttonState}
                 buttonText={this.state.buttonText}
                 onSubmit={this.onSubmit}
-                // buttonTextWhenReady={this.state.buttonText}
+                buttonTextWhenReady={this.state.buttonText}
                 onSuccess={()=>{
                     console.log('#1')
-                    // this.setState({
-                    //     buttonText:'Pending'
-                    // })
+                    this.setState({
+                        buttonText:'Pending'
+                    })
                 }}
                 onError={()=>{
                     console.log('#2')

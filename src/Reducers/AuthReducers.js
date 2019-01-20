@@ -17,7 +17,9 @@ import {USER_LOGIN_SUCCESS,
         FRIEND_PROFILE,
         UPDATE_STATUS_FRIEND,
         ADD_GROUP,
-        DELETE_GROUP,}  from '../Actions/types'
+        DELETE_GROUP,
+        SELECT_ADD_CLASS,
+        CLASS_MEMBERS}  from '../Actions/types'
 
 const INITIAL_STATE = {users:null,
                        provider:'',
@@ -504,7 +506,7 @@ export default (state= INITIAL_STATE, action)=>{
                         }
                     }
                 }
-                console.log(v)
+                // console.log(v)
                 return v
             // }
 
@@ -530,6 +532,116 @@ export default (state= INITIAL_STATE, action)=>{
                 }
             }
             return v
+        }
+
+        case SELECT_ADD_CLASS:{
+            if(state.users === null){
+                return state
+            }
+
+            let classs = state.users.classs
+
+            // console.log(classs)
+            // console.log(action.class_id)
+            // console.log(action.class_data)
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    classs : {
+                        ...state.users.classs,
+                        [action.class_id]: action.class_data
+                    }
+                }
+            }
+
+            // console.log(v)
+            return v;
+        }
+
+        case CLASS_MEMBERS:{
+            if(state.users === null){
+                return state
+            }
+
+            let classs = state.users.classs
+
+            let key = 0
+            let value = null
+            _.each(classs, function(_v, _k) { 
+                if(_k === action.parent_id){
+                    key = _k
+                    value = _v
+                }
+            })
+
+            // console.log(action.class_members_id)
+            if(value.members === undefined){
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        classs : {
+                            ...state.users.classs,
+                            [action.parent_id]: {...value, members:{[action.class_members_id]: action.class_members_data}}
+                        }
+                    }
+                }           
+                return v
+            }else{
+
+                let members = value.members
+
+                let a = 0
+                let b = null
+                _.each(members, function(_v, _k) { 
+                    if(_k === action.class_members_id){
+                        a = _k
+                        b = _v
+                    }
+                })
+
+                // console.log(members)
+                // console.log(a, ' | ', b)
+
+                if(a == 0){
+                    members = {...members, ...{[action.class_members_id]:action.class_members_data}}
+                    // console.log(members)
+
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            classs : {
+                                ...state.users.classs,
+                                [action.parent_id]: {...value, members}
+                            }
+                        }
+                    }       
+                    // console.log(v)
+
+                    return v
+                }else{
+                    members = {...members, ...{[action.class_members_id]:action.class_members_data}}
+                    // console.log(members)
+
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            classs : {
+                                ...state.users.classs,
+                                [action.parent_id]: {...value, members}
+                            }
+                        }
+                    }       
+                    // console.log(v)
+
+                    return v
+                }
+            }
+            return state;
         }
         
         default:

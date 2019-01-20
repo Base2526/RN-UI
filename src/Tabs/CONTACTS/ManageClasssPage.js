@@ -57,32 +57,56 @@ class ManageClasssPage extends React.Component{
     
         this.state = { 
             renderContent: false,
+            data: {}
         }
     }
 
     componentDidMount() {
         setTimeout(() => {this.setState({renderContent: true})}, 0);
+
+        const { navigation } = this.props;
+        const data = navigation.getParam('data', null);
+
+        this.setState({data})
+
+        console.log(data)
+    }
+
+    countMembers = (item) =>{
+        let count = 0
+        if(item.members !== undefined){
+          _.each(item.members, function(_v, _k) { 
+              if(_v.status){
+                count++
+              } 
+          })
+        }
+        return count
+    }
+
+    componentWillReceiveProps(nextProps) {
+        let classs = nextProps.auth.users.classs
+        let arr_classs = Object.keys(classs).map((key, index) => {
+            return {...{class_id:key}, ...classs[key]};
+        })
+
+        let {class_id} = this.state.data
+        var v = arr_classs.find(function(element) { 
+            return element.class_id == class_id; 
+        }); 
+
+        this.setState({data: v})
     }
 
     render() {
-        // const { navigation } = this.props;
-        // const group_id = navigation.getParam('group_id', null);
-        // // console.log(group_id)
+        
+        let {data} = this.state
 
-        // let groups = this.props.auth.users.groups;
-
-        // let group = null
-        // _.each(groups, function(_v, _k) { 
-        //     if(group_id === _k){
-        //         group = {group_id:_k, ..._v}
-        //     }
-        // });
-
-        // console.log(group)
+        // console.log(data)
         return (
                 <ScrollView style={{ flex: 1,}}>
                 <View style={{flex:1, backgroundColor:'gray'}}>
-                    <GroupBackgroundImage style={{paddingTop:getHeaderInset()}} auth={this.props.auth} />
+                    <GroupBackgroundImage style={{paddingTop:getHeaderInset()}} auth={this.props.auth} data={data} />
                     <View style={{ flex:1}}>
                     <TableView >
                         <Section
@@ -102,12 +126,12 @@ class ManageClasssPage extends React.Component{
                                             source={require('../../Images/member-icon.png')}
                                         />
                                         <Text style={{ fontSize:22 , paddingLeft:10}}>
-                                            Members 
+                                            Members ({this.countMembers(data)})
                                         </Text>
                                     </View>
                                 }
                                 onPress={() => { 
-                                    this.props.navigation.navigate('ListClassMemberPage')
+                                    this.props.navigation.navigate('ListClassMemberPage', {'data': data})
                                     // this.props.navigation.navigate('ListGroupMemberPage', {'group': group})
                                 }}
                             />

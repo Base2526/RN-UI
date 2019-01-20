@@ -49,46 +49,38 @@ export default class GroupBackgroundImage extends React.Component {
   }
 
   render() {
-  const resizeMode = 'center';
-  const text = 'This is some text inlaid in an <Image />';
 
+    let name = this.props.data.name
+    let image_url = this.props.data.image_url
 
-  // console.log(this.props.auth.users.profiles)
-  // console.log(this.props.group)
-
-  // let{name, image_url} = this.props.group.group_profile;
-
-  let name = 'test'
-  let image_url = ''
-
-  return (
-    <View style={{flex:1, paddingTop: this.getHeaderInset(), flexDirection:'row'}}>
-          <FastImage
-            style={StyleSheet.absoluteFill}
-            source={{
-            uri: "https://d2v9y0dukr6mq2.cloudfront.net/video/thumbnail/BzLleR6hitaj26kp/videoblocks-modern-dynamic-digital-flame-fractal-with-symmetry-transparent-png-background-very-high-resolution-rendering-with-red-orange-and-yellow-color-scale-transparent-png_bxhqkr8i_thumbnail-full03.png",
-            headers:{ Authorization: 'someAuthToken' },
-            priority: FastImage.priority.normal,
-            }}
-            resizeMode={FastImage.resizeMode.cover}
-          />
-          <View style={{flexDirection:'row', margin:20}}>
-            <TouchableOpacity
-                style={{height:60,
-                        width: 60,
-                        borderRadius: 10,
-                        }}>
-                <ImageWithDefault 
-                    source={{uri: image_url}}
-                    style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}
-                />      
-            </TouchableOpacity>
-            <View style={{justifyContent: 'flex-end', }}>
-              <Text style={{fontSize:22, marginLeft:10, color:'white'}}>{name}</Text>
+    return (
+      <View style={{flex:1, paddingTop: this.getHeaderInset(), flexDirection:'row'}}>
+            <FastImage
+              style={StyleSheet.absoluteFill}
+              source={{
+              uri: "https://d2v9y0dukr6mq2.cloudfront.net/video/thumbnail/BzLleR6hitaj26kp/videoblocks-modern-dynamic-digital-flame-fractal-with-symmetry-transparent-png-background-very-high-resolution-rendering-with-red-orange-and-yellow-color-scale-transparent-png_bxhqkr8i_thumbnail-full03.png",
+              headers:{ Authorization: 'someAuthToken' },
+              priority: FastImage.priority.normal,
+              }}
+              resizeMode={FastImage.resizeMode.cover}
+            />
+            <View style={{flexDirection:'row', margin:20}}>
+              <TouchableOpacity
+                  style={{height:60,
+                          width: 60,
+                          borderRadius: 10,
+                          }}>
+                  <ImageWithDefault 
+                      source={{uri: image_url}}
+                      style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}
+                  />      
+              </TouchableOpacity>
+              <View style={{justifyContent: 'flex-end', }}>
+                <Text style={{fontSize:22, marginLeft:10, color:'white'}}>{name}</Text>
+              </View>
             </View>
-          </View>
-      </View>
-  );
-}
+        </View>
+    );
+  }
 }
 

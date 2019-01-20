@@ -22,3 +22,6 @@ export const FRIEND_PROFILE         = "friend_profile"
 export const UPDATE_STATUS_FRIEND   = "update_status_friend" 
 export const ADD_GROUP              = "add_group" 
 export const DELETE_GROUP           = "delete_group"
+
+export const SELECT_ADD_CLASS       = "select_add_class"
+export const CLASS_MEMBERS          = "class_members"

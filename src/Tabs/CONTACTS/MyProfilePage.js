@@ -51,9 +51,9 @@ class MyProfilePage extends React.Component{
             // </TouchableOpacity>
 
             <View style={{flexDirection:'row', flex:1}}>
-                <TouchableOpacity style={{paddingRight:10}}>
+                {/* <TouchableOpacity style={{paddingRight:10}}>
                     <Text style={{color:'white', fontSize:16, borderWidth: 1, borderColor: 'gray', borderRadius: 12, padding: 8, overflow:"hidden",}}>EDIT</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <TouchableOpacity style={{paddingRight:10}}>
                     <Text style={{color:'white', fontSize:16, borderWidth: 1, borderColor: 'gray', borderRadius: 12, padding: 8, overflow:"hidden",}}>SHARE</Text>
                 </TouchableOpacity>
@@ -85,29 +85,18 @@ class MyProfilePage extends React.Component{
     // And improved abstraction for this will be built in to react-navigation
     // at some point.
     getHeaderInset() {
-      const NOTCH_HEIGHT = isIphoneX() ? 25 : 0;
+        const NOTCH_HEIGHT = isIphoneX() ? 25 : 0;
   
-      // $FlowIgnore: we will remove the HEIGHT static soon enough
-      const BASE_HEADER_HEIGHT = Header.HEIGHT;
+        // $FlowIgnore: we will remove the HEIGHT static soon enough
+        const BASE_HEADER_HEIGHT = Header.HEIGHT;
   
-      const HEADER_HEIGHT =
+        const HEADER_HEIGHT =
         Platform.OS === 'ios'
           ? BASE_HEADER_HEIGHT + NOTCH_HEIGHT
           : BASE_HEADER_HEIGHT + getStatusBarHeight();
   
-          console.log("HEADER_HEIGHT : " , HEADER_HEIGHT)
+        //   console.log("HEADER_HEIGHT : " , HEADER_HEIGHT)
         return HEADER_HEIGHT
-      return Platform.select({
-        ios: {
-          contentInset: { top: HEADER_HEIGHT },
-          contentOffset: { y: -HEADER_HEIGHT },
-        },
-        android: {
-          contentContainerStyle: {
-            paddingTop: HEADER_HEIGHT,
-          },
-        },
-      });
     }
 
     ///
@@ -298,7 +287,7 @@ class MyProfilePage extends React.Component{
                                 // title="Help / FAQ"
                                 cellStyle="Subtitle"
                                 titleTextColor="#007AFF"
-                                onPress={() => console.log("open Help/FAQ")}
+                                // onPress={() => console.log("open Help/FAQ")}
                                 cellContentView={
                                 <View style={{flex:1, flexDirection:'row'}}>
                                     <Text
@@ -309,11 +298,14 @@ class MyProfilePage extends React.Component{
                                     </Text>
                                     <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
                                         <TouchableOpacity
-                                        onPress={()=>alert('edit')}>
+                                        style={{borderColor:'gray', borderRadius:5, borderWidth:.2}}
+                                        onPress={()=>{
+                                            this.props.navigation.navigate("BasicInfoNavigator")
+                                        }}>
                                             <Text
                                                 // allowFontScaling
                                                 // numberOfLines={1}
-                                                style={{ fontSize: 14, }}>
+                                                style={{ fontSize: 14, margin:5}}>
                                                 EDIT
                                             </Text>
                                         </TouchableOpacity>
@@ -367,7 +359,7 @@ class MyProfilePage extends React.Component{
                                     <View style={{flex:1}}>
                                         <View >
                                             <Text style={{ fontSize:18 }}>
-                                                QR code
+                                                My QR code
                                             </Text>
                                             {/* <Text style={{ fontSize:18 }}>
                                                 Male
@@ -376,6 +368,10 @@ class MyProfilePage extends React.Component{
                                         
                                     </View>
                                 }
+                                onPress={()=>{
+                                    // MyQRcode
+                                    this.props.navigation.navigate("MyQRcode")
+                                }}
                             />
 
                             <Cell
@@ -479,11 +475,14 @@ class MyProfilePage extends React.Component{
                                         </Text>
                                         <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
                                             <TouchableOpacity
-                                            onPress={()=>alert('edit')}>
+                                            style={{borderColor:'gray', borderRadius:5, borderWidth:.2}}
+                                            onPress={()=>{
+                                                this.props.navigation.navigate("ContactInfoNavigator")
+                                            }}>
                                                 <Text
                                                     // allowFontScaling
                                                     // numberOfLines={1}
-                                                    style={{ fontSize: 14, }}>
+                                                    style={{ fontSize: 14, margin:5}}>
                                                     EDIT
                                                 </Text>
                                             </TouchableOpacity>
