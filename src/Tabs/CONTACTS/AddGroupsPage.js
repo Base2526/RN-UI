@@ -31,7 +31,7 @@ import ImageWithDefault from '../../Utils/ImageWithDefault'
 // More info on all the options is below in the API Reference... just some common use cases shown here
 const options = {
   title: 'Select Avatar',
-  customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
+  // customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
   noData: true,
   storageOptions: {
     skipBackup: true,
@@ -297,7 +297,6 @@ class AddGroupsPage extends React.Component{
                       this.setState({
                         avatarSource: source,
                       });
-
                       console.log(this.state.avatarSource.uri)
                     }
                   });

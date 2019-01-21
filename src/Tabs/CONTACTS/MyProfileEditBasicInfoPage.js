@@ -18,12 +18,32 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Modal from 'react-native-modalbox';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import DatePicker from 'react-native-datepicker'
+import FastImage from 'react-native-fast-image'
+
+import ImagePicker from 'react-native-image-picker';
 
 import Moment from 'moment'
 
 import * as actions from '../../Actions'
-
+import Constant from '../../Utils/Constant'
 import ImageWithDefault from '../../Utils/ImageWithDefault'
+
+import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
+
+// More info on all the options is below in the API Reference... just some common use cases shown here
+const options = {
+    title: 'Select Avatar',
+    // customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
+    noData: true,
+    storageOptions: {
+      skipBackup: true,
+      path: 'images',
+    },
+    quality: 0.7,
+    maxWidth: 500,
+    maxHeight: 500,
+};
+  
 
 class MyProfileEditBasicInfoPage extends React.Component{
 
@@ -75,6 +95,8 @@ class MyProfileEditBasicInfoPage extends React.Component{
         Moment.locale('en');
 
         this.state ={
+            profile_picture: '',
+            background_picture: '',
             date: Moment(new Date()).format('YYYY-MM-DD'),
         }
     }
@@ -102,7 +124,7 @@ class MyProfileEditBasicInfoPage extends React.Component{
             return (Dimensions.get('window').height - 100);
         }
 
-        console.log(height)
+        // console.log(height)
         return height;
     }
 
@@ -121,7 +143,7 @@ class MyProfileEditBasicInfoPage extends React.Component{
             return (Dimensions.get('window').height - 100);
         }
 
-        console.log(height)
+        // console.log(height)
         return height;
     }
 
@@ -394,6 +416,56 @@ class MyProfileEditBasicInfoPage extends React.Component{
         return list;
     }
 
+    profilePicture = () => {
+        ImagePicker.showImagePicker(options, (response) => {
+            console.log('Response = ', response);
+
+            if (response.didCancel) {
+            console.log('User cancelled image picker');
+            } else if (response.error) {
+            console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+            console.log('User tapped custom button: ', response.customButton);
+            } else {
+                const source = { uri: response.uri };
+
+                // You can also display the image using data:
+                // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+                this.setState({
+                    profile_picture: source,
+                });
+
+                // console.log(this.state.avatarSource.uri)
+            }
+        });
+    }
+
+    backgroundPicture = () =>{
+        ImagePicker.showImagePicker(options, (response) => {
+            console.log('Response = ', response);
+
+            if (response.didCancel) {
+            console.log('User cancelled image picker');
+            } else if (response.error) {
+            console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+            console.log('User tapped custom button: ', response.customButton);
+            } else {
+                const source = { uri: response.uri };
+
+                // You can also display the image using data:
+                // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+                this.setState({
+                    background_picture: source,
+                });
+
+                console.log(source.uri)
+            }
+        });
+    }
+    
     render(){
         return(
         <SafeAreaView style={{flex:1}}>
@@ -541,15 +613,24 @@ class MyProfileEditBasicInfoPage extends React.Component{
                             <View style={{
                                         flexDirection:'row', 
                                         height: 150,
-                                        width: 150}}>
+                                        width: 150,
+                                        marginBottom:10}}>
                                 <TouchableOpacity
                                 onPress={()=>{
-                                    alert('#1')
+                                    this.profilePicture()
                                 }}>
-                                    <ImageWithDefault 
-                                        source={{uri: 'http://www.cndajin.com/data/wls/195/17865217.png'}}
+                                    {/* <ImageWithDefault 
+                                        source={{uri: this.state.profile_picture == "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.profile_picture.uri,}}
                                         style={{width: 150, height: 150}}
-                                    />
+                                    /> */}
+
+                                    <PlaceHolderFastImage 
+                                        style={{width: 150, height: 150}}
+                                        source={{
+                                            uri: this.state.profile_picture == "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.profile_picture.uri,
+                                            headers:{ Authorization: 'someAuthToken' },
+                                            priority: FastImage.priority.normal,
+                                        }}/>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={{position:'absolute', 
                                                             right:0, 
@@ -560,7 +641,7 @@ class MyProfileEditBasicInfoPage extends React.Component{
                                                             padding:5,
                                                             margin:5}}
                                                             onPress={()=>{
-                                                                alert('#2')
+                                                                this.profilePicture()
                                                             }}>
                                     <Text style={{color:'gray'}}>EDIT</Text>
                                 </TouchableOpacity>
@@ -593,15 +674,28 @@ class MyProfileEditBasicInfoPage extends React.Component{
                         <View style={{
                                     flexDirection:'row', 
                                     height: 150,
-                                    width: 150}}>
+                                    width: 150,
+                                    marginBottom:10}}>
                             <TouchableOpacity
                                 onPress={()=>{
-                                    alert('1')
+                                    this.backgroundPicture()
                                 }}>
-                                <ImageWithDefault 
-                                    source={{uri: 'https://images.pexels.com/photos/1054289/pexels-photo-1054289.jpeg?auto=compress&cs=tinysrgb&h=350'}}
+                                {/* <ImageWithDefault 
+                                    // source={{uri: 'https://images.pexels.com/photos/1054289/pexels-photo-1054289.jpeg?auto=compress&cs=tinysrgb&h=350'}}
+                                    source={{
+                                        uri: 'https://images.pexels.com/photos/1054289/pexels-photo-1054289.jpeg?auto=compress&cs=tinysrgb&h=350',
+                                        headers:{ Authorization: 'someAuthToken' },
+                                        priority: FastImage.priority.normal,
+                                    }}
                                     style={{height: 150, width: 150}}
-                                />
+                                /> */}
+                                <PlaceHolderFastImage 
+                                    style={{width: 150, height: 150}}
+                                    source={{
+                                        uri: this.state.background_picture == "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.background_picture.uri,
+                                        headers:{ Authorization: 'someAuthToken' },
+                                        priority: FastImage.priority.normal,
+                                    }}/>
                             </TouchableOpacity>
                             <TouchableOpacity style={{position:'absolute', 
                                                         right:0, 
@@ -612,7 +706,7 @@ class MyProfileEditBasicInfoPage extends React.Component{
                                                         padding:5,
                                                         margin:5}}
                                 onPress={()=>{
-                                    alert('2')
+                                    this.backgroundPicture()
                                 }}>
                                 <Text style={{color:'gray'}}>EDIT</Text>
                             </TouchableOpacity>
@@ -739,6 +833,9 @@ class MyProfileEditBasicInfoPage extends React.Component{
                                                 height:0,
                                                 position:'absolute'
                                             },
+                                            dateText: {
+                                                fontSize:16
+                                            }
                                             // ... You can check the source to find the other keys.
                                         }}
                                         onDateChange={(date) => {this.setState({date: date});}}
