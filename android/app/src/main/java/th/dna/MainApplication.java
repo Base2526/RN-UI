@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.CallbackManager;
 import com.facebook.react.ReactApplication;
+import cl.json.RNSharePackage;
 //import fr.snapp.imagebase64.RNImgToBase64Package;
 //import com.RNFetchBlob.RNFetchBlobPackage;
 //import io.fixd.rctlocale.RCTLocalePackage;
@@ -17,6 +18,7 @@ import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 import org.reactnative.camera.RNCameraPackage;
 
+import cl.json.ShareApplication;
 import io.invertase.firebase.RNFirebasePackage;
 
 import com.facebook.react.ReactNativeHost;
@@ -35,9 +37,14 @@ import java.util.List;
 import org.pgsqlite.SQLitePluginPackage;
 
 
-public class MainApplication extends Application implements ReactApplication {
+public class MainApplication extends Application implements ShareApplication, ReactApplication {
 
   CallbackManager mCallbackManager = new CallbackManager.Factory().create();
+
+    @Override
+    public String getFileProviderAuthority() {
+        return "th.dna.provider";
+    }
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
@@ -49,6 +56,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNSharePackage(),
 //            new RNImgToBase64Package(),
 //            new RNFetchBlobPackage(),
 //            new RCTLocalePackage(),

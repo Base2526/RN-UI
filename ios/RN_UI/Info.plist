@@ -40,6 +40,8 @@
 	<array>
 		<string>twitter</string>
 		<string>twitterauth</string>
+    <string>whatsapp</string>
+    <string>mailto</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -76,6 +78,11 @@
 	<string>Your message to user when the photo library is accessed for the first time</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>using speech recognition</string>
+  
+  <key>NSPhotoLibraryAddUsageDescription</key>
+  <string>$(PRODUCT_NAME) wants to save photos</string>
+  
+  
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

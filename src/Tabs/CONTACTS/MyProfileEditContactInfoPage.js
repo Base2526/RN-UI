@@ -319,9 +319,9 @@ class MyProfileEditContactInfoPage extends React.Component{
                                 </View>
                             </View>
                         }
-                        onPress={()=>{
-                            // this.openModalInteresteIn()
-                        }}
+                        // onPress={()=>{
+                        //     // this.openModalInteresteIn()
+                        // }}
                     />
                     <Cell
                         cellStyle="Subtitle"
@@ -371,9 +371,9 @@ class MyProfileEditContactInfoPage extends React.Component{
                                 </View>
                             </View>
                         }
-                        onPress={()=>{
-                            // this.openModalInteresteIn()
-                        }}
+                        // onPress={()=>{
+                        //     // this.openModalInteresteIn()
+                        // }}
                     />
                     <Cell
                         cellStyle="Subtitle"

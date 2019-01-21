@@ -17,11 +17,20 @@ import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
+import Share, {ShareSheet, Button} from 'react-native-share';
 
 import {getStatusBarHeight} from '../../Utils/Helpers'
 import BackgroundImage from '../../test/image-with-text'
 import ImageWithDefault from '../../Utils/ImageWithDefault'
 import * as actions from '../../Actions'
+
+
+let shareOptions = {
+    title: "React Native",
+    message: "Hola mundo",
+    url: "http://facebook.github.io/react-native/",
+    subject: "Share Link" //  for email
+};
 
 class MyProfilePage extends React.Component{
 
@@ -54,7 +63,11 @@ class MyProfilePage extends React.Component{
                 {/* <TouchableOpacity style={{paddingRight:10}}>
                     <Text style={{color:'white', fontSize:16, borderWidth: 1, borderColor: 'gray', borderRadius: 12, padding: 8, overflow:"hidden",}}>EDIT</Text>
                 </TouchableOpacity> */}
-                <TouchableOpacity style={{paddingRight:10}}>
+                <TouchableOpacity style={{paddingRight:10}}
+                onPress={()=>{
+                    const { params = {} } = navigation.state
+                    params.handleShare()
+                }}>
                     <Text style={{color:'white', fontSize:16, borderWidth: 1, borderColor: 'gray', borderRadius: 12, padding: 8, overflow:"hidden",}}>SHARE</Text>
                 </TouchableOpacity>
             </View>
@@ -103,6 +116,13 @@ class MyProfilePage extends React.Component{
 
     componentDidMount() {
         setTimeout(() => {this.setState({renderContent: true})}, 0);
+    
+        this.props.navigation.setParams({handleShare: this.handleShare})
+    }
+
+    handleShare = () => {
+        // alert('handleShare')
+        Share.open(shareOptions);
     }
 
     FlatListItemSeparator = () => {
