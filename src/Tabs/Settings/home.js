@@ -46,7 +46,7 @@ import {
 } from 'react-native';
   
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import ExpandableList from 'react-native-expandable-section-list';
+import ExpandableList from 'react-native-expandable-section-flatlist';
 import MockData from '../CONTACTS/mockData';
 import DictStyle from '../CONTACTS/dictStyle';
 

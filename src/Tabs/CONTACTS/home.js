@@ -12,6 +12,7 @@ import Styles from '../../styles';
 import ScrollableTabView, {ScrollableTabBar, DefaultTabBar} from 'react-native-scrollable-tab-view';
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
+import { Header } from 'react-navigation';
 
 const utf8 = require('utf8');
 
@@ -20,9 +21,11 @@ import GroupsPage from './GroupsPage'
 import ClasssPage from './ClasssPage'
 
 import * as actions from '../../Actions'
-import {getHeaderInset, isEquivalent2Object} from '../../Utils/Helpers'
+import {getHeaderInset, getStatusBarHeight} from '../../Utils/Helpers'
 
-const Header = props => (
+import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
+
+const _header = props => (
     <View style={{flex:1, alignItems:'flex-end', flexDirection:'row'}}>
         <View style={{flex:1}}>
             <TouchableOpacity
@@ -33,7 +36,11 @@ const Header = props => (
                 <Icon name="bars" size={25} color="white" />
             </TouchableOpacity>
         </View>
-
+        {/* 
+        <View style={{height:Header.HEIGHT, backgroundColor:'green'}}>
+            <Text>Title Header</Text>
+        </View> 
+        */}
         <View style={{flex:1, flexDirection:'row', marginBottom:10, justifyContent: 'flex-end'}}>
             <TouchableOpacity
                 style={{height: 25,
@@ -81,6 +88,7 @@ const Header = props => (
 
             </TouchableOpacity>
         </View>
+    
     </View>
   );
 
@@ -93,17 +101,16 @@ const ImageHeader = (props) => {
     }
 
     return(<View style={{ backgroundColor: '#eee', height: getHeaderInset(true) }}>
-      <FastImage
-        style={StyleSheet.absoluteFill}
-
-        source={{
-        uri: bg_url,
-        headers:{ Authorization: 'someAuthToken' },
-        priority: FastImage.priority.normal,
-        }}
-        resizeMode={FastImage.resizeMode.cover}
-    />
-      <Header {...props} style={{ backgroundColor: 'transparent' }}/>
+        <FastImage
+            style={StyleSheet.absoluteFill}
+            source={{
+                uri: bg_url,
+                headers:{ Authorization: 'someAuthToken' },
+                priority: FastImage.priority.normal,
+            }}
+            resizeMode={FastImage.resizeMode.cover}
+        />
+      <_header {...props} style={{ backgroundColor: 'transparent' }}/>
     </View>)
 }
 
@@ -437,6 +444,11 @@ class ContactsHome extends Component {
         )
     }
 
+    handleScroll = (event) => {
+        console.log(event)
+        console.log('handleScroll') 
+    }
+
     render() {
         let {renderContent, isOpenMenu} = this.state;
 
@@ -459,9 +471,9 @@ class ContactsHome extends Component {
                     tabBarPosition='top'
                     //  contentProps={...props}
                     onChangeTab={this.handleChangeTab.bind(this)}>
-                    <FriendsPage tabLabel='Friends' index={0} amount={4} params={this.props} />
-                    <GroupsPage tabLabel='Groups' index={1} amount={5} params={this.props} />
-                    <ClasssPage tabLabel='Classs' index={2} amount={6} params={this.props}/>
+                    <FriendsPage tabLabel='Friends' index={0} amount={4} params={this.props} handleScroll={this.handleScroll}/>
+                    <GroupsPage tabLabel='Groups' index={1} amount={5} params={this.props} handleScroll={this.handleScroll}/>
+                    <ClasssPage tabLabel='Classs' index={2} amount={6} params={this.props} handleScroll={this.handleScroll}/>
                 </ScrollableTabView>
                 }
             </View>

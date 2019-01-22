@@ -1,6 +1,4 @@
 import firebase from 'react-native-firebase';
-// import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-appstate';
-
 import DeviceInfo from 'react-native-device-info';
 
 import deepDiffer from 'react-native/lib/deepDiffer'

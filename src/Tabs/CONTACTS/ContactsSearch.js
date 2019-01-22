@@ -5,7 +5,7 @@ import {View,
         Image,
         TouchableOpacity} from 'react-native'
 
-import ExpandableList from 'react-native-expandable-section-list'
+import ExpandableList from 'react-native-expandable-section-flatlist'
 
 import SearchBar from '../../Utils/SearchBar'
 import {getHeaderHeight} from '../../Utils/Helpers'

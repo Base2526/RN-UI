@@ -1,5 +1,4 @@
 import firebase from 'react-native-firebase';
-// import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-appstate';
 
 // fb = (state, action) =>{
 //     console.log(action)

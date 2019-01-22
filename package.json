@@ -19,7 +19,7 @@
     "react-native-datepicker": "file:src/Library/react-native-datepicker",
     "react-native-device-info": "^0.24.3",
     "react-native-elements": "^0.19.1",
-    "react-native-expandable-section-list": "^1.0.7",
+    "react-native-expandable-section-flatlist": "^1.1.8",
     "react-native-fast-image": "^5.1.1",
     "react-native-fbsdk": "file:src/Library/react-native-fbsdk",
     "react-native-firebase": "^5.1.1",

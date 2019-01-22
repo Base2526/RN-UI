@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ActivityIndicator, View, StyleSheet } from 'react-native'
+import { ActivityIndicator, View, StyleSheet, Image} from 'react-native'
 import FastImage from 'react-native-fast-image'
 
 import Constant from '../Utils/Constant'
@@ -28,12 +28,12 @@ export default class PlaceHolderFastImage extends Component {
     // const top = (this.state.style.height / 2) - 15
     // const left = this.state.style.width == 'auto' ? (Metrics.screenWidth / 2 - 30) : (this.state.style.width / 2 - 15)
 
-    // console.log(this.props.source)
+    // console.log(this.props.resizeMode)
     return <View style={{}}>
             <View 
               style={this.state.loaded ? {width: 0, height: 0} : {} } >
-              <FastImage 
-                source={{uri:Constant.DEFAULT_AVATARSOURCE_URI}}
+              <Image 
+                source={Constant.DEFAULT_AVATARSOURCE_URI}
                 style={this.props.style}
               />
               <View style={{
@@ -58,10 +58,17 @@ export default class PlaceHolderFastImage extends Component {
               // onLoad={()=>{
               //     console.log('onLoad')
               // }}
-              onLoadStart={()=>console.log('onLoadStart')}
-              onLoad={()=>console.log('onLoad')}
+              resizeMode={this.props.resizeMode=== undefined? FastImage.resizeMode.contain : this.props.resizeMode}
+              onLoadStart={()=>{
+                // console.log('onLoadStart')
+              }}
+              onLoad={()=>{
+                // console.log('onLoad')
+              }}
               // onLoadEnd={()=>console.log('onLoadEnd')}
-              onError={()=>console.log('onError')}
+              onError={()=>{
+                console.log('onError')
+              }}
             />
           </View>
   }

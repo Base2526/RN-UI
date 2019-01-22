@@ -8,7 +8,7 @@ import {
     Image
 } from 'react-native'
   
-import ExpandableList from 'react-native-expandable-section-list'
+import ExpandableList from 'react-native-expandable-section-flatlist'
 import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -447,6 +447,7 @@ class FriendsPage extends React.Component{
               } }
               renderSectionHeaderX={this._renderSection}
               openOptions={[0, 1, 2, 3]}
+              // onScroll={this.props.handleScroll}
             />
           }
           </View>

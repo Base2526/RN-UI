@@ -8,7 +8,7 @@ import {FlatList,
         TouchableHighlight,
         Image} from 'react-native'
 
-import ExpandableList from 'react-native-expandable-section-list'
+import ExpandableList from 'react-native-expandable-section-flatlist'
 
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import FastImage from 'react-native-fast-image'
