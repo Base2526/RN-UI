@@ -20,6 +20,7 @@ import FriendsPage from './FriendsPage'
 import GroupsPage from './GroupsPage'
 import ClasssPage from './ClasssPage'
 
+
 import * as actions from '../../Actions'
 import {getHeaderInset, getStatusBarHeight} from '../../Utils/Helpers'
 
@@ -191,10 +192,10 @@ class ContactsHome extends Component {
                             params.handleHeaderRightContactsMenu()
                         } }>
                         
-                        <FastImage
+                        <Image
                             style={{width: 35, height: 20}}
                             source={require('../../Images/collapse_down_menu.png')}
-                            resizeMode={FastImage.resizeMode.contain}
+                            // resizeMode={FastImage.resizeMode.contain}
                         /> 
                     </TouchableOpacity>
                 </View>
@@ -202,61 +203,6 @@ class ContactsHome extends Component {
         }
     }
     
-    /*({
-        title: "Contacts",
-        tabBarVisible: false,
-        header: (props) => <ImageHeader {...props} />,
-        headerLeft: (
-            <TouchableOpacity
-                style={Styles.headerButton}
-                onPress={() => navigation.openDrawer()}>
-                <Icon name="bars" size={25} />
-            </TouchableOpacity>
-        ),
-        headerRight: (
-            <View style={{flexDirection:'row'}}>
-                <TouchableOpacity
-                    style={{height: 20,
-                            width: 30,
-                            alignItems:'center'}}
-                    onPress={() => {
-                        const { params = {} } = navigation.state
-                        params.handleHeaderRightContactsSearch()
-
-                        // navigation.navigate('Search')
-                    } }>
-                    <Icon name="search" size={20} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={{height: 20,
-                            width: 30,
-                            alignItems:'center'}}
-                    onPress={() => {
-                        const { params = {} } = navigation.state
-                        params.handleHeaderRight()
-                    } }>
-                    <Icon name="plus" size={20} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={{height: 20,
-                            width: 30,
-                            alignItems:'center'}}
-                    onPress={() => {
-                        const { params = {} } = navigation.state
-                        params.handleHeaderRightContactsMenu()
-                    } }>
-                    
-                    <FastImage
-                        style={{width: 35, height: 20}}
-                        source={require('../../Images/collapse_down_menu.png')}
-                        resizeMode={FastImage.resizeMode.contain}
-                    /> 
-                </TouchableOpacity>
-            </View>
-        ),
-    });
-    */
-
     constructor(props){
         super(props)
 
@@ -269,20 +215,11 @@ class ContactsHome extends Component {
         }
     }
 
-    saveDetails() {
-        alert('Save Details');
-    }
-
     componentDidMount () {
         setTimeout(() => {this.setState({renderContent: true})}, 0);
         this.props.navigation.setParams({ handleHeaderRight: this.handleHeaderRight })
         this.props.navigation.setParams({ handleHeaderRightContactsSearch: this.handleHeaderRightContactsSearch })
         this.props.navigation.setParams({ handleHeaderRightContactsMenu: this.handleHeaderRightContactsMenu })
-        // this.props.navigation.setParams({ state: this.state })
-    }
-
-    componentWillUnmount(){
-        // console.log('9999 --> componentWillUnmount')
     }
 
     componentWillReceiveProps(nextProps) {
@@ -380,15 +317,22 @@ class ContactsHome extends Component {
                 //   this.props.params.navigation.navigate("ApplicationDetailPage")
                     alert("Click Menu")
                 }}>
-                <FastImage
+                {/* <FastImage
                     style={{width: 40, height: 40, borderRadius: 10}}
                     source={{
-                    uri: 'https://unsplash.it/400/400?image=1',
-                    headers:{ Authorization: 'someAuthToken' },
-                    priority: FastImage.priority.normal,
+                        uri: 'https://unsplash.it/400/400?image=1',
+                        headers:{ Authorization: 'someAuthToken' },
+                        priority: FastImage.priority.normal,
                     }}
                     resizeMode={FastImage.resizeMode.contain}
-                />
+                /> */}
+                {/* <PlaceHolderFastImage 
+                    source={{uri: 'https://unsplash.it/400/400?image=1', priority: FastImage.priority.normal}}
+                    style={{width: 40, height: 40, borderRadius: 10}}/> */}
+
+                <Image 
+                    source={require('../../Images/icon-error.png')}
+                    style={{width: 40, height: 40, borderRadius: 10}}/>
             </TouchableOpacity>
             <View style={{justifyContent:'center', paddingTop:5}}>
               <Text >{item.name}</Text>

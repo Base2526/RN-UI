@@ -59,7 +59,7 @@ module.exports = {
     */
 
     // avatarSource.uri
-    DEFAULT_AVATARSOURCE_URI: require('../Images/icon-error.png'),
+    DEFAULT_AVATARSOURCE_URI: 'https://cdn1.iconfinder.com/data/icons/aami-flat-files/64/files-58-512.png',
 
     FRIEND_STATUS_FRIEND: '10',
     FRIEND_STATUS_FRIEND_CANCEL: '13',

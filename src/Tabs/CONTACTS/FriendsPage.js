@@ -13,8 +13,10 @@ import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
+import FastImage from 'react-native-fast-image'
+
 import Spinner from 'react-native-loading-spinner-overlay';
-import firebase from 'react-native-firebase';
+// import firebase from 'react-native-firebase';
 
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
@@ -149,7 +151,7 @@ class FriendsPage extends React.Component{
                               width: 60,
                               borderRadius: 10}}>
                       <PlaceHolderFastImage 
-                        source={{uri: rowItem.image_url}}
+                        source={{uri: rowItem.image_url, priority: FastImage.priority.normal}}
                         style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/>
                   </TouchableOpacity>
                   <View>
@@ -447,7 +449,7 @@ class FriendsPage extends React.Component{
               } }
               renderSectionHeaderX={this._renderSection}
               openOptions={[0, 1, 2, 3]}
-              // onScroll={this.props.handleScroll}
+              onScroll={this.props.handleScroll}
             />
           }
           </View>

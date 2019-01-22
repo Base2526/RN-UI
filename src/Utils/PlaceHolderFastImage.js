@@ -25,15 +25,11 @@ export default class PlaceHolderFastImage extends Component {
   }
 
   render() {
-    // const top = (this.state.style.height / 2) - 15
-    // const left = this.state.style.width == 'auto' ? (Metrics.screenWidth / 2 - 30) : (this.state.style.width / 2 - 15)
-
-    // console.log(this.props.resizeMode)
     return <View style={{}}>
             <View 
               style={this.state.loaded ? {width: 0, height: 0} : {} } >
               <Image 
-                source={Constant.DEFAULT_AVATARSOURCE_URI}
+                source={require('../Images/icon-error.png')}
                 style={this.props.style}
               />
               <View style={{
