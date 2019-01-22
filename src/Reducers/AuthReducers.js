@@ -1,5 +1,5 @@
 import firebase from 'react-native-firebase';
-import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-appstate';
+// import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-appstate';
 
 import DeviceInfo from 'react-native-device-info';
 
@@ -220,6 +220,7 @@ export default (state= INITIAL_STATE, action)=>{
         }
 
         // online
+        /*
         case FOREGROUND:{
             state = {...state,
                     online:'1'}
@@ -243,6 +244,7 @@ export default (state= INITIAL_STATE, action)=>{
             this._online(state, '0')
             return state
         }
+        */
 
         /*
         DEVICE_ACCESS_ADDED,

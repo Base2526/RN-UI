@@ -8,12 +8,38 @@ const firestoreDB = admin.firestore().settings({ timestampsInSnapshots: true });
 เป็นส่วน call api Drupal
 */
 var request = require('request');
-
 const config = require('./config');
 
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase! > " + config.headers);
-// });
+// https://gist.github.com/CodingDoug/490f9222c8b0f696338e2d74fcb78594
+exports.userPresenceCreate = functions.database.ref('user_presence/{userId}').onCreate((snapshot, context) => {
+    console.log(context.params.userId);
+    const original = snapshot.val();
+
+    console.log(original);
+
+    /*
+        {   
+        bundle_identifier: 'th.dna',
+        model_number: 'iPhone 5s',
+        platform: 'ios',
+        status: 'online',
+        udid: 'E5EB164A-ED5A-4502-8938-AD18952CB34C' }
+     */
+
+    return true;
+})
+
+exports.userPresenceUpdate = functions.database.ref('user_presence/{userId}').onUpdate((change, context) => {
+    // console.log(change);
+    // console.log(context.params.userId);
+
+    let before = change.before.val();
+    let after = change.after.val()
+    console.log(before)
+    console.log(after)
+
+    return true;
+})
 
 // classs
 exports.updateClasss = functions.firestore

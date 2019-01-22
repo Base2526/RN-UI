@@ -9,27 +9,16 @@ import {
 } from 'react-native'
   
 import ExpandableList from 'react-native-expandable-section-list'
-import DictStyle from './dictStyle'
-
 import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import Spinner from 'react-native-loading-spinner-overlay';
-
-import { FOREGROUND, BACKGROUND, INACTIVE } from 'redux-enhancer-react-native-appstate';
+import firebase from 'react-native-firebase';
 
 import * as actions from '../../Actions'
-import firebase from 'react-native-firebase';
-import { Constants } from 'react-native-navigation';
-// import { stat } from 'fs';
-
-import DeviceInfo from 'react-native-device-info';
-
 import Constant from '../../Utils/Constant'
-// import {watchTaskAddEvent, watchTaskChangedEvent, watchTaskRemovedEvent} from '../../Actions'
-import ImageWithDefault from '../../Utils/ImageWithDefault'
-
+import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
 import {getUid} from '../../Utils/Helpers'
 
 class FriendsPage extends React.Component{
@@ -40,11 +29,11 @@ class FriendsPage extends React.Component{
           renderContent: false,
           loading: false,
         }
-        // console.log(DeviceInfo.getUniqueID())
     }
     
     componentDidMount() {
       setTimeout(() => {this.setState({renderContent: true})}, 0);
+
     }
 
     componentWillReceiveProps(nextProps){
@@ -54,9 +43,6 @@ class FriendsPage extends React.Component{
       if(!nextProps.hasOwnProperty('auth')){
         return;
       }
-
-      // console.log('componentWillReceiveProps : auth')
-      // console.log(nextProps)
     }
 
     loadData=()=>{
@@ -144,52 +130,38 @@ class FriendsPage extends React.Component{
       }
     }
 
-    _y = props =>{
-      
-    }
-
     _renderRow = (rowItem, rowId, sectionId) => {
-
-        // console.log(rowItem)
-
         if(rowId == 0 && sectionId == 0){
           return (
             <TouchableOpacity 
               key={ rowId } 
               onPress={this._itemOnPress.bind(this, rowItem, rowId, sectionId)}
-              onLongPress={()=>alert("MyProfile onLongPress")}
-              >
+              onLongPress={()=>alert("MyProfile onLongPress")}>
               <View
                 style={{
                   alignItems: 'center', 
-                  // margin: 5, 
                   padding: 10,
-                  // borderWidth: 0.5, 
-                  borderColor: DictStyle.colorSet.lineColor,
+                  borderColor: '#E4E4E4',
                   flexDirection: 'row',
-                }}
-              >
+                }}>
                   <TouchableOpacity
                       style={{height:60,
                               width: 60,
-                              borderRadius: 10}}        
-                      >
-                      <ImageWithDefault 
+                              borderRadius: 10}}>
+                      <PlaceHolderFastImage 
                         source={{uri: rowItem.image_url}}
-                        style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}
-                      />
-                      
+                        style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/>
                   </TouchableOpacity>
                   <View>
                     <Text style={{fontSize: 18, 
                                   fontWeight: '600',
-                                  color: DictStyle.colorSet.normalFontColor,
+                                  color: '#222',
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
                         Name : {rowItem.name}
                     </Text>
-                    <Text style={{fontSize: DictStyle.fontSet.mSize, 
-                                color: DictStyle.colorSet.normalFontColor,
+                    <Text style={{fontSize: 13, 
+                                color: '#222',
                                 paddingLeft: 10}}>
                         Status : {rowItem.status}
                     </Text>
@@ -210,9 +182,6 @@ class FriendsPage extends React.Component{
         // console.log(rowItem.status)
         switch(rowItem.status){
           case Constant.FRIEND_STATUS_FRIEND:{
-            // console.log('1, --' + key)
-            
-            // friend_member.push({...friend, friend_id:key});
             swipeoutRight = [
               {
                 text: 'Delete',
@@ -248,27 +217,11 @@ class FriendsPage extends React.Component{
 
           case Constant.FRIEND_STATUS_FRIEND_REQUEST:{
             // console.log('3, --' + key)
-            // swipeoutRight = [
-            //   {
-            //     text: 'Cancel',
-            //     backgroundColor: 'gray',
-            //     onPress: () => { alert("Block Click") }
-            //   }
-            // ]  
             break
           }
 
           case Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND:{
             // console.log('4, --' + key)
-            // console.log()
-
-            // swipeoutRight = [
-            //   {
-            //     text: 'Cancel',
-            //     backgroundColor: 'gray',
-            //     onPress: () => { alert("Block Click") }
-            //   }
-            // ]  
             break
           }
         }
@@ -288,29 +241,26 @@ class FriendsPage extends React.Component{
                 // margin: 5, 
                 padding: 10,
                 // borderWidth: 0.5, 
-                borderColor: DictStyle.colorSet.lineColor,
+                borderColor: '#E4E4E4',
                 flexDirection: 'row',
               }}>
                 <TouchableHighlight 
-                    style={{height:60,
-                            width: 60,
-                            borderRadius: 10}}>
-                      <ImageWithDefault 
+                    style={{}}>
+                      <PlaceHolderFastImage 
                         source={{uri:rowItem.profile.image_url}}
-                        // source={{uri: 'https://cdn-images-1.medium.com/max/1600/1*-CY5bU4OqiJRox7G00sftw.gif'}}
                         style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/>
                 </TouchableHighlight>
                 <View>
                     <Text style={{fontSize: 18, 
                                   fontWeight: '600',
-                                  color: DictStyle.colorSet.normalFontColor,
+                                  color: '#222',
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
 
                          Name : {rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.profile.name}
                     </Text>
-                    <Text style={{fontSize: DictStyle.fontSet.mSize, 
-                                color: DictStyle.colorSet.normalFontColor,
+                    <Text style={{fontSize: 13, 
+                                color: '#222',
                                 paddingLeft: 10}}>
                         Status : {rowItem.profile.status_message}
                     </Text>
@@ -375,10 +325,10 @@ class FriendsPage extends React.Component{
                       justifyContent: 'space-between', 
                       alignItems: 'center', 
                       borderBottomWidth: 0.5,
-                      borderBottomColor: DictStyle.colorSet.lineColor }}>
+                      borderBottomColor: '#E4E4E4' }}>
           <View style={{ flexDirection: 'row', 
                         alignItems: 'center'}}>
-              <Text style={{ fontSize: DictStyle.fontSet.mSize, 
+              <Text style={{ fontSize: 13, 
                               color: 'gray',
                               paddingLeft: 10,
                               fontWeight:'700' }}>
@@ -438,10 +388,10 @@ class FriendsPage extends React.Component{
                         justifyContent: 'space-between', 
                         alignItems: 'center', 
                         borderBottomWidth: 0.5,
-                        borderBottomColor: DictStyle.colorSet.lineColor }}>
+                        borderBottomColor: '#E4E4E4' }}>
             <View style={{ flexDirection: 'row', 
                           alignItems: 'center'}}>
-                <Text style={{ fontSize: DictStyle.fontSet.mSize, 
+                <Text style={{ fontSize: 13, 
                                 color: 'gray',
                                 paddingLeft: 10,
                                 fontWeight:'700' }}>

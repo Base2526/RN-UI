@@ -1,10 +1,11 @@
-// import firebase from 'firebase'
+import {Platform} from 'react-native'
 import firebase from 'react-native-firebase';
 const FBSDK = require('react-native-fbsdk');
 const { LoginButton, AccessToken, LoginManager } = FBSDK;
 
 import DeviceInfo from 'react-native-device-info';
 var _ = require('lodash');
+
 
 import {USER_LOGIN_SUCCESS,
         USER_LOGIN_FAIL,
@@ -727,6 +728,47 @@ export function watchTaskEvent(uid, dispatch) {
             })
         })
     })
+
+
+    // track online/offline
+    const oldRealTimeDb = firebase.database();
+    const onlineRef = oldRealTimeDb.ref('.info/connected');
+    onlineRef.on('value', snapshot => {
+        oldRealTimeDb.ref('user_presence/' + uid).orderByChild("udid").equalTo(DeviceInfo.getUniqueID()).once('value').then(function (snapshot) { 
+            console.log('-- 1')
+            if(snapshot.val() === null){
+                oldRealTimeDb.ref('user_presence/' + uid).push({
+                            'platform': Platform.OS,
+                            'udid': DeviceInfo.getUniqueID(),
+                            'bundle_identifier': DeviceInfo.getBundleId(),
+                            'model_number': DeviceInfo.getModel(),
+                            'status':'online'
+                        });
+            }else{
+                // console.log(snapshot.key); 
+                // console.log(snapshot.val()); 
+                // console.log(Object.keys(snapshot.val())[0]);
+                // console.log('is not null')
+                oldRealTimeDb.ref("user_presence/" + uid + "/"+ Object.keys(snapshot.val())[0] +"/").set({
+                    'platform': Platform.OS,
+                    'udid': DeviceInfo.getUniqueID(),
+                    'bundle_identifier': DeviceInfo.getBundleId(),
+                    'model_number': DeviceInfo.getModel(),
+                    'status':'online'
+                });
+
+                oldRealTimeDb.ref("user_presence/" + uid + "/"+ Object.keys(snapshot.val())[0] +"/")
+                    .onDisconnect() // Set up the disconnect hook
+                    .set({
+                        'platform': Platform.OS,
+                        'udid': DeviceInfo.getUniqueID(),
+                        'bundle_identifier': DeviceInfo.getBundleId(),
+                        'model_number': DeviceInfo.getModel(),
+                        'status':'offline'
+                    });
+            } 
+        });             
+    });
 }
 
 // Firestore unsubscribe to updates
