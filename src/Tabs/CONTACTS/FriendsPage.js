@@ -30,6 +30,9 @@ class FriendsPage extends React.Component{
         this.state = {
           renderContent: false,
           loading: false,
+
+          sectionID: null,
+          rowID: null,
         }
     }
     
@@ -45,6 +48,8 @@ class FriendsPage extends React.Component{
       if(!nextProps.hasOwnProperty('auth')){
         return;
       }
+
+      console.log('componentWillReceiveProps')
     }
 
     loadData=()=>{
@@ -185,11 +190,7 @@ class FriendsPage extends React.Component{
         switch(rowItem.status){
           case Constant.FRIEND_STATUS_FRIEND:{
             swipeoutRight = [
-              {
-                text: 'Delete',
-                backgroundColor: 'red',
-                onPress: () => { alert("Delete Click") }
-              },{
+             {
                 text: 'Hide',
                 backgroundColor: '#3c33ff',
                 onPress: () => { alert("Hide Click") }
@@ -203,10 +204,23 @@ class FriendsPage extends React.Component{
             swipeoutLeft  = [
               {
                 component:<View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'rgba(186, 53, 100, 1.0)'}}>
-                            <Icon raised color='white'containerStyle={{backgroundColor: '#FF5722'}} name={rowId% 2 === 0 ? 'volume-up': 'volume-mute'} size={40}/>
+                            <Icon raised color='white'containerStyle={{backgroundColor: '#FF5722'}} name={rowItem.mute ? 'volume-mute' : 'volume-up'} size={40}/>
                           </View>
                 ,
-                onPress: () => console.log("Do something"),
+                onPress: () => {
+                  // console.log(rowItem.mute)
+
+                  // if(rowItem.mute){
+                  //   console.log('1')
+                  // }else{
+                  //   console.log('0')
+                  // }
+
+                  this.props.actionFriendMute(this.props.uid, rowItem.friend_id, (result)=>{
+                    console.log(result)
+                    // this.props.navigation.goBack()
+                  })
+                },
               },
             ]
             break
@@ -232,7 +246,22 @@ class FriendsPage extends React.Component{
           <Swipeout 
             style={{backgroundColor:'white'}} 
             right={swipeoutRight}
-            left={swipeoutLeft}>
+            left={swipeoutLeft}
+            // autoClose={true}
+            rowID={rowId}
+            sectionID={sectionId}
+            onOpen={(sectionId, rowId) => {
+              // 
+              this.setState({
+                sectionID: sectionId,
+                rowID: rowId,
+              })
+
+              console.log('sectionId', sectionId)
+              console.log('rowId', rowId)
+            }}
+            close={!(this.state.sectionID === sectionId && this.state.rowID === rowId)}
+            >
           <TouchableOpacity 
             key={ rowId } 
             onPress={this._itemOnPress.bind(this, rowItem, rowId, sectionId)}
@@ -418,6 +447,9 @@ class FriendsPage extends React.Component{
     };
     
     render() {
+
+      // console.log('render()')
+      // console.log(this.props.auth)
 
       let {
         renderContent

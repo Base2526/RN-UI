@@ -14,12 +14,15 @@ import {USER_LOGIN_SUCCESS,
         DEVICE_ACCESS_MODIFIED,
         UPDATE_PROFILE,
         ADD_FRIEND,
+        MODIFIED_FRIEND,
         FRIEND_PROFILE,
         UPDATE_STATUS_FRIEND,
         ADD_GROUP,
         DELETE_GROUP,
         SELECT_ADD_CLASS,
-        CLASS_MEMBERS} from './types'
+        CLASS_MEMBERS,
+        FRIEND_MUTE,
+        FRIEND_HIDE} from './types'
 
 import {saveAsyncStorage, loadAsyncStorage} from '../Utils/Helpers'
 import Constant from '../Utils/Constant'
@@ -417,18 +420,7 @@ export const actionSelectClass = (class_id, uid, friend_id, callback) => dispatc
                 });               
             });
         }
-        // querySnapshot.docChanges.forEach(function(change) {
-        //     console.log(change)
-        // })
-
-        // if (querySnapshot.exists) {
-        //     console.log("1, querySnapshot.exists")
-        // }else{
-        //     firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').add({
-        //         friend_id,
-        //         complete: true,
-        //     })
-        // }
+        
     })
 
     callback({'status':true, 'uid':uid, 'friend_id': friend_id, 'class_id': class_id})
@@ -442,6 +434,71 @@ export const actionChangeFriendsName = (uid, friend_id, name, callback) => dispa
 
     callback({'status':true, uid, friend_id, name})
 }
+
+// friend hide
+export const actionFriendHide = (uid, friend_id, callback) => dispatch=> {
+    var hideRef =  firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
+
+    var transaction = firebase.firestore().runTransaction(t => {
+        return t.get(hideRef)
+        .then(doc => {
+            // console.log(doc.data().mute)
+            // Add one person to the city population
+            // var newPopulation = doc.data().population + 1;
+            // t.update(cityRef, {population: newPopulation});
+            // t.update(classsRef, {mute: !doc.data().status});
+
+            if(doc.data().hide === undefined){
+                t.set(hideRef, {
+                    hide: true,
+                }, { merge: true});
+            }else{
+                t.update(hideRef, {hide: !doc.data().hide});
+            }
+        });
+    }).then(result => {
+        console.log('Transaction success!');
+    }).catch(err => {
+        console.log('Transaction failure:', err);
+    });
+
+    dispatch({ type: FRIEND_HIDE, friend_id});
+
+    callback({'status':true})
+}
+
+// friend mute/unmute
+export const actionFriendMute = (uid, friend_id, callback) => dispatch=> {
+    var muteRef =  firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
+
+    var transaction = firebase.firestore().runTransaction(t => {
+        return t.get(muteRef)
+        .then(doc => {
+            // console.log(doc.data().mute)
+            // Add one person to the city population
+            // var newPopulation = doc.data().population + 1;
+            // t.update(cityRef, {population: newPopulation});
+            // t.update(classsRef, {mute: !doc.data().status});
+
+            if(doc.data().mute === undefined){
+                t.set(muteRef, {
+                    mute: true,
+                }, { merge: true});
+            }else{
+                t.update(muteRef, {mute: !doc.data().mute});
+            }
+        });
+    }).then(result => {
+        console.log('Transaction success!');
+    }).catch(err => {
+        console.log('Transaction failure:', err);
+    });
+
+    dispatch({ type: FRIEND_MUTE, friend_id});
+
+    callback({'status':true})
+}
+
 
 let unsubscribe = null;
 
@@ -583,41 +640,62 @@ export function watchTaskEvent(uid, dispatch) {
     firebase.firestore().collection('users').doc(uid).collection('friends').onSnapshot((querySnapshot) => {
         // console.log(querySnapshot)
 
+        querySnapshot.docChanges.forEach(function(change) {
+            // console.log(change.type)
+            if (change.type === 'added') {
+                console.log('New, id : ', change.doc.id ,' data : ', change.doc.data());
+
+
+                firebase.firestore().collection('profiles').doc(change.doc.id).get().then(doc => {
+                    if (!doc.exists) {
+                        console.log('No such document!');
+                    } else {
+                        console.log('Document data:', doc.data());
+
+                        dispatch({ type: ADD_FRIEND, friend_id:change.doc.id, data:change.doc.data(), profile:doc.data()});
+                    }
+                })
+                .catch(err => {
+                    console.log('Error getting document', err);
+                });
+                
+            }
+            if (change.type === 'modified') {
+                console.log('Modified, id : ', change.doc.id ,' data : ', change.doc.data());
+                
+                dispatch({ type: MODIFIED_FRIEND, friend_id:change.doc.id, data:change.doc.data() });
+            }
+        })
+
+        // querySnapshot.docChanges().forEach(change => {
+        //     if (change.type === 'added') {
+        //       console.log('New city: ', change.doc.data());
+        //     }
+        //     if (change.type === 'modified') {
+        //       console.log('Modified city: ', change.doc.data());
+        //     }
+        //     if (change.type === 'removed') {
+        //       console.log('Removed city: ', change.doc.data());
+        //     }
+        //   });
+
+        /*
         querySnapshot.forEach(function(doc) {
             // console.log(doc)
             // console.log(doc.id, " => ", doc.data());
 
+            console.log('ADD_FRIEND')
             dispatch({ type: ADD_FRIEND, id:doc.id, data:doc.data()});
 
-            // let id = doc.id
-            // let data = doc.data()
-
-            // ADD_FRIEND FRIEND_PROFILE
-
-            /*
-            firebase.firestore().collection('profiles').doc(doc.id)
-            .get()
-            .then(snapshot => {
-                // console.log(doc)
-                console.log(doc.id, " => ", doc.data());
-                console.log(snapshot.data())
-                // snapshot.docs.forEach(doc => {
-                //     console.log(JSON.parse(doc._document.data.toString()))
-                // });
-
-                let v = {...doc.data(), profile:snapshot.data()}
-                console.log(v)
-            });
-            */
-
-           firebase.firestore().collection('profiles').doc(doc.id).onSnapshot((docSnapshot) => {
+            firebase.firestore().collection('profiles').doc(doc.id).onSnapshot((docSnapshot) => {
                 // console.log(docSnapshot.id) 
                 // doc.id จะมีค่าเท่ากันกับ  docSnapshot.id 
                 // console.log(docSnapshot.id, " => ", docSnapshot.data());
 
                 dispatch({ type: FRIEND_PROFILE, id:docSnapshot.id, data:docSnapshot.data()});
-           })
+            })
         })
+        */
     })
 
     // track device access
@@ -735,7 +813,7 @@ export function watchTaskEvent(uid, dispatch) {
     const onlineRef = oldRealTimeDb.ref('.info/connected');
     onlineRef.on('value', snapshot => {
         oldRealTimeDb.ref('user_presence/' + uid).orderByChild("udid").equalTo(DeviceInfo.getUniqueID()).once('value').then(function (snapshot) { 
-            console.log('-- 1')
+            // console.log('-- 1')
             if(snapshot.val() === null){
                 oldRealTimeDb.ref('user_presence/' + uid).push({
                             'platform': Platform.OS,

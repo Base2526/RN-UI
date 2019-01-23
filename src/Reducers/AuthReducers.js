@@ -12,12 +12,14 @@ import {USER_LOGIN_SUCCESS,
         DEVICE_ACCESS_MODIFIED,
         UPDATE_PROFILE,
         ADD_FRIEND,
+        MODIFIED_FRIEND,
         FRIEND_PROFILE,
         UPDATE_STATUS_FRIEND,
         ADD_GROUP,
         DELETE_GROUP,
         SELECT_ADD_CLASS,
-        CLASS_MEMBERS}  from '../Actions/types'
+        CLASS_MEMBERS,
+        FRIEND_MUTE}  from '../Actions/types'
 
 const INITIAL_STATE = {users:null,
                        provider:'',
@@ -158,7 +160,7 @@ init = (auth) => {
 */
 
 export default (state= INITIAL_STATE, action)=>{
-    console.log(action)
+    // console.log(action)
     // this.fb(state, action)
 
     // console.log(action)
@@ -356,13 +358,62 @@ export default (state= INITIAL_STATE, action)=>{
             let key = 0
             let value = null
             _.each(friends, function(_v, _k) { 
-                if(_k === action.id){
+                if(_k === action.friend_id){
                     key = _k
                     value = _v
                 }
             });
 
-            // if(key == 0){
+            if(key == 0){
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        friends : {
+                            ...state.users.friends,
+                            [action.friend_id]:{...action.data, ...{profile: action.profile}}
+                        }
+                    }
+                }
+                return v;
+            }else{
+
+                let newValue = {...action.data, ...{profile: action.profile}}
+                if(!isEquivalent2Object(value, newValue)){
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            friends : {
+                                ...state.users.friends,
+                                [action.friend_id]:newValue
+                            }
+                        }
+                    }
+                    return v;
+                }
+            }
+            return state
+        }
+
+        case MODIFIED_FRIEND:{
+
+            if(state.users === null){
+                return state
+            }
+
+            let friends = state.users.friends
+
+            let key = 0
+            let value = null
+            _.each(friends, function(_v, _k) { 
+                if(_k === action.friend_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            if(key != 0){
 
                 let v = {
                     ...state,
@@ -370,30 +421,18 @@ export default (state= INITIAL_STATE, action)=>{
                         ...state.users,
                         friends : {
                             ...state.users.friends,
-                            [action.id]:action.data
+                            [action.friend_id]:{...value, ...action.data}
                         }
                     }
                 }
-
                 // console.log(v)
-                return v
-            // }else{
-            //     let v = {
-            //         ...state,
-            //         users : {
-            //             ...state.users,
-            //             friends : {
-            //                 ...state.users.friends,
-            //                 [key]:action.data
-            //             }
-            //         }
-            //     }
-            //     console.log(v)
-            //     return v
-            // }
 
-            return state
+                return v;
+            }
+
+            return state;
         }
+
         case FRIEND_PROFILE:{
             if(state.users === null){
                 return state
@@ -644,6 +683,46 @@ export default (state= INITIAL_STATE, action)=>{
             return state;
         }
         
+        case FRIEND_MUTE:{
+            if(state.users === null){
+                return state
+            }
+
+            let friends = state.users.friends
+
+            let key = 0
+            let value = null
+            _.each(friends, function(_v, _k) { 
+                if(_k === action.friend_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            // console.log(key)
+            // console.log(value)
+            if(value.mute === undefined){
+                value = {...value, mute:true}
+            }else{
+                value = {...value, mute:!value.mute}
+            }
+            // console.log(value)
+
+            // friends
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    friends : {
+                        ...state.users.friends,
+                        [action.friend_id]: value
+                    }
+                }
+            }
+            // console.log(v)
+            return v
+        }
+
         default:
             return state
     }
