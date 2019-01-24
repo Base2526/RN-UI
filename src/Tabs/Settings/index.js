@@ -6,6 +6,7 @@ import Home from './homeX';
 import homeY from './homeY'
 import SettingListHide from './SettingListHide'
 import SettingListBlock from './SettingListBlock'
+import SettingListFriendRequestSent from './SettingListFriendRequestSent'
 import SettingListManageClass from './SettingListManageClass'
 import SettingListManageGroup from './SettingListManageGroup'
 import SettingListManageMyApplication from './SettingListManageMyApplication'
@@ -24,13 +25,19 @@ const index =  createStackNavigator({
     'hide': {
         screen: SettingListHide,
         navigationOptions: {
-          title: 'Hide'
+          title: 'Friend hide'
         },
     },
     'block': {
         screen: SettingListBlock,
         navigationOptions: {
-          title: 'Block'
+          title: 'Friend block'
+        },
+    },
+    'friend_request_sent': {
+        screen: SettingListFriendRequestSent,
+        navigationOptions: {
+          title: 'Friend Request Sent'
         },
     },
     'manage_class': {
@@ -85,6 +92,7 @@ index.navigationOptions = ({ navigation }) => {
     // set tabbar visible
     if (routeName === 'hide' || 
         routeName === 'block' || 
+        routeName === 'friend_request_sent' ||
         routeName === 'manage_class' ||
         routeName === 'manage_group' ||
         routeName === 'manage_my_application' ||

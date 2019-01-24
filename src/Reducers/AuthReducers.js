@@ -19,7 +19,9 @@ import {USER_LOGIN_SUCCESS,
         DELETE_GROUP,
         SELECT_ADD_CLASS,
         CLASS_MEMBERS,
-        FRIEND_MUTE}  from '../Actions/types'
+        FRIEND_MUTE,
+        FRIEND_HIDE,
+        FRIEND_BLOCK}  from '../Actions/types'
 
 const INITIAL_STATE = {users:null,
                        provider:'',
@@ -699,8 +701,6 @@ export default (state= INITIAL_STATE, action)=>{
                 }
             });
 
-            // console.log(key)
-            // console.log(value)
             if(value.mute === undefined){
                 value = {...value, mute:true}
             }else{
@@ -720,6 +720,84 @@ export default (state= INITIAL_STATE, action)=>{
                 }
             }
             // console.log(v)
+            return v
+        }
+
+        case FRIEND_HIDE:{
+
+            if(state.users === null){
+                return state
+            }
+
+            let friends = state.users.friends
+
+            let key = 0
+            let value = null
+            _.each(friends, function(_v, _k) { 
+                if(_k === action.friend_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            if(value.hide === undefined){
+                value = {...value, hide:true}
+            }else{
+                value = {...value, hide:!value.hide}
+            }
+            // console.log(value)
+
+            // friends
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    friends : {
+                        ...state.users.friends,
+                        [action.friend_id]: value
+                    }
+                }
+            }
+            // console.log(v)
+
+            return v
+        }
+
+        case FRIEND_BLOCK:{
+
+            if(state.users === null){
+                return state
+            }
+
+            let friends = state.users.friends
+
+            let key = 0
+            let value = null
+            _.each(friends, function(_v, _k) { 
+                if(_k === action.friend_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            if(value.block === undefined){
+                value = {...value, block:true}
+            }else{
+                value = {...value, block:!value.block}
+            }
+            // console.log(value)
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    friends : {
+                        ...state.users.friends,
+                        [action.friend_id]: value
+                    }
+                }
+            }
+
             return v
         }
 

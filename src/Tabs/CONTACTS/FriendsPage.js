@@ -81,9 +81,23 @@ class FriendsPage extends React.Component{
           // console.log(Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND)
           switch(friend.status){
             case Constant.FRIEND_STATUS_FRIEND:{
-              // console.log('1, --' + key)
-              
-              friend_member.push({...friend, friend_id:key});
+
+              // hide, block
+              if(friend.hide === undefined && friend.block === undefined){
+                friend_member.push({...friend, friend_id:key});
+              }else if(friend.hide !== undefined && friend.block !== undefined){
+                if(!friend.hide && !friend.block){
+                  friend_member.push({...friend, friend_id:key});
+                }
+              }else if(friend.hide !== undefined){
+                if(!friend.hide){
+                  friend_member.push({...friend, friend_id:key});
+                }
+              }else if(friend.block !== undefined){
+                if(!friend.block){
+                  friend_member.push({...friend, friend_id:key});
+                }
+              }
               break
             }
 
@@ -102,7 +116,7 @@ class FriendsPage extends React.Component{
               // console.log('4, --' + key)
               // console.log()
 
-              friendRequestSent_member.push({...friend, friend_id:key});  
+              // friendRequestSent_member.push({...friend, friend_id:key});  
               break
             }
           }
@@ -193,11 +207,19 @@ class FriendsPage extends React.Component{
              {
                 text: 'Hide',
                 backgroundColor: '#3c33ff',
-                onPress: () => { alert("Hide Click") }
+                onPress: () => { 
+                  this.props.actionFriendHide(this.props.uid, rowItem.friend_id, (result)=>{
+                    console.log(result)
+                  })
+                }
               },{
                 text: 'Block',
                 backgroundColor: '#22ff1a',
-                onPress: () => { alert("Block Click") }
+                onPress: () => { 
+                  this.props.actionFriendBlock(this.props.uid, rowItem.friend_id, (result)=>{
+                    console.log(result)
+                  })
+                }
               }
             ]
 
@@ -208,17 +230,8 @@ class FriendsPage extends React.Component{
                           </View>
                 ,
                 onPress: () => {
-                  // console.log(rowItem.mute)
-
-                  // if(rowItem.mute){
-                  //   console.log('1')
-                  // }else{
-                  //   console.log('0')
-                  // }
-
                   this.props.actionFriendMute(this.props.uid, rowItem.friend_id, (result)=>{
                     console.log(result)
-                    // this.props.navigation.goBack()
                   })
                 },
               },
@@ -257,8 +270,8 @@ class FriendsPage extends React.Component{
                 rowID: rowId,
               })
 
-              console.log('sectionId', sectionId)
-              console.log('rowId', rowId)
+              // console.log('sectionId', sectionId)
+              // console.log('rowId', rowId)
             }}
             close={!(this.state.sectionID === sectionId && this.state.rowID === rowId)}
             >

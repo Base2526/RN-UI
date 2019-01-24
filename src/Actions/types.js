@@ -29,3 +29,4 @@ export const CLASS_MEMBERS          = "class_members"
 
 export const FRIEND_MUTE            = "friend_mute"
 export const FRIEND_HIDE            = "friend_hide"
+export const FRIEND_BLOCK           = "friend_block"

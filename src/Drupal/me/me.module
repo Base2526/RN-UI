@@ -8781,10 +8781,44 @@ function add_friend(){
       if($data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] == $friend_id){
         
         $friend_status = $data_item_load->field_friend_status[LANGUAGE_NONE][0]['tid'];
+
+        /* 
+          เราจะเอา กรณีที่เราเคยสั่งคำขอเป็นเพือนแล้ว เพือนเกิดกด cancel เราจะอนุญาติ ให้สามารถ ส่งคำขอเป็นเพือนได้อีก
+        */
+        if($friend_status == 13){
+
+          $profile_wrapper = entity_metadata_wrapper('field_collection_item', $data_item_load);
+          $profile_wrapper->field_friend_status->set(FRIEND_STATUS_WAIT_FOR_A_FRIEND);
+          $profile_wrapper->save();
+        
+          firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_FRIENDS)->document($friend_id)->set(["status"=>FRIEND_STATUS_WAIT_FOR_A_FRIEND], ['merge' => true]);
+    
+          // เราต้อง update friend status ของเพือนด้วย
+          $profile_friend = profile2_by_uid_load($friend_id, 'main');
+
+          foreach ($profile_friend->field_profile_friends[LANGUAGE_NONE] as $friend_key => $friend_value) {
+            $data_friend_item_load = field_collection_item_load($friend_value['value']);
+            
+            if($data_friend_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] == $uid){
+
+              $friend_wrapper = entity_metadata_wrapper('field_collection_item', $data_friend_item_load);
+              $friend_wrapper->field_friend_status->set(FRIEND_STATUS_FRIEND_REQUEST);
+              $friend_wrapper->save();
+              
+              firestore_db()->collection(FIRESTORE_USERS)->document($friend_id)->collection(FIRESTORE_FRIENDS)->document($uid)->set(["status"=>FRIEND_STATUS_FRIEND_REQUEST], ['merge' => true]);
+
+              $result['result']         = TRUE;
+              $result['friend_status']  = '99';  
+              $result['message']        = "Send requests friend success [again].";
+              return $result;
+            }
+          }
+        }
         break;
       }
   }
 
+  
   if ($friend_status == 0) {
     // มีอยู่กรณีเดียวทีเราสามารถเพิ่มเพือนได้
     /*
@@ -8930,6 +8964,7 @@ function add_friend(){
       case '12':{
         $result['result']         = TRUE;
         $result['friend_status']  = '-1';
+        $result['x']              = $friend_status;
         $result['message']        = "Wait for a friend.";
       }
         break;

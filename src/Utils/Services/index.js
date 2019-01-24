@@ -190,7 +190,7 @@ export const add_friend = (uid, friend_id) =>{
     return fetch(Constant.ADD_FRIEND, data)
         .then((response) => response.json())
         .then((responseJson) => {
-            // console.log(responseJson)
+            console.log(responseJson)
             return responseJson;
         }).catch((error) => {
             console.error(error);

@@ -22,7 +22,8 @@ import {USER_LOGIN_SUCCESS,
         SELECT_ADD_CLASS,
         CLASS_MEMBERS,
         FRIEND_MUTE,
-        FRIEND_HIDE} from './types'
+        FRIEND_HIDE,
+        FRIEND_BLOCK} from './types'
 
 import {saveAsyncStorage, loadAsyncStorage} from '../Utils/Helpers'
 import Constant from '../Utils/Constant'
@@ -439,7 +440,7 @@ export const actionChangeFriendsName = (uid, friend_id, name, callback) => dispa
 export const actionFriendHide = (uid, friend_id, callback) => dispatch=> {
     var hideRef =  firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
 
-    var transaction = firebase.firestore().runTransaction(t => {
+    firebase.firestore().runTransaction(t => {
         return t.get(hideRef)
         .then(doc => {
             // console.log(doc.data().mute)
@@ -463,7 +464,37 @@ export const actionFriendHide = (uid, friend_id, callback) => dispatch=> {
     });
 
     dispatch({ type: FRIEND_HIDE, friend_id});
+    callback({'status':true})
+}
 
+// friend block
+export const actionFriendBlock = (uid, friend_id, callback) => dispatch=> {
+    var blockRef =  firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
+
+    firebase.firestore().runTransaction(t => {
+        return t.get(blockRef)
+        .then(doc => {
+            // console.log(doc.data().mute)
+            // Add one person to the city population
+            // var newPopulation = doc.data().population + 1;
+            // t.update(cityRef, {population: newPopulation});
+            // t.update(classsRef, {mute: !doc.data().status});
+
+            if(doc.data().block === undefined){
+                t.set(blockRef, {
+                    block: true,
+                }, { merge: true});
+            }else{
+                t.update(blockRef, {block: !doc.data().block});
+            }
+        });
+    }).then(result => {
+        console.log('Transaction success!');
+    }).catch(err => {
+        console.log('Transaction failure:', err);
+    });
+
+    dispatch({ type: FRIEND_BLOCK, friend_id});
     callback({'status':true})
 }
 
@@ -471,7 +502,7 @@ export const actionFriendHide = (uid, friend_id, callback) => dispatch=> {
 export const actionFriendMute = (uid, friend_id, callback) => dispatch=> {
     var muteRef =  firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
 
-    var transaction = firebase.firestore().runTransaction(t => {
+    firebase.firestore().runTransaction(t => {
         return t.get(muteRef)
         .then(doc => {
             // console.log(doc.data().mute)

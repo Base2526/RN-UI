@@ -116,17 +116,25 @@ class homeY extends React.Component {
           <Section header="STANDARD">
             <Cell 
               cellStyle="Basic" 
-              title="Hide" 
+              title="Friend hide" 
               accessory="DisclosureIndicator"
               onPress={()=>{
                 this.props.navigation.navigate("hide")
               }} />
             <Cell 
               cellStyle="Basic" 
-              title="Block" 
+              title="Friend block" 
               accessory="DisclosureIndicator"
               onPress={()=>{
                 this.props.navigation.navigate("block")
+              }} />
+              
+            <Cell 
+              cellStyle="Basic" 
+              title="Friend request sent" 
+              accessory="DisclosureIndicator"
+              onPress={()=>{
+                this.props.navigation.navigate("friend_request_sent")
               }} />
             <Cell 
               cellStyle="Basic" 

@@ -11,7 +11,7 @@ import Constant from '../../Utils/Constant'
 import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
 import {getUid} from '../../Utils/Helpers'
 
-class SettingListBlock extends React.Component{
+class SettingListFriendRequestSent extends React.Component{
     constructor(props){
         super(props)
         this.state = {
@@ -32,11 +32,11 @@ class SettingListBlock extends React.Component{
         for (var key in this.props.auth.users.friends) {
             let friend =  this.props.auth.users.friends[key]
             switch(friend.status){
-              case Constant.FRIEND_STATUS_FRIEND:{
+              case Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND:{
   
-                if(friend.block){
-                    friend_member.push({...friend, friend_id:key});
-                }
+                // if(friend.hide){
+                friend_member.push({...friend, friend_id:key});
+                // }
                 break
               }            
             }
@@ -58,11 +58,11 @@ class SettingListBlock extends React.Component{
         for (var key in nextProps.auth.users.friends) {
             let friend =  nextProps.auth.users.friends[key]
             switch(friend.status){
-              case Constant.FRIEND_STATUS_FRIEND:{
+              case Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND:{
   
-                if(friend.block){
+                // if(friend.hide){
                     friend_member.push({...friend, friend_id:key});
-                }
+                // }
                 break
               }            
             }
@@ -76,7 +76,7 @@ class SettingListBlock extends React.Component{
     renderItem({ item, index }) {
         // return (<View><Text>{index}</Text></View>)
 
-        console.log(item)
+        // console.log(item)
         return(
             <View
               style={{
@@ -109,17 +109,20 @@ class SettingListBlock extends React.Component{
                     </Text>
                 </View>
 
-                <View style={{flexDirection:'row', position:'absolute', right:0, margin:5, }}>
+                <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
+                  <View style={{borderColor:'red', borderWidth:1, borderRadius:10, padding:5, marginLeft:5}}>
                     <TouchableOpacity
-                        onPress={()=>{
-                            this.props.actionFriendBlock(this.props.uid, item.friend_id, (result)=>{
-                                console.log(result)
-                            })
-                        }}>
-                        <View style={{borderColor:'red', borderWidth:1, borderRadius:10, padding:5, marginLeft:5}}>
-                            <Text style={{color:'red'}}>Unblock</Text>
-                        </View>
+                    onPress={()=>{
+                        // this.props.actionFriendHide(this.props.uid, item.friend_id, (result)=>{
+                        //     console.log(result)
+                        // })
+                        this.props.actionUpdateStatusFriend(this.props.uid, item.friend_id, Constant.FRIEND_STATUS_FRIEND_CANCEL, (result)=>{
+                            console.log(result)
+                        })
+                    }}>
+                      <Text style={{color:'red'}}>Cancel request</Text>
                     </TouchableOpacity>
+                  </View>
                 </View>
             </View>
         )
@@ -127,7 +130,7 @@ class SettingListBlock extends React.Component{
 
     render(){
         let {data} = this.state
-        console.log(data)
+        // console.log(data)
         return(<View style={{flex:1}}>
                 <FlatList
                     data={data}
@@ -154,4 +157,4 @@ const mapStateToProps = (state) => {
     }
 }
   
-export default connect(mapStateToProps, actions)(SettingListBlock);
+export default connect(mapStateToProps, actions)(SettingListFriendRequestSent);
