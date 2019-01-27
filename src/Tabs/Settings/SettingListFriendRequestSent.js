@@ -78,6 +78,10 @@ class SettingListFriendRequestSent extends React.Component{
 
         // console.log(item)
         return(
+            <TouchableOpacity 
+            onPress={()=>{
+                this.props.navigation.navigate("FriendProfilePage",{'friend_id': item.friend_id})
+            }}>            
             <View
               style={{
                 alignItems: 'center', 
@@ -125,6 +129,7 @@ class SettingListFriendRequestSent extends React.Component{
                   </View>
                 </View>
             </View>
+            </TouchableOpacity>
         )
     }
 

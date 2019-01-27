@@ -2,7 +2,8 @@ import React from 'react'
 import {View, 
         Text, 
         FlatList,
-        TouchableOpacity} from 'react-native'
+        TouchableOpacity,
+        Alert} from 'react-native'
 
 import { connect } from 'react-redux';
 
@@ -109,15 +110,40 @@ class SettingListBlock extends React.Component{
                     </Text>
                 </View>
 
-                <View style={{flexDirection:'row', position:'absolute', right:0, margin:5, }}>
+                <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0 , margin:5, }}>
                     <TouchableOpacity
                         onPress={()=>{
-                            this.props.actionFriendBlock(this.props.uid, item.friend_id, (result)=>{
-                                console.log(result)
-                            })
+                            
+                           Alert.alert(
+                            '',
+                            '',
+                            [
+                              {text: 'Remove', 
+                                onPress: () => {
+                                    this.props.actionUpdateStatusFriend(this.props.uid, item.friend_id, Constant.FRIEND_STATUS_FRIEND_REMOVE, (data)=>{
+                                    })
+                                },
+                              },
+
+                              {text: 'Unblock', 
+                                onPress: () => {
+                                    this.props.actionFriendBlock(this.props.uid, item.friend_id, (result)=>{
+                                        console.log(result)
+                                    })
+                                }, 
+                              },
+                              {text: 'Cancel', 
+                                onPress: () => {
+                                    console.log("cancel")
+                                }, 
+                                style: 'cancel'
+                              },
+                            ],
+                            { cancelable: false }
+                          )
                         }}>
                         <View style={{borderColor:'red', borderWidth:1, borderRadius:10, padding:5, marginLeft:5}}>
-                            <Text style={{color:'red'}}>Unblock</Text>
+                            <Text style={{color:'red'}}>Edit</Text>
                         </View>
                     </TouchableOpacity>
                 </View>

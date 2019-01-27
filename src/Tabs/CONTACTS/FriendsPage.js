@@ -5,7 +5,8 @@ import {
     Text,
     TouchableOpacity,
     TouchableHighlight,
-    Image
+    Image,
+    Alert
 } from 'react-native'
   
 import ExpandableList from 'react-native-expandable-section-flatlist'
@@ -208,17 +209,53 @@ class FriendsPage extends React.Component{
                 text: 'Hide',
                 backgroundColor: '#3c33ff',
                 onPress: () => { 
-                  this.props.actionFriendHide(this.props.uid, rowItem.friend_id, (result)=>{
-                    console.log(result)
-                  })
+                  let title = rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.profile.name
+                  
+                  Alert.alert(
+                    '',
+                    'Hide '+ title +'?',
+                    [
+                      // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                      {text: 'Cancel', 
+                      onPress: () => {console.log("cancel")}, 
+                      style: 'cancel'},
+                      {text: 'OK', 
+                      onPress: () => {
+                          this.props.actionFriendHide(this.props.uid, rowItem.friend_id, (result)=>{
+                            console.log(result)
+                          })
+                        }, 
+                      },
+                    ],
+                    { cancelable: false }
+                  )
                 }
               },{
                 text: 'Block',
                 backgroundColor: '#22ff1a',
                 onPress: () => { 
-                  this.props.actionFriendBlock(this.props.uid, rowItem.friend_id, (result)=>{
-                    console.log(result)
-                  })
+                 
+                  let title = rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.profile.name
+                  
+                  Alert.alert(
+                    '',
+                    'Block '+ title + '?',
+                    [
+                      // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                      {text: 'Cancel', 
+                      onPress: () => {console.log("cancel")}, 
+                      style: 'cancel'},
+                      {text: 'OK', 
+                      onPress: () => {
+                         this.props.actionFriendBlock(this.props.uid, rowItem.friend_id, (result)=>{
+                          console.log(result)
+                        })
+                      }, 
+                      },
+                    ],
+                    { cancelable: false }
+                  )
+                  
                 }
               }
             ]
@@ -314,9 +351,7 @@ class FriendsPage extends React.Component{
                   <View style={{borderColor:'green', borderWidth:1, borderRadius:10, padding:5}}>
                     <TouchableOpacity
                     onPress={()=>{
-                      this.setState({loading:true})
                       this.props.actionUpdateStatusFriend(this.props.uid, rowItem.friend_id, Constant.FRIEND_STATUS_FRIEND, (data)=>{
-                        this.setState({loading:false})
                       })
                     }}>
                       <Text style={{color:'green'}}>Accept</Text>
@@ -325,10 +360,8 @@ class FriendsPage extends React.Component{
                   <View style={{borderColor:'red', borderWidth:1, borderRadius:10, padding:5, marginLeft:5}}>
                     <TouchableOpacity
                     onPress={()=>{
-                      this.setState({
-                        loading:true
+                      this.props.actionUpdateStatusFriend(this.props.uid, rowItem.friend_id, Constant.FRIEND_STATUS_FRIEND_CANCEL_FROM_FRIEND, (data)=>{
                       })
-
                     }}>
                       <Text style={{color:'red'}}>Cancel</Text>
                     </TouchableOpacity>

@@ -375,7 +375,7 @@ export const actionUpdateStatusFriend = (uid, friend_id, status, callback) => di
     // status
     dispatch({ type: UPDATE_STATUS_FRIEND, friend_id, status});
 
-    callback({'status':true})
+    callback({'status':true, 's' : status})
 }
 
 // key, this.props.uid, friend.friend_id
@@ -674,25 +674,39 @@ export function watchTaskEvent(uid, dispatch) {
         querySnapshot.docChanges.forEach(function(change) {
             // console.log(change.type)
             if (change.type === 'added') {
-                console.log('New, id : ', change.doc.id ,' data : ', change.doc.data());
+                // console.log('New, id : ', change.doc.id ,' data : ', change.doc.data());
 
 
-                firebase.firestore().collection('profiles').doc(change.doc.id).get().then(doc => {
-                    if (!doc.exists) {
+                // firebase.firestore().collection('profiles').doc(change.doc.id).get().then(doc => {
+                //     if (!doc.exists) {
+                //         console.log('No such document!');
+                //     } else {
+                //         console.log('Document data:', doc.data());
+
+                //         dispatch({ type: ADD_FRIEND, friend_id:change.doc.id, data:change.doc.data(), profile:doc.data()});
+                //     }
+                // })
+                // .catch(err => {
+                //     console.log('Error getting document', err);
+                // });
+
+                firebase.firestore().collection('profiles').doc(change.doc.id).onSnapshot((friendDocSnapshot) => {
+                    // console.log('profiles friend ',  friendDocSnapshot.data())
+                    // friendQuerySnapshot.docChanges.forEach(function(change) {
+                    //     console.log(change.type)
+                    // })
+
+                    if (!friendDocSnapshot.exists) {
                         console.log('No such document!');
                     } else {
-                        console.log('Document data:', doc.data());
+                        // console.log('Document data:', friendDocSnapshot.data());
 
-                        dispatch({ type: ADD_FRIEND, friend_id:change.doc.id, data:change.doc.data(), profile:doc.data()});
+                        dispatch({ type: ADD_FRIEND, friend_id:change.doc.id, data:change.doc.data(), profile:friendDocSnapshot.data()});
                     }
                 })
-                .catch(err => {
-                    console.log('Error getting document', err);
-                });
-                
             }
             if (change.type === 'modified') {
-                console.log('Modified, id : ', change.doc.id ,' data : ', change.doc.data());
+                // console.log('Modified, id : ', change.doc.id ,' data : ', change.doc.data());
                 
                 dispatch({ type: MODIFIED_FRIEND, friend_id:change.doc.id, data:change.doc.data() });
             }

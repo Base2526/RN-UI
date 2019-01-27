@@ -32,6 +32,8 @@ import * as actions from '../../Actions'
 
 import {getUid} from '../../Utils/Helpers'
 
+import Constant from '../../Utils/Constant'
+
 class FriendProfilePage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
@@ -420,8 +422,9 @@ class FriendProfilePage extends React.Component{
             return <View></View>
         }
 
-        // console.log(friend)
+        console.log(friend)
 
+        // 
         return (
             // <SafeAreaView style={{flex:1}}>
             <View style={{flex:1}}>
@@ -568,6 +571,8 @@ class FriendProfilePage extends React.Component{
                                                 {friend.hasOwnProperty('change_friend_name') ? friend.change_friend_name: friend.profile.name }
                                             </Text>
                                         </View>
+
+                                        {friend.status == Constant.FRIEND_STATUS_FRIEND ? 
                                         <View style={{position:'absolute', right:0, paddingTop:5}}>
                                             <TouchableOpacity
                                                 onPress={()=>{
@@ -579,6 +584,8 @@ class FriendProfilePage extends React.Component{
                                                 />
                                             </TouchableOpacity>
                                         </View>
+                                        :null
+                                        }
                                     </View>
                                 }
                             />
@@ -619,6 +626,7 @@ class FriendProfilePage extends React.Component{
                                     <Text style={{ fontSize:18 }}>
                                          {this.getClasssName()}
                                     </Text>
+                                    { friend.status == Constant.FRIEND_STATUS_FRIEND ? 
                                     <View style={{position:'absolute', right:0, paddingTop:5}}>
                                         <TouchableOpacity
                                             onPress={()=>{
@@ -630,6 +638,8 @@ class FriendProfilePage extends React.Component{
                                             />
                                         </TouchableOpacity>
                                     </View>
+                                    : null
+                                    }
                                 </View>
                             }
                             />

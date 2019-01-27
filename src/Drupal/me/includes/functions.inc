@@ -384,14 +384,15 @@ function user_for_friend_editupdate(){
 
 	$param = $_REQUEST['context']['params'];
 
-	if (empty($param['uid']) || empty($param['friend_id'])) {
-	  $result['result'] = FALSE;
-	  $result['message'] = "function update_friend_of_user : parameter";
+	if (empty($param['userId']) || empty($param['friendId'])) {
+	  $result['result'] 	= FALSE;
+		$result['message'] 	= "function update_friend_of_user : parameter";
+		$result['param'] 		= $param;
 	  return $result;
 	}
   
-	$uid        = $param['uid'];
-	$friend_id  = $param['friend_id'];
+	$uid        = $param['userId'];
+	$friend_id  = $param['friendId'];
 	$data       = $_REQUEST['newValue'];
   
 	/*
@@ -734,12 +735,12 @@ function delete_classs(){
 	  $profile_item_load = field_collection_item_load($profile_value['value']);
   
 	  if (strcasecmp($profile_item_load->field_profile_friend_classs[LANGUAGE_NONE][0]['value'], $item_id) == 0) {
-		$profile_wrapper = entity_metadata_wrapper('field_collection_item', $profile_item_load);
-		$profile_wrapper->field_profile_friend_classs->set('');
-		$profile_wrapper->save();
-  
-  
-		$firebase->delete(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $uid . '/friends/' . $profile_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] .'/classs');
+			$profile_wrapper = entity_metadata_wrapper('field_collection_item', $profile_item_load);
+			$profile_wrapper->field_profile_friend_classs->set('');
+			$profile_wrapper->save();
+		
+		
+			$firebase->delete(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $uid . '/friends/' . $profile_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] .'/classs');
 	  }
 	}
   

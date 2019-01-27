@@ -15,6 +15,8 @@ import SettingListCustomizeTabMenus from './SettingListCustomizeTabMenus'
 import GoogleSearchCompany from './GoogleSearchCompany'
 import GoogleSearchCompanyDetail from './GoogleSearchCompanyDetail'
 
+import FriendProfilePage from '../CONTACTS/FriendProfilePage';
+
 const index =  createStackNavigator({
     'home': {
         screen: homeY,
@@ -83,6 +85,12 @@ const index =  createStackNavigator({
           title: 'Google Search Company Detail'
         },
     },
+    'FriendProfilePage': {
+        screen: FriendProfilePage,
+        navigationOptions: {
+          // title: 'Friend Profile',
+        }
+      },
 })
 
 index.navigationOptions = ({ navigation }) => {
@@ -99,7 +107,8 @@ index.navigationOptions = ({ navigation }) => {
         routeName === 'manage_force_logout' ||
         routeName === 'manage_customize_tab_menus' ||
         routeName === 'google_search_company' ||
-        routeName === 'google_search_company_detail') {
+        routeName === 'google_search_company_detail' ||
+        routeName === 'FriendProfilePage') {
       navigationOptions.tabBarVisible = false;
     }
     return navigationOptions;

@@ -2711,7 +2711,27 @@ function me_services_resources()
       ),
     ),
 
-
+    
+    'chat_messasge_more'=>array(
+      'create' =>array(
+        'help'=>'เป็น services ใช้สำหรับ chat load message more',
+        'callback'=>'chat_messasge_more',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+        /* กรณีที่เราต้องการ pass parameter */
+        'args' => array(
+          array(
+           'name' => 'parameters',
+           'type' => 'array',
+           'description' => '',
+           'source' => 'param',
+           'optional' => TRUE,
+           'default value' => array(),
+          ),
+        ),
+      ),
+    ),
 
     'chat_upload_picture'=>array(
       'create' =>array(
@@ -8785,7 +8805,11 @@ function add_friend(){
         /* 
           เราจะเอา กรณีที่เราเคยสั่งคำขอเป็นเพือนแล้ว เพือนเกิดกด cancel เราจะอนุญาติ ให้สามารถ ส่งคำขอเป็นเพือนได้อีก
         */
-        if($friend_status == 13){
+        /**
+         * 13 : cancel จากคนที่ส่งคำขอ
+         * 40 : cancel จากคนเพือน
+          */
+        if($friend_status == 13 || $friend_status == 40 || $friend_status == 41){
 
           $profile_wrapper = entity_metadata_wrapper('field_collection_item', $data_item_load);
           $profile_wrapper->field_friend_status->set(FRIEND_STATUS_WAIT_FOR_A_FRIEND);
@@ -9483,6 +9507,29 @@ function update_picture_profile2(){
   }  
 }
 
+function chat_messasge_more(){
+  $result = array();
+
+  $param = json_decode(file_get_contents('php://input'), true);
+  // $param['owner_id']
+  if ( empty($param['chatId'])) {
+    $result['result']   = FALSE;
+    $result['message']  = "function : chat_upload_picture, parameter : uid, picture";
+    return $result;
+  }
+  $result['result']   = TRUE;
+  $result['data']     = [];
+  /*
+  messageId: "z47TUGVfdQkyXoJJEPJU"
+  message_type: "text"
+  status: "send"
+  text: "test message"
+  uid: "549001"
+   */
+  // $result['result']   = TRUE;
+  return $result;
+}
+
 function chat_upload_picture(){
   $result = array();
 
@@ -9497,7 +9544,8 @@ function chat_upload_picture(){
     if ( empty($_REQUEST['uid']) || empty($_FILES["idna"]) ) {
       $result['result'] = FALSE;
       $result['message']  = "function : chat_upload_picture, parameter : uid, picture";
-      // $result['_REQUEST']  = $_REQUEST;
+      // $result['$_REQUEST']= $_REQUEST;
+      // $result['_FILES'] = $_FILES["idna"];
       return $result;
     }
 
@@ -9562,12 +9610,13 @@ function chat_upload_video(){
   */
 
   if ( empty($_REQUEST['uid']) || empty($_FILES["idna"]["tmp_name"]) ) {
-    $result['result'] = FALSE;
-    $result['message']  = "function : chat_upload_picture, parameter : uid, picture";
+    $result['result']   = FALSE;
+    $result['message']  = "function : chat_upload_video, parameter : uid, picture";
+    // $result['$_REQUEST']= $_REQUEST;
     return $result;
   }
 
-  $array_type = array("image/mp4", "video/mp4", "application/mp4");
+  $array_type = array("image/mp4", "video/mp4", "application/mp4", "video/quicktime");
 
   watchdog(TAG, 'chat_upload_video: %type', array('%type'=> serialize(strtolower($_FILES["idna"]["type"])) ), WATCHDOG_INFO);
 
