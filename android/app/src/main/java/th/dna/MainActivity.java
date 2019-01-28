@@ -3,7 +3,10 @@ package th.dna;
 import android.content.Intent;
 
 import com.facebook.react.ReactActivity;
+import com.facebook.react.ReactActivityDelegate;
+import com.facebook.react.ReactRootView;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
+import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 
 //import org.pgsqlite.SQLitePluginPackage;
 
@@ -26,6 +29,17 @@ public class MainActivity extends ReactActivity implements DefaultHardwareBackBt
         super.onActivityResult(requestCode, resultCode, data);
 
         new MainApplication().getCallbackManager().onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+     protected ReactActivityDelegate createReactActivityDelegate() {
+            return new ReactActivityDelegate(this, getMainComponentName()) {
+                @Override
+                protected ReactRootView createRootView() {
+                          return new RNGestureHandlerEnabledRootView(MainActivity.this);
+
+                }
+            };
     }
 
 //    @Override

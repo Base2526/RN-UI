@@ -1,5 +1,7 @@
 import React from 'react'
-import {View, Text} from 'react-native'
+import {View, 
+        Text, 
+        Dimensions} from 'react-native'
 import { createDrawerNavigator, createStackNavigator, createSwitchNavigator, createAppContainer, StackNavigator } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Tabs from './Tabs';  //Tab Nav
@@ -10,9 +12,11 @@ import SignIn from "./Screens/SignIn";
 import ForgotPassword from "./Screens/ForgotPassword"
 import Welcome from "./Screens/Welcome"
 
-import Menu from './DrawerMenu'
+import DrawerMenu from './DrawerMenu'
 
 import AuthLoadingScreen from './Screens/AuthLoadingScreen'
+
+var {height, width} = Dimensions.get('window');
 
 // Inbox: { screen: InboxScreen },
 export const AuthStack = createStackNavigator({
@@ -44,29 +48,30 @@ export const AuthStack = createStackNavigator({
 
 let drawerNavigatorConfig = {
   // initialRouteName: Home,
-  // drawerWidth: width/2 + ((width/2) / 2), // เป็นการเอา เศษ 3 ส่วน 4
+  drawerWidth: width/2 + ((width/2) / 2), // เป็นการเอา เศษ 3 ส่วน 4
   drawerPosition: 'left',
   drawerOpenRoute: 'DrawerOpen',
   drawerCloseRoute: 'DrawerClose',
   drawerToggleRoute: 'DrawerToggle',
-  contentComponent: Menu, // กรณีเราไม่ใส่ก็จะ render routeConfigs โดยไม่มี  DrawerContent
+  contentComponent: DrawerMenu, // กรณีเราไม่ใส่ก็จะ render routeConfigs โดยไม่มี  DrawerContent
 }
 
 AppDrawer = createDrawerNavigator({
   Tabs: {
     screen: Tabs,
     navigationOptions: {
-      drawerLabel: 'Tabs',
-      drawerIcon: ({ tintColor }) => <Icon name="cog" size={17} />,
+      // drawerLabel: 'Tabs',
+      // drawerIcon: ({ tintColor }) => <Icon name="cog" size={17} />,
+      drawerLabel: () => null
     }
   },
-  Profile: {
-    screen: Profile,
-    navigationOptions: {
-      drawerLabel: 'Profile',
-      drawerIcon: ({ tintColor }) => <Icon name="user-circle" size={17} />,
-    }
-  },
+  // Profile: {
+  //   screen: Profile,
+  //   navigationOptions: {
+  //     drawerLabel: 'Profile',
+  //     drawerIcon: ({ tintColor }) => <Icon name="user-circle" size={17} />,
+  //   }
+  // },
   
 }, drawerNavigatorConfig);
 

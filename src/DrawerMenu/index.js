@@ -1,13 +1,79 @@
 import React from 'react'
-import {Modal, Alert ,View, Text, Button, ScrollView, StyleSheet, TouchableOpacity, Image} from 'react-native'
-
+import {Modal, 
+        Alert,
+        View, 
+        Text, 
+        Button, 
+        ScrollView, 
+        StyleSheet, 
+        TouchableOpacity, 
+        Image,
+        Dimensions,
+        FlatList} from 'react-native'
 import {DrawerNavigator, DrawerItems, createDrawerNavigator, SafeAreaView} from 'react-navigation'
-
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import FastImage from 'react-native-fast-image'
+import { ifIphoneX } from 'react-native-iphone-x-helper'
+import { connect } from 'react-redux';
 
+var {height, width} = Dimensions.get('window');
 
-class Menu extends React.Component{
+import * as actions from '../Actions'
+
+const formatData = (data, numColumns) => {
+    // เป้นการ ลบ item ที่มี ​field ออกทั้งหมด เพราะว่าเรารองรับการ orientation srceen ด้วย
+    data = data.filter(function(item){
+      return !('empty' in item);
+    }).map((item)=>{
+      return item;
+    });
+  
+    const numberOfFullRows = Math.floor(data.length / numColumns);
+  
+    let numberOfElementsLastRow = data.length - (numberOfFullRows * numColumns);
+    while (numberOfElementsLastRow !== numColumns && numberOfElementsLastRow !== 0) {
+      data.push({ name: `blank-${numberOfElementsLastRow}`, empty: true });
+      numberOfElementsLastRow++;
+    }
+  
+    return data;
+};
+
+const calculatorWidthHeightItem=(margin)=>{
+    return ( width/2 + ((width/2) / 2) - (margin * 8) ) / 4
+}
+
+const data = [
+    {
+      name: "Strawberry",
+      color: "Red",
+    },
+    {
+      name: "Blueberry",
+      color: "Blue",
+    },{
+      name: "Apple",
+      color: "Green",
+    },
+    {
+      name: "Blueberry",
+      color: "Blue",
+    },
+    {
+      name: "Banana",
+      color: "Yellow",
+    },
+    {
+      name: "Blueberry",
+      color: "Blue",
+    },
+    {
+      name: "Blueberry",
+      color: "Blue",
+    },
+  ]
+
+class DrawerMenu extends React.Component{
     constructor(props){
         super(props)
 
@@ -18,12 +84,16 @@ class Menu extends React.Component{
         }
 
         this.onPressLearnMore = this.onPressLearnMore.bind(this)
+        // this._calculatorWidthHeightItem = this._calculatorWidthHeightItem.bind(this)
     }
 
     componentDidMount(){
         setTimeout(() => {this.setState({renderContent: true})}, 0);
 
         // console.log('cd-componentDidMount : ' + this.state.x)
+
+        let drawerWidth = ( width/2 + ((width/2) / 2) ) / 4
+        console.log(drawerWidth)
     }
 
     componentDidUpdate(){
@@ -156,6 +226,18 @@ class Menu extends React.Component{
         </View>)
     }
 
+    
+
+    renderItem({ item, index }) {
+        // console.log(this)
+        return <View style={{
+            margin: 5,
+            height: calculatorWidthHeightItem(5),
+            width: calculatorWidthHeightItem(5),
+            backgroundColor: '#CCC',
+        }}/>
+    }
+
     render(){
 
         let {
@@ -189,79 +271,106 @@ class Menu extends React.Component{
         return(
             <View style={{flex:1}}>
             { renderContent &&
-            <ScrollView>
-                <SafeAreaView style={styles.container} forceInset={{ top: 'always', horizontal: 'never' }}>
+                <View style={{flex:1}}>
+                {/* <SafeAreaView style={styles.container} forceInset={{ top: 'always', horizontal: 'never' }}> */}
                 <View style={{flex:1}}>
                     <View
-                    style={{
-                        backgroundColor: '#3399ff',
-                        height: 180,
-                    }}
-                    >
-                        <View style={{position:'absolute'}}>
-                            {/* <Text style={{ color: 'black', fontSize: 30, justifyContent:'flex-end' }}>
-                                Header
-                            </Text>    */}
-                            
-                            <TouchableOpacity style={ styles.imageContainer }>
+                        style={{
+                            backgroundColor: 'gray',
+                            ...ifIphoneX({
+                                height: 160,
+                            }, {
+                                height: 140,
+                            }),
+                            ...ifIphoneX({
+                                paddingTop: 50
+                            }, {
+                                paddingTop: 30
+                            })
+                        }}>
+                        <FastImage
+                            style={StyleSheet.absoluteFill}
+                            source={require('../Images/boxpink.png')}
+                            // source={{
+                            //     uri: 'https://unsplash.it/400/400?image=1',
+                            //     headers:{ Authorization: 'someAuthToken' },
+                            //     priority: FastImage.priority.normal,
+                            // }}
+                            resizeMode={FastImage.resizeMode.cover}
+                        />
+                        <View style={{flexDirection:'row', 
+                                    // backgroundColor:'gray',
+                                    marginLeft:10,
+                                    alignItems:'center'}}>
+                            <TouchableOpacity style={{}}>
                                 <Image style={ styles.image } source={{ uri: 'http://www.free-avatars.com/data/media/37/cat_avatar_0597.jpg' }} />
                             </TouchableOpacity> 
-                                
+                            <Text style={{paddingLeft:10, 
+                                        fontSize:25, 
+                                        color:'white'}}>Test</Text>
                         </View>
                         
-                        {other_user}
-                        
-                        <View style={{width:null, position:'absolute', bottom:0, padding:10}}>
-                            <Text
-                            onPress={this.onPressLearnMore.bind(this)}
-                            title="Menu"
-                            // color="#841584"
-                            accessibilityLabel="Learn more about this purple button"
-
-                            style={{fontSize:18}}
-                            >Somkid Simajarn</Text>
-                            <Text
-                            onPress={this.onPressLearnMore.bind(this)}
-                            title="Menu"
-                            // color="#841584"
-                            accessibilityLabel="Learn more about this purple button"
-
-                            style={{fontSize:14}}
-                            >android.somkid@gmail.com</Text>
-                        </View>
-                        
-                        <View style={{width:null, position:'absolute', bottom:0, right:0}}>
-                            {/* <Text
-                            onPress={this.onPressLearnMore.bind(this)}
-                            title="Menu"
-                            // color="#841584"
-                            accessibilityLabel="Learn more about this purple button"
-
-                            style={{ textAlign:'right', padding:10}}
-                            >Menu--</Text> */}
-                            {/* {collapse} */}
-                            <TouchableOpacity
-                                style={{padding:5}}
-                                onPress={()=>{
-                                    this.onPressLearnMore()
-                                }}>
-                                <FastImage
-                                    style={{width: 20, height: 20}}
-                                    source={collapse}
-                                    resizeMode={FastImage.resizeMode.contain}
-                                />
-                            </TouchableOpacity>
-                        </View>
                     </View>
-                    {menu}
-                    {/* <DrawerItems {...menu} /> */}
+
+                    <View>
+                        <Text>Accounts</Text>
+                        <FlatList
+                            contentContainerStyle={styles.list}
+                            data={formatData(data, 4)}
+                            numColumns={4}
+                            scrollEnabled={false}
+                            renderItem={this.renderItem}
+                            contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}/>
+                    </View>
                 </View>
-                </SafeAreaView>
-            </ScrollView>
+                {/* </SafeAreaView> */}
+                
+                <View>
+                    {/* <ScrollView horizontal={true} > 
+                        <View style={{height:50, width:50, backgroundColor:'gray'}}>
+                            <Text>TEST 1</Text>
+                        </View>
+                        <View style={{height:50, width:50, backgroundColor:'red'}}>
+                            <Text>TEST 2</Text>
+                        </View>
+                        <View style={{height:50, width:50, backgroundColor:'gray'}}>
+                            <Text>TEST 3</Text>
+                        </View>
+                        <View style={{height:50, width:50, backgroundColor:'red'}}>
+                            <Text>TEST 4</Text>
+                        </View>
+                        <View style={{height:50, width:50, backgroundColor:'gray'}}>
+                            <Text>TEST 5</Text>
+                        </View>
+                        <View style={{height:50, width:50, backgroundColor:'red'}}>
+                            <Text>TEST 6</Text>
+                        </View>
+                        <View style={{height:50, width:50, backgroundColor:'gray'}}>
+                            <Text>TEST 7</Text>
+                        </View>
+                        <View style={{height:50, width:50, backgroundColor:'red'}}>
+                            <Text>TEST 8</Text>
+                        </View>
+                        <View style={{height:50, width:50, backgroundColor:'gray'}}>
+                            <Text>TEST 9</Text>
+                        </View>
+                        <View style={{height:50, width:50, backgroundColor:'red'}}>
+                            <Text>TEST 10</Text>
+                        </View>
+                        <View style={{height:50, width:50, backgroundColor:'gray'}}>
+                            <Text>TEST 11</Text>
+                        </View>
+                        <View style={{height:50, width:50, backgroundColor:'red'}}>
+                            <Text>TEST</Text>
+                        </View>
+                    </ScrollView>
+                    */}
+                </View>
+                </View>
             }
 
             
-            {this.renderManageAccountsView()}
+             { /*this.renderManageAccountsView() */}
             </View>
         )
     }
@@ -297,7 +406,19 @@ const styles = StyleSheet.create({
     },
   });
 
-export default Menu
+const mapStateToProps = (state) => {
+    console.log(state)
+    if(!state._persist.rehydrated){
+        return {}
+    }
+    
+    return{
+    auth:state.auth
+    }
+}
+
+// export default Menu
+export default connect(mapStateToProps, actions)(DrawerMenu);
 
 /*
 import React from 'react'
