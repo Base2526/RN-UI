@@ -7,8 +7,7 @@ import {FlatList,
         Platform, 
         TouchableOpacity,
         ScrollView,
-        SafeAreaView,
-        Image} from 'react-native'
+        SafeAreaView,} from 'react-native'
 
 import { Header } from 'react-navigation';
 
@@ -24,6 +23,7 @@ import BackgroundImage from '../../test/image-with-text'
 import ImageWithDefault from '../../Utils/ImageWithDefault'
 import * as actions from '../../Actions'
 
+import Image from 'react-native-remote-svg'
 
 let shareOptions = {
     title: "React Native",
@@ -60,15 +60,33 @@ class MyProfilePage extends React.Component{
             // </TouchableOpacity>
 
             <View style={{flexDirection:'row', flex:1}}>
-                {/* <TouchableOpacity style={{paddingRight:10}}>
-                    <Text style={{color:'white', fontSize:16, borderWidth: 1, borderColor: 'gray', borderRadius: 12, padding: 8, overflow:"hidden",}}>EDIT</Text>
-                </TouchableOpacity> */}
+
+                <TouchableOpacity style={{paddingRight:10}}
+                onPress={()=>{
+                    const { params = {} } = navigation.state
+                    params.handleEdit()
+                }}>
+                    {/* <Text style={{color:'white', fontSize:16, borderWidth: 1, borderColor: 'gray', borderRadius: 12, padding: 8, overflow:"hidden",}}>SHARE</Text> */}
+
+                    <Image
+                    style={{ width: 25, height: 25}}
+                    // require('../Images/icon-tab-contacts.svg')
+                    source={require('../../Images/icon-edit.svg')}
+                    />
+                </TouchableOpacity>
+
                 <TouchableOpacity style={{paddingRight:10}}
                 onPress={()=>{
                     const { params = {} } = navigation.state
                     params.handleShare()
                 }}>
-                    <Text style={{color:'white', fontSize:16, borderWidth: 1, borderColor: 'gray', borderRadius: 12, padding: 8, overflow:"hidden",}}>SHARE</Text>
+                    {/* <Text style={{color:'white', fontSize:16, borderWidth: 1, borderColor: 'gray', borderRadius: 12, padding: 8, overflow:"hidden",}}>SHARE</Text> */}
+
+                    <Image
+                    style={{ width: 25, height: 25}}
+                    // require('../Images/icon-tab-contacts.svg')
+                    source={require('../../Images/icon-share.svg')}
+                    />
                 </TouchableOpacity>
             </View>
         ),
@@ -112,17 +130,20 @@ class MyProfilePage extends React.Component{
         return HEADER_HEIGHT
     }
 
-    ///
-
     componentDidMount() {
         setTimeout(() => {this.setState({renderContent: true})}, 0);
     
+        this.props.navigation.setParams({handleEdit: this.handleEdit})
         this.props.navigation.setParams({handleShare: this.handleShare})
     }
 
     handleShare = () => {
         // alert('handleShare')
         Share.open(shareOptions);
+    }
+
+    handleEdit = () =>{
+        this.props.navigation.navigate("EditMyProfilePage")
     }
 
     FlatListItemSeparator = () => {
@@ -316,7 +337,7 @@ class MyProfilePage extends React.Component{
                                     style={{flex:1, fontSize: 18,  }}>
                                     Basic Info
                                     </Text>
-                                    <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
+                                    {/* <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
                                         <TouchableOpacity
                                         style={{borderColor:'gray', borderRadius:5, borderWidth:.2}}
                                         onPress={()=>{
@@ -329,7 +350,7 @@ class MyProfilePage extends React.Component{
                                                 EDIT
                                             </Text>
                                         </TouchableOpacity>
-                                    </View>
+                                    </View> */}
                                 </View>
                             }
                             />
@@ -493,7 +514,7 @@ class MyProfilePage extends React.Component{
                                         style={{flex:1, fontSize: 18,  }}>
                                         Contact Info
                                         </Text>
-                                        <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
+                                        {/* <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
                                             <TouchableOpacity
                                             style={{borderColor:'gray', borderRadius:5, borderWidth:.2}}
                                             onPress={()=>{
@@ -506,7 +527,7 @@ class MyProfilePage extends React.Component{
                                                     EDIT
                                                 </Text>
                                             </TouchableOpacity>
-                                        </View>
+                                        </View> */}
                                     </View>
                                 }
                             />

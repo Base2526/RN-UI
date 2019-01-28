@@ -5,8 +5,7 @@ import { View,
         TouchableOpacity, 
         StyleSheet,
         FlatList, 
-        Dimensions,
-        Image,  } from 'react-native';
+        Dimensions  } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Styles from '../../styles';
 import ScrollableTabView, {ScrollableTabBar, DefaultTabBar} from 'react-native-scrollable-tab-view';
@@ -26,6 +25,8 @@ import {getHeaderInset, getStatusBarHeight} from '../../Utils/Helpers'
 
 import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
 
+import Image from 'react-native-remote-svg'
+
 const _header = props => (
     <View style={{flex:1, alignItems:'flex-end', flexDirection:'row'}}>
         <View style={{flex:1}}>
@@ -34,7 +35,10 @@ const _header = props => (
                 onPress={() => {
                     props.navigation.openDrawer()
                 }}>
-                <Icon name="bars" size={25} color="white" />
+                <Image
+                    style={{ width: 25, height: 25}}
+                    source={require('../../Images/icon-menu.svg')}
+                />
             </TouchableOpacity>
         </View>
         {/* 
@@ -53,8 +57,11 @@ const _header = props => (
                     let {params = {}} = props.navigation.state.routes[0]
 
                     params.handleHeaderRightContactsSearch()
-                } }>
-                <Icon name="search" size={25} color="white"/>
+                }}>
+                <Image
+                    style={{ width: 25, height: 25}}
+                    source={require('../../Images/icon-search.svg')}
+                />
             </TouchableOpacity>
             <TouchableOpacity
                 style={{height: 25,
@@ -66,7 +73,10 @@ const _header = props => (
                     let {params = {}} = props.navigation.state.routes[0]
                     params.handleHeaderRight()
                 } }>
-                <Icon name="plus" size={25} color="white"/>
+                <Image
+                    style={{ width: 25, height: 25}}
+                    source={require('../../Images/icon-plus.svg')}
+                />
             </TouchableOpacity>
             <TouchableOpacity
                 style={{height: 25,
@@ -78,15 +88,10 @@ const _header = props => (
                     let {params = {}} = props.navigation.state.routes[0]
                     params.handleHeaderRightContactsMenu()
                 } }>
-                {/* <Icon name="allergies" size={20} /> */}
-
-                {/* <FastImage
-                    style={{width: 35, height: 25}}
-                    source={require('../../Images/collapse_down_menu.png')}
-                    resizeMode={FastImage.resizeMode.contain}
-                />  */}
-                <Icon name="caret-down" size={25} color="white"/>
-
+                <Image
+                    style={{ width: 25, height: 25}}
+                    source={require('../../Images/icon-menu-down.svg')}
+                />
             </TouchableOpacity>
         </View>
     
@@ -101,14 +106,18 @@ const ImageHeader = (props) => {
         }
     }
 
+    /**
+     source={require('../Images/boxpink.png')}
+     */
     return(<View style={{ backgroundColor: '#eee', height: getHeaderInset(true) }}>
         <FastImage
             style={StyleSheet.absoluteFill}
-            source={{
-                uri: bg_url,
-                headers:{ Authorization: 'someAuthToken' },
-                priority: FastImage.priority.normal,
-            }}
+            source={require('../../Images/boxpink.png')}
+            // source={{
+            //     uri: bg_url,
+            //     headers:{ Authorization: 'someAuthToken' },
+            //     priority: FastImage.priority.normal,
+            // }}
             resizeMode={FastImage.resizeMode.cover}
         />
       <_header {...props} style={{ backgroundColor: 'transparent' }}/>
@@ -192,11 +201,11 @@ class ContactsHome extends Component {
                             params.handleHeaderRightContactsMenu()
                         } }>
                         
-                        <Image
+                        {/* <Image
                             style={{width: 35, height: 20}}
                             source={require('../../Images/collapse_down_menu.png')}
                             // resizeMode={FastImage.resizeMode.contain}
-                        /> 
+                        />  */}
                     </TouchableOpacity>
                 </View>
             ),
@@ -330,9 +339,9 @@ class ContactsHome extends Component {
                     source={{uri: 'https://unsplash.it/400/400?image=1', priority: FastImage.priority.normal}}
                     style={{width: 40, height: 40, borderRadius: 10}}/> */}
 
-                <Image 
+                {/* <Image 
                     source={require('../../Images/icon-error.png')}
-                    style={{width: 40, height: 40, borderRadius: 10}}/>
+                    style={{width: 40, height: 40, borderRadius: 10}}/> */}
             </TouchableOpacity>
             <View style={{justifyContent:'center', paddingTop:5}}>
               <Text >{item.name}</Text>

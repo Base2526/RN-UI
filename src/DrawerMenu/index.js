@@ -40,7 +40,16 @@ const formatData = (data, numColumns) => {
 };
 
 const calculatorWidthHeightItem=(margin)=>{
-    return ( width/2 + ((width/2) / 2) - (margin * 8) ) / 4
+    let {width, height} = Dimensions.get('window')
+
+    let w = 0
+    if(width<height){
+        w = width
+    }else{
+        w = height
+    }
+
+    return ( w/2 + ((w/2) / 2) - (margin * 8) ) / 4
 }
 
 const data = [
@@ -81,6 +90,7 @@ class DrawerMenu extends React.Component{
             renderContent: false,
             x:100,
             modalVisible: false,
+            
         }
 
         this.onPressLearnMore = this.onPressLearnMore.bind(this)
@@ -226,16 +236,52 @@ class DrawerMenu extends React.Component{
         </View>)
     }
 
-    
-
-    renderItem({ item, index }) {
+    renderItemAccounts({ item, index }) {
         // console.log(this)
-        return <View style={{
-            margin: 5,
-            height: calculatorWidthHeightItem(5),
-            width: calculatorWidthHeightItem(5),
-            backgroundColor: '#CCC',
-        }}/>
+        return <TouchableOpacity>
+                <View style={{
+                    margin: 5,
+                    height: calculatorWidthHeightItem(5),
+                    width: calculatorWidthHeightItem(5),
+                    backgroundColor: '#CCC',
+                    justifyContent:'center',
+                    alignItems:'center'
+                }}>
+                    <Text>{index}</Text>
+                </View>
+                </TouchableOpacity>
+    }
+
+    renderItemMyApplicaton({ item, index }) {
+        // console.log(this)
+        return <TouchableOpacity>
+                <View style={{
+                    margin: 5,
+                    height: calculatorWidthHeightItem(5),
+                    width: calculatorWidthHeightItem(5),
+                    backgroundColor: '#CCC',
+                    justifyContent:'center',
+                    alignItems:'center'
+                }}>
+                    <Text>{index}</Text>
+                </View>
+                </TouchableOpacity>
+    }
+    
+    renderItemFollowing({ item, index }) {
+        // console.log(this)
+        return <TouchableOpacity>
+                <View style={{
+                    margin: 5,
+                    height: calculatorWidthHeightItem(5),
+                    width: calculatorWidthHeightItem(5),
+                    backgroundColor: '#CCC',
+                    justifyContent:'center',
+                    alignItems:'center'
+                }}>
+                    <Text>{index}</Text>
+                </View>
+                </TouchableOpacity>
     }
 
     render(){
@@ -268,12 +314,18 @@ class DrawerMenu extends React.Component{
             collapse = require('../Images/collapse_up.png')
         }
 
+        if(!this.props.hasOwnProperty('auth') || !this.props.auth.isLogin){
+            return <View style={{flex: 1}}></View>
+        }
+        
+        // console.log(this.props.auth)
+
+        let {users} = this.props.auth
+
         return(
             <View style={{flex:1}}>
             { renderContent &&
-                <View style={{flex:1}}>
-                {/* <SafeAreaView style={styles.container} forceInset={{ top: 'always', horizontal: 'never' }}> */}
-                <View style={{flex:1}}>
+                 <View style={{flex:1}}>
                     <View
                         style={{
                             backgroundColor: 'gray',
@@ -291,11 +343,6 @@ class DrawerMenu extends React.Component{
                         <FastImage
                             style={StyleSheet.absoluteFill}
                             source={require('../Images/boxpink.png')}
-                            // source={{
-                            //     uri: 'https://unsplash.it/400/400?image=1',
-                            //     headers:{ Authorization: 'someAuthToken' },
-                            //     priority: FastImage.priority.normal,
-                            // }}
                             resizeMode={FastImage.resizeMode.cover}
                         />
                         <View style={{flexDirection:'row', 
@@ -303,74 +350,66 @@ class DrawerMenu extends React.Component{
                                     marginLeft:10,
                                     alignItems:'center'}}>
                             <TouchableOpacity style={{}}>
-                                <Image style={ styles.image } source={{ uri: 'http://www.free-avatars.com/data/media/37/cat_avatar_0597.jpg' }} />
+                                <FastImage
+                                    style={{height:80,
+                                            width:80,
+                                            borderRadius: 40}} 
+                                    source={{
+                                        uri: users.profiles.image_url,
+                                        headers:{ Authorization: 'someAuthToken' },
+                                        priority: FastImage.priority.normal,
+                                    }}
+                                    resizeMode={FastImage.resizeMode.stretch}
+                                />
                             </TouchableOpacity> 
+                            <View style={{marginRight: 90,}}>
                             <Text style={{paddingLeft:10, 
-                                        fontSize:25, 
-                                        color:'white'}}>Test</Text>
+                                        fontSize:25,
+                                        color:'white',}}>{users.profiles.name}</Text>
+                            </View>
                         </View>
                         
                     </View>
 
-                    <View>
-                        <Text>Accounts</Text>
+                    <ScrollView>
+                        <View>
+                            <Text>Accounts</Text>
+                            <FlatList
+                                contentContainerStyle={styles.list}
+                                data={formatData(data, 4)}
+                                numColumns={4}
+                                scrollEnabled={false}
+                                renderItem={this.renderItemAccounts}
+                                contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
+                                key = {this.state.orientation}/>
+                        </View>
+                        <View>
+                            <Text>My Application</Text>
+                            <FlatList
+                                contentContainerStyle={styles.list}
+                                data={formatData(data, 4)}
+                                numColumns={4}
+                                scrollEnabled={false}
+                                renderItem={this.renderItemMyApplicaton}
+                                contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
+                                key = {this.state.orientation}/>
+                        </View>
+                        <View>
+                        <Text>Following</Text>
                         <FlatList
                             contentContainerStyle={styles.list}
                             data={formatData(data, 4)}
                             numColumns={4}
                             scrollEnabled={false}
-                            renderItem={this.renderItem}
-                            contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}/>
+                            renderItem={this.renderItemFollowing}
+                            contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
+                            key = {this.state.orientation}/>
                     </View>
-                </View>
-                {/* </SafeAreaView> */}
-                
-                <View>
-                    {/* <ScrollView horizontal={true} > 
-                        <View style={{height:50, width:50, backgroundColor:'gray'}}>
-                            <Text>TEST 1</Text>
-                        </View>
-                        <View style={{height:50, width:50, backgroundColor:'red'}}>
-                            <Text>TEST 2</Text>
-                        </View>
-                        <View style={{height:50, width:50, backgroundColor:'gray'}}>
-                            <Text>TEST 3</Text>
-                        </View>
-                        <View style={{height:50, width:50, backgroundColor:'red'}}>
-                            <Text>TEST 4</Text>
-                        </View>
-                        <View style={{height:50, width:50, backgroundColor:'gray'}}>
-                            <Text>TEST 5</Text>
-                        </View>
-                        <View style={{height:50, width:50, backgroundColor:'red'}}>
-                            <Text>TEST 6</Text>
-                        </View>
-                        <View style={{height:50, width:50, backgroundColor:'gray'}}>
-                            <Text>TEST 7</Text>
-                        </View>
-                        <View style={{height:50, width:50, backgroundColor:'red'}}>
-                            <Text>TEST 8</Text>
-                        </View>
-                        <View style={{height:50, width:50, backgroundColor:'gray'}}>
-                            <Text>TEST 9</Text>
-                        </View>
-                        <View style={{height:50, width:50, backgroundColor:'red'}}>
-                            <Text>TEST 10</Text>
-                        </View>
-                        <View style={{height:50, width:50, backgroundColor:'gray'}}>
-                            <Text>TEST 11</Text>
-                        </View>
-                        <View style={{height:50, width:50, backgroundColor:'red'}}>
-                            <Text>TEST</Text>
-                        </View>
                     </ScrollView>
-                    */}
-                </View>
-                </View>
+                </View>  
             }
-
-            
-             { /*this.renderManageAccountsView() */}
+             
+            { /*this.renderManageAccountsView() */}
             </View>
         )
     }
@@ -413,7 +452,7 @@ const mapStateToProps = (state) => {
     }
     
     return{
-    auth:state.auth
+        auth:state.auth
     }
 }
 

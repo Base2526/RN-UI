@@ -207,7 +207,7 @@ class FriendsPage extends React.Component{
             swipeoutRight = [
              {
                 text: 'Hide',
-                backgroundColor: '#3c33ff',
+                backgroundColor: '#FFCA16',
                 onPress: () => { 
                   let title = rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.profile.name
                   
@@ -232,7 +232,7 @@ class FriendsPage extends React.Component{
                 }
               },{
                 text: 'Block',
-                backgroundColor: '#22ff1a',
+                backgroundColor: '#7ACC1F',
                 onPress: () => { 
                  
                   let title = rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.profile.name

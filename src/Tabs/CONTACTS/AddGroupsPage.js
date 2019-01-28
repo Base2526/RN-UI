@@ -1,6 +1,15 @@
 import React from 'react'
 
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, TouchableHighlight, TextInput } from 'react-native';
+import { View, 
+        Text, 
+        StyleSheet, 
+        TouchableOpacity, 
+        FlatList, 
+        ActivityIndicator, 
+        TouchableHighlight, 
+        TextInput,
+        SectionList,
+        Dimensions} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Styles from '../../styles';
 import { List, ListItem, SearchBar } from "react-native-elements";
@@ -9,6 +18,8 @@ import { connect } from 'react-redux';
 import DictStyle from '../CONTACTS/dictStyle';
 
 import ImagePicker from 'react-native-image-picker';
+
+import Image from 'react-native-remote-svg'
 
 // import RNFetchBlob from 'react-native-fetch-blob'
 
@@ -20,6 +31,7 @@ import Constant from '../../Utils/Constant'
 import {getUid} from '../../Utils/Helpers'
 
 import ImageWithDefault from '../../Utils/ImageWithDefault'
+
 
 // import {group_all, 
 //         groupDetail_all, 
@@ -42,10 +54,95 @@ const options = {
   maxHeight: 500,
 };
 
+const formatData = (data, numColumns) => {
+  // เป้นการ ลบ item ที่มี ​field ออกทั้งหมด เพราะว่าเรารองรับการ orientation srceen ด้วย
+  data = data.filter(function(item){
+    return !('empty' in item);
+  }).map((item)=>{
+    return item;
+  });
+
+  const numberOfFullRows = Math.floor(data.length / numColumns);
+
+  let numberOfElementsLastRow = data.length - (numberOfFullRows * numColumns);
+  while (numberOfElementsLastRow !== numColumns && numberOfElementsLastRow !== 0) {
+    data.push({ name: `blank-${numberOfElementsLastRow}`, empty: true });
+    numberOfElementsLastRow++;
+  }
+
+  return data;
+};
+
+const sections = [
+  {
+    title: "Brand and Business",
+    key: "vegetables",
+    data: [
+     {
+       key: "vegetables",
+       list: [
+          {
+            name: "Carrot",
+            color: "Orange",
+          },
+          {
+            name: "Cabbage",
+            color: "Purple",
+          },{
+            name: "Carrot",
+            color: "Orange",
+          },
+          {
+            name: "Cabbage",
+            color: "Purple",
+          },{
+            name: "Carrot",
+            color: "Orange",
+          },
+          {
+            name: "Cabbage",
+            color: "Purple",
+          },
+          {
+            name: "Cabbage",
+            color: "Purple",
+          },{
+            name: "Carrot",
+            color: "Orange",
+          },
+          {
+            name: "Cabbage",
+            color: "Purple",
+          },
+          {
+            name: "Cabbage",
+            color: "Purple",
+          },{
+            name: "Carrot",
+            color: "Orange",
+          },
+          {
+            name: "Cabbage",
+            color: "Purple",
+          }
+        ],
+      },
+    ],
+  },
+]
+
+const calculatorWidthHeightItem=(margin, itemRow)=>{
+  let {width, height} = Dimensions.get('window')
+
+  console.log(width, (itemRow) )
+  return (width - (margin* (itemRow*2))) / itemRow
+}
+
 class AddGroupsPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
         title: "Create Group",
+        // headerTitleStyle = {color='red'},
         // headerLeft: (
         //     <TouchableOpacity
         //         style={Styles.headerButton}
@@ -90,7 +187,9 @@ class AddGroupsPage extends React.Component{
           text: '',
           avatarSource: {"uri":""},
           seleteds: [],
-          groupName: ''
+          groupName: '',
+          orientation:'PORTRAIT',
+          numColumns:4
         };
     }
 
@@ -109,6 +208,17 @@ class AddGroupsPage extends React.Component{
         loading: false,
         refreshing: false
       });
+    }
+
+    onLayout(e) {
+      const {width, height} = Dimensions.get('window')
+      // console.log(width, height)
+  
+      if(width<height){
+        this.setState({orientation:'PORTRAIT', numColumns:4})
+      }else{
+        this.setState({orientation:'LANDSCAPE', numColumns:6})
+      }
     }
 
     handleCreateGroup = () => {
@@ -268,11 +378,9 @@ class AddGroupsPage extends React.Component{
     renderHeader = () => {
       // return <SearchBar placeholder="Type Here..." lightTheme round />;
       return(
-        <View style={{flexDirection:'row', justifyContent:'center', padding:10, backgroundColor:'rgba(186, 53, 100, 1.0)'}}>
+        <View style={{justifyContent:'center', backgroundColor:'white'}}>
+        <View style={{flexDirection:'row', padding:15, justifyContent:'center',}}>
             <TouchableOpacity 
-              style={{height:80,
-                      width: 80,
-                      borderRadius: 40}}
                 onPress={()=>{
 
                   /**
@@ -302,17 +410,29 @@ class AddGroupsPage extends React.Component{
                   });
                 }}>
               <FastImage
-                  style={{width: 80, height: 80, borderRadius: 40, borderColor:'gray', borderWidth:1}}
+                  style={{width: 100, 
+                          height: 100, 
+                          borderRadius: 50, 
+                          // borderColor:'gray', 
+                          backgroundColor: '#FF83AF',
+                          // borderWidth:1
+                        }}
                   source={{
-                  uri: this.state.avatarSource.uri === "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.avatarSource.uri,
-                  headers:{ Authorization: 'someAuthToken' },
-                  priority: FastImage.priority.normal,
+                    uri: this.state.avatarSource.uri === "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.avatarSource.uri,
+                    headers:{ Authorization: 'someAuthToken' },
+                    priority: FastImage.priority.normal,
                   }}
                   resizeMode={FastImage.resizeMode.normal}
               />
+              <TouchableOpacity
+                style={{position:'absolute', bottom:0, right:0}}>
+                <Image
+                    style={{width:25, height:25}}
+                    source={require('../../Images/icon-photo-edit.svg')}/>
+              </TouchableOpacity>
             </TouchableOpacity>
-            <View style={{justifyContent:'center', flex:1, marginLeft:5}}>
-              <TextInput style = {{fontSize:22}}
+            <View style={{justifyContent:'center', flex:1, marginLeft:10}}>
+              <TextInput style = {{fontSize:26}}
                   underlineColorAndroid = "transparent"
                   placeholder = "Input group name"
                   placeholderTextColor = "gray"
@@ -321,6 +441,21 @@ class AddGroupsPage extends React.Component{
                   onChangeText = {this.handleEmail}
                   value={this.state.groupName}/>
             </View>
+
+        </View>
+        <View style={{position:'absolute', bottom:0, right:0, padding:5}}>
+          <Text style={{fontSize:16, fontWeight:'bold'}}>0/50</Text>
+        </View>
+        <View
+              style={{
+                height: 1,
+                width: "100%",
+                backgroundColor: "#CED0CE",
+                // marginLeft: "14%"
+                position:'absolute',
+                bottom:0
+              }}
+            />
         </View>)
     };
   
@@ -366,7 +501,7 @@ class AddGroupsPage extends React.Component{
       }
     }
 
-    renderItem = ({item, index}) => {        
+    renderListItem = ({item, index}) => {        
       let check = null
       var __ = this.state.seleteds.find(function(element) { 
         return element === item.friend_id; 
@@ -375,6 +510,14 @@ class AddGroupsPage extends React.Component{
       if(__ !== undefined){
         check = <Icon name="check" size={15} />
       }
+
+      return(<TouchableOpacity
+              style={{padding:5}}>
+              <Image
+                  style={{ width: calculatorWidthHeightItem(5, this.state.numColumns), 
+                          height: calculatorWidthHeightItem(5, this.state.numColumns),}}
+                  source={require('../../Images/icon-create-group-circleplus.svg')}/>
+            </TouchableOpacity>)
 
       return(
             <View
@@ -393,7 +536,7 @@ class AddGroupsPage extends React.Component{
                           borderRadius: 10}}
                   onPress={()=>this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.friend_id})}>
                     <ImageWithDefault 
-                      source={{uri:item.profile.image_url}}
+                      source={{uri:'item.profile.image_url'}}
                       style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/>
               </TouchableOpacity>
               </View>
@@ -409,7 +552,7 @@ class AddGroupsPage extends React.Component{
                               color: DictStyle.colorSet.normalFontColor,
                               
                               paddingLeft: 10}}>
-                      {item.profile.name}
+                      'item.profile.name'
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -422,36 +565,80 @@ class AddGroupsPage extends React.Component{
       )
     }
     
+    renderSectionHeader = ({ section }) => {
+      return (<View style={{padding:10}}><Text style={{fontSize:18}}>Members</Text></View>)
+    }
+
+    renderSection = ({ item }) => {
+      // console.log("renderSection")
+      return (
+        <FlatList
+          key = {this.state.orientation}
+          // data={item.list}
+          /*  เราต้องมีการคำนวณ item ให้เต็มแต่ละแถว  */
+          data = {formatData(item.list, this.state.numColumns)}
+          numColumns={this.state.numColumns}
+          renderItem={this.renderListItem}
+          keyExtractor={this.keyExtractor}
+          extraData={this.state}
+          contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
+          // style={{flex:1, backgroundColor:'red'}}
+        />
+      )
+    }
+
     render() {
         let {
           renderContent
         } = this.state;
+
+        /*
+        data={formatData(data, 4)}
+                                numColumns={4}
+                                scrollEnabled={false}
+                                renderItem={this.renderItemAccounts}
+                                contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
+         */
     
         return (
-          <View style={{flex:1, backgroundColor: 'white'}}>
+          <View style={{flex:1, backgroundColor: 'white'}} onLayout={this.onLayout.bind(this)}>
           {this.renderHeader()}
           {
             renderContent &&
             
+            /*
             <FlatList
               style={{flex:1}}
-              data={this.state.data}
+              // data={this.state.data}
+
+              data={formatData(this.state.data, 4)}
+              numColumns={4}
+              // contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
               
               renderItem={this.renderItem.bind(this)}
               // keyExtractor={(item) =>item}
               keyExtractor = { (item, index) => index.toString() }
-              ItemSeparatorComponent={this.renderSeparator}
+              // ItemSeparatorComponent={this.renderSeparator}
               // ListHeaderComponent={this.renderHeader}
               ListFooterComponent={this.renderFooter}
               // onRefresh={this.handleRefresh}
               // refreshing={this.state.refreshing}
               // onEndReached={this.handleLoadMore}
-              renderSectionHeader={this.renderSectionHeader}
+              // renderSectionHeader={this.renderSectionHeader}
               onEndReachedThreshold={50}
               extraData={this.state}
               ListHeaderComponent={() => (!this.state.data.length ? 
                 <Text style={{textAlign:'left', fontSize:22}}>No Friend.</Text>
                 : null)}
+            />
+              */
+
+            <SectionList
+              sections={sections}
+              renderSectionHeader={this.renderSectionHeader}
+              renderItem={this.renderSection}
+              // style={{justifyContent:'space-between'}}
+              extraData={this.state}
             />
           }
           </View>

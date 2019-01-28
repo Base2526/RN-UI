@@ -45,48 +45,47 @@ const options = {
 };
   
 
-class MyProfileEditBasicInfoPage extends React.Component{
+class EditMyProfilePage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
-        title: "Edit Basic Info",
-        // headerLeft: (
-        //     <TouchableOpacity
-        //         style={Styles.headerButton}
-        //         onPress={() => navigation.openDrawer()}>
-        //         <Icon name="bars" size={20} />
-        //     </TouchableOpacity>
-        // ),
-        headerRight: (
-            // <View style={{flexDirection:'row', flex:1}}>
-            //     <TouchableOpacity 
-            //         style={{paddingRight:10}}
-            //         onPress={()=>{
-            //             // GroupMemberInvite
-            //             const { params = {} } = navigation.state
-            //             params.handleClose()
-
-            //         }}>
-            //         <Text style={{color:'red', fontSize:16}}>Close</Text>
-            //     </TouchableOpacity> 
-            // </View>
-
-            <TouchableOpacity 
-                    style={{paddingRight:10}}
-                    onPress={()=>{
+        // title: "Edit Profile",
+        headerLeft: (
+            <View style={{marginLeft:10}}>
+                <TouchableOpacity
+                    style={{padding:5}}
+                    onPress={() => {
                         const { params = {} } = navigation.state
-                        params.handleClose()
+                        params.handleCancel()
                     }}>
-                    <Text style={{color:'red', fontSize:16}}>Close</Text>
-                </TouchableOpacity> 
+                    <Text style={{fontSize:18, color:'black'}}>CANCEL</Text>
+                </TouchableOpacity>
+            </View>
+        ),
+        headerRight: (
+            <View style={{marginRight:10}}>
+            <TouchableOpacity
+                style={{padding:5}}
+                onPress={() => {
+                    const { params = {} } = navigation.state
+                    params.handleSave()
+                }}>
+                <Text style={{fontSize:18, color:'black'}}>SAVE</Text>
+            </TouchableOpacity>
+            </View>
         ),
     })
 
-    handleClose = () => {
+    handleSave = () => {
+        alert('save')
+    }
+
+    handleCancel = () => {
         this.props.navigation.goBack(null)
     }
 
     componentDidMount() {
-        this.props.navigation.setParams({handleClose: this.handleClose })
+        this.props.navigation.setParams({handleSave: this.handleSave })
+        this.props.navigation.setParams({handleCancel: this.handleCancel })
     }
 
     constructor(props) {
@@ -467,6 +466,16 @@ class MyProfileEditBasicInfoPage extends React.Component{
     }
     
     render(){
+
+        let {width, height} = Dimensions.get('window') 
+
+        let w = 0
+        if(width < height){
+            w = width
+        }else{
+            w = height
+        }
+
         return(
         <SafeAreaView style={{flex:1}}>
             <Modal 
@@ -560,33 +569,7 @@ class MyProfileEditBasicInfoPage extends React.Component{
 
             <KeyboardAwareScrollView>
                 
-            {/* <View style={{ height:40, 
-                        // marginTop:getStatusBarHeight(), 
-                        justifyContent:'center', 
-                        paddingLeft:10}}>
-                <Text style={{fontSize:22}}>Edit Basic Info</Text>
-                <TouchableOpacity 
-                    style={{
-                            borderWidth: 1, 
-                            borderColor: 'red',
-                            borderRadius: 5,
-                            height:30, 
-                            width:60,
-                            justifyContent: 'center', 
-                            alignItems: 'center',
-                            position:'absolute',
-                            right:0,
-                            margin:10,
-                            zIndex: 10,
-                                }}
-                    onPress={()=>{
-                        this.props.navigation.goBack()
-                    }}>
-                    <Text style={{color:'red', fontSize:16}}>Close</Text>
-                </TouchableOpacity> 
-            </View> */}
-              
-            <View style={{flex: 1,}}>
+            <View style={{flex: 1}}>
           
             <TableView >
                 <Section
@@ -609,28 +592,28 @@ class MyProfileEditBasicInfoPage extends React.Component{
                         cellStyle="Basic"
                         titleTextColor="#007AFF"
                         hideSeparator={true}
+                        contentContainerStyle={{ paddingLeft:0, paddingRight:0 }}
                         cellContentView={
                             <View style={{
                                         flexDirection:'row', 
-                                        height: 150,
-                                        width: 150,
-                                        marginBottom:10}}>
+                                        height: 200,
+                                        backgroundColor:'yellow',
+                                        }}>
                                 <TouchableOpacity
+                                style={{backgroundColor:'green'}}
                                 onPress={()=>{
                                     this.profilePicture()
                                 }}>
-                                    {/* <ImageWithDefault 
-                                        source={{uri: this.state.profile_picture == "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.profile_picture.uri,}}
-                                        style={{width: 150, height: 150}}
-                                    /> */}
-
+                                
                                     <PlaceHolderFastImage 
-                                        style={{width: 150, height: 150}}
+                                        style={{height: 200,
+                                            width: w }} 
                                         source={{
                                             uri: this.state.profile_picture == "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.profile_picture.uri,
                                             headers:{ Authorization: 'someAuthToken' },
                                             priority: FastImage.priority.normal,
-                                        }}/>
+                                        }}
+                                        resizeMode={FastImage.resizeMode.cover}/>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={{position:'absolute', 
                                                             right:0, 
@@ -639,7 +622,8 @@ class MyProfileEditBasicInfoPage extends React.Component{
                                                             borderColor:'gray', 
                                                             borderWidth:1,
                                                             padding:5,
-                                                            margin:5}}
+                                                            margin:5
+                                                        }}
                                                             onPress={()=>{
                                                                 this.profilePicture()
                                                             }}>
@@ -714,10 +698,42 @@ class MyProfileEditBasicInfoPage extends React.Component{
                         }
                     />
                 </Section>
+
+                
                 <Section
                     sectionPaddingTop={5}
                     sectionPaddingBottom={0}
                     separatorInsetLeft={0}>
+                    <Cell
+                        // title="Help / FAQ"
+                        cellStyle="Subtitle"
+                        titleTextColor="#007AFF"
+                        // onPress={() => console.log("open Help/FAQ")}
+                        cellContentView={
+                        <View style={{flex:1, flexDirection:'row'}}>
+                            <Text
+                            // allowFontScaling
+                            // numberOfLines={1}
+                            style={{flex:1, fontSize: 18,  }}>
+                            Basic Info
+                            </Text>
+                            {/* <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
+                                <TouchableOpacity
+                                style={{borderColor:'gray', borderRadius:5, borderWidth:.2}}
+                                onPress={()=>{
+                                    this.props.navigation.navigate("BasicInfoNavigator")
+                                }}>
+                                    <Text
+                                        // allowFontScaling
+                                        // numberOfLines={1}
+                                        style={{ fontSize: 14, margin:5}}>
+                                        EDIT
+                                    </Text>
+                                </TouchableOpacity>
+                            </View> */}
+                        </View>
+                    }
+                    />
                     <Cell
                         cellStyle="Subtitle"
                         titleTextColor="#007AFF"
@@ -878,6 +894,283 @@ class MyProfileEditBasicInfoPage extends React.Component{
                         }}
                     />
                 </Section>
+            
+            
+                <Section
+                    sectionPaddingTop={5}
+                    sectionPaddingBottom={0}
+                    separatorInsetLeft={0}>
+                    <Cell
+                                cellStyle="Basic"
+                                // title="MY INFO"
+                                contentContainerStyle={{ }} 
+                                hideSeparator={false}
+                                cellContentView={
+                                    // <Text style={{ flex: 1, fontSize: 18, }}>
+                                    //   Contact Info
+                                    // </Text>
+                                    <View style={{flex:1, flexDirection:'row'}}>
+                                        <Text
+                                        // allowFontScaling
+                                        // numberOfLines={1}
+                                        style={{flex:1, fontSize: 18,  }}>
+                                        Contact Info
+                                        </Text>
+                                        {/* <View style={{flex:1, alignItems: 'flex-end', justifyContent:'center'}}>
+                                            <TouchableOpacity
+                                            style={{borderColor:'gray', borderRadius:5, borderWidth:.2}}
+                                            onPress={()=>{
+                                                this.props.navigation.navigate("ContactInfoNavigator")
+                                            }}>
+                                                <Text
+                                                    // allowFontScaling
+                                                    // numberOfLines={1}
+                                                    style={{ fontSize: 14, margin:5}}>
+                                                    EDIT
+                                                </Text>
+                                            </TouchableOpacity>
+                                        </View> */}
+                                    </View>
+                                }
+                            />
+                    <Cell
+                        cellStyle="Subtitle"
+                        titleTextColor="#007AFF"
+                        hideSeparator={true} 
+                        cellContentView={
+                            <View style={{flex:1, flexDirection:'row'}}>
+                                <Text style={{flex:1, fontSize: 16,  }}>
+                                Mobile phones
+                                </Text>
+                            </View>
+                        }
+                    />
+                    
+                    <Cell
+                        cellStyle="Subtitle"
+                        titleTextColor="#007AFF"
+                        hideSeparator={true} 
+                        // accessory="DisclosureIndicator"
+                        // backgroundColor= "blue"
+                        cellContentView={
+                            <View style={{flexDirection:'row'}}>
+                                <View style={{flex:1, flexDirection:'row'}}>
+                                    <Text style={{flex:1, fontSize: 16,  }}>
+                                    0988129483
+                                    </Text>
+                                </View>
+                                <View style={{flex:1, 
+                                            flexDirection:'row', 
+                                            position:'absolute', 
+                                            right:0,
+                                            bottom:0}}>
+                                    <TouchableOpacity 
+                                        style={{justifyContent: 'center', 
+                                                alignItems: 'center',
+                                                zIndex: 10,
+                                                marginRight:10}}
+                                        onPress={()=>{
+                                            this.props.navigation.navigate("AddAnotherPhone", {'title':'Edit phone', 'mode': 'edit'})
+                                        }}>
+                                        <Text style={{color:'gray', fontSize:16}}>Edit</Text>
+                                    </TouchableOpacity> 
+                                    <TouchableOpacity 
+                                        style={{justifyContent: 'center', 
+                                                alignItems: 'center',
+                                                zIndex: 10,}}
+                                        onPress={()=>{
+                                            Alert.alert(
+                                                'Delete',
+                                                'Are sure delete phone ?',
+                                                [
+                                                //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                                                  {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                                                  {text: 'Delete', onPress: () => console.log('Delete Pressed')},
+                                                ],
+                                                { cancelable: false }
+                                              )
+                                        }}>
+                                        <Text style={{color:'red', fontSize:16}}>Delete</Text>
+                                    </TouchableOpacity> 
+                                </View>
+                            </View>
+                        }
+                        // onPress={()=>{
+                        //     // this.openModalInteresteIn()
+                        // }}
+                    />
+                    <Cell
+                        cellStyle="Subtitle"
+                        titleTextColor="#007AFF"
+                        hideSeparator={true} 
+                        // accessory="DisclosureIndicator"
+                        cellContentView={
+                            <View style={{flexDirection:'row'}}>
+                                <View style={{flex:1, flexDirection:'row'}}>
+                                    <Text style={{flex:1, fontSize: 16,  }}>
+                                    0988129999
+                                    </Text>
+                                </View>
+                                <View style={{flex:1, 
+                                            flexDirection:'row', 
+                                            position:'absolute', 
+                                            right:0,
+                                            bottom:0}}>
+                                    <TouchableOpacity 
+                                        style={{justifyContent: 'center', 
+                                                alignItems: 'center',
+                                                zIndex: 10,
+                                                marginRight:10}}
+                                        onPress={()=>{
+                                            this.props.navigation.navigate("AddAnotherPhone", {'title':'Edit phone','mode': 'edit'})
+                                        }}>
+                                        <Text style={{color:'gray', fontSize:16}}>Edit</Text>
+                                    </TouchableOpacity> 
+                                    <TouchableOpacity 
+                                        style={{justifyContent: 'center', 
+                                                alignItems: 'center',
+                                                zIndex: 10,}}
+                                        onPress={()=>{
+                                            Alert.alert(
+                                                'Delete',
+                                                'Are sure delete phone ?',
+                                                [
+                                                //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                                                  {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                                                  {text: 'Delete', onPress: () => console.log('Delete Pressed')},
+                                                ],
+                                                { cancelable: false }
+                                              )
+                                        }}>
+                                        <Text style={{color:'red', fontSize:16}}>Delete</Text>
+                                    </TouchableOpacity> 
+                                </View>
+                            </View>
+                        }
+                        // onPress={()=>{
+                        //     // this.openModalInteresteIn()
+                        // }}
+                    />
+                    <Cell
+                        cellStyle="Subtitle"
+                        titleTextColor="#007AFF"
+                        hideSeparator={true} 
+                        accessory="DisclosureIndicator"
+                        cellContentView={
+                            <View style={{flex:1, flexDirection:'row'}}>
+                                <Text style={{flex:1, fontSize: 16,  }}>
+                                Add another phone
+                                </Text>
+                            </View>
+                        }
+                        onPress={()=>{
+                            this.props.navigation.navigate("AddAnotherPhone", {'title':"Add another phone", 'mode': 'add'})
+                        }}
+                    />
+                </Section>
+
+                <Section
+                    sectionPaddingTop={5}
+                    sectionPaddingBottom={0}
+                    separatorInsetLeft={0}>
+                    <Cell
+                        cellStyle="Subtitle"
+                        titleTextColor="#007AFF"
+                        hideSeparator={true} 
+                        cellContentView={
+                            <View style={{flex:1, flexDirection:'row'}}>
+                                <Text style={{flex:1, fontSize: 16,  }}>
+                                Address
+                                </Text>
+                            </View>
+                        }
+                    />
+                    <Cell
+                        cellContentView={
+                            <TextInput
+                                style={{fontSize:16, 
+                                        flex:1, 
+                                        borderColor:'gray', 
+                                        borderRadius:5, 
+                                        borderWidth:.5,
+                                        padding:5,
+                                        marginBottom:10}}
+                                placeholder="input address"
+                                multiline={true}
+                                underlineColorAndroid='transparent'
+                            />
+                        }
+                        />
+                </Section>
+
+                <Section
+                    sectionPaddingTop={5}
+                    sectionPaddingBottom={0}
+                    separatorInsetLeft={0}>
+                    <Cell
+                        cellStyle="Subtitle"
+                        titleTextColor="#007AFF"
+                        hideSeparator={true} 
+                        cellContentView={
+                            <View style={{flex:1, flexDirection:'row'}}>
+                                <Text style={{flex:1, fontSize: 16,  }}>
+                                Website
+                                </Text>
+                            </View>
+                        }
+                    />
+                    <Cell
+                        cellStyle="Subtitle"
+                        titleTextColor="#007AFF"
+                        hideSeparator={true} 
+                        accessory="DisclosureIndicator"
+                        cellContentView={
+                            <View style={{flex:1, flexDirection:'row'}}>
+                                <Text style={{flex:1, fontSize: 16,  }}>
+                                Add another website
+                                </Text>
+                            </View>
+                        }
+                        onPress={()=>{
+                            this.props.navigation.navigate("AddAnotherWebsite")
+                        }}
+                    />
+                </Section>
+
+                <Section
+                    sectionPaddingTop={5}
+                    sectionPaddingBottom={0}
+                    separatorInsetLeft={0}>
+                    <Cell
+                        cellStyle="Subtitle"
+                        titleTextColor="#007AFF"
+                        hideSeparator={true} 
+                        cellContentView={
+                            <View style={{flex:1, flexDirection:'row'}}>
+                                <Text style={{flex:1, fontSize: 16,  }}>
+                                Email
+                                </Text>
+                            </View>
+                        }
+                    />
+                    <Cell
+                        cellStyle="Subtitle"
+                        titleTextColor="#007AFF"
+                        hideSeparator={true} 
+                        accessory="DisclosureIndicator"
+                        cellContentView={
+                            <View style={{flex:1, flexDirection:'row'}}>
+                                <Text style={{flex:1, fontSize: 16,  }}>
+                                Add another email
+                                </Text>
+                            </View>
+                        }
+                        onPress={()=>{
+                            this.props.navigation.navigate("AddAnotherEmail")
+                        }}
+                    />
+                </Section>
+           
             </TableView>
           </View>
           </KeyboardAwareScrollView>
@@ -898,4 +1191,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps, actions)(MyProfileEditBasicInfoPage);
+export default connect(mapStateToProps, actions)(EditMyProfilePage);

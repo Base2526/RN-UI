@@ -16,7 +16,7 @@ import DrawerMenu from './DrawerMenu'
 
 import AuthLoadingScreen from './Screens/AuthLoadingScreen'
 
-var {height, width} = Dimensions.get('window');
+// var {height, width} = Dimensions.get('window');
 
 // Inbox: { screen: InboxScreen },
 export const AuthStack = createStackNavigator({
@@ -46,9 +46,21 @@ export const AuthStack = createStackNavigator({
     }
 });
 
+/*
+ Drawer menu เราจะความกว้างเราจะเอาแนวตั้งเป็นหลัก
+ */
+let {width, height} = Dimensions.get('window')
+
+let w = 0
+if(width<height){
+    w = width
+}else{
+    w = height
+}
+
 let drawerNavigatorConfig = {
   // initialRouteName: Home,
-  drawerWidth: width/2 + ((width/2) / 2), // เป็นการเอา เศษ 3 ส่วน 4
+  drawerWidth: w/2 + ((w/2) / 2), // เป็นการเอา เศษ 3 ส่วน 4
   drawerPosition: 'left',
   drawerOpenRoute: 'DrawerOpen',
   drawerCloseRoute: 'DrawerClose',

@@ -35,8 +35,8 @@ import ClasssSettingsPage from './ClasssSettingsPage'
 import ClasssMemberAddFriend from './ClasssMemberAddFriend'
 import ChangeFriendsName from './ChangeFriendsName'
 import MyQRcode from './MyQRcode'
-import MyProfileEditBasicInfoPage from './MyProfileEditBasicInfoPage'
-import MyProfileEditContactInfoPage from './MyProfileEditContactInfoPage'
+import EditMyProfilePage from './EditMyProfilePage'
+// import MyProfileEditContactInfoPage from './MyProfileEditContactInfoPage'
 
 import AddAnotherPhone from './AddAnotherPhone'
 import AddAnotherWebsite from './AddAnotherWebsite'
@@ -171,15 +171,7 @@ const index = createStackNavigator({
 // EditBasicInfoPage
 const BasicInfoNavigator = createStackNavigator(
 {
-  'MyProfileEditBasicInfoPage': {screen: MyProfileEditBasicInfoPage},
-},
-{
-  // headerMode: 'none',
-},);
-
-const ContactInfoNavigator = createStackNavigator(
-{
-  'MyProfileEditContactInfoPage': {screen: MyProfileEditContactInfoPage},
+  'EditMyProfilePage': {screen: EditMyProfilePage},  
   'AddAnotherPhone': {screen: AddAnotherPhone},
   'AddAnotherWebsite': {screen: AddAnotherWebsite},
   'AddAnotherEmail': {screen: AddAnotherEmail},
@@ -187,6 +179,17 @@ const ContactInfoNavigator = createStackNavigator(
 {
   // headerMode: 'none',
 },);
+
+// const ContactInfoNavigator = createStackNavigator(
+// {
+//   // 'MyProfileEditContactInfoPage': {screen: MyProfileEditContactInfoPage},
+//   'AddAnotherPhone': {screen: AddAnotherPhone},
+//   'AddAnotherWebsite': {screen: AddAnotherWebsite},
+//   'AddAnotherEmail': {screen: AddAnotherEmail},
+// },
+// {
+//   // headerMode: 'none',
+// },);
 
 // https://github.com/react-navigation/react-navigation/issues/707#issuecomment-299859578
 const MainModalNavigator = createStackNavigator(
@@ -206,7 +209,7 @@ const MainModalNavigator = createStackNavigator(
     'MyQRcode': {screen: MyQRcode},
     'BasicInfoNavigator': {screen: BasicInfoNavigator},
 
-    'ContactInfoNavigator': {screen: ContactInfoNavigator}
+    // 'ContactInfoNavigator': {screen: ContactInfoNavigator}
   },
   {
     mode: 'modal',
@@ -227,9 +230,10 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
        routeName === 'ClasssSettingsPage' ||
        routeName === 'ClasssMemberAddFriend' ||
        routeName === 'ChangeFriendsName' ||
-       routeName === 'MyQRcode' ||
+       routeName === 'MyQRcode' ){
       //  routeName === 'MyProfileEditBasicInfoPage' ||
-       routeName === 'MyProfileEditContactInfoPage'){
+      //  routeName === 'MyProfileEditContactInfoPage'
+      
       navigationOptions.tabBarVisible = false;
       return navigationOptions;
     }
@@ -254,11 +258,11 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
       routeName === 'ContactsSearch' ||
       routeName === 'ListGroupMemberPage' ||
       routeName === 'ManageClasssPage' ||
-      routeName === 'MyProfileEditContactInfoPage' ||
+      // routeName === 'MyProfileEditContactInfoPage' ||
       routeName === 'AddAnotherPhone' ||
       routeName === 'AddAnotherEmail' || 
       routeName === 'AddAnotherWebsite' ||
-      routeName === 'MyProfileEditBasicInfoPage'
+      routeName === 'EditMyProfilePage'
       ) {
     navigationOptions.tabBarVisible = false;
   }

@@ -73,11 +73,12 @@ export default class BackgroundImage extends React.Component {
             <FastImage
               style={StyleSheet.absoluteFill}
               // style={{borderColor: '#000', borderWidth:4}}
-              source={{
-              uri: bg_url,
-              headers:{ Authorization: 'someAuthToken' },
-              priority: FastImage.priority.normal,
-              }}
+              // source={{
+              // uri: bg_url,
+              // headers:{ Authorization: 'someAuthToken' },
+              // priority: FastImage.priority.normal,
+              // }}
+              source={require('../Images/boxpink.png')}
               resizeMode={FastImage.resizeMode.cover}
             />
             <View style={{flexDirection:'row', margin:20}}>
@@ -91,7 +92,7 @@ export default class BackgroundImage extends React.Component {
                           // borderColor:'#000'
                           }}        
                   >
-
+{/* source={require('../../Images/boxpink.png')} */}
                   <ImageWithDefault 
                       source={{uri: image_url}}
                       style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}
