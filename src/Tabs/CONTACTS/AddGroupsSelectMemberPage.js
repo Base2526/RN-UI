@@ -30,6 +30,9 @@ class AddGroupsSelectMemberPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
         title: "",
+        headerStyle: {
+            backgroundColor: 'rgba(186, 53, 100, 1.0)',
+        },
         headerRight: (
             <TouchableOpacity
               style={{paddingRight:10}}
@@ -37,7 +40,7 @@ class AddGroupsSelectMemberPage extends React.Component{
                 const { params = {} } = navigation.state
                 params.handleAddMember()
               }}>
-              <Text style={{fontSize:16, fontWeight:'600'}}>Add Member</Text>
+              <Text style={{fontSize:16, fontWeight:'600'}}>Add</Text>
             </TouchableOpacity>
           ),
     })
@@ -56,29 +59,49 @@ class AddGroupsSelectMemberPage extends React.Component{
     
 
         const { navigation, auth } = this.props;
-        // const group = navigation.getParam('group', null);
+        const data = navigation.getParam('members', null);
 
-        
+        // console.log(members)
+
         // let members = group.group_profile.members
         let friends = auth.users.friends
 
-        // let key = []
-        // _.each(members, function(_v, _k) { 
-        //     key.push(_v.friend_id)
-        // });
-
-        let data = []
-        _.each(friends, function(_v, _k) { 
-            data.push({..._v, friend_id:_k})
+        let key = []
+        _.each(data, function(_v, _k) { 
+            key.push(_v)
         });
 
-        this.setState({data})    
+        let newData = []
+        _.each(friends, function(_v, _k) { 
+            let find = key.find(k => k.friend_id==_k)
+            if(find === undefined){
+                newData.push({..._v, friend_id:_k})
+            }else{
+                newData.push(find)
+            }
+        });
+
+        this.setState({data:newData})    
         
-        console.log(data)
+        // console.log(new Date())
     }
 
     handleAddMember = () =>{
-        alert('handleAddMember')
+        // alert('handleAddMember')
+
+        let newData = this.state.data.filter(function(item){
+            return item.seleted == true;
+        })
+
+        // console.log(newData)
+        newData.sort(function(a, b) {
+            var dateA = new Date(a.create), dateB = new Date(b.create);
+            return dateA - dateB;
+        });
+
+        const { navigation } = this.props;
+        navigation.goBack();
+        navigation.state.params.onSeleted(newData);
     }
 
     onSubmit = () => {
@@ -93,6 +116,7 @@ class AddGroupsSelectMemberPage extends React.Component{
         let newData = [...this.state.data];
         if(this.state.data[index].seleted === undefined){
             this.state.data[index].seleted = true
+            this.state.data[index].create = new Date()
         }else{
             this.state.data[index].seleted = !this.state.data[index].seleted
         }
@@ -124,7 +148,7 @@ class AddGroupsSelectMemberPage extends React.Component{
                             }}>
                             <Image
                                 style={{ width: 25, height: 25}}
-                                source={ seleted ? require('../../Images/icon-unselect.svg') : require('../../Images/collapse_down.svg')}
+                                source={ seleted ? require('../../Images/icon-unselect.svg') : require('../../Images/icon-select.svg')}
                             />
                         </TouchableOpacity>
                     </View>

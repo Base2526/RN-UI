@@ -73,28 +73,6 @@ const formatData = (data, numColumns) => {
   return data;
 };
 
-const sections = [
-  {
-    title: "Members",
-    key: "1",
-    data: [
-     {
-       key: "1",
-       list: [
-          {
-            name: "Carrot",
-            color: "Orange",
-          },
-          {
-            name: "Carrot",
-            color: "Orange",
-          },
-        ],
-      },
-    ],
-  },
-]
-
 const calculatorWidthHeightItem=(margin, itemRow)=>{
   let {width, height} = Dimensions.get('window')
 
@@ -106,14 +84,6 @@ class AddGroupsPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
         title: "Create Group",
-        // headerTitleStyle = {color='red'},
-        // headerLeft: (
-        //     <TouchableOpacity
-        //         style={Styles.headerButton}
-        //         onPress={() => navigation.openDrawer()}>
-        //         <Icon name="bars" size={25} />
-        //     </TouchableOpacity>
-        // ),
         headerStyle: {
           backgroundColor: 'rgba(186, 53, 100, 1.0)',
 
@@ -162,12 +132,7 @@ class AddGroupsPage extends React.Component{
                {
                  key: "1",
                  list: [
-                    {
-                      uid: "0"
-                    },
-                    {
-                      uid: "549073"
-                    },
+                    {}
                   ],
                 },
               ],
@@ -221,7 +186,6 @@ class AddGroupsPage extends React.Component{
       }else{
         console.log('-success-')
 
-
         // console.log(this.state.avatarSource.uri)
         // console.log(this.state.avatarSource.uri.replace('file://', ''))
   
@@ -261,6 +225,31 @@ class AddGroupsPage extends React.Component{
           }
         })
       }
+    }
+    
+    onSeleted = (values) =>{
+      let newSections = this.state.sections
+      newSections[0].data[0].list = [{},...values]
+
+      this.setState({
+        sections: newSections
+      })
+
+      
+    }
+
+    onDeleted = (index) =>{
+      let newSections = this.state.sections
+      let list = newSections[0].data[0].list;
+
+      let newList = list.filter(function(value, key){
+        return key != index;
+      })
+
+      newSections[0].data[0].list = newList
+      this.setState({
+        sections: newSections
+      })
     }
 
     loadData=()=>{
@@ -395,9 +384,9 @@ class AddGroupsPage extends React.Component{
                   });
                 }}>
               <FastImage
-                  style={{width: 100, 
-                          height: 100, 
-                          borderRadius: 50, 
+                  style={{width: 80, 
+                          height: 80, 
+                          borderRadius: 40, 
                           // borderColor:'gray', 
                           backgroundColor: '#FF83AF',
                           // borderWidth:1
@@ -503,7 +492,13 @@ class AddGroupsPage extends React.Component{
         return(<TouchableOpacity
                 style={{padding:5}}
                 onPress={()=>{
-                  this.props.navigation.navigate("AddGroupsSelectMemberPage")
+                  let list = this.state.sections[0].data[0].list;
+                  let newList = list.filter(function(value, key){
+                    return key != 0;
+                  })
+                  // console.log(newList)
+
+                  this.props.navigation.navigate("AddGroupsSelectMemberPage", { onSeleted: this.onSeleted, members:newList })
                 }}>
                 <Image
                     style={{ width: calculatorWidthHeightItem(5, this.state.numColumns), 
@@ -517,16 +512,28 @@ class AddGroupsPage extends React.Component{
               onPress={()=>{
 
               }}>
-              <Image
-                  style={{width: calculatorWidthHeightItem(5, this.state.numColumns), 
-                          height: calculatorWidthHeightItem(5, this.state.numColumns),}}
-                  source={require('../../Images/icon-create-group-circleplus.svg')}/>
+              <FastImage
+                  style={{width: calculatorWidthHeightItem(5, this.state.numColumns),  
+                          height: calculatorWidthHeightItem(5, this.state.numColumns),
+                          borderRadius: calculatorWidthHeightItem(5, this.state.numColumns)/2, 
+                          borderColor:'gray', 
+                          // backgroundColor: '#FF83AF',
+                          borderWidth:1
+                        }}
+                  source={{
+                    uri: item.profile.image_url,
+                    headers:{ Authorization: 'someAuthToken' },
+                    priority: FastImage.priority.normal,
+                  }}
+                  resizeMode={FastImage.resizeMode.normal}
+              />
+              
               <TouchableOpacity
                 style={{padding:5,
                         position:'absolute',
                         right:0}}
                 onPress={()=>{
-                    alert('Delete Friend')
+                    this.onDeleted(index)
                 }}>
                 <Image
                     style={{width: 20, 
