@@ -209,8 +209,12 @@ class FriendsPage extends React.Component{
           case Constant.FRIEND_STATUS_FRIEND:{
             swipeoutRight = [
              {
-                text: 'Hide',
-                backgroundColor: '#FFCA16',
+                // text: 'Hide',
+                // backgroundColor: '#FFCA16',
+                component:<View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: '#FFCA16'}}>
+                            <Text style={{fontWeight:'bold', color:'white', fontSize:18}}>HIDE</Text>
+                          </View>
+                ,
                 onPress: () => { 
                   let title = rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.profile.name
                   
@@ -234,8 +238,12 @@ class FriendsPage extends React.Component{
                   )
                 }
               },{
-                text: 'Block',
-                backgroundColor: '#7ACC1F',
+                // text: 'Block',
+                // backgroundColor: '#7ACC1F',
+                component:<View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: '#7ACC1F'}}>
+                            <Text style={{fontWeight:'bold', color:'white', fontSize:18}}>BLOCK</Text>
+                          </View>
+                ,
                 onPress: () => { 
                  
                   let title = rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.profile.name
@@ -269,7 +277,7 @@ class FriendsPage extends React.Component{
                             {/* <Icon raised color='white'containerStyle={{backgroundColor: '#FF5722'}} name={rowItem.mute ? 'volume-mute' : 'volume-up'} size={40}/> */}
                          
                             <Image
-                                style={{width: 40, height: 40}}
+                                style={{width: 60, height: 60}}
                                 source={rowItem.mute ? require('../../Images/icon-mute.svg') : require('../../Images/icon-unmute.svg')}
                                 // resizeMode={FastImage.resizeMode.contain}
                             />

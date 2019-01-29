@@ -8,21 +8,24 @@ import {FlatList,
         TouchableOpacity,
         ScrollView,
         SafeAreaView,
-        Image} from 'react-native'
+        } from 'react-native'
 
 import { Header } from 'react-navigation';
 
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
-import { isIphoneX } from 'react-native-iphone-x-helper';
+import { ifIphoneX } from 'react-native-iphone-x-helper';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 var _ = require('lodash');
 
+import Image from 'react-native-remote-svg'
+
 import {getStatusBarHeight, getHeaderInset} from '../../Utils/Helpers'
 import GroupBackgroundImage from '../../test/group-image-with-text'
-import ImageWithDefault from '../../Utils/ImageWithDefault'
+import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
 import * as actions from '../../Actions'
+
 
 class ManageGroupPage extends React.Component{
 
@@ -30,26 +33,26 @@ class ManageGroupPage extends React.Component{
         headerTransparent: true,
         headerTitleStyle:{color:'white'},
         headerTintColor: 'white',
-        headerRight: (
-            <View style={{flexDirection:'row', flex:1}}>
-                <TouchableOpacity 
-                    style={{paddingRight:10}}
-                    onPress={()=>{
-                        Alert.alert(
-                            '',
-                            'If you leave this group, you\'ll no longer be able to see its member list or chat history Continue?',
-                            [
-                            //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-                              {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-                              {text: 'OK', onPress: () => console.log('OK Pressed')},
-                            ],
-                            { cancelable: false }
-                          )
-                    }}>
-                    <Text style={{color:'red', fontSize:16, borderWidth: 1, borderColor: 'red', borderRadius: 12, padding: 8, overflow:"hidden",}}>Leave group</Text>
-                </TouchableOpacity> 
-            </View>
-        ),
+        // headerRight: (
+            // <View style={{flexDirection:'row', flex:1}}>
+            //     <TouchableOpacity 
+            //         style={{paddingRight:10}}
+            //         onPress={()=>{
+            //             Alert.alert(
+            //                 '',
+            //                 'If you leave this group, you\'ll no longer be able to see its member list or chat history Continue?',
+            //                 [
+            //                 //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+            //                   {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+            //                   {text: 'OK', onPress: () => console.log('OK Pressed')},
+            //                 ],
+            //                 { cancelable: false }
+            //               )
+            //         }}>
+            //         <Text style={{color:'red', fontSize:16, borderWidth: 1, borderColor: 'red', borderRadius: 12, padding: 8, overflow:"hidden",}}>Leave group</Text>
+            //     </TouchableOpacity> 
+            // </View>
+        // ),
     });
 
     constructor(){
@@ -80,10 +83,89 @@ class ManageGroupPage extends React.Component{
 
         console.log(group)
         return (
-                <ScrollView style={{ flex: 1,}}>
-                <View style={{flex:1, backgroundColor:'gray'}}>
-                    <GroupBackgroundImage style={{paddingTop:getHeaderInset()}} auth={this.props.auth} group={group} />
-                    <View style={{ flex:1}}>
+                // <ScrollView style={{ flex: 1,}}>
+                <View style={{flex:1, backgroundColor:'#DF2D6C', paddingTop:getHeaderInset()}}>
+                    <View style={{ alignItems:'center'}}>
+                        <TouchableOpacity
+                            style={{paddingTop:10}}>
+                            <PlaceHolderFastImage 
+                                source={{uri: '', priority: FastImage.priority.normal}}
+                                style={{width: 100, height: 100, borderRadius: 50, borderWidth:4, borderColor:'#BCD1D5'}}/>
+                        </TouchableOpacity>
+                        <View style={{padding:5, flexDirection:'row'}}>
+                            <Image
+                                style={{ width: 30, height: 30}}
+                                source={require('../../Images/icon-group-arrow.svg')}
+                            />
+                            <View style={{paddingLeft:5}}>
+                                <Text style={{fontSize:26, fontWeight:'bold', textAlignVertical: 'bottom', color:'#BCD1D5'}}>Group B</Text>
+                            </View>
+                        </View>
+                        <View style={{padding:5, flexDirection:'row'}}>
+                            <TouchableOpacity style={{marginRight:5}}>
+                                <PlaceHolderFastImage 
+                                    source={{uri: '', priority: FastImage.priority.normal}}
+                                    style={{width: 36, height: 36, borderRadius: 18, }}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{marginRight:5}}>
+                                <PlaceHolderFastImage 
+                                    source={{uri: '', priority: FastImage.priority.normal}}
+                                    style={{width: 36, height: 36, borderRadius: 18, }}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{marginRight:5}}>
+                                <PlaceHolderFastImage 
+                                    source={{uri: '', priority: FastImage.priority.normal}}
+                                    style={{width: 36, height: 36, borderRadius: 18, }}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{marginRight:5}}>
+                                <PlaceHolderFastImage 
+                                    source={{uri: '', priority: FastImage.priority.normal}}
+                                    style={{width: 36, height: 36, borderRadius: 18, }}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                                style={{width: 36, height: 36, borderRadius: 18, justifyContent:'center', alignItems:'center', backgroundColor:'#BCD1D5'}}>
+                                <Text style={{color:'white', fontWeight:'bold'}}>12+</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                    <View style={{position:'absolute', 
+                                bottom:0, 
+                                left:0, 
+                                right:0, 
+                                flexDirection:'row', 
+                                alignItems:'center', 
+                                justifyContent:'center', 
+                                // backgroundColor:'blue',
+                                ...ifIphoneX({
+                                    marginBottom: 40,
+                                }, {
+                                    marginBottom: 20,
+                                })}}>
+                        <TouchableOpacity style={{alignItems:'center'}}>
+                            <Image
+                                style={{ width: 30, height: 30}}
+                                source={require('../../Images/icon-group-chat.svg')}
+                            />
+                            <Text style={{fontWeight:'bold', color:'#BCD1D5', fontSize:16}}>CHAT</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{marginRight:30, marginLeft:30,  alignItems:'center'}}>
+                            <Image
+                                style={{ width: 30, height: 30}}
+                                source={require('../../Images/icon-group-qr.svg')}
+                            />
+                            <Text style={{fontWeight:'bold', color:'#BCD1D5', fontSize:16}}>QR</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{alignItems:'center'}}>
+                            <Image
+                                style={{ width: 40, height: 40}}
+                                source={require('../../Images/icon-group-setting.svg')}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                    
+                    {/* <GroupBackgroundImage style={{paddingTop:getHeaderInset()}} auth={this.props.auth} group={group} /> */}
+                    {/* <View style={{ flex:1}}>
                     <TableView >
                         <Section
                             sectionPaddingTop={5}
@@ -175,9 +257,9 @@ class ManageGroupPage extends React.Component{
                             />
                         </Section>
                       </TableView>
-                    </View>
+                    </View> */}
                 </View>
-            </ScrollView> 
+            // </ScrollView> 
         );
     }
 }

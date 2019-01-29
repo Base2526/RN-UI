@@ -13,8 +13,6 @@ import SettingsScreen from './Settings';
 
 // import NotificationTabBarIcon from '../Library/NotificationTabBarIcon'
 
-
-
 const SettingsTabs = createBottomTabNavigator({
     Contacts: {
         screen: ContactsScreen,
