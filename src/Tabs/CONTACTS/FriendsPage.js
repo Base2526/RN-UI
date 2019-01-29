@@ -5,7 +5,7 @@ import {
     Text,
     TouchableOpacity,
     TouchableHighlight,
-    Image,
+    // Image,
     Alert
 } from 'react-native'
   
@@ -15,6 +15,7 @@ import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import FastImage from 'react-native-fast-image'
+import Image from 'react-native-remote-svg'
 
 import Spinner from 'react-native-loading-spinner-overlay';
 // import firebase from 'react-native-firebase';
@@ -23,6 +24,8 @@ import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
 import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
 import {getUid} from '../../Utils/Helpers'
+
+
 
 class FriendsPage extends React.Component{
 
@@ -263,7 +266,14 @@ class FriendsPage extends React.Component{
             swipeoutLeft  = [
               {
                 component:<View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'rgba(186, 53, 100, 1.0)'}}>
-                            <Icon raised color='white'containerStyle={{backgroundColor: '#FF5722'}} name={rowItem.mute ? 'volume-mute' : 'volume-up'} size={40}/>
+                            {/* <Icon raised color='white'containerStyle={{backgroundColor: '#FF5722'}} name={rowItem.mute ? 'volume-mute' : 'volume-up'} size={40}/> */}
+                         
+                            <Image
+                                style={{width: 40, height: 40}}
+                                source={rowItem.mute ? require('../../Images/icon-mute.svg') : require('../../Images/icon-unmute.svg')}
+                                // resizeMode={FastImage.resizeMode.contain}
+                            />
+                         
                           </View>
                 ,
                 onPress: () => {
@@ -433,13 +443,13 @@ class FriendsPage extends React.Component{
         if(state){
           ic_collapse = <Image
                         style={{width: 20, height: 20}}
-                        source={require('../../Images/collapse_down.png')}
+                        source={require('../../Images/collapse_down.svg')}
                         // resizeMode={FastImage.resizeMode.contain}
                     />
         }else{
           ic_collapse = <Image
                         style={{width: 20, height: 20}}
-                        source={require('../../Images/collapse_up.png')}
+                        source={require('../../Images/collapse_up.svg')}
                         // resizeMode={FastImage.resizeMode.contain}
                     />
         }

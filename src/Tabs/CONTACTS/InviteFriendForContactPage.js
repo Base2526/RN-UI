@@ -10,7 +10,7 @@ import {getUid, getHeaderInset} from '../../Utils/Helpers'
 export default class InviteFriendForContactPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
-        title: "Add Friends",
+        title: 'Invite Friend',
         headerStyle: {
             backgroundColor: 'rgba(186, 53, 100, 1.0)',
         },

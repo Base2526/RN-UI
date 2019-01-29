@@ -27,7 +27,6 @@ const options = {
     storageOptions: {
       skipBackup: true,
       path: 'images',
-      
     },
     quality: 0.7,
     maxWidth: 500,

@@ -42,6 +42,8 @@ import AddAnotherPhone from './AddAnotherPhone'
 import AddAnotherWebsite from './AddAnotherWebsite'
 import AddAnotherEmail from './AddAnotherEmail'
 
+import AddGroupsSelectMemberPage from './AddGroupsSelectMemberPage'
+
 const index = createStackNavigator({
     'Home': {
         screen: Home,
@@ -69,6 +71,12 @@ const index = createStackNavigator({
     },
     'AddGroupsPage': {
         screen: AddGroupsPage,
+        navigationOptions: {
+          // title: 'Add Groups',
+        },
+    },
+    'AddGroupsSelectMemberPage':{
+      screen: AddGroupsSelectMemberPage,
         navigationOptions: {
           // title: 'Add Groups',
         },
@@ -112,7 +120,7 @@ const index = createStackNavigator({
     'InviteFriendForContactPage': {
       screen: InviteFriendForContactPage,
       navigationOptions: {
-        title: 'Invite Friend',
+        // title: 'Invite Friend',
       }
     },
     'ChatPage': {
@@ -258,7 +266,7 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
       routeName === 'ContactsSearch' ||
       routeName === 'ListGroupMemberPage' ||
       routeName === 'ManageClasssPage' ||
-      // routeName === 'MyProfileEditContactInfoPage' ||
+      routeName === 'AddGroupsSelectMemberPage' ||
       routeName === 'AddAnotherPhone' ||
       routeName === 'AddAnotherEmail' || 
       routeName === 'AddAnotherWebsite' ||

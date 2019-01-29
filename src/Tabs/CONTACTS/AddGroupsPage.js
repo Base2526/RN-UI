@@ -75,56 +75,20 @@ const formatData = (data, numColumns) => {
 
 const sections = [
   {
-    title: "Brand and Business",
-    key: "vegetables",
+    title: "Members",
+    key: "1",
     data: [
      {
-       key: "vegetables",
+       key: "1",
        list: [
           {
             name: "Carrot",
             color: "Orange",
           },
           {
-            name: "Cabbage",
-            color: "Purple",
-          },{
             name: "Carrot",
             color: "Orange",
           },
-          {
-            name: "Cabbage",
-            color: "Purple",
-          },{
-            name: "Carrot",
-            color: "Orange",
-          },
-          {
-            name: "Cabbage",
-            color: "Purple",
-          },
-          {
-            name: "Cabbage",
-            color: "Purple",
-          },{
-            name: "Carrot",
-            color: "Orange",
-          },
-          {
-            name: "Cabbage",
-            color: "Purple",
-          },
-          {
-            name: "Cabbage",
-            color: "Purple",
-          },{
-            name: "Carrot",
-            color: "Orange",
-          },
-          {
-            name: "Cabbage",
-            color: "Purple",
-          }
         ],
       },
     ],
@@ -189,7 +153,26 @@ class AddGroupsPage extends React.Component{
           seleteds: [],
           groupName: '',
           orientation:'PORTRAIT',
-          numColumns:4
+          numColumns:4,
+          sections : [
+            {
+              title: "Members",
+              key: "1",
+              data: [
+               {
+                 key: "1",
+                 list: [
+                    {
+                      uid: "0"
+                    },
+                    {
+                      uid: "549073"
+                    },
+                  ],
+                },
+              ],
+            },
+          ]
         };
     }
 
@@ -208,6 +191,8 @@ class AddGroupsPage extends React.Component{
         loading: false,
         refreshing: false
       });
+
+      // console.log(this.state.sections[0].data[0].list.length)
     }
 
     onLayout(e) {
@@ -444,7 +429,7 @@ class AddGroupsPage extends React.Component{
 
         </View>
         <View style={{position:'absolute', bottom:0, right:0, padding:5}}>
-          <Text style={{fontSize:16, fontWeight:'bold'}}>0/50</Text>
+          <Text style={{fontSize:16, fontWeight:'bold'}}>{this.state.sections[0].data[0].list.length == 1 ? '0': this.state.sections[0].data[0].list.length - 1}/50</Text>
         </View>
         <View
               style={{
@@ -501,7 +486,56 @@ class AddGroupsPage extends React.Component{
       }
     }
 
-    renderListItem = ({item, index}) => {        
+    renderListItem = ({item, index}) => { 
+      
+      if ('empty' in item) {
+        return <View style={{height: 120, 
+          width: 100, 
+          flex:1,
+          // borderColor: "green", 
+          // borderWidth: 1, 
+          justifyContent:'center', 
+          alignItems:'center',
+          backgroundColor: 'transparent',}} />;
+      }
+
+      if(index == 0){
+        return(<TouchableOpacity
+                style={{padding:5}}
+                onPress={()=>{
+                  this.props.navigation.navigate("AddGroupsSelectMemberPage")
+                }}>
+                <Image
+                    style={{ width: calculatorWidthHeightItem(5, this.state.numColumns), 
+                            height: calculatorWidthHeightItem(5, this.state.numColumns),}}
+                    source={require('../../Images/icon-create-group-circleplus.svg')}/>
+              </TouchableOpacity>)
+      }
+
+      return(<TouchableOpacity
+              style={{padding:5}}
+              onPress={()=>{
+
+              }}>
+              <Image
+                  style={{width: calculatorWidthHeightItem(5, this.state.numColumns), 
+                          height: calculatorWidthHeightItem(5, this.state.numColumns),}}
+                  source={require('../../Images/icon-create-group-circleplus.svg')}/>
+              <TouchableOpacity
+                style={{padding:5,
+                        position:'absolute',
+                        right:0}}
+                onPress={()=>{
+                    alert('Delete Friend')
+                }}>
+                <Image
+                    style={{width: 20, 
+                            height: 20,
+                            }}
+                    source={require('../../Images/icon-group-delete-member.svg')}/>
+              </TouchableOpacity>
+            </TouchableOpacity>)
+      
       let check = null
       var __ = this.state.seleteds.find(function(element) { 
         return element === item.friend_id; 
@@ -566,7 +600,8 @@ class AddGroupsPage extends React.Component{
     }
     
     renderSectionHeader = ({ section }) => {
-      return (<View style={{padding:10}}><Text style={{fontSize:18}}>Members</Text></View>)
+      console.log(section)
+      return (<View style={{padding:10}}><Text style={{fontSize:18}}>{section.title}</Text></View>)
     }
 
     renderSection = ({ item }) => {
@@ -588,18 +623,8 @@ class AddGroupsPage extends React.Component{
     }
 
     render() {
-        let {
-          renderContent
-        } = this.state;
+        let {renderContent, sections} = this.state;
 
-        /*
-        data={formatData(data, 4)}
-                                numColumns={4}
-                                scrollEnabled={false}
-                                renderItem={this.renderItemAccounts}
-                                contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
-         */
-    
         return (
           <View style={{flex:1, backgroundColor: 'white'}} onLayout={this.onLayout.bind(this)}>
           {this.renderHeader()}
