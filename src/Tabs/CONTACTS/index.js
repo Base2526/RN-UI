@@ -60,7 +60,7 @@ const index = createStackNavigator({
     'AddFriendsPage': {
         screen: AddFriendsPage,
         navigationOptions: {
-          title: 'Add Friends'
+          // title: 'Add Friends'
         },
     },
     'AddClasssPage': {
@@ -250,7 +250,7 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
 
   routeName = routes[navigation.state.routes[navigation.state.index].index].routeName;
 
-  console.log(routeName)
+  // console.log(routeName)
   // set tabbar visible
   if (routeName === 'AddFriendsPage' || 
       routeName === 'AddClasssPage' || 

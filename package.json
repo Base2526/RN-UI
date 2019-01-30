@@ -42,7 +42,6 @@
     "react-native-sqlite-storage": "^3.3.9",
     "react-native-submit-button": "file:src/Library/react-native-submit-button",
     "react-native-svg": "^9.0.5",
-    "react-native-svg-image": "^2.0.1",
     "react-native-swipeout": "^2.3.6",
     "react-native-tableview-simple": "^1.0.0",
     "react-native-vector-icons": "^6.1.0",

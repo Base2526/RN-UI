@@ -143,11 +143,13 @@ class AddGroupsSelectMemberPage extends React.Component{
                     alignItems:'center',}}>
                     <View style={{padding:10}}>
                         <TouchableOpacity 
+                            style={{padding:5}}
                             onPress={()=>{
                                 this.onSeleted(index)
                             }}>
+
                             <Image
-                                style={{ width: 25, height: 25}}
+                                style={{ width: 30, height: 30}}
                                 source={ seleted ? require('../../Images/icon-unselect.svg') : require('../../Images/icon-select.svg')}
                             />
                         </TouchableOpacity>

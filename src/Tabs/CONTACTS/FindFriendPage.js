@@ -37,7 +37,7 @@ class FindFriendPage extends React.Component{
 
   static navigationOptions = ({ navigation }) => ({
       title: "Add Friends",
-      // header: (props) => <ImageHeader {...props} />,
+      headerTintColor: 'white',
       headerStyle: {
         backgroundColor: 'rgba(186, 53, 100, 1.0)',
 

@@ -84,6 +84,7 @@ class AddGroupsPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
         title: "Create Group",
+        headerTintColor: 'white',
         headerStyle: {
           backgroundColor: 'rgba(186, 53, 100, 1.0)',
 
@@ -102,7 +103,7 @@ class AddGroupsPage extends React.Component{
                   const { params = {} } = navigation.state
                   params.handleCreateGroup()
                 }}>
-                <Text style={{fontSize:16, fontWeight:'600'}}>Create</Text>
+                <Text style={{fontSize:18, fontWeight:'600', color:'white'}}>Create</Text>
             </TouchableOpacity>
           ),
     })

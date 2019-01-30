@@ -46,8 +46,10 @@ class AddClasssPage extends React.Component{
         }
     }
 
+
     static navigationOptions = ({ navigation }) => ({
         title: "Add Classs",
+        headerTintColor: 'white',
         headerStyle: {
           backgroundColor: 'rgba(186, 53, 100, 1.0)',
           // ios navigationoptions underline hide
@@ -64,10 +66,11 @@ class AddClasssPage extends React.Component{
               const { params = {} } = navigation.state
               params.handleCreateClass()
             }}>
-            <Text style={{fontSize:16, fontWeight:'600'}}>Create</Text>
+            <Text style={{fontSize:18, fontWeight:'600', color:'white'}}>Create</Text>
           </TouchableOpacity>
         ),
     })
+
 
     componentDidMount() {
       this.props.navigation.setParams({ handleCreateClass: this.handleCreateClass })

@@ -17,6 +17,7 @@ export default class ChatPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
         title: "Contacts",
+        headerTintColor: 'white',
         tabBarVisible: false,
         // headerLeft: (
         //     <TouchableOpacity

@@ -40,7 +40,7 @@ export default class ContactsSearch extends React.Component{
     // static navigationOptions = {
     //     header: { visible: false } // !!! Hide Header
     //   }
-    static navigationOptions = {header: null };
+    static navigationOptions = {header: null, headerTintColor: 'white', };
 
     constructor(props){
       super(props)

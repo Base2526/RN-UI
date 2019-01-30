@@ -1,11 +1,18 @@
 import React from 'react'
 
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, TouchableHighlight } from 'react-native';
+import { View, 
+        Text, 
+        StyleSheet, 
+        TouchableOpacity, 
+        FlatList, 
+        ActivityIndicator, } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { connect } from 'react-redux';
 import { List, ListItem, SearchBar } from "react-native-elements";
 import FastImage from 'react-native-fast-image'
 import Spinner from 'react-native-loading-spinner-overlay';
+
+import Image from 'react-native-remote-svg'
 
 import Styles from '../../styles';
 import DictStyle from './dictStyle';
@@ -45,8 +52,10 @@ class AddFriendsPage extends React.Component{
 
   static navigationOptions = ({ navigation }) => ({
       title: "Add Friends",
+      headerTintColor: 'white',
       // header: (props) => <ImageHeader {...props} />,
       headerStyle: {
+        // color: 'white',
         backgroundColor: 'rgba(186, 53, 100, 1.0)',
 
         // ios navigationoptions underline hide
@@ -54,7 +63,7 @@ class AddFriendsPage extends React.Component{
 
         // android navigationoptions underline hide
         elevation: 0,
-        shadowOpacity: 0
+        shadowOpacity: 0,
       },
     //   style: { },
   })
@@ -152,52 +161,37 @@ class AddFriendsPage extends React.Component{
     return(
       <View style={{flexDirection:'row', justifyContent:'center', backgroundColor:'rgba(186, 53, 100, 1.0)'}}>
           <TouchableOpacity 
-                    style={{height:40,
-                            width: 40,
-                            borderRadius: 10,
-                            margin:10}}
-                      onPress={()=>{
-                        this.props.navigation.navigate("InviteFriendForContactPage")
-                      }}>
-                    <FastImage
-                        style={{width: 40, height: 40, borderRadius: 10}}
-                        source={{
-                        uri: 'https://cdn0.iconfinder.com/data/icons/thin-communication-messaging/57/thin-328_phone_book_number_contact-512.png',
-                        headers:{ Authorization: 'someAuthToken' },
-                        priority: FastImage.priority.normal,
-                        }}
-                        resizeMode={FastImage.resizeMode.contain}
-                    />                      
+            style={{justifyContent:'center', alignItems:'center', padding:10}}
+            onPress={()=>{
+              this.props.navigation.navigate("InviteFriendForContactPage")
+            }}>
+            <Image
+              style={{ width: 40, height: 40}}
+              source={require('../../Images/icon-contacts-phone-book.svg')}
+            />  
+            <Text style={{color:'white', padding:5}}>Phone book</Text>                   
           </TouchableOpacity>
           <TouchableOpacity 
-                    style={{height:40,
-                            width: 40,
-                            borderRadius: 10,
-                            margin:10}}
-                      onPress={()=>{
-          
-                        this.props.navigation.navigate("QRCodeReaderPage")
-                      }}>
-                      <Icon name="qrcode" size={40} />
+            style={{justifyContent:'center', alignItems:'center', padding:10}} 
+            onPress={()=>{
+              this.props.navigation.navigate("QRCodeReaderPage")
+            }}>
+            <Image
+              style={{ width: 40, height: 40}}
+              source={require('../../Images/icon-contacts-qr.svg')}
+            />  
+            <Text style={{color:'white', padding:5}}>QR code</Text>     
           </TouchableOpacity>
           <TouchableOpacity 
-                    style={{height:40,
-                            width: 40,
-                            borderRadius: 10,
-                            margin:10}}
-                      onPress={()=>{
-                        this.props.navigation.navigate("FindFriendPage")
-                      }}>
-                      <Icon name="search" size={40} />
-                    {/* <FastImage
-                        style={{width: 40, height: 40, borderRadius: 10}}
-                        source={{
-                        uri: 'http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/user-id-icon.png',
-                        headers:{ Authorization: 'someAuthToken' },
-                        priority: FastImage.priority.normal,
-                        }}
-                        resizeMode={FastImage.resizeMode.contain}
-                    /> */}
+            style={{justifyContent:'center', alignItems:'center', padding:10}}
+            onPress={()=>{
+              this.props.navigation.navigate("FindFriendPage")
+            }}>
+            <Image
+              style={{ width: 40, height: 40}}
+              source={require('../../Images/icon-contacts-search.svg')}
+            />
+            <Text style={{color:'white', padding:5}}>Search</Text>     
           </TouchableOpacity>
           {/* <TouchableOpacity 
                     style={{height:40,
