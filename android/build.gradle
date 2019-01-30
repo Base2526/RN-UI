@@ -40,6 +40,8 @@ buildscript {
 
         // Add dependency
         classpath 'io.fabric.tools:gradle:1.26.1'
+
+
     }
 }
 

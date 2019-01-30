@@ -27,6 +27,8 @@ import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
 
 import Image from 'react-native-remote-svg'
 
+// import SvgUri from 'react-native-svg-uri'
+
 const _header = props => (
     <View style={{flex:1, alignItems:'flex-end', flexDirection:'row'}}>
         <View style={{flex:1}}>
@@ -37,8 +39,19 @@ const _header = props => (
                 }}>
                 <Image
                     style={{ width: 25, height: 25}}
-                    source={require('../../Images/icon-menu.svg')}
+                    source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36.494" height="34.04" viewBox="0 0 36.494 34.04">
+                    <g id="_3" data-name="3" transform="translate(0 0)">
+                      <g id="Group_12" data-name="Group 12">
+                        <rect id="Rectangle_2" data-name="Rectangle 2" width="36.494" height="5.872" fill="#8fb3c1"/>
+                        <rect id="Rectangle_3" data-name="Rectangle 3" width="36.494" height="5.872" transform="translate(0 14.084)" fill="#8fb3c1"/>
+                        <rect id="Rectangle_4" data-name="Rectangle 4" width="36.494" height="5.872" transform="translate(0 28.168)" fill="#8fb3c1"/>
+                      </g>
+                    </g>
+                  </svg>
+                  `}}
                 />
+
+            
             </TouchableOpacity>
         </View>
         {/* 
@@ -51,17 +64,32 @@ const _header = props => (
                 style={{height: 25,
                         width: 30,
                         alignItems:'center',
-                        marginRight:5}}
+                        marginRight:5,}}
                 onPress={() => {
                     // const { params = {} } = props.navigation.state
                     let {params = {}} = props.navigation.state.routes[0]
 
                     params.handleHeaderRightContactsSearch()
                 }}>
-                <Image
+                {/* <Image
                     style={{ width: 25, height: 25}}
                     source={require('../../Images/icon-search.svg')}
-                />
+                /> */}
+                <Image
+                    style={{ width: 25, height: 25}}
+                    source={{uri:`data:image/svg+xml;utf8,<svg id="Group_449" data-name="Group 449" xmlns="http://www.w3.org/2000/svg" width="17.479" height="19.332" viewBox="0 0 17.479 19.332">
+                    <line id="Line_9" data-name="Line 9" x2="4.685" y2="5.972" transform="translate(12.007 12.743)" fill="none" stroke="#b5cdd1" stroke-miterlimit="10" stroke-width="2"/>
+                    <g id="Ellipse_39" data-name="Ellipse 39" transform="translate(0 0)" fill="none" stroke="#b5cdd1" stroke-width="2">
+                      <ellipse cx="7.464" cy="7.464" rx="7.464" ry="7.464" stroke="none"/>
+                      <ellipse cx="7.464" cy="7.464" rx="6.464" ry="6.464" fill="none"/>
+                    </g>
+                    <path id="Path_320" data-name="Path 320" d="M1278.858,275.317a1.814,1.814,0,1,1-1.814-1.814A1.814,1.814,0,0,1,1278.858,275.317Z" transform="translate(-1271.202 -268.788)" fill="#adc8cd" stroke="rgba(0,0,0,0)" stroke-width="1"/>
+                    <path id="Path_321" data-name="Path 321" d="M1325.429,275.317a1.814,1.814,0,1,1-1.814-1.814A1.814,1.814,0,0,1,1325.429,275.317Z" transform="translate(-1314.422 -268.788)" fill="#adc8cd" stroke="rgba(0,0,0,0)" stroke-width="1"/>
+                    <path id="Path_322" data-name="Path 322" d="M1275.559,302.806a3.676,3.676,0,0,0,1.217,2.259,13.9,13.9,0,0,0,2.226,1.723,13.766,13.766,0,0,0,2.109-1.562,4.181,4.181,0,0,0,1.377-2.419" transform="translate(-1271.506 -295.983)" fill="#adc8cd" stroke="rgba(0,0,0,0)" stroke-width="1"/>
+                  </svg>
+                  
+                  `}} />
+                
             </TouchableOpacity>
             <TouchableOpacity
                 style={{height: 25,
@@ -73,10 +101,19 @@ const _header = props => (
                     let {params = {}} = props.navigation.state.routes[0]
                     params.handleHeaderRight()
                 } }>
-                <Image
+                {/* <Image
                     style={{ width: 25, height: 25}}
                     source={require('../../Images/icon-plus.svg')}
-                />
+                /> */}
+                <Image
+                    style={{ width: 25, height: 25}}
+                    source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18.628" height="18.715" viewBox="0 0 18.628 18.715">
+                    <g id="Group_451" data-name="Group 451" transform="translate(-348.867 -60.276)">
+                      <line id="Line_105" data-name="Line 105" x2="18.628" transform="translate(348.867 69.633)" fill="none" stroke="#b5cdd1" stroke-width="2"/>
+                      <line id="Line_106" data-name="Line 106" x2="18.715" transform="translate(358.181 60.276) rotate(90)" fill="none" stroke="#b5cdd1" stroke-width="2"/>
+                    </g>
+                  </svg>
+                  `}} />
             </TouchableOpacity>
             <TouchableOpacity
                 style={{height: 25,
@@ -88,10 +125,17 @@ const _header = props => (
                     let {params = {}} = props.navigation.state.routes[0]
                     params.handleHeaderRightContactsMenu()
                 } }>
-                <Image
+                {/* <Image
                     style={{ width: 25, height: 25}}
                     source={require('../../Images/icon-menu-down.svg')}
-                />
+                /> */}
+
+                <Image
+                    style={{ width: 25, height: 25}}
+                    source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="23.551" height="7.517" viewBox="0 0 23.551 7.517">
+                    <path id="Path_438" data-name="Path 438" d="M926.373,54.318h3.918l7.857,5,7.825-5h3.951l-11.775,7.517Z" transform="translate(-926.373 -54.318)" fill="#adc8cd"/>
+                  </svg>                  
+                  `}} />
             </TouchableOpacity>
         </View>
     
@@ -423,6 +467,7 @@ class ContactsHome extends Component {
                     locked={true}
                     tabBarPosition='top'
                     //  contentProps={...props}
+                    tabBarTextStyle={{fontSize:15}}
                     onChangeTab={this.handleChangeTab.bind(this)}>
                     <FriendsPage tabLabel='Friends' index={0} amount={4} params={this.props} handleScroll={this.handleScroll}/>
                     <GroupsPage tabLabel='Groups' index={1} amount={5} params={this.props} handleScroll={this.handleScroll}/>

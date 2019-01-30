@@ -91,8 +91,8 @@ export default class FriendBackgroundImage extends React.Component {
                   />       */}
 
                     <TestSVG 
-                      width={80}
-                      height={80}
+                      width={100}
+                      height={100}
                       strokeWidth={3}
                       image_uri={image_url}/> 
               </TouchableOpacity>

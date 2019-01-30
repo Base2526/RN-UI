@@ -6,19 +6,12 @@ import {View,
         TouchableOpacity, 
         Alert} from 'react-native'
 
-import { List, ListItem, SearchBar } from "react-native-elements";
-
 import FastImage from 'react-native-fast-image'
 import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 var _ = require('lodash');
 
-import DictStyle from './dictStyle';
-
 import * as actions from '../../Actions'
-import Constant from '../../Utils/Constant'
-
-import ImageWithDefault from '../../Utils/ImageWithDefault'
 
 class ClasssPage extends React.Component{
     constructor(props) {
@@ -31,10 +24,10 @@ class ClasssPage extends React.Component{
         page: 1,
         seed: 1,
         error: null,
-        refreshing: false
-      };
+        refreshing: false,
 
-      // console.log("--ClasssPage")
+        rowID: null,
+      };
     }
 
     componentDidMount() {
@@ -51,15 +44,11 @@ class ClasssPage extends React.Component{
     }
 
     componentWillReceiveProps(nextProps) {
-
-      // console.log(nextProps)
-
       let data = []
       for (var key in nextProps.classs) {
         let classs =  nextProps.classs[key]
         data.push({...{class_id:key}, ...classs});
       }
-
       this.setState({data,});
     }
   
@@ -112,21 +101,17 @@ class ClasssPage extends React.Component{
         <View
           style={{
             height: 1,
-            width: "86%",
+            width: "100%",
             backgroundColor: "#CED0CE",
-            marginLeft: "14%"
+            // marginLeft: "14%"
           }}
         />
       );
     };
-  
-    renderHeader = () => {
-      return <SearchBar placeholder="Type Here..." lightTheme round />;
-    };
-  
+    
     renderFooter = () => {
       if (!this.state.loading) return null;
-  
+
       return (
         <View
           style={{
@@ -155,10 +140,12 @@ class ClasssPage extends React.Component{
 
     renderItem = ({ item, index }) => {
 
-      console.log(item)
       var swipeoutBtns = [
         {
-          text: 'Delete',
+          // text: 'Delete',
+          component:<View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
+                      <Text style={{fontWeight:'bold', color:'white', fontSize:16}}>DELETE</Text>
+                    </View>,
           backgroundColor: 'red',
           onPress: () => {
             Alert.alert(
@@ -182,8 +169,16 @@ class ClasssPage extends React.Component{
       ]
       
       return (<Swipeout 
-        style={{backgroundColor:'white'}} 
-        right={swipeoutBtns}>
+                style={{backgroundColor:'white'}} 
+                right={swipeoutBtns}
+                rowID={index}
+                sectionID={0}
+                onOpen={(sectionId, rowId) => {
+                  this.setState({
+                    rowID: rowId,
+                  })
+                }}
+                close={!(this.state.rowID === index)}>
           <TouchableOpacity key={ item.name } onPress={() => {
             this.props.params.navigation.navigate("ManageClasssPage", {'data': item})
           }}>
@@ -193,7 +188,7 @@ class ClasssPage extends React.Component{
                 // margin: 5, 
                 padding: 10,
                 // borderWidth: 0.5, 
-                borderColor: DictStyle.colorSet.lineColor,
+                // borderColor: DictStyle.colorSet.lineColor,
                 flexDirection: 'row'
               }}
             >
@@ -205,23 +200,10 @@ class ClasssPage extends React.Component{
                             borderWidth:3,
                             justifyContent:'center',
                             alignItems:'center'
-                            }}>
-                    
-                    {/* <FastImage
-                        style={{width: 60, height: 60, borderRadius: 10}}
-                        source={{
-                          uri: item.image_url === '' ? Constant.DEFAULT_AVATARSOURCE_URI : Constant.API_URL + item.image_url,
-                        headers:{ Authorization: 'someAuthToken' },
-                        priority: FastImage.priority.normal,
-                        }}
-                        resizeMode={FastImage.resizeMode.contain}
-                    /> */}
-
-                  {/* <ImageWithDefault 
-                    source={{uri: item.image_url}}
-                    style={{width: 60, height: 60, borderRadius: 10}}
-                  /> */}
-
+                            }}
+                    onPress={()=>{
+                      this.props.params.navigation.navigate("ManageClasssPage", {'data': item})
+                    }}>
                   <FastImage
                     style={{width: 64, 
                             height: 64, 
@@ -237,7 +219,7 @@ class ClasssPage extends React.Component{
                 <View style={{paddingLeft: 10}}>
                 <Text style={{fontSize: 18, 
                                 fontWeight: '600', 
-                                color: DictStyle.colorSet.normalFontColor,
+                                // color: DictStyle.colorSet.normalFontColor,
                                 paddingBottom:5
                               }}>
                       {item.name}
@@ -265,27 +247,12 @@ class ClasssPage extends React.Component{
             renderContent && 
           <FlatList
             data={this.state.data}
-            // renderItem={({ item }) => (
-            //   <ListItem
-            //     roundAvatar
-            //     title={`${item.name.first} ${item.name.last}`}
-            //     subtitle={item.email}
-            //     avatar={{ uri: item.picture.thumbnail }}
-            //     containerStyle={{ borderBottomWidth: 0 }}
-            //     onPress={()=>console.log("item click")}
-            //   />
-            // )}
             renderItem={this.renderItem}
-            
-            // keyExtractor={item => item.email}
             keyExtractor = { (item, index) => index.toString() } 
             ItemSeparatorComponent={this.renderSeparator}
-            // ListHeaderComponent={this.renderHeader}
             ListFooterComponent={this.renderFooter}
-            // onRefresh={this.handleRefresh}
-            // refreshing={this.state.refreshing}
-            // onEndReached={this.handleLoadMore}
             onEndReachedThreshold={50}
+            extraData={this.state}
           />
         }
         </View>

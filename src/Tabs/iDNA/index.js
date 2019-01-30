@@ -19,7 +19,7 @@ const index = createStackNavigator({
     'Home': {
         screen: Home,
         navigationOptions: {
-          title: 'iDNA',
+          // title: 'iDNA',
         },
     },
     'CreateApplicationPage': {

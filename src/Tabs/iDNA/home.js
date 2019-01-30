@@ -9,31 +9,9 @@ import ListMyAppPage from './ListMyAppPage'
 import ListCenterPage from './ListCenterPage'
 import ListFollowingPage from './ListFollowingPage'
 
-export default class home extends Component {
+import Image from 'react-native-remote-svg'
 
-    /*
-    static navigationOptions = ({ navigation }) => ({
-        title: "iDNA",
-        headerLeft: (
-            <TouchableOpacity
-                style={Styles.headerButton}
-                onPress={() => navigation.openDrawer()}>
-                <Icon name="bars" size={25} />
-            </TouchableOpacity>
-        ),
-        headerRight: (
-            this.state.positionSelect == 0 &&
-            <TouchableOpacity
-                style={Styles.headerButton}
-                onPress={() => {
-                    const { params = {} } = navigation.state
-                    params.handleHeaderRight()
-                } }>
-                <Icon name="plus" size={20} />
-            </TouchableOpacity>
-          ),
-    })
-    */
+export default class home extends Component {
 
     static navigationOptions = ({navigation}) => {
         const {params = {}, positionSelect} = navigation.state;
@@ -43,16 +21,24 @@ export default class home extends Component {
             case 0:{
                 __headerRight = 
                 <View style={{flexDirection:'row'}}>
-                    
                     <TouchableOpacity
-                        style={{height: 20,
-                                width: 30,
-                                alignItems:'center'}}
+                        style={{height: 25,
+                                width: 25,
+                                alignItems:'center', marginRight:10}}
                         onPress={() => {
                             const { params = {} } = navigation.state
                             params.handleHeaderRight()
                         } }>
-                        <Icon name="plus" size={20} />
+                        {/* <Icon color={'white'} name="plus" size={20} /> */}
+                        <Image
+                            style={{ width: 25, height: 25,}}
+                            source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18.628" height="18.715" viewBox="0 0 18.628 18.715">
+                            <g id="Group_451" data-name="Group 451" transform="translate(-348.867 -60.276)">
+                            <line id="Line_105" data-name="Line 105" x2="18.628" transform="translate(348.867 69.633)" fill="none" stroke="#b5cdd1" stroke-width="2"/>
+                            <line id="Line_106" data-name="Line 106" x2="18.715" transform="translate(358.181 60.276) rotate(90)" fill="none" stroke="#b5cdd1" stroke-width="2"/>
+                            </g>
+                        </svg>
+                        `}} />
                     </TouchableOpacity>
                 </View>
             }
@@ -73,12 +59,36 @@ export default class home extends Component {
         }
 
         return {
-            title: "iDNA",
+            // title: "iDNA",
+            headerTintColor: 'white',
+            headerStyle: {
+            backgroundColor: 'rgba(186, 53, 100, 1.0)',
+            // ios navigationoptions underline hide
+            borderBottomWidth: 0,
+
+            // android navigationoptions underline hide
+            elevation: 0,
+            shadowOpacity: 0
+            },
             headerLeft: (
                 <TouchableOpacity
                     style={Styles.headerButton}
                     onPress={() => navigation.openDrawer()}>
-                    <Icon name="bars" size={25} />
+                    {/* <Icon name="bars" size={25} /> */}
+
+                    <Image
+                        style={{ width: 25, height: 25}}
+                        source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36.494" height="34.04" viewBox="0 0 36.494 34.04">
+                        <g id="_3" data-name="3" transform="translate(0 0)">
+                        <g id="Group_12" data-name="Group 12">
+                            <rect id="Rectangle_2" data-name="Rectangle 2" width="36.494" height="5.872" fill="#8fb3c1"/>
+                            <rect id="Rectangle_3" data-name="Rectangle 3" width="36.494" height="5.872" transform="translate(0 14.084)" fill="#8fb3c1"/>
+                            <rect id="Rectangle_4" data-name="Rectangle 4" width="36.494" height="5.872" transform="translate(0 28.168)" fill="#8fb3c1"/>
+                        </g>
+                        </g>
+                    </svg>
+                    `}}
+                    />
                 </TouchableOpacity>
             ),
             headerRight: (
