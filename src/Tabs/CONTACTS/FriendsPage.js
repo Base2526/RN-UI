@@ -22,7 +22,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
-import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
+// import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
 import {getUid} from '../../Utils/Helpers'
 
 import TestSVG from '../../test/TestSVG'
@@ -171,11 +171,16 @@ class FriendsPage extends React.Component{
                 }}>
                 
                   <TouchableOpacity>
+                    <TestSVG 
+                      width={80}
+                      height={80}
+                      strokeWidth={3}
+                      image_uri={rowItem.image_url}/>
                       {/* <PlaceHolderFastImage 
                         source={{uri: rowItem.image_url, priority: FastImage.priority.normal}}
                         style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/> */}
 
-                      <FastImage
+                      {/* <FastImage
                         style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}
                         source={{
                           uri: rowItem.image_url,
@@ -183,7 +188,10 @@ class FriendsPage extends React.Component{
                           priority: FastImage.priority.normal,
                         }}
                         resizeMode={FastImage.resizeMode.cover}
-                      />
+                      /> */}
+                    {/* 
+                    
+                  */}
                   </TouchableOpacity>
                   <View>
                     <Text style={{fontSize: 18, 
@@ -357,7 +365,12 @@ class FriendsPage extends React.Component{
                         source={{uri:rowItem.profile.image_url}}
                         style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/> */}
                 
-                      <FastImage
+                      <TestSVG 
+                        width={80}
+                        height={80}
+                        strokeWidth={3}
+                        image_uri={rowItem.profile.image_url}/>
+                      {/* <FastImage
                         style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}
                         source={{
                           uri:rowItem.profile.image_url,
@@ -365,7 +378,7 @@ class FriendsPage extends React.Component{
                           priority: FastImage.priority.normal,
                         }}
                         resizeMode={FastImage.resizeMode.cover}
-                      />
+                      /> */}
                 </TouchableHighlight>
                 <View>
                     <Text style={{fontSize: 18, 

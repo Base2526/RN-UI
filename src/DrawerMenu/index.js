@@ -20,6 +20,8 @@ var {height, width} = Dimensions.get('window');
 
 import * as actions from '../Actions'
 
+import TestSVG from '../test/TestSVG'
+
 const formatData = (data, numColumns) => {
     // เป้นการ ลบ item ที่มี ​field ออกทั้งหมด เพราะว่าเรารองรับการ orientation srceen ด้วย
     data = data.filter(function(item){
@@ -243,11 +245,15 @@ class DrawerMenu extends React.Component{
                     margin: 5,
                     height: calculatorWidthHeightItem(5),
                     width: calculatorWidthHeightItem(5),
-                    backgroundColor: '#CCC',
+                    // backgroundColor: '#CCC',
                     justifyContent:'center',
                     alignItems:'center'
                 }}>
-                    <Text>{index}</Text>
+                    <TestSVG 
+                      width={calculatorWidthHeightItem(5)}
+                      height={calculatorWidthHeightItem(5)}
+                      strokeWidth={3}
+                      image_uri={''}/>
                 </View>
                 </TouchableOpacity>
     }
