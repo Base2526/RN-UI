@@ -9,6 +9,7 @@ import {View,
 
 import { List, ListItem, SearchBar } from "react-native-elements";
 import { connect } from 'react-redux';
+import FastImage from 'react-native-fast-image'
 
 import Swipeout from 'react-native-swipeout'
 
@@ -241,13 +242,20 @@ class GroupsPage extends React.Component{
                   flexDirection: 'row'
                 }}
               >
-                  <TouchableHighlight 
-                      style={{height:60,
-                              width: 60,
-                              borderRadius: 10}}>
-                      <ImageWithDefault 
-                        source={{uri: item.group_profile.image_url}}
-                        style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
+                  <TouchableHighlight
+                    style={{width: 80, height: 80, borderRadius: 40}}>
+                    {/* <ImageWithDefault 
+                      source={{uri: item.group_profile.image_url}}
+                      style={{width: 80, height: 80, borderRadius: 40, borderColor:'gray', borderWidth:1}}
+                    /> */}
+                    <FastImage
+                        style={{width: 80, height: 80, borderRadius: 40, borderWidth:.5, borderColor:'gray'}}
+                        source={{
+                          uri: item.group_profile.image_url,
+                          headers:{ Authorization: 'someAuthToken' },
+                          priority: FastImage.priority.normal,
+                        }}
+                        resizeMode={FastImage.resizeMode.cover}
                       />
                   </TouchableHighlight>
                   <View style={{paddingLeft: 10}}>

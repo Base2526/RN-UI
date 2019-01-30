@@ -43,6 +43,7 @@ import AddAnotherWebsite from './AddAnotherWebsite'
 import AddAnotherEmail from './AddAnotherEmail'
 
 import AddGroupsSelectMemberPage from './AddGroupsSelectMemberPage'
+import AddClasssSelectMemberPage from './AddClasssSelectMemberPage'
 
 const index = createStackNavigator({
     'Home': {
@@ -77,6 +78,12 @@ const index = createStackNavigator({
     },
     'AddGroupsSelectMemberPage':{
       screen: AddGroupsSelectMemberPage,
+        navigationOptions: {
+          // title: 'Add Groups',
+        },
+    },
+    'AddClasssSelectMemberPage':{
+      screen: AddClasssSelectMemberPage,
         navigationOptions: {
           // title: 'Add Groups',
         },
@@ -267,6 +274,7 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
       routeName === 'ListGroupMemberPage' ||
       routeName === 'ManageClasssPage' ||
       routeName === 'AddGroupsSelectMemberPage' ||
+      routeName === 'AddClasssSelectMemberPage' ||
       routeName === 'AddAnotherPhone' ||
       routeName === 'AddAnotherEmail' || 
       routeName === 'AddAnotherWebsite' ||

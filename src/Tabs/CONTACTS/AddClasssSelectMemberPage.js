@@ -26,7 +26,7 @@ import * as actions from '../../Actions'
 
 import ImageWithDefault from '../../Utils/ImageWithDefault'
 
-class AddGroupsSelectMemberPage extends React.Component{
+class AddClasssSelectMemberPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
         title: "",
@@ -212,4 +212,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps, actions)(AddGroupsSelectMemberPage);
+export default connect(mapStateToProps, actions)(AddClasssSelectMemberPage);

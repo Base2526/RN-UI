@@ -8,7 +8,7 @@ import {View,
 
 import { List, ListItem, SearchBar } from "react-native-elements";
 
-// import FastImage from 'react-native-fast-image'
+import FastImage from 'react-native-fast-image'
 import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 var _ = require('lodash');
@@ -198,9 +198,14 @@ class ClasssPage extends React.Component{
               }}
             >
                 <TouchableOpacity 
-                    style={{height:60,
-                            width: 60,
-                            borderRadius: 10}}>
+                    style={{height:80,
+                            width: 80,
+                            borderRadius: 40,
+                            borderColor:'#DF2D6C',
+                            borderWidth:3,
+                            justifyContent:'center',
+                            alignItems:'center'
+                            }}>
                     
                     {/* <FastImage
                         style={{width: 60, height: 60, borderRadius: 10}}
@@ -212,9 +217,21 @@ class ClasssPage extends React.Component{
                         resizeMode={FastImage.resizeMode.contain}
                     /> */}
 
-                  <ImageWithDefault 
+                  {/* <ImageWithDefault 
                     source={{uri: item.image_url}}
                     style={{width: 60, height: 60, borderRadius: 10}}
+                  /> */}
+
+                  <FastImage
+                    style={{width: 64, 
+                            height: 64, 
+                            borderRadius: 32}}
+                    source={{
+                      uri: item.image_url,
+                      headers:{ Authorization: 'someAuthToken' },
+                      priority: FastImage.priority.normal,
+                    }}
+                    resizeMode={FastImage.resizeMode.cover}
                   />
                 </TouchableOpacity>
                 <View style={{paddingLeft: 10}}>

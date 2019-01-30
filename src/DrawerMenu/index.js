@@ -356,7 +356,7 @@ class DrawerMenu extends React.Component{
                                     marginLeft:10,
                                     alignItems:'center'}}>
                             <TouchableOpacity style={{}}>
-                                <FastImage
+                                {/* <FastImage
                                     style={{height:80,
                                             width:80,
                                             borderRadius: 40}} 
@@ -366,7 +366,13 @@ class DrawerMenu extends React.Component{
                                         priority: FastImage.priority.normal,
                                     }}
                                     resizeMode={FastImage.resizeMode.stretch}
-                                />
+                                /> */}
+
+                                <TestSVG 
+                                    width={80}
+                                    height={80}
+                                    strokeWidth={3}
+                                    image_uri={users.profiles.image_url}/> 
                             </TouchableOpacity> 
                             <View style={{marginRight: 90,}}>
                             <Text style={{paddingLeft:10, 

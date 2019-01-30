@@ -29,6 +29,7 @@ class ListGroupMemberPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
         title: "Members",
+        headerTintColor: 'white',
         headerRight: (
             <View style={{flexDirection:'row', flex:1}}>
                 <TouchableOpacity 
@@ -38,7 +39,7 @@ class ListGroupMemberPage extends React.Component{
                         const { params = {} } = navigation.state
                         params.handleInvite()
                     }}>
-                    <Text style={{color:'black', fontSize:16}}>Invite</Text>
+                    <Text style={{color:'white', fontSize:18}}>Invite</Text>
                 </TouchableOpacity> 
             </View>
         ),

@@ -349,6 +349,34 @@ class AddGroupsPage extends React.Component{
         />
       );
     };
+
+    onSelectImage = () => {
+      /**
+       * The first arg is the options object for customization (it can also be null or omitted for default options),
+       * The second arg is the callback which sends object: response (more info in the API Reference)
+       */
+      ImagePicker.showImagePicker(options, (response) => {
+        console.log('Response = ', response);
+
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          console.log('ImagePicker Error: ', response.error);
+        } else if (response.customButton) {
+          console.log('User tapped custom button: ', response.customButton);
+        } else {
+          const source = { uri: response.uri };
+
+          // You can also display the image using data:
+          // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+          this.setState({
+            avatarSource: source,
+          });
+          console.log(this.state.avatarSource.uri)
+        }
+      });
+    }
   
     renderHeader = () => {
       // return <SearchBar placeholder="Type Here..." lightTheme round />;
@@ -357,32 +385,7 @@ class AddGroupsPage extends React.Component{
         <View style={{flexDirection:'row', padding:15, justifyContent:'center',}}>
             <TouchableOpacity 
                 onPress={()=>{
-
-                  /**
-                   * The first arg is the options object for customization (it can also be null or omitted for default options),
-                   * The second arg is the callback which sends object: response (more info in the API Reference)
-                   */
-                  ImagePicker.showImagePicker(options, (response) => {
-                    console.log('Response = ', response);
-
-                    if (response.didCancel) {
-                      console.log('User cancelled image picker');
-                    } else if (response.error) {
-                      console.log('ImagePicker Error: ', response.error);
-                    } else if (response.customButton) {
-                      console.log('User tapped custom button: ', response.customButton);
-                    } else {
-                      const source = { uri: response.uri };
-
-                      // You can also display the image using data:
-                      // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-
-                      this.setState({
-                        avatarSource: source,
-                      });
-                      console.log(this.state.avatarSource.uri)
-                    }
-                  });
+                  this.onSelectImage()
                 }}>
               <FastImage
                   style={{width: 80, 
@@ -400,7 +403,11 @@ class AddGroupsPage extends React.Component{
                   resizeMode={FastImage.resizeMode.normal}
               />
               <TouchableOpacity
-                style={{position:'absolute', bottom:0, right:0}}>
+                style={{position:'absolute', bottom:0, right:0}}
+                onPress={()=>{
+                  this.onSelectImage()
+                }}
+                >
                 <Image
                     style={{width:25, height:25}}
                     source={require('../../Images/icon-photo-edit.svg')}/>
@@ -608,7 +615,7 @@ class AddGroupsPage extends React.Component{
     }
     
     renderSectionHeader = ({ section }) => {
-      console.log(section)
+      // console.log(section)
       return (<View style={{padding:10}}><Text style={{fontSize:18}}>{section.title}</Text></View>)
     }
 

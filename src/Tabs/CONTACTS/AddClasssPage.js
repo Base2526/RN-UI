@@ -1,37 +1,65 @@
 import React from 'react'
 
-import {View, Text, TouchableOpacity, TextInput, FlatList} from 'react-native'
+import {View, 
+        Text, 
+        TouchableOpacity, 
+        TextInput, 
+        FlatList,
+        SectionList,
+        Dimensions} from 'react-native'
 import FastImage from 'react-native-fast-image'
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { connect } from 'react-redux';
+import ImagePicker from 'react-native-image-picker';
+import Image from 'react-native-remote-svg'
 
 import DictStyle from '../CONTACTS/dictStyle';
 
-import Styles from '../../styles';
-
-import ImagePicker from 'react-native-image-picker';
-
 import Constant from '../../Utils/Constant'
 import * as actions from '../../Actions'
-
 import {getUid} from '../../Utils/Helpers'
-
 import ImageWithDefault from '../../Utils/ImageWithDefault'
 
 // More info on all the options is below in the API Reference... just some common use cases shown here
 const options = {
-    title: 'Select Avatar',
-    // customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
-    noData: true,
-    storageOptions: {
-      skipBackup: true,
-      path: 'images',
-    },
-    quality: 0.7,
-    maxWidth: 500,
-    maxHeight: 500,
-  };
+  title: 'Select Avatar',
+  // customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
+  noData: true,
+  storageOptions: {
+    skipBackup: true,
+    path: 'images',
+  },
+  quality: 0.7,
+  maxWidth: 500,
+  maxHeight: 500,
+};
+
+const formatData = (data, numColumns) => {
+  // เป้นการ ลบ item ที่มี ​field ออกทั้งหมด เพราะว่าเรารองรับการ orientation srceen ด้วย
+  data = data.filter(function(item){
+    return !('empty' in item);
+  }).map((item)=>{
+    return item;
+  });
+
+  const numberOfFullRows = Math.floor(data.length / numColumns);
+
+  let numberOfElementsLastRow = data.length - (numberOfFullRows * numColumns);
+  while (numberOfElementsLastRow !== numColumns && numberOfElementsLastRow !== 0) {
+    data.push({ name: `blank-${numberOfElementsLastRow}`, empty: true });
+    numberOfElementsLastRow++;
+  }
+
+  return data;
+};
+  
+const calculatorWidthHeightItem=(margin, itemRow)=>{
+  let {width, height} = Dimensions.get('window')
+
+  console.log(width, (itemRow) )
+  return (width - (margin* (itemRow*2))) / itemRow
+}
 
 class AddClasssPage extends React.Component{
 
@@ -43,9 +71,24 @@ class AddClasssPage extends React.Component{
             loading: false,
             data: [],
             seleteds: [],
+            orientation:'PORTRAIT',
+            numColumns:4,
+            sections : [
+              {
+                title: "Members",
+                key: "1",
+                data: [
+                 {
+                   key: "1",
+                   list: [
+                      {}
+                    ],
+                  },
+                ],
+              },
+            ]
         }
     }
-
 
     static navigationOptions = ({ navigation }) => ({
         title: "Add Classs",
@@ -80,6 +123,18 @@ class AddClasssPage extends React.Component{
         data: this.loadData(),
       });
     }
+
+    onLayout(e) {
+      const {width, height} = Dimensions.get('window')
+      // console.log(width, height)
+  
+      if(width<height){
+        this.setState({orientation:'PORTRAIT', numColumns:4})
+      }else{
+        this.setState({orientation:'LANDSCAPE', numColumns:6})
+      }
+    }
+
 
     loadData=()=>{
       let friend_member = []
@@ -167,6 +222,29 @@ class AddClasssPage extends React.Component{
       }
     }
 
+    onSeleted = (values) =>{
+      let newSections = this.state.sections
+      newSections[0].data[0].list = [{},...values]
+
+      this.setState({
+        sections: newSections
+      })
+    }
+
+    onDeleted = (index) =>{
+      let newSections = this.state.sections
+      let list = newSections[0].data[0].list;
+
+      let newList = list.filter(function(value, key){
+        return key != index;
+      })
+
+      newSections[0].data[0].list = newList
+      this.setState({
+        sections: newSections
+      })
+    }
+
     handleClass = (className) => {
       this.setState({ className })
     }
@@ -193,63 +271,96 @@ class AddClasssPage extends React.Component{
       }
     }
 
+    onSelectImage = () => {
+      /**
+       * The first arg is the options object for customization (it can also be null or omitted for default options),
+       * The second arg is the callback which sends object: response (more info in the API Reference)
+       */
+      ImagePicker.showImagePicker(options, (response) => {
+        console.log('Response = ', response);
+
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          console.log('ImagePicker Error: ', response.error);
+        } else if (response.customButton) {
+          console.log('User tapped custom button: ', response.customButton);
+        } else {
+          const source = { uri: response.uri };
+
+          // You can also display the image using data:
+          // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+          this.setState({
+            avatarSource: source,
+          });
+
+          console.log(this.state.avatarSource.uri)
+        }
+      });
+    }
+
     renderHeader = () => {
       // return <SearchBar placeholder="Type Here..." lightTheme round />;
       return(
-        <View style={{flexDirection:'row', justifyContent:'center', padding:10, backgroundColor:'rgba(186, 53, 100, 1.0)'}}>
-            <TouchableOpacity 
-              style={{height:80,
-                      width: 80,
-                      borderRadius: 40}}
-                onPress={()=>{
-
-                  /**
-                   * The first arg is the options object for customization (it can also be null or omitted for default options),
-                   * The second arg is the callback which sends object: response (more info in the API Reference)
-                   */
-                  ImagePicker.showImagePicker(options, (response) => {
-                    console.log('Response = ', response);
-
-                    if (response.didCancel) {
-                      console.log('User cancelled image picker');
-                    } else if (response.error) {
-                      console.log('ImagePicker Error: ', response.error);
-                    } else if (response.customButton) {
-                      console.log('User tapped custom button: ', response.customButton);
-                    } else {
-                      const source = { uri: response.uri };
-
-                      // You can also display the image using data:
-                      // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-
-                      this.setState({
-                        avatarSource: source,
-                      });
-
-                      console.log(this.state.avatarSource.uri)
-                    }
-                  });
-                }}>
-              <FastImage
-                  style={{width: 80, height: 80, borderRadius: 40, borderColor:'gray', borderWidth:1}}
-                  source={{
-                  uri: this.state.avatarSource.uri === "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.avatarSource.uri,
-                  headers:{ Authorization: 'someAuthToken' },
-                  priority: FastImage.priority.normal,
+        <View style={{justifyContent:'center', backgroundColor:'white'}}>
+            <View style={{flexDirection:'row', padding:15, justifyContent:'center',}}>
+              <TouchableOpacity 
+                style={{height:80,
+                        width: 80,
+                        borderRadius: 40}}
+                  onPress={()=>{
+                    this.onSelectImage()
+                  }}>
+                <FastImage
+                    style={{width: 80, 
+                            height: 80, 
+                            borderRadius: 40, 
+                            backgroundColor: '#FF83AF',
+                            // borderWidth:1
+                          }}
+                    source={{
+                      uri: this.state.avatarSource.uri === "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.avatarSource.uri,
+                      headers:{ Authorization: 'someAuthToken' },
+                      priority: FastImage.priority.normal,
+                    }}
+                    resizeMode={FastImage.resizeMode.normal}
+                />
+                <TouchableOpacity
+                  style={{position:'absolute', bottom:0, right:0}}
+                  onPress={()=>{
+                    this.onSelectImage()
                   }}
-                  resizeMode={FastImage.resizeMode.normal}
-              />
-            </TouchableOpacity>
-            <View style={{justifyContent:'center', flex:1, marginLeft:5}}>
-              <TextInput style = {{fontSize:22}}
-                  underlineColorAndroid = "transparent"
-                  placeholder = "Input class name"
-                  placeholderTextColor = "gray"
-                  autoCapitalize = "none"
-                  ref= {(el) => { this.className = el; }}
-                  onChangeText = {this.handleClass}
-                  value={this.state.className}/>
+                  >
+                  <Image
+                      style={{width:25, height:25}}
+                      source={require('../../Images/icon-photo-edit.svg')}/>
+                </TouchableOpacity>
+              </TouchableOpacity>
+              <View style={{justifyContent:'center', flex:1, marginLeft:5}}>
+                <TextInput style = {{fontSize:22}}
+                    underlineColorAndroid = "transparent"
+                    placeholder = "Input class name"
+                    placeholderTextColor = "gray"
+                    autoCapitalize = "none"
+                    ref= {(el) => { this.className = el; }}
+                    onChangeText = {this.handleClass}
+                    value={this.state.className}/>
+              </View>
             </View>
+            <View style={{position:'absolute', bottom:0, right:0, padding:5}}>
+              <Text style={{fontSize:16, fontWeight:'bold'}}>{this.state.sections[0].data[0].list.length == 1 ? '0': this.state.sections[0].data[0].list.length - 1}/50</Text>
+            </View>
+            <View
+              style={{
+                height: 1,
+                width: "100%",
+                backgroundColor: "#CED0CE",
+                // marginLeft: "14%"
+                position:'absolute',
+                bottom:0
+              }}
+            />
         </View>)
     };
 
@@ -327,88 +438,189 @@ class AddClasssPage extends React.Component{
       )
     }
 
-    render(){
-        return(
-            <View style={{flex:1}}>
-            {this.renderHeader()}
+    renderSectionHeader = ({ section }) => {
+      // console.log(section)
+      return (<View style={{padding:10}}><Text style={{fontSize:18}}>{section.title}</Text></View>)
+    }
 
-            <FlatList
-              style={{flex:1}}
-              data={this.state.data}
+    renderSection = ({ item }) => {
+      // console.log("renderSection")
+      return (
+        <FlatList
+          key = {this.state.orientation}
+          // data={item.list}
+          /*  เราต้องมีการคำนวณ item ให้เต็มแต่ละแถว  */
+          data = {formatData(item.list, this.state.numColumns)}
+          numColumns={this.state.numColumns}
+          renderItem={this.renderListItem}
+          keyExtractor={this.keyExtractor}
+          extraData={this.state}
+          contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
+          // style={{flex:1, backgroundColor:'red'}}
+        />
+      )
+    }
+
+    renderListItem = ({item, index}) => { 
+      
+      if ('empty' in item) {
+        return <View style={{height: 120, 
+          width: 100, 
+          flex:1,
+          // borderColor: "green", 
+          // borderWidth: 1, 
+          justifyContent:'center', 
+          alignItems:'center',
+          backgroundColor: 'transparent',}} />;
+      }
+
+      if(index == 0){
+        return(<TouchableOpacity
+                style={{padding:5}}
+                onPress={()=>{
+                  
+                  let list = this.state.sections[0].data[0].list;
+                  let newList = list.filter(function(value, key){
+                    return key != 0;
+                  })
+                  console.log(newList)
+
+                  
+                  this.props.navigation.navigate("AddClasssSelectMemberPage", { onSeleted: this.onSeleted, members:newList })
+                  
+                }}>
+                <Image
+                    style={{ width: calculatorWidthHeightItem(5, this.state.numColumns), 
+                            height: calculatorWidthHeightItem(5, this.state.numColumns),}}
+                    source={require('../../Images/icon-create-group-circleplus.svg')}/>
+              </TouchableOpacity>)
+      }
+
+      return(<TouchableOpacity
+              style={{padding:5}}
+              onPress={()=>{
+
+              }}>
+              <FastImage
+                  style={{width: calculatorWidthHeightItem(5, this.state.numColumns),  
+                          height: calculatorWidthHeightItem(5, this.state.numColumns),
+                          borderRadius: calculatorWidthHeightItem(5, this.state.numColumns)/2, 
+                          borderColor:'gray', 
+                          // backgroundColor: '#FF83AF',
+                          borderWidth:1
+                        }}
+                  source={{
+                    uri: item.profile.image_url,
+                    headers:{ Authorization: 'someAuthToken' },
+                    priority: FastImage.priority.normal,
+                  }}
+                  resizeMode={FastImage.resizeMode.normal}
+              />
               
-              renderItem={this.renderItem.bind(this)}
-              // keyExtractor={(item) =>item}
-              keyExtractor = { (item, index) => index.toString() }
-              ItemSeparatorComponent={this.renderSeparator}
-              // ListHeaderComponent={this.renderHeader}
-              ListFooterComponent={this.renderFooter}
-              // onRefresh={this.handleRefresh}
-              // refreshing={this.state.refreshing}
-              // onEndReached={this.handleLoadMore}
-              renderSectionHeader={this.renderSectionHeader}
-              onEndReachedThreshold={50}
-              extraData={this.state}
-              ListHeaderComponent={() => (!this.state.data.length ? 
-                <Text style={{textAlign:'left', fontSize:22}}>No Friend.</Text>
-                : null)}
-            />
-
-            {/*                    
-              <TouchableOpacity 
-                        style={{height:80,
-                                width: 80,
-                                borderRadius: 10,
-                                margin:10}}
-                          onPress={()=>
-                          {
-                            
-                            ImagePicker.showImagePicker(options, (response) => {
-                              console.log('Response = ', response);
-
-                              if (response.didCancel) {
-                                console.log('User cancelled image picker');
-                              } else if (response.error) {
-                                console.log('ImagePicker Error: ', response.error);
-                              } else if (response.customButton) {
-                                console.log('User tapped custom button: ', response.customButton);
-                              } else {
-                                const source = { uri: response.uri };
-
-                                // You can also display the image using data:
-                                // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-
-                                this.setState({
-                                  avatarSource: source,
-                                });
-
-                                console.log(this.state.avatarSource.uri)
-                              }
-                            });
-                          }}>
-                        <FastImage
-                            style={{width: 80, height: 80, borderRadius: 10}}
-                            source={{
-                            uri: this.state.avatarSource.uri === "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.avatarSource.uri,
-                            headers:{ Authorization: 'someAuthToken' },
-                            priority: FastImage.priority.normal,
+              <TouchableOpacity
+                style={{padding:5,
+                        position:'absolute',
+                        right:0}}
+                onPress={()=>{
+                    this.onDeleted(index)
+                }}>
+                <Image
+                    style={{width: 20, 
+                            height: 20,
                             }}
-                            resizeMode={FastImage.resizeMode.contain}
-                        />
+                    source={require('../../Images/icon-group-delete-member.svg')}/>
               </TouchableOpacity>
-              <TextInput style = {{margin: 15,
-                                  height: 40,
-                                  width:180,
-                                  borderColor: 'gray',
-                                  borderWidth: 1}}
-                  underlineColorAndroid = "transparent"
-                  placeholder = "Class name"
-                  placeholderTextColor = "gray"
-                  autoCapitalize = "none"
-                  ref= {(el) => { this.className = el; }}
-                  onChangeText = {this.handleClass}
-                  value={this.state.className}/>
-              */}
-            </View>
+            </TouchableOpacity>)
+    }
+
+    render(){
+      let {sections} = this.state;
+      return(
+          <View style={{flex:1}} onLayout={this.onLayout.bind(this)}>
+          {this.renderHeader()}
+
+          {/*
+          <FlatList
+            style={{flex:1}}
+            data={this.state.data}
+            renderItem={this.renderItem.bind(this)}
+            keyExtractor = { (item, index) => index.toString() }
+            ItemSeparatorComponent={this.renderSeparator}
+            ListFooterComponent={this.renderFooter}
+            renderSectionHeader={this.renderSectionHeader}
+            onEndReachedThreshold={50}
+            extraData={this.state}
+            ListHeaderComponent={() => (!this.state.data.length ? 
+              <Text style={{textAlign:'left', fontSize:22}}>No Friend.</Text>
+              : null)}
+          />
+            */}
+
+
+          <SectionList
+            sections={sections}
+            renderSectionHeader={this.renderSectionHeader}
+            renderItem={this.renderSection}
+            // style={{justifyContent:'space-between'}}
+            extraData={this.state}
+          />
+
+          {/*                    
+            <TouchableOpacity 
+                      style={{height:80,
+                              width: 80,
+                              borderRadius: 10,
+                              margin:10}}
+                        onPress={()=>
+                        {
+                          
+                          ImagePicker.showImagePicker(options, (response) => {
+                            console.log('Response = ', response);
+
+                            if (response.didCancel) {
+                              console.log('User cancelled image picker');
+                            } else if (response.error) {
+                              console.log('ImagePicker Error: ', response.error);
+                            } else if (response.customButton) {
+                              console.log('User tapped custom button: ', response.customButton);
+                            } else {
+                              const source = { uri: response.uri };
+
+                              // You can also display the image using data:
+                              // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+                              this.setState({
+                                avatarSource: source,
+                              });
+
+                              console.log(this.state.avatarSource.uri)
+                            }
+                          });
+                        }}>
+                      <FastImage
+                          style={{width: 80, height: 80, borderRadius: 10}}
+                          source={{
+                          uri: this.state.avatarSource.uri === "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.avatarSource.uri,
+                          headers:{ Authorization: 'someAuthToken' },
+                          priority: FastImage.priority.normal,
+                          }}
+                          resizeMode={FastImage.resizeMode.contain}
+                      />
+            </TouchableOpacity>
+            <TextInput style = {{margin: 15,
+                                height: 40,
+                                width:180,
+                                borderColor: 'gray',
+                                borderWidth: 1}}
+                underlineColorAndroid = "transparent"
+                placeholder = "Class name"
+                placeholderTextColor = "gray"
+                autoCapitalize = "none"
+                ref= {(el) => { this.className = el; }}
+                onChangeText = {this.handleClass}
+                value={this.state.className}/>
+            */}
+          </View>
         )
     }
 }

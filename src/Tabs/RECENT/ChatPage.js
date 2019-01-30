@@ -26,6 +26,9 @@ export default class ChatPage extends React.Component{
         //         <Icon name="bars" size={25} />
         //     </TouchableOpacity>
         // ),
+        headerStyle: {
+            backgroundColor: 'rgba(186, 53, 100, 1.0)',
+        },
         headerRight: (
             <TouchableOpacity
                 style={{paddingRight:10}}
@@ -33,7 +36,7 @@ export default class ChatPage extends React.Component{
                     const { params = {} } = navigation.state
                     params.handleHeaderRight()
                 } }>
-                <Icon name="video" size={20} />
+                <Icon name="video" size={20} color={'white'} />
             </TouchableOpacity>
           ),
     });
