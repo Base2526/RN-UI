@@ -1,17 +1,12 @@
 import React from 'react';
-import {View, Text, TouchableHighlight} from 'react-native'
+import {View, Text} from 'react-native'
 import { createBottomTabNavigator, createStackNavigator } from 'react-navigation';
-// import Icon from 'react-native-vector-icons/FontAwesome5';
-import Icon from 'react-native-vector-icons/Ionicons';
-
 import Image from 'react-native-remote-svg'
 
 import ContactsScreen from './CONTACTS';
 import RecentScreen from './RECENT';
 import iDNAScreen from './iDNA';
 import SettingsScreen from './Settings';
-
-// import NotificationTabBarIcon from '../Library/NotificationTabBarIcon'
 
 const SettingsTabs = createBottomTabNavigator({
     Contacts: {

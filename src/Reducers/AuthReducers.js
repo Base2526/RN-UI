@@ -162,7 +162,7 @@ init = (auth) => {
 */
 
 export default (state= INITIAL_STATE, action)=>{
-    // console.log(action)
+    console.log(action)
     // this.fb(state, action)
 
     // console.log(action)

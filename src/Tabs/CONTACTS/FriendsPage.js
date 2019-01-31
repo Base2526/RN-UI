@@ -4,30 +4,22 @@ import {
     View,
     Text,
     TouchableOpacity,
-    TouchableHighlight,
-    // Image,
     Alert
 } from 'react-native'
   
 import ExpandableList from 'react-native-expandable-section-flatlist'
 import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import FastImage from 'react-native-fast-image'
 import Image from 'react-native-remote-svg'
 
 import Spinner from 'react-native-loading-spinner-overlay';
-// import firebase from 'react-native-firebase';
 
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
-// import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
 import {getUid} from '../../Utils/Helpers'
-
 import TestSVG from '../../test/TestSVG'
-
-
 
 class FriendsPage extends React.Component{
 
@@ -70,21 +62,13 @@ class FriendsPage extends React.Component{
           ]
         }
 
-        // console.log(friend_profiles)
         let friendRequestSent_member = []
         let friendRequest_member = [];
         let friend_member = []
         for (var key in this.props.auth.users.friends) {
-          // console.log(key)
 
           let friend =  this.props.auth.users.friends[key]
 
-          // let friend_profile = {};//friend_profiles[key]
-          // console.log(friend)
-          // console.log(friend_profile)
-
-          // console.log(friend.status)
-          // console.log(Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND)
           switch(friend.status){
             case Constant.FRIEND_STATUS_FRIEND:{
 
@@ -128,9 +112,6 @@ class FriendsPage extends React.Component{
           }
         }
 
-        // console.log(friendRequestSent_member)
-        // console.log(friend_member)
-
         let friendRequest = {
           title:'Friend Request',
           member: friendRequest_member
@@ -165,7 +146,9 @@ class FriendsPage extends React.Component{
               onPress={()=>{
                 this._itemOnPress(rowItem, rowId, sectionId)
               }}
-              onLongPress={()=>alert("MyProfile onLongPress")}>
+              onLongPress={()=>{
+
+              }}>
               <View
                 style={{
                   alignItems: 'center', 
@@ -184,22 +167,6 @@ class FriendsPage extends React.Component{
                       height={80}
                       strokeWidth={3}
                       image_uri={rowItem.image_url}/>
-                      {/* <PlaceHolderFastImage 
-                        source={{uri: rowItem.image_url, priority: FastImage.priority.normal}}
-                        style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/> */}
-
-                      {/* <FastImage
-                        style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}
-                        source={{
-                          uri: rowItem.image_url,
-                          headers:{ Authorization: 'someAuthToken' },
-                          priority: FastImage.priority.normal,
-                        }}
-                        resizeMode={FastImage.resizeMode.cover}
-                      /> */}
-                    {/* 
-                    
-                  */}
                   </TouchableOpacity>
                   <View>
                     <Text style={{fontSize: 18, 
@@ -335,7 +302,6 @@ class FriendsPage extends React.Component{
             style={{backgroundColor:'white'}} 
             right={swipeoutRight}
             left={swipeoutLeft}
-            // autoClose={true}
             rowID={rowId}
             sectionID={sectionId}
             onOpen={(sectionId, rowId) => {
@@ -347,11 +313,13 @@ class FriendsPage extends React.Component{
             close={!(this.state.sectionID === sectionId && this.state.rowID === rowId)}
             >
           <TouchableOpacity 
-            key={ rowId } 
+            key={rowId} 
             onPress={()=>{
               this._itemOnPress(rowItem, rowId, sectionId)
             }}
-            onLongPress={()=>alert("Friend onLongPress")}>
+            onLongPress={()=>{
+
+            }}>
             <View
               style={{
                 alignItems: 'center', 
@@ -363,24 +331,11 @@ class FriendsPage extends React.Component{
                   onPress={()=>{
                     this._itemOnPress(rowItem, rowId, sectionId)
                   }}>
-                      {/* <PlaceHolderFastImage 
-                        source={{uri:rowItem.profile.image_url}}
-                        style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/> */}
-                
                       <TestSVG 
                         width={80}
                         height={80}
                         strokeWidth={3}
                         image_uri={rowItem.profile.image_url}/>
-                      {/* <FastImage
-                        style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}
-                        source={{
-                          uri:rowItem.profile.image_url,
-                          headers:{ Authorization: 'someAuthToken' },
-                          priority: FastImage.priority.normal,
-                        }}
-                        resizeMode={FastImage.resizeMode.cover}
-                      /> */}
                 </TouchableOpacity>
                 <View>
                     <Text style={{fontSize: 18, 
@@ -388,7 +343,6 @@ class FriendsPage extends React.Component{
                                   color: '#222',
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
-
                          Name : {rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.profile.name}
                     </Text>
                     <Text style={{fontSize: 13, 
@@ -463,18 +417,9 @@ class FriendsPage extends React.Component{
               {section}
               </Text>
           </View>
-          {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ fontSize: 24, 
-                              color: DictStyle.colorSet.weakFontColor }}>
-              {'^ '}
-              </Text>
-          </View> */}
           </View>
         )
       }else{
-
-        // console.log(this.loadData()[sectionId].member)
-
         let member_size = this.loadData()[sectionId].member.length
         if(member_size == 0){
           return ;
@@ -490,24 +435,24 @@ class FriendsPage extends React.Component{
 
 
           ic_collapse =  <Image
-          style={{ width: 20, height: 20}}
-          source={{uri:`data:image/svg+xml;utf8,<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-          width="60.000000pt" height="60.000000pt" viewBox="0 0 60.000000 60.000000"
-          preserveAspectRatio="xMidYMid meet">
-         <metadata>
-         Created by potrace 1.15, written by Peter Selinger 2001-2017
-         </metadata>
-         <g transform="translate(0.000000,60.000000) scale(0.100000,-0.100000)"
-         fill="#000000" stroke="none">
-         <path d="M128 389 l-31 -31 101 -101 102 -102 99 99 c108 107 111 116 55 153
-         -25 16 -26 16 -90 -48 l-64 -63 -63 62 c-34 34 -66 62 -71 62 -4 0 -21 -14
-         -38 -31z m109 -41 l63 -62 63 62 c67 67 84 71 108 26 12 -24 10 -28 -79 -117
-         l-92 -92 -90 90 c-49 49 -90 94 -90 100 0 13 37 55 48 55 3 0 35 -28 69 -62z"/>
-         <path d="M147 382 c-10 -10 -16 -23 -16 -28 1 -5 39 -45 85 -88 l84 -80 84 80
-         c46 43 84 84 85 90 0 6 -7 18 -18 28 -17 16 -21 13 -85 -51 l-66 -68 -66 68
-         c-36 37 -67 67 -69 67 -1 0 -9 -8 -18 -18z"/>
-         </g>
-         </svg>`}} />
+                            style={{ width: 20, height: 20}}
+                            source={{uri:`data:image/svg+xml;utf8,<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                                  width="60.000000pt" height="60.000000pt" viewBox="0 0 60.000000 60.000000"
+                                  preserveAspectRatio="xMidYMid meet">
+                                <metadata>
+                                Created by potrace 1.15, written by Peter Selinger 2001-2017
+                                </metadata>
+                                <g transform="translate(0.000000,60.000000) scale(0.100000,-0.100000)"
+                                fill="#000000" stroke="none">
+                                <path d="M128 389 l-31 -31 101 -101 102 -102 99 99 c108 107 111 116 55 153
+                                -25 16 -26 16 -90 -48 l-64 -63 -63 62 c-34 34 -66 62 -71 62 -4 0 -21 -14
+                                -38 -31z m109 -41 l63 -62 63 62 c67 67 84 71 108 26 12 -24 10 -28 -79 -117
+                                l-92 -92 -90 90 c-49 49 -90 94 -90 100 0 13 37 55 48 55 3 0 35 -28 69 -62z"/>
+                                <path d="M147 382 c-10 -10 -16 -23 -16 -28 1 -5 39 -45 85 -88 l84 -80 84 80
+                                c46 43 84 84 85 90 0 6 -7 18 -18 28 -17 16 -21 13 -85 -51 l-66 -68 -66 68
+                                c-36 37 -67 67 -69 67 -1 0 -9 -8 -18 -18z"/>
+                                </g>
+                                </svg>`}} />
 
         }else{
           // ic_collapse = <Image
@@ -539,19 +484,6 @@ class FriendsPage extends React.Component{
                            `}} />
         }
 
-
-        // var friend = this.mockData().filter(function(user) {
-        //   // console.log(user.title)
-
-        //   if(user.title.toLocaleLowerCase().localeCompare(section.toLocaleLowerCase()) == 0){
-        //     // console.log(Object.keys(user.member).length)
-        //     // return Object.keys(user.member).length
-        //     return user;
-        //   }
-        //   return {};
-        // })
-        // console.log(friend)
-
         return (
             <View
                 style={{ 
@@ -571,10 +503,6 @@ class FriendsPage extends React.Component{
                 </Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                {/* <Text style={{ fontSize: 24, 
-                                color: DictStyle.colorSet.weakFontColor }}>
-                {'^ '}
-                </Text> */}
                 {ic_collapse}
             </View>
             </View>
@@ -583,18 +511,11 @@ class FriendsPage extends React.Component{
     }
     
     _btnPress = () => {
-      // console.log(this.ExpandableList);
       this.ExpandableList.setSectionState(0, false);
     };
     
     render() {
-
-      // console.log('render()')
-      // console.log(this.props.auth)
-
-      let {
-        renderContent
-      } = this.state;
+      let {renderContent} = this.state;
 
       if(!this.props.hasOwnProperty('auth') || !this.props.auth.isLogin){
         return <View style={{flex: 1}}></View>
@@ -644,12 +565,5 @@ const mapStateToProps = (state) => {
     auth:state.auth
   }
 }
-
-// const mapDispatchToProps = (dispatch) => {
-//   // watchTaskAddEvent(dispatch)
-//   // watchTaskChangedEvent(dispatch)
-//   // watchTaskRemovedEvent(dispatch)
-//   return {actionAcceptFriend}
-// }
 
 export default connect(mapStateToProps, actions)(FriendsPage);

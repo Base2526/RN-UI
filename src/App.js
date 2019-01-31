@@ -16,6 +16,8 @@ import DrawerMenu from './DrawerMenu'
 
 import AuthLoadingScreen from './Screens/AuthLoadingScreen'
 
+// import {setDrawerStatus} from './Utils/Helpers'
+
 // var {height, width} = Dimensions.get('window');
 
 // Inbox: { screen: InboxScreen },
@@ -86,6 +88,35 @@ AppDrawer = createDrawerNavigator({
   // },
   
 }, drawerNavigatorConfig);
+
+const defaultGetStateForAction = AppDrawer.router.getStateForAction;
+// AppDrawer.router.getStateForAction = (action, state) => {
+
+//     //use 'DrawerOpen' to capture drawer open event
+//     if (state && action.type === 'Navigation/NAVIGATE' && action.routeName === 'DrawerClose') {
+//         console.log('DrawerClose');
+//         //write the code you want to deal with 'DrawerClose' event
+//     }
+//     console.log('DrawerOpen')
+//     return defaultGetStateForAction(action, state);
+// };
+
+AppDrawer.router.getStateForAction = (action, state) => {
+    switch (action.type) {
+      case 'Navigation/OPEN_DRAWER':
+      case 'Navigation/DRAWER_OPENED':
+        // setDrawerStatus(true)
+        break;
+        
+      case 'Navigation/CLOSE_DRAWER':
+      case 'Navigation/DRAWER_CLOSED':
+        // setDrawerStatus(false)
+        break;
+    }
+  
+    return defaultGetStateForAction(action, state);
+};
+
 
 // export const createRootNavigator = (signedIn = false) => {
 //   return( createAppContainer(createSwitchNavigator(

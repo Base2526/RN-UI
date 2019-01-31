@@ -16,10 +16,7 @@ import FastImage from 'react-native-fast-image'
 import { ifIphoneX } from 'react-native-iphone-x-helper'
 import { connect } from 'react-redux';
 
-var {height, width} = Dimensions.get('window');
-
 import * as actions from '../Actions'
-
 import TestSVG from '../test/TestSVG'
 
 const formatData = (data, numColumns) => {
@@ -101,20 +98,9 @@ class DrawerMenu extends React.Component{
 
     componentDidMount(){
         setTimeout(() => {this.setState({renderContent: true})}, 0);
-
-        // console.log('cd-componentDidMount : ' + this.state.x)
-
-        let drawerWidth = ( width/2 + ((width/2) / 2) ) / 4
-        console.log(drawerWidth)
-    }
-
-    componentDidUpdate(){
-        // console.log('cd-componentDidUpdate : ' + this.state.x)
     }
 
     onPressLearnMore(){
-        // alert('onPressLearnMore')
-
         if(this.state.x === 100){
             this.setState ({
                 x:101
@@ -275,7 +261,6 @@ class DrawerMenu extends React.Component{
     }
     
     renderItemFollowing({ item, index }) {
-        // console.log(this)
         return <TouchableOpacity>
                 <View style={{
                     margin: 5,
@@ -291,15 +276,8 @@ class DrawerMenu extends React.Component{
     }
 
     render(){
-
-        let {
-            renderContent
-        } = this.state;
-  
-          
+        let {renderContent} = this.state;
         let props = this.props
-
-        let menu, collapse, other_user
 
         if(this.state.x === 100){
             menu = <DrawerItems {...props} />
@@ -324,7 +302,6 @@ class DrawerMenu extends React.Component{
             return <View style={{flex: 1}}></View>
         }
         
-        // console.log(this.props.auth)
 
         let {users} = this.props.auth
 
@@ -356,18 +333,6 @@ class DrawerMenu extends React.Component{
                                     marginLeft:10,
                                     alignItems:'center'}}>
                             <TouchableOpacity style={{}}>
-                                {/* <FastImage
-                                    style={{height:80,
-                                            width:80,
-                                            borderRadius: 40}} 
-                                    source={{
-                                        uri: users.profiles.image_url,
-                                        headers:{ Authorization: 'someAuthToken' },
-                                        priority: FastImage.priority.normal,
-                                    }}
-                                    resizeMode={FastImage.resizeMode.stretch}
-                                /> */}
-
                                 <TestSVG 
                                     width={80}
                                     height={80}
@@ -459,6 +424,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => {
     console.log(state)
+
     if(!state._persist.rehydrated){
         return {}
     }
@@ -468,28 +434,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-// export default Menu
 export default connect(mapStateToProps, actions)(DrawerMenu);
-
-/*
-import React from 'react'
-import {View, Text, StyleSheet, ScrollView} from 'react-native'
-
-import { DrawerItems, SafeAreaView } from 'react-navigation';
-
-let CustomDrawerContentComponent = (props) => (
-  <ScrollView>
-    <SafeAreaView style={styles.container} forceInset={{ top: 'always', horizontal: 'never' }}>
-      <DrawerItems {...props} />
-    </SafeAreaView>
-  </ScrollView>
-);
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
-
-export default CustomDrawerContentComponent
-*/

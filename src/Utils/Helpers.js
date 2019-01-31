@@ -65,7 +65,26 @@ export async function removeAsyncStorageByKey(key){
     return result
 }
 
+export const setDrawerStatus = async status => {
+    try {
+      await AsyncStorage.setItem('isOpen', JSON.stringify(status));
+    } catch (error) {
+      // Error retrieving data
+      console.log(error.message);
+    }
+};
 
+export const getDrawerStatus = async () => {
+    let isOpen = false;
+    try {
+        isOpen = await AsyncStorage.getItem('isOpen') || false;
+    } catch (error) {
+      // Error retrieving data
+      console.log(error.message);
+    }
+
+    return JSON.parse(isOpen);
+}
 
 
 export const LANDSCAPE = 'landscape';
