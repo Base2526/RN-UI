@@ -22,6 +22,10 @@ import {USER_LOGIN_SUCCESS,
         FRIEND_MUTE,
         FRIEND_HIDE,
         FRIEND_BLOCK,
+        ADDED_MY_APPLICATION,
+        MODIFIED_MY_APPLICATION,
+        REMOVED_MY_APPLICATION,
+        UPDATE_STATUS_MY_APPLICATION,
         ADD_APPLICATION_CATEGORY}  from '../Actions/types'
 
 const INITIAL_STATE = {users:null,
@@ -33,149 +37,10 @@ const INITIAL_STATE = {users:null,
                        }
 
 import {isEquivalent2Object} from '../Utils/Helpers'
-// import { stat } from 'fs';
-
-_online = (state, online) =>{
-    // console.log(action)
-    // console.log(state)
-    // console.log(DeviceInfo.getUniqueID())
-    // if(state.isLogin){
-    // console.log(action)
-    // console.log(state)
-
-    if(state.users === null){
-        // console.log('state.user')
-        return
-    }
-
-    // let device_access = state.users.profiles.device_access
-    let device_access = state.users.device_access
-    
-    let key = 0
-    _.each(device_access, function(_v, _k) { 
-        if(_v.udid === DeviceInfo.getUniqueID()){
-            key = _k
-        }
-    });
-
-    if(key === 0){
-        return;
-    }
-
-    let uid = state.users.user.uid;
-
-    let userRef = firebase.firestore().collection('users').doc(uid).collection('device_access').doc(key)
-    /*
-        check is_login == 1 หรือไม่ ก่อนทำงาน 
-        จะมีกรณีถูก forelogout จะมีการ update online : 1 โดยความเป็นจิงไม่ควรเป็นแบบนั้น
-        
-        *** เราสามารถข้างการเช็ดได้เลย{เพราะจะเสียเวลาวิ่งไปดึงข้อมูลทุกครั้งก่อนเสมอ} แต่ตอนนี้ใช้การเช็ด
-    */
-    const doc = userRef.get()
-    doc.then(v=>{
-        // console.log(v.data())
-        let data = v.data()
-        if(data.is_login == 1){
-            userRef.set({online},{ merge: true })
-        }else{
-            console.log('not login')
-        }
-    })
-    
-    /*
-    check before set เพราะจะมีกรณีที่ user ลบ ออกจากระบบแล้ว 
-    */
-    // const doc = userRef.get()
-    // doc.then(v=>{
-    //     console.log(v)
-        
-    //     if(v.exists){
-    //         userRef.set({
-    //             profiles: {
-    //                 device_access:{
-    //                     [key]:{
-    //                         online
-    //                     }
-    //                 }
-    //             }
-    //         },{ merge: true });
-    //     }
-    // })
-
-    // const doc = await userRef.get()
-    // console.log(doc.exists)
-    // if(doc.exists){
-        
-    // }else{
-    //     console.log('user lost')
-    // }
-    
-
-    // console.log(userRef)
-        /*
-        let uid = state.users.user.uid
-        // console.log(uid)
-
-        var updateRef = firebase.database().ref('idna/user/1/profiles/device_access/1121038/');
-        updateRef.update({ 'online': online});
-        // switch(action.type){
-        //     case FOREGROUND:{
-        //         updateRef.update({ 'online': '1'});
-        //         break;
-        //     } 
-            
-        //     case INACTIVE:{
-        //         updateRef.update({ 'online': '0'});
-        //         break;
-        //     }
-
-        //     case BACKGROUND:{
-        //         updateRef.update({ 'online': '-1'});
-        //         break;
-        //     }
-        // }
-    // }
-    */
-}
-
-/*
-init = (auth) => {
-    let online = auth.online
-
-    var updateRef = firebase.database().ref('idna/user/1/profiles/device_access/1121038/');
-    updateRef.update({ 'online': online});
-    // switch(online){
-    //     case '1':{
-    //         updateRef.update({ 'online': '1'});
-    //         break;
-    //     } 
-        
-    //     case '0':{
-    //         updateRef.update({ 'online': '0'});
-    //         break;
-    //     }
-
-    //     case '-1':{
-    //         updateRef.update({ 'online': '-1'});
-    //         break;
-    //     }
-    // }
-}
-*/
 
 export default (state= INITIAL_STATE, action)=>{
     console.log(action)
-    // this.fb(state, action)
-
-    // console.log(action)
-    // console.log(state)
     switch(action.type){
-        // case EMAIL_CHANGED:{
-        //     return { ...state, email: action.payload };
-        // }
-        // case PASSWORD_CHANGED:{
-        //     return { ...state, password: action.payload}
-        // }
         case USER_LOGIN_SUCCESS: {
             state = {...state, 
                     // user: action.user, 
@@ -184,8 +49,6 @@ export default (state= INITIAL_STATE, action)=>{
                     users: action.users,
                     online: '1',
                     }
-
-            this._online(state, '1')
             return state
         } 
         case USER_LOGIN_FAIL: {
@@ -216,44 +79,12 @@ export default (state= INITIAL_STATE, action)=>{
                     users: action.payload.auth.users,
                     isLogin: action.payload.auth.isLogin,
                     provider: action.payload.auth.provider,
-                    online: action.payload.auth.online}
-
-            this._online(state, '1')
+                    online: action.payload.auth.online,
+                    application_category: action.payload.auth.application_category,}
 
             return state
         }
 
-        // online
-        /*
-        case FOREGROUND:{
-            state = {...state,
-                    online:'1'}
-
-            this._online(state, '1')
-            return state
-        } 
-        
-        case INACTIVE:{   
-            state = {...state,
-                    online:'0'}
-
-            this._online(state, '0')
-            return state
-        }
-
-        case BACKGROUND:{
-            state = {...state,
-                online:'0'}
-
-            this._online(state, '0')
-            return state
-        }
-        */
-
-        /*
-        DEVICE_ACCESS_ADDED,
-        DEVICE_ACCESS_MODIFIED
-        */
         case DEVICE_ACCESS_ADDED:
         case DEVICE_ACCESS_MODIFIED:{
             if(state.users === null){
@@ -272,10 +103,6 @@ export default (state= INITIAL_STATE, action)=>{
                 }
             });
 
-            // console.log(value)
-            // console.log(action.device)
-            // console.log(isEquivalent2Object(value, action.device))
-
             if(key == 0){
                 // console.log("#0")
                 // มีเครื่องใหม่ เข้าใช้งานระบบ
@@ -293,12 +120,6 @@ export default (state= INITIAL_STATE, action)=>{
                 // console.log(v)
                 return v
             }else{
-                // console.log("#1")
-                // เป็นการ compare ก่อน update 
-
-                // console.log(value)
-                // console.log(action.device)
-                // console.log(isEquivalent2Object(value, action.device))
                 if(!isEquivalent2Object(value, action.data)){
                     // console.log(key)
                     // console.log(value)
@@ -803,15 +624,113 @@ export default (state= INITIAL_STATE, action)=>{
             return v
         }
 
-        case ADD_APPLICATION_CATEGORY:{
-            // application_category
+        case ADDED_MY_APPLICATION:
+        case MODIFIED_MY_APPLICATION:{
+            if(state.users === null){
+                return state
+            }
+
+            let my_applications = state.users.my_applications
+
+            let key = 0
+            let value = null
+            _.each(my_applications, function(_v, _k) { 
+                if(_k === action.my_application_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            if(key == 0){
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        my_applications : {
+                            ...state.users.my_applications,
+                            [action.my_application_id]:{...action.my_application_data}
+                        }
+                    }
+                }
+                // console.log(v)
+                return v;
+            }else{
+
+                /**
+                 * เราจะ update กรณีข้อมูลเปลี่ยนแปลงเท่านั้น
+                 *  */
+                if(!isEquivalent2Object(value, action.my_application_data)){
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            my_applications : {
+                                ...state.users.my_applications,
+                                [action.my_application_id]:action.my_application_data
+                            }
+                        }
+                    }
+                    // console.log(v)
+                    return v;
+                }
+            }
+
+            return state
+        }
+
+        case REMOVED_MY_APPLICATION:{
+
+            // my_application_id:change.doc.id, my_application_data
+            console.log('REMOVED_MY_APPLICATION')
+            console.log(action.my_application_id)
+            console.log(action.my_application_data)
+            return state
+        }
+
+        case UPDATE_STATUS_MY_APPLICATION:{
+            if(state.users === null){
+                return state
+            }
+
+            let my_applications = state.users.my_applications
+
+            let key = 0
+            let value = null
+            _.each(my_applications, function(_v, _k) { 
+                if(_k === action.my_application_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            if(value.status === undefined){
+                value = {...value, status:true}
+            }else{
+                value = {...value, status:!value.status}
+            }
+
             let v = {
                 ...state,
-                application_category : action.data_category
+                users : {
+                    ...state.users,
+                    my_applications : {
+                        ...state.users.my_applications,
+                        [action.my_application_id]: value
+                    }
+                }
             }
 
             console.log(v)
             return state
+        }
+
+        case ADD_APPLICATION_CATEGORY:{
+            // application_category
+            let v = {
+                ...state,
+                application_category: action.data_category
+            }
+            return v
         }
 
         default:

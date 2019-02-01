@@ -32,4 +32,9 @@ export const FRIEND_HIDE            = "friend_hide"
 export const FRIEND_BLOCK           = "friend_block"
 
 
+export const ADDED_MY_APPLICATION    = "added_my_application"
+export const MODIFIED_MY_APPLICATION = "modified_my_application"
+export const REMOVED_MY_APPLICATION  = "removed_my_application"
+export const UPDATE_STATUS_MY_APPLICATION = "update_status_my_application"
+
 export const ADD_APPLICATION_CATEGORY= "add_application_category"

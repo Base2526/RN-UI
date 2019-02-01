@@ -15,6 +15,8 @@ import MyApplicationProfilePage from './MyApplicationProfilePage'
 
 import CenterSearch from './CenterSearch'
 
+import ManageMyApplicationPage from './ManageMyApplicationPage'
+
 const index = createStackNavigator({
     'Home': {
         screen: Home,
@@ -70,6 +72,12 @@ const index = createStackNavigator({
           title: 'Search',
         }
     },
+    'ManageMyApplicationPage': {
+      screen: ManageMyApplicationPage,
+      navigationOptions: {
+        title: '',
+      }
+    },
 });
 
 index.navigationOptions = ({ navigation }) => {
@@ -80,10 +88,12 @@ index.navigationOptions = ({ navigation }) => {
     if (routeName === 'CreateApplicationPage' || 
         routeName === 'ApplicationDetailPage' ||
         routeName === 'ListAllCategory' ||
+        routeName === 'ListAllSubcategory' ||
         routeName === 'Comment' ||
         routeName === 'MyProfilePage' ||
         routeName === 'MyApplicationProfilePage' ||
-        routeName === 'CenterSearch') {
+        routeName === 'CenterSearch'||
+        routeName === 'ManageMyApplicationPage') {
       navigationOptions.tabBarVisible = false;
     }
   

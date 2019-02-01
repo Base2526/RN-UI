@@ -114,6 +114,19 @@ const images = [{
   
 export default class ApplicationDetailPage extends React.Component{
 
+    static navigationOptions = ({ navigation }) => ({
+        headerTintColor: 'white',
+        headerStyle: {
+            backgroundColor: 'rgba(186, 53, 100, 1.0)',
+            // ios navigationoptions underline hide
+            borderBottomWidth: 0,
+
+            // android navigationoptions underline hide
+            elevation: 0,
+            shadowOpacity: 0
+        },
+    })
+
     constructor(){
         super();
     

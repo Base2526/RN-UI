@@ -54,18 +54,30 @@ class ListAllCategory extends Component {
         refreshing: false
       });
 
-      this.props.actionApplicationCategory().then((result) => {
-        console.log(result)
+      let {application_category} = this.props.auth
+      if(application_category != null){
 
         let newData = []
-        Object.entries(result.data).forEach(([key, value]) => {
+        Object.entries(application_category).forEach(([key, value]) => {
           newData.push(value)
         })
 
         this.setState({
           data: newData
         })
-      })
+      }else{
+        this.props.actionApplicationCategory().then((result) => {
+  
+          let newData = []
+          Object.entries(result.data).forEach(([key, value]) => {
+            newData.push(value)
+          })
+  
+          this.setState({
+            data: newData
+          })
+        })
+      }
     }
   
     renderSeparator = () => {
@@ -96,16 +108,17 @@ class ListAllCategory extends Component {
     };
 
     renderItem = ({ item, index }) => {
+      console.log(item)
       return(<TouchableOpacity 
                 key={ item.name } 
                 onPress={() => {
                     this.props.navigation.goBack()
-                    this.props.navigation.state.params.handleCategoryBack({ selected: 1 });
+                    this.props.navigation.state.params.handleCategoryBack({ item });
                 }}>
                 <View
                   style={{
                     alignItems: 'center', 
-                    padding: 10,
+                    padding: 20,
                     flexDirection: 'row',
                     backgroundColor: 'white'
                   }}>
@@ -139,11 +152,27 @@ class ListAllCategory extends Component {
           ItemSeparatorComponent={this.renderSeparator}
           ListFooterComponent={this.renderFooter}
           onEndReachedThreshold={50}
+          extraData={this.state}
         />
       </View>
     );
   }
 }
 
-export default connect(null, actions)(ListAllCategory)
+const mapStateToProps = (state) => {
+  console.log(state)
+
+  // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
+  //_persist.rehydrated parameter is initially set to false
+  if(!state._persist.rehydrated){
+    return {}
+  }
+
+  return{
+    // uid:getUid(state),
+    auth:state.auth
+  }
+}
+
+export default connect(mapStateToProps, actions)(ListAllCategory)
 

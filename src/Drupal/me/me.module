@@ -10768,22 +10768,26 @@ function create_my_application(){
     return $result;
   }
 
-  if (empty($_REQUEST['uid']) || empty($_REQUEST['name']) || empty($_REQUEST['image']) || empty($_REQUEST['category']) || empty($_REQUEST['subcategory'])) {
+  if (empty($_REQUEST['uid']) || empty($_REQUEST['name']) || empty($_REQUEST['category']) || empty($_REQUEST['subcategory'])) {
     $result['result'] = FALSE;
     $result['message']  = "function : create_my_application, parameter";
+    $result['_REQUEST'] = $_REQUEST;
+    $result['_FILES'] = $_FILES;
     return $result;
   }
 
   $uid      = $_REQUEST['uid'];
   $name     = $_REQUEST['name'];
-  $image    = $_REQUEST['image'];
+  // $image    = $_REQUEST['image'];
   $category = $_REQUEST['category'];
   $subcategory = $_REQUEST['subcategory'];
 
-  if($image != ""){
+  // if($image != ""){
+  if(!empty($_FILES["idna"])){
 
     // http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
-    $binary = base64_decode($image);
+    // $binary = base64_decode($image);
+    $binary =  file_get_contents($_FILES["idna"]["tmp_name"]);//base64_decode($image);
 
     //Create the directory if it does not already exist, otherwise check the permissions
     $directory = 'public://';
@@ -10860,20 +10864,27 @@ function create_my_application(){
 
   $data_update = array(
       "owner_id"    => $uid,
-      "is_defualt"  => "0",
+      "is_defualt"  => false,
       "name"        => $name,
       "category"    => $category,
       "subcategory" => $subcategory,
-      "status"      => "0",
+      "status"      => false,
 
       // $url = substr(file_create_url(image_style_url('medium',$image_url['uri'])), strlen($GLOBALS['base_url']));
       
       // "image_url"   => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
       "image_url"   => file_create_url(image_style_url('medium', $image_url['uri']))
   );
-  $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/" . FIREBASE_MY_APPLIPATIONS_PATH . $node->nid, $data_update);
+  // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/" . FIREBASE_MY_APPLIPATIONS_PATH . $node->nid, $data_update);
 
-  // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_CENTER . $category .'/'. $node->nid, $data_update);
+
+  // firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_FRIENDS)->document($friend_id)->set($values);
+
+  // FIRESTORE_MY_APPLIPATIONS
+
+  // firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->set($f_item);
+
+  firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_MY_APPLIPATIONS)->document($node->nid)->set($data_update);
 
   $result['result']   = TRUE;
   $result['item']     = $data_update;

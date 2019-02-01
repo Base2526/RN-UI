@@ -237,13 +237,13 @@ export const create_class = (uid, class_name, uri) =>{
         headers: Constant.FETCH_HEADERS,
         method: 'POST',
         body: data
-      }).then((response) => {
-          return response.json()
-      }).then((responseJson) => {
-          return responseJson;
-      }).catch((error) => {
-        return {'status': false, 'message': error}
-      })
+    }).then((response) => {
+        return response.json()
+    }).then((responseJson) => {
+        return responseJson;
+    }).catch((error) => {
+    return {'status': false, 'message': error}
+    })
 }
 
 export const search_google = (textSearch) => {
@@ -256,6 +256,33 @@ export const search_google = (textSearch) => {
       console.error(error);
     });
 };
+
+export const create_my_application = (uid, application_name, category, subcategory, uri) =>{
+    var data = new FormData();
+    data.append('idna', {
+        uri: uri, // your file path string
+        name: 'imageName.png',
+        type: 'image/png'
+    })
+    data.append("uid", uid)
+    data.append("name", application_name)
+    data.append("category", category)
+    data.append("subcategory", subcategory)
+
+    return fetch(Constant.CREATE_MY_APPLICATION, {
+        headers: Constant.FETCH_HEADERS,
+        method: 'POST',
+        body: data
+    }).then((response) => {
+        // console.log(response)
+        return response.json()
+    }).then((responseJson) => {
+        // console.log(responseJson)
+        return responseJson;
+    }).catch((error) => {
+        return {'status': false, 'message': error}
+    })
+}
 
 export const application_category = () =>{
     let data = {

@@ -4,11 +4,14 @@ import {View,
         TouchableOpacity, 
         ActivityIndicator, 
         TextInput,
-        ScrollView} from 'react-native';
+        ScrollView,
+        Switch} from 'react-native';
 import FastImage from 'react-native-fast-image'
 import ImagePicker from 'react-native-image-picker';
 import Image from 'react-native-remote-svg'
 import Spinner from 'react-native-loading-spinner-overlay';
+
+var _ = require('lodash');
 
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -31,7 +34,7 @@ const options = {
     maxHeight: 500,
 };
 
-class CreateApplicationPage extends React.Component{
+class ManageMyApplicationPage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
         headerTintColor: 'white',
         headerStyle: {
@@ -48,9 +51,9 @@ class CreateApplicationPage extends React.Component{
                 style={{marginRight:5}}
                 onPress={() => {
                     const { params = {} } = navigation.state
-                    params.handleCreateApplication()
+                    params.handleSaveApplication()
                 }}>
-                <Text style={{fontSize:18, fontWeight:'600', color:'white'}}>Create</Text>
+                <Text style={{fontSize:18, fontWeight:'600', color:'white'}}>Save</Text>
             </TouchableOpacity>
           ),
     })
@@ -63,6 +66,7 @@ class CreateApplicationPage extends React.Component{
             applicationName: '',
             renderContent: false,
             loading: false,
+            showSpinner: false,
             data: [],
             page: 1,
             seed: 1,
@@ -72,22 +76,82 @@ class CreateApplicationPage extends React.Component{
             category_select:{},
             subcategory_select:{},
             applicationImage: {"uri":""},
+            isPublished: false,
+            item:{}
         };
     }
 
     componentDidMount() {
-      setTimeout(() => {this.setState({renderContent: true})}, 0);
+        setTimeout(() => {this.setState({renderContent: true})}, 0);
 
-      this.props.navigation.setParams({ handleCreateApplication: this.handleCreateApplication })
+        this.props.navigation.setParams({ handleSaveApplication: this.handleSaveApplication })
 
-      this.setState({
-        error: null,
-        loading: false,
-        refreshing: false
-      });
+        this.setState({
+            error: null,
+            loading: false,
+            refreshing: false
+        });
+
+        const { navigation } = this.props;
+        const item = navigation.getParam('item', null);
+        // console.log(item)
+
+        // _.each(item,  function(_v, _k) { 
+        //     console.log(_v, _k)
+        //     console.group(item)
+        //     // if()
+        // })
+
+        let {application_category} = this.props.auth
+
+        let c = item.category
+        var __ = _.filter(application_category, function(v, k) {
+            return c == v.tid;
+        });
+
+        let category
+        let subcategory
+
+        if(__.length > 0){
+            category = __[0]
+
+            let s = item.subcategory
+            var ___ = _.filter(category.children, function(v, k) {
+                return s == v.tid;
+            });
+
+            if(___.length > 0){
+                subcategory = ___[0]
+            }
+        }
+
+        this.setState({ item, 
+                        applicationName:item.name,
+                        category_select:category, 
+                        subcategory_select:subcategory, 
+                        applicationImage:{'uri':item.image_url},
+                        isPublished:item.status,
+                        loading: true})
+
+        // this.setState({item, applicationName:item.name, applicationImage:{uri:item.image_url}})
+        /*
+        let {application_category} = this.props.auth
+
+        let c = this.state.item.category
+        var category = _.filter(application_category, function(v, k) {
+            return c == v.tid;
+        });
+
+        // this.state.applicationName
+        
+        let categoryName = category[0].name
+        // let subCategoryName = category[0].name
+
+        console.log(this.state.applicationName)
+        */
     }
 
-    handleCreateApplication = () => {
+    handleSaveApplication = () => {
         // let uid = this.props.uid
         
         let uri = this.state.applicationImage.uri; 
@@ -113,21 +177,22 @@ class CreateApplicationPage extends React.Component{
         }else if(Object.keys(subcategory).length == 0){
             alert("Subcategory not select.")
         }else {
-            this.setState({loading: true})
-            this.props.actionCreateMyApplication(this.props.uid, applicationName, category.tid, subcategory.tid, uri).then((result) => {
-                // console.log(result)
-                this.setState({loading: false})
-                if(result.status){
-                    this.props.navigation.goBack()
-                }else{
-                    // alert()
-                }
-            })
+            console.log('success')
+            // this.setState({loading: true})
+            // this.props.actionCreateMyApplication(this.props.uid, applicationName, category.tid, subcategory.tid, uri).then((result) => {
+            //     // console.log(result)
+            //     this.setState({loading: false})
+            //     if(result.status){
+            //         this.props.navigation.goBack()
+            //     }else{
+            //         // alert()
+            //     }
+            // })
         }
     }
 
     handleCategoryBack = (data) => {
-        console.log(data.item)
+        // console.log(data.item)
 
         // if() isEquivalent2Object
         if(Object.keys(this.state.category_select).length == 0){
@@ -146,7 +211,7 @@ class CreateApplicationPage extends React.Component{
     };    
 
     handleSubcategoryBack = (data) => {
-        console.log(data.item)
+        // console.log(data.item)
         this.setState({
             subcategory_select:data.item
         })
@@ -180,139 +245,6 @@ class CreateApplicationPage extends React.Component{
       );
     };
 
-    renderItem = ({item, index}) => {
-        // return here
-        console.log("renderItem : " + index)
-        
-        switch(index){
-            case 0:{
-                return(
-                <View style={{flexDirection:'row', justifyContent:'center'}}>
-                    <TouchableOpacity 
-                        style={{height:80,
-                                width: 80,
-                                borderRadius: 10,
-                                margin:10}}
-                        onPress={()=>{
-                        
-                            /**
-                             * The first arg is the options object for customization (it can also be null or omitted for default options),
-                             * The second arg is the callback which sends object: response (more info in the API Reference)
-                             */
-                            ImagePicker.showImagePicker(options, (response) => {
-                            console.log('Response = ', response);
-
-                            if (response.didCancel) {
-                                console.log('User cancelled image picker');
-                            } else if (response.error) {
-                                console.log('ImagePicker Error: ', response.error);
-                            } else if (response.customButton) {
-                                console.log('User tapped custom button: ', response.customButton);
-                            } else {
-                                const source = { uri: response.uri };
-
-                                // You can also display the image using data:
-                                // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-
-                                this.setState({
-                                avatarSource: source,
-                                });
-
-                                console.log(this.state.avatarSource.uri)
-                            }
-                            });
-                        }}>
-                        <FastImage
-                            style={{width: 80, height: 80, borderRadius: 10}}
-                            source={{
-                            uri: this.state.avatarSource.uri,
-                            headers:{ Authorization: 'someAuthToken' },
-                            priority: FastImage.priority.normal,
-                            }}
-                            resizeMode={FastImage.resizeMode.contain}
-                        />
-                    </TouchableOpacity>
-                </View>)
-            }
-            break
-            case 1:
-            {
-                return(<View style={{height:60, flexDirection:'row'}}>
-                            <Text style={{flex:2, alignSelf:"center", textAlign:'right'}}>Application name :</Text>
-                            <TextInput style = {{
-                                            flex:3,
-                                            height: 40,
-                                            width:120,
-                                            borderColor: 'gray',
-                                            borderWidth: 1,
-                                            alignSelf:'center'}}
-                                underlineColorAndroid = "transparent"
-                                placeholder = "Name application"
-                                placeholderTextColor = "gray"
-                                autoCapitalize = "none"
-                                onChangeText = {this.handleEmail}
-                                />
-                        </View>)
-            }
-            break
-            case 2:{
-                return(<TouchableOpacity
-                    onPress={()=>{
-                        // ListAllCategory
-                        // alert('ListAllCategory')
-                        this.props.navigation.navigate("ListAllCategory", { handleCategoryBack: this.handleCategoryBack })
-                    }}
-                        >
-                        <View style={{height:60, flexDirection:'row'}}>
-                            <Text style={{flex:2, alignSelf:"center", textAlign:'right'}}>Category :</Text>
-                            <View style={{flex:3, flexDirection:'row', alignItems:'center'}}>
-                                <Text style={{}}>Select Category</Text>
-                                <FastImage
-                                    style={{width: 20, height: 20, position:'absolute', right:0}}
-                                    source={require('../../Images/disclosure_indicator.png')}
-                                    resizeMode={FastImage.resizeMode.contain}
-                                />
-                            </View>
-                        </View>
-                    </TouchableOpacity>)
-            }
-            break
-            case 3:{
-
-                if(this.state.category_select == -99){
-                    return
-                }
-
-                return(<TouchableOpacity
-                        onPress={()=>{
-                            // ListAllCategory
-                            // alert('ListAllCategory')
-                            this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack })
-                        }}
-                            >
-                            <View style={{height:60, flexDirection:'row'}}>
-                                <Text style={{flex:2, alignSelf:"center", textAlign:'right'}}>Subcategory :</Text>
-                                <View style={{flex:3, flexDirection:'row', alignItems:'center'}}>
-                                    <Text style={{}}>Select Subcategory</Text>
-                                    <FastImage
-                                        style={{width: 20, height: 20, position:'absolute', right:0}}
-                                        source={require('../../Images/disclosure_indicator.png')}
-                                        resizeMode={FastImage.resizeMode.contain}
-                                    />
-                                </View>
-                            </View>
-                        </TouchableOpacity>)
-            }
-            break
-
-            default:{
-              
-            }
-        }
-
-        
-    }
-
     handleApplicatonName = (text) => {
         this.setState({ applicatonName:text })
     }
@@ -345,12 +277,25 @@ class CreateApplicationPage extends React.Component{
         });
     }
 
+    togglePublished = (value) => {
+        this.setState({isPublished: value})
+
+        this.props.actionUpdateStatusMyApplication(this.props.uid, this.state.item.item_id, (result)=>{
+            console.log(result)
+        })
+    }
+
     render() {
+
+        if(!this.state.loading){
+            return (<View style={{flex:1, backgroundColor:'white'}}></View>)
+        }
+
         return (
         <KeyboardAwareScrollView>
           <ScrollView style={{flex:1, backgroundColor: 'white'}}>
             <Spinner
-                visible={this.state.loading}
+                visible={this.state.showSpinner}
                 textContent={'Wait...'}
                 textStyle={{color: '#FFF'}}
                 overlayColor={'rgba(0,0,0,0.5)'}
@@ -435,7 +380,11 @@ class CreateApplicationPage extends React.Component{
                                 style={{ fontSize: 22, flex: 1 }}
                                 placeholder="Input name application"
                                 ref= {(el) => { this.applicationName = el; }}
-                                onChangeText={(text) => this.setState({applicationName:text})}
+                                onChangeText={(text) => {
+                                    this.setState({applicationName:text})
+                                    // console.log(text)
+                                }}
+                                value={this.state.applicationName}
                             />
                         }
                     />
@@ -448,19 +397,43 @@ class CreateApplicationPage extends React.Component{
                         onPress={()=>{
                             this.props.navigation.navigate("ListAllCategory", { handleCategoryBack: this.handleCategoryBack })
                         }}/>
-                    
-                    {Object.keys(this.state.category_select).length != 0 ?
-                        <Cell 
-                            cellStyle="RightDetail" 
-                            title="Subcategory" 
-                            detail={Object.keys(this.state.subcategory_select).length == 0 ? "None" : this.state.subcategory_select.name}
-                            accessory="DisclosureIndicator"
-                            contentContainerStyle={{ padding:10}} 
-                            onPress={()=>{
-                                this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select })
-                            }}/>
-                        :null
-                    }
+                    <Cell 
+                        cellStyle="RightDetail" 
+                        title="Subcategory" 
+                        detail={Object.keys(this.state.subcategory_select).length == 0 ? "None" : this.state.subcategory_select.name}
+                        accessory="DisclosureIndicator"
+                        contentContainerStyle={{ padding:10}} 
+                        onPress={()=>{
+                            this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select })
+                        }}/>
+
+                    <Cell 
+                        cellStyle="RightDetail" 
+                        title="Emails" 
+                        detail="None"
+                        accessory="DisclosureIndicator"
+                        contentContainerStyle={{ padding:10}} 
+                        onPress={()=>{
+                            this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select })
+                        }}/>
+                    <Cell 
+                        cellStyle="RightDetail" 
+                        title="Phones" 
+                        detail="None"
+                        accessory="DisclosureIndicator"
+                        contentContainerStyle={{ padding:10}} 
+                        onPress={()=>{
+                            this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select })
+                        }}/>
+                    <Cell
+                        cellStyle="Basic" 
+                        title="Published"
+                        cellAccessoryView={
+                        <Switch 
+                            onValueChange = {this.togglePublished}
+                            value = {this.state.isPublished}/>
+                        }
+                        contentContainerStyle={{ paddingVertical: 4 }}/>
                 </Section>
             </TableView>
           </ScrollView>
@@ -484,4 +457,4 @@ const mapStateToProps = (state) => {
     }
 }
   
-export default connect(mapStateToProps, actions)(CreateApplicationPage)
+export default connect(mapStateToProps, actions)(ManageMyApplicationPage)

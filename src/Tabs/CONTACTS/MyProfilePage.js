@@ -26,7 +26,6 @@ import * as actions from '../../Actions'
 import Image from 'react-native-remote-svg'
 
 
-
 let shareOptions = {
     title: "React Native",
     message: "Hola mundo",

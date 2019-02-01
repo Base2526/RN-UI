@@ -24,6 +24,10 @@ import {USER_LOGIN_SUCCESS,
         FRIEND_MUTE,
         FRIEND_HIDE,
         FRIEND_BLOCK,
+        ADDED_MY_APPLICATION,
+        MODIFIED_MY_APPLICATION,
+        REMOVED_MY_APPLICATION,
+        UPDATE_STATUS_MY_APPLICATION,
         ADD_APPLICATION_CATEGORY} from './types'
 
 import {saveAsyncStorage, loadAsyncStorage} from '../Utils/Helpers'
@@ -34,7 +38,8 @@ import {login,
         add_friend,
         create_group,
         create_class,
-        application_category} from '../Utils/Services'
+        application_category,
+        create_my_application} from '../Utils/Services'
 
 // export const emailChanged = (text) =>{
 //     return({
@@ -52,12 +57,22 @@ import {login,
 
 export const actionApplicationCategory = () =>dispatch =>{
     return application_category().then(data=>{
-
         if(data.result){
             dispatch({ type: ADD_APPLICATION_CATEGORY, data_category: data.data});
             return {'status':true, 'data': data.data}
         }
 
+        return {'status':false}
+    })
+}
+// uid, group_name, members, uri
+export const actionCreateMyApplication = (uid, application_name, category, subcategory, uri) =>dispatch =>{
+    // 
+    return create_my_application(uid, application_name, category, subcategory, uri).then(data=>{
+        if(data.result){
+            // dispatch({ type: ADD_APPLICATION_CATEGORY, data_category: data.data});
+            return {'status':true, 'data': data.data}
+        }
         return {'status':false}
     })
 }
@@ -544,6 +559,37 @@ export const actionFriendMute = (uid, friend_id, callback) => dispatch=> {
     callback({'status':true})
 }
 
+// Published/Unpublished my application
+export const actionUpdateStatusMyApplication = (uid, my_application_id, callback) => dispatch =>{
+    var statusRef =  firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(my_application_id);
+
+    firebase.firestore().runTransaction(t => {
+        return t.get(statusRef)
+        .then(doc => {
+            // console.log(doc.data().mute)
+            // Add one person to the city population
+            // var newPopulation = doc.data().population + 1;
+            // t.update(cityRef, {population: newPopulation});
+            // t.update(classsRef, {mute: !doc.data().status});
+
+            if(doc.data().status === undefined){
+                t.set(statusRef, {
+                    status: true,
+                }, { merge: true});
+            }else{
+                t.update(statusRef, {status: !doc.data().status});
+            }
+        });
+    }).then(result => {
+        console.log('Transaction success!');
+    }).catch(err => {
+        console.log('Transaction failure:', err);
+    });
+
+    dispatch({ type: UPDATE_STATUS_MY_APPLICATION, my_application_id});
+
+    callback({'status':true})
+}
 
 let unsubscribe = null;
 
@@ -866,6 +912,26 @@ export function watchTaskEvent(uid, dispatch) {
         })
     })
 
+    // trach my application
+    firebase.firestore().collection('users').doc(uid).collection('my_applications').onSnapshot((qSnapshot) => {
+        qSnapshot.docChanges.forEach(function(change) {
+            console.log(change.type, change.doc.id, change.doc.data());
+            switch(change.type){
+                case 'added':{
+                    dispatch({type: ADDED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
+                    break;
+                }
+                case 'modified':{
+                    dispatch({type: MODIFIED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
+                    break;
+                }
+                case 'removed':{
+                    dispatch({type: REMOVED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
+                    break;
+                }
+            }
+        })
+    })
 
     // track online/offline
     const oldRealTimeDb = firebase.database();

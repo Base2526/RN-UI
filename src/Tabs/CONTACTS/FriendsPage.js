@@ -542,7 +542,7 @@ class FriendsPage extends React.Component{
               } }
               renderSectionHeaderX={this._renderSection}
               openOptions={[0, 1, 2, 3]}
-              onScroll={this.props.handleScroll}
+              // onScroll={this.props.handleScroll}
             />
           }
           </View>
