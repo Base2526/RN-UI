@@ -24,12 +24,12 @@ export default class home extends Component {
                     <TouchableOpacity
                         style={{height: 25,
                                 width: 25,
-                                alignItems:'center', marginRight:10}}
+                                alignItems:'center', 
+                                marginRight:10}}
                         onPress={() => {
                             const { params = {} } = navigation.state
-                            params.handleHeaderRight()
-                        } }>
-                        {/* <Icon color={'white'} name="plus" size={20} /> */}
+                            params.handleAddNewApplication()
+                        }}>
                         <Image
                             style={{ width: 25, height: 25,}}
                             source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18.628" height="18.715" viewBox="0 0 18.628 18.715">
@@ -46,13 +46,25 @@ export default class home extends Component {
             case 1:{
                 __headerRight = <TouchableOpacity
                         style={{height: 20,
-                            width: 30,
-                            alignItems:'center'}}
+                                width: 30,
+                                alignItems:'center', 
+                                marginRight:10}}
                     onPress={() => {
                         const { params = {} } = navigation.state
                         params.handleHeaderRightCenterSearch()
-                    } }>
-                    <Icon name="search" size={20} />
+                    }}>
+                    <Image
+                        style={{ width: 25, height: 25}}
+                        source={{uri:`data:image/svg+xml;utf8,<svg id="Group_449" data-name="Group 449" xmlns="http://www.w3.org/2000/svg" width="17.479" height="19.332" viewBox="0 0 17.479 19.332">
+                            <line id="Line_9" data-name="Line 9" x2="4.685" y2="5.972" transform="translate(12.007 12.743)" fill="none" stroke="#b5cdd1" stroke-miterlimit="10" stroke-width="2"/>
+                            <g id="Ellipse_39" data-name="Ellipse 39" transform="translate(0 0)" fill="none" stroke="#b5cdd1" stroke-width="2">
+                            <ellipse cx="7.464" cy="7.464" rx="7.464" ry="7.464" stroke="none"/>
+                            <ellipse cx="7.464" cy="7.464" rx="6.464" ry="6.464" fill="none"/>
+                            </g>
+                            <path id="Path_320" data-name="Path 320" d="M1278.858,275.317a1.814,1.814,0,1,1-1.814-1.814A1.814,1.814,0,0,1,1278.858,275.317Z" transform="translate(-1271.202 -268.788)" fill="#adc8cd" stroke="rgba(0,0,0,0)" stroke-width="1"/>
+                            <path id="Path_321" data-name="Path 321" d="M1325.429,275.317a1.814,1.814,0,1,1-1.814-1.814A1.814,1.814,0,0,1,1325.429,275.317Z" transform="translate(-1314.422 -268.788)" fill="#adc8cd" stroke="rgba(0,0,0,0)" stroke-width="1"/>
+                            <path id="Path_322" data-name="Path 322" d="M1275.559,302.806a3.676,3.676,0,0,0,1.217,2.259,13.9,13.9,0,0,0,2.226,1.723,13.766,13.766,0,0,0,2.109-1.562,4.181,4.181,0,0,0,1.377-2.419" transform="translate(-1271.506 -295.983)" fill="#adc8cd" stroke="rgba(0,0,0,0)" stroke-width="1"/>
+                        </svg>`}} />
                 </TouchableOpacity>
             }
             break
@@ -122,7 +134,7 @@ export default class home extends Component {
         setTimeout(() => {this.setState({renderContent: true})}, 0);
 
         this.props.navigation.setParams({ 
-            handleHeaderRight: this.handleHeaderRight,
+            handleAddNewApplication: this.handleAddNewApplication,
             positionSelect: this.state.positionSelect,
             handleHeaderRightCenterSearch: this.handleHeaderRightCenterSearch
         })
@@ -130,7 +142,7 @@ export default class home extends Component {
         // this.props.navigation.setParams({ handleHeaderRightContactsSearch: this.handleHeaderRightContactsSearch })
     }
 
-    handleHeaderRight = () => {
+    handleAddNewApplication = () => {
         switch(this.state.positionSelect){
             case 0:{
                 this.props.navigation.navigate("CreateApplicationPage")

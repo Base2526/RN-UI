@@ -7,7 +7,7 @@ import { AppNavigator } from "./App";
 import Constant from './Utils/Constant'
 import {loadAsyncStorage} from './Utils/Helpers'
 
-import configureStore from './ConfigureStore'
+import configureStore from './configureStore'
 const { persistor, store } = configureStore()
 
 export default class App extends React.Component {

@@ -22,6 +22,7 @@ module.exports = {
     CREATE_GROUP: API_URL + END_POINT + '/create_chat_group',
     CREATE_CLASS: API_URL + END_POINT + '/create_class',
     
+    APPLICATION_CATEGORY : API_URL + END_POINT + '/application_category',
     
     FETCH_HEADERS: {
         'Accept': 'application/json',

@@ -23,7 +23,8 @@ import {USER_LOGIN_SUCCESS,
         CLASS_MEMBERS,
         FRIEND_MUTE,
         FRIEND_HIDE,
-        FRIEND_BLOCK} from './types'
+        FRIEND_BLOCK,
+        ADD_APPLICATION_CATEGORY} from './types'
 
 import {saveAsyncStorage, loadAsyncStorage} from '../Utils/Helpers'
 import Constant from '../Utils/Constant'
@@ -32,7 +33,8 @@ import {login,
         people_you_may_khow, 
         add_friend,
         create_group,
-        create_class} from '../Utils/Services'
+        create_class,
+        application_category} from '../Utils/Services'
 
 // export const emailChanged = (text) =>{
 //     return({
@@ -47,6 +49,18 @@ import {login,
 //         payload:text
 //     })
 // }
+
+export const actionApplicationCategory = () =>dispatch =>{
+    return application_category().then(data=>{
+
+        if(data.result){
+            dispatch({ type: ADD_APPLICATION_CATEGORY, data_category: data.data});
+            return {'status':true, 'data': data.data}
+        }
+
+        return {'status':false}
+    })
+}
 
 export const actionLogin = ({email, password}) => dispatch => {
     // firebase.auth().signInWithEmailAndPassword(email, password)

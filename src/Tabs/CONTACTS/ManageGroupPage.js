@@ -251,41 +251,6 @@ class ManageGroupPage extends React.Component{
     }
 }
 
-const styles = StyleSheet.create({
-    
-    MainContainer :{
-    
-    justifyContent: 'center',
-    // flex:1,
-    backgroundColor:'red'
-    // paddingTop: (Platform.OS === 'iOS') ? 20 : 0
-        
-    },
-        
-    FlatList_Item: {
-        padding: 10,
-        fontSize: 18,
-        height: 44,
-        
-    },
-        
-    header_footer_style:{
-        
-        width: '100%', 
-        height: 44, 
-        backgroundColor: '#4CAF50', 
-        alignItems: 'center', 
-        justifyContent: 'center'
-        
-    },
-    
-    textStyle:{
-        textAlign: 'center', 
-        color: '#fff', 
-        fontSize: 21
-    }
-});
-
 const mapStateToProps = (state) => {
     console.log(state)
   

@@ -256,3 +256,22 @@ export const search_google = (textSearch) => {
       console.error(error);
     });
 };
+
+export const application_category = () =>{
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({
+            // 'uid': '1',
+        }),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.APPLICATION_CATEGORY, data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            // console.log(responseJson)
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+        });
+}

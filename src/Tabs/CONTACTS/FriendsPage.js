@@ -15,7 +15,6 @@ import FastImage from 'react-native-fast-image'
 import Image from 'react-native-remote-svg'
 
 import Spinner from 'react-native-loading-spinner-overlay';
-
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
 import {getUid} from '../../Utils/Helpers'

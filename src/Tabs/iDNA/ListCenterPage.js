@@ -5,10 +5,7 @@ import {Text,
         SectionList, 
         TouchableOpacity,
         Dimensions } from "react-native"
-
-// import FastImage from 'react-native-fast-image'
-
-import ImageWithDefault from '../../Utils/ImageWithDefault'
+import FastImage from 'react-native-fast-image'
 
 const sections = [
   {
@@ -169,11 +166,9 @@ export default class ListCenterPage extends React.Component {
   }
 
   renderSection = ({ item }) => {
-    console.log("renderSection")
     return (
       <FlatList
         key = {this.state.orientation}
-        // data={item.list}
         /*  เราต้องมีการคำนวณ item ให้เต็มแต่ละแถว  */
         data = {formatData(item.list, this.state.numColumns)}
         numColumns={this.state.numColumns}
@@ -181,13 +176,21 @@ export default class ListCenterPage extends React.Component {
         keyExtractor={this.keyExtractor}
         extraData={this.state}
         contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
-        // style={{flex:1, backgroundColor:'red'}}
       />
     )
   }
 
   renderSectionHeader = ({ section }) => {
-    return (<View style={{borderColor:'gray', borderWidth:1}}><Text>{section.title}</Text></View>)
+    return (<View style={{}}>
+              <Text>{section.title}</Text>
+              <View
+                style={{
+                  height: 1,
+                  width: "100%",
+                  backgroundColor: "#CED0CE",
+                }}
+              />
+            </View>)
   }
 
   renderListItem = ({ item }) => {
@@ -207,29 +210,21 @@ export default class ListCenterPage extends React.Component {
       <View style={{height: 120, 
                     width: 100, 
                     flex:1,
-                    // borderColor: "green", 
-                    // borderWidth: 1, 
-                    // backgroundColor:'red',
                     justifyContent:'center', 
                     alignItems:'center' }}>
         <TouchableOpacity 
             onPress={()=>{
               this.props.params.navigation.navigate("ApplicationDetailPage")
             }}>
-            {/* <FastImage
-                style={{width: 80, height: 80, borderRadius: 10}}
+            <FastImage
+                style={{width: 80, height: 80, borderRadius: 40}}
                 source={{
                 uri: 'https://unsplash.it/400/400?image=1',
                 headers:{ Authorization: 'someAuthToken' },
                 priority: FastImage.priority.normal,
                 }}
                 resizeMode={FastImage.resizeMode.contain}
-            /> */}
-
-                <ImageWithDefault 
-                    source={{uri: 'https://unsplash.it/400/400?image=1'}}
-                    style={{width: 60, height: 60, borderRadius: 10}}
-                  />
+            />
         </TouchableOpacity>
         <View style={{justifyContent:'center', paddingTop:5}}>
           <Text >{item.name}</Text>
@@ -243,7 +238,6 @@ export default class ListCenterPage extends React.Component {
   }
 
   render () {
-    console.log('render')
     let {
       renderContent
     } = this.state;

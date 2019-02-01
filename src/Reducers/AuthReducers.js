@@ -21,13 +21,15 @@ import {USER_LOGIN_SUCCESS,
         CLASS_MEMBERS,
         FRIEND_MUTE,
         FRIEND_HIDE,
-        FRIEND_BLOCK}  from '../Actions/types'
+        FRIEND_BLOCK,
+        ADD_APPLICATION_CATEGORY}  from '../Actions/types'
 
 const INITIAL_STATE = {users:null,
                        provider:'',
                        isLogin: false,
                        online: '-1',
-                       error_message:''
+                       error_message:'',
+                       application_category: null
                        }
 
 import {isEquivalent2Object} from '../Utils/Helpers'
@@ -799,6 +801,17 @@ export default (state= INITIAL_STATE, action)=>{
             }
 
             return v
+        }
+
+        case ADD_APPLICATION_CATEGORY:{
+            // application_category
+            let v = {
+                ...state,
+                application_category : action.data_category
+            }
+
+            console.log(v)
+            return state
         }
 
         default:
