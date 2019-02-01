@@ -48,7 +48,7 @@ class ManageMyApplicationPage extends React.Component{
         },
         headerRight: (
             <TouchableOpacity
-                style={{marginRight:5}}
+                style={{marginRight:10}}
                 onPress={() => {
                     const { params = {} } = navigation.state
                     params.handleSaveApplication()
@@ -124,6 +124,9 @@ class ManageMyApplicationPage extends React.Component{
                 subcategory = ___[0]
             }
         }
+
+        console.log(category)
+        console.log(subcategory)
 
         this.setState({ item, 
                         applicationName:item.name,
@@ -291,6 +294,7 @@ class ManageMyApplicationPage extends React.Component{
             return (<View style={{flex:1, backgroundColor:'white'}}></View>)
         }
 
+        console.log(this.state)
         return (
         <KeyboardAwareScrollView>
           <ScrollView style={{flex:1, backgroundColor: 'white'}}>
@@ -395,7 +399,7 @@ class ManageMyApplicationPage extends React.Component{
                         accessory="DisclosureIndicator"
                         contentContainerStyle={{ padding:10}} 
                         onPress={()=>{
-                            this.props.navigation.navigate("ListAllCategory", { handleCategoryBack: this.handleCategoryBack })
+                            this.props.navigation.navigate("ListAllCategory", { handleCategoryBack: this.handleCategoryBack, category_select:this.state.category_select })
                         }}/>
                     <Cell 
                         cellStyle="RightDetail" 
@@ -404,7 +408,7 @@ class ManageMyApplicationPage extends React.Component{
                         accessory="DisclosureIndicator"
                         contentContainerStyle={{ padding:10}} 
                         onPress={()=>{
-                            this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select })
+                            this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select, subcategory_select:this.state.subcategory_select })
                         }}/>
 
                     <Cell 
@@ -414,7 +418,7 @@ class ManageMyApplicationPage extends React.Component{
                         accessory="DisclosureIndicator"
                         contentContainerStyle={{ padding:10}} 
                         onPress={()=>{
-                            this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select })
+                            // this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select })
                         }}/>
                     <Cell 
                         cellStyle="RightDetail" 
@@ -423,7 +427,7 @@ class ManageMyApplicationPage extends React.Component{
                         accessory="DisclosureIndicator"
                         contentContainerStyle={{ padding:10}} 
                         onPress={()=>{
-                            this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select })
+                            // this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select })
                         }}/>
                     <Cell
                         cellStyle="Basic" 

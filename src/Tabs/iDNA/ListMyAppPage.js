@@ -12,8 +12,10 @@ import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 import Image from 'react-native-remote-svg'
 
+import Spinner from 'react-native-loading-spinner-overlay';
+
 import * as actions from '../../Actions'
-import Constant from '../../Utils/Constant'
+import {getUid} from '../../Utils/Helpers'
 
 class ListMyAppPage extends React.Component{
     constructor(props) {
@@ -28,6 +30,11 @@ class ListMyAppPage extends React.Component{
         error: null,
         refreshing: false,
         numColumns:4,
+        showSpinner: false,
+
+
+        sectionID: null,
+        rowID: null,
       };
     }
 
@@ -104,7 +111,9 @@ class ListMyAppPage extends React.Component{
         <Swipeout 
             key={item.item_id}
             style={{backgroundColor:'white'}} 
-            right={swipeoutBtns}>
+            right={swipeoutBtns}
+            
+            >
             <TouchableOpacity  
               onPress={() => {
                 this.props.params.navigation.navigate("ApplicationDetailPage")
@@ -164,8 +173,26 @@ class ListMyAppPage extends React.Component{
       return [published, unPublished];        
     }
 
+    // let {application_category} = this.props.auth
+
+    manageMyApplicationPage = (item)=>{
+      let {application_category} = this.props.auth
+
+      if(application_category != null){
+        this.props.params.navigation.navigate("ManageMyApplicationPage", {item})
+      }else{
+
+        this.props.actionApplicationCategory().then((result) => {
+          console.log(result)
+          if(result.status){
+            this.props.params.navigation.navigate("ManageMyApplicationPage", {item})
+          }
+        })
+      }
+    }
+
     _renderRow = (rowItem, rowId, sectionId) => {
-      // console.log(rowItem)
+      console.log(rowItem)
 
       var swipeoutRightBtns = []
       if(rowItem.status){
@@ -182,7 +209,17 @@ class ListMyAppPage extends React.Component{
                                       fontSize:16}}>UNPUBLISHED</Text>
                       </View>,
             onPress: () => {
-              alert('UNPUBLISHED')
+              // console.log('UNPUBLISHED')
+
+              this.setState({
+                sectionID: sectionId,
+                rowID: rowId,
+                showSpinner:true
+              })
+
+              this.props.actionUpdateStatusMyApplication(this.props.uid, rowItem.item_id, (result)=>{
+                this.setState({showSpinner:false})
+              })
             }
           },
         ]
@@ -200,7 +237,18 @@ class ListMyAppPage extends React.Component{
                                       fontSize:16}}>PUBLISHED</Text>
                       </View>,
             onPress: () => {
-              alert('PUBLISHED')
+
+              this.setState({
+                sectionID: sectionId,
+                rowID: rowId,
+                showSpinner:true
+              })
+
+              this.props.actionUpdateStatusMyApplication(this.props.uid, rowItem.item_id, (result)=>{
+                console.log(result)
+
+                this.setState({showSpinner:false})
+              })
             }
           },
           {
@@ -221,16 +269,31 @@ class ListMyAppPage extends React.Component{
         ]
       }
 
+      swipeoutRightBtns = []
+
       return (
         <Swipeout 
             // key={item.item_id}
             style={{backgroundColor:'white'}} 
-            right={swipeoutRightBtns}>
+            right={swipeoutRightBtns}
+            
+            rowID={rowId}
+            sectionID={sectionId}
+            // onOpen={(sectionId, rowId) => {
+            //   this.setState({
+            //     sectionID: sectionId,
+            //     rowID: rowId,
+            //   })
+            // }}
+            close={(this.state.sectionID === sectionId && this.state.rowID === rowId)}
+            
+            >
         <TouchableOpacity 
           key={ rowId } 
           onPress={()=>{
             // this._itemOnPress(rowItem, rowId, sectionId)
-            this.props.params.navigation.navigate("ManageMyApplicationPage", {item: rowItem})
+          
+            this.manageMyApplicationPage(rowItem)
           }}>
           <View
             style={{
@@ -239,18 +302,12 @@ class ListMyAppPage extends React.Component{
               borderColor: '#E4E4E4',
               flexDirection: 'row',
             }}>
-            
               <TouchableOpacity
                 onPress={()=>{
-                  this.props.params.navigation.navigate("ManageMyApplicationPage", {item: rowItem})
-                }}
-                >
-                {/* <TestSVG 
-                  width={80}
-                  height={80}
-                  strokeWidth={3}
-                  image_uri={rowItem.image_url}/> */}
-
+                  // this.props.params.navigation.navigate("ManageMyApplicationPage", {item: rowItem})
+                
+                  this.manageMyApplicationPage(rowItem)
+                }}>
                   <FastImage
                       style={{width: 80, height: 80, borderRadius: 40}}
                       source={{
@@ -284,16 +341,14 @@ class ListMyAppPage extends React.Component{
                           style={{ width: 15, height: 15}}
                           source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24.105" height="12.233" viewBox="0 0 24.105 12.233">
                           <path id="Path_2031" data-name="Path 2031" d="M-1634.662,58.446h3.792l8.08,8.08,8.08-8.08h4.153l-12.233,12.233Z" transform="translate(1634.662 -58.446)" fill="#3c3f3f"/>
-                        </svg>
-                        `}} />
+                        </svg>`}} />
 
       }else{
         ic_collapse =  <Image
                           style={{ width: 15, height: 15}}
                           source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24.105" height="12.233" viewBox="0 0 24.105 12.233">
                           <path id="Path_2031" data-name="Path 2031" d="M-1634.662,70.679h3.792l8.08-8.08,8.08,8.08h4.153l-12.233-12.233Z" transform="translate(1634.662 -58.446)" fill="#3c3f3f"/>
-                        </svg>
-                        `}} />
+                        </svg>`}} />
       }
 
       let member_size = this.loadData()[sectionId].member.length
@@ -329,21 +384,17 @@ class ListMyAppPage extends React.Component{
     render() {
       let {renderContent, data} = this.state;
 
+      console.log(this.state.showSpinner)
       return (
         <View style={{flex:1}}>
+        <Spinner
+                visible={this.state.showSpinner}
+                textContent={'Wait...'}
+                textStyle={{color: '#FFF'}}
+                overlayColor={'rgba(0,0,0,0.5)'}
+            />
         { 
           renderContent &&
-          // <FlatList
-          //   data={data}
-          //   renderItem={this.renderItem}
-          //   ItemSeparatorComponent={this.renderSeparator}
-          //   ListFooterComponent={this.renderFooter}
-          //   onEndReachedThreshold={50}
-          //   key = {this.state.data}
-          //   keyExtractor={(item) => item.item_id}
-          //   extraData={this.state}
-          // />
-
           <ExpandableList
               ref={instance => this.ExpandableList = instance}
               dataSource={this.loadData()}
@@ -356,7 +407,6 @@ class ListMyAppPage extends React.Component{
               } }
               renderSectionHeaderX={this._renderSection}
               openOptions={[0, 1, 2, 3]}
-              // onScroll={this.props.handleScroll}
             />
         }
         </View>
@@ -374,7 +424,7 @@ const mapStateToProps = (state) => {
   }
 
   return{
-    // uid:getUid(state),
+    uid:getUid(state),
     auth:state.auth
   }
 }

@@ -426,61 +426,18 @@ class FriendsPage extends React.Component{
 
         let ic_collapse;
         if(state){
-          // ic_collapse = <Image
-          //               style={{width: 20, height: 20}}
-          //               source={require('../../Images/collapse_down.svg')}
-          //               // resizeMode={FastImage.resizeMode.contain}
-          //           />
-
-
           ic_collapse =  <Image
-                            style={{ width: 20, height: 20}}
-                            source={{uri:`data:image/svg+xml;utf8,<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                                  width="60.000000pt" height="60.000000pt" viewBox="0 0 60.000000 60.000000"
-                                  preserveAspectRatio="xMidYMid meet">
-                                <metadata>
-                                Created by potrace 1.15, written by Peter Selinger 2001-2017
-                                </metadata>
-                                <g transform="translate(0.000000,60.000000) scale(0.100000,-0.100000)"
-                                fill="#000000" stroke="none">
-                                <path d="M128 389 l-31 -31 101 -101 102 -102 99 99 c108 107 111 116 55 153
-                                -25 16 -26 16 -90 -48 l-64 -63 -63 62 c-34 34 -66 62 -71 62 -4 0 -21 -14
-                                -38 -31z m109 -41 l63 -62 63 62 c67 67 84 71 108 26 12 -24 10 -28 -79 -117
-                                l-92 -92 -90 90 c-49 49 -90 94 -90 100 0 13 37 55 48 55 3 0 35 -28 69 -62z"/>
-                                <path d="M147 382 c-10 -10 -16 -23 -16 -28 1 -5 39 -45 85 -88 l84 -80 84 80
-                                c46 43 84 84 85 90 0 6 -7 18 -18 28 -17 16 -21 13 -85 -51 l-66 -68 -66 68
-                                c-36 37 -67 67 -69 67 -1 0 -9 -8 -18 -18z"/>
-                                </g>
-                                </svg>`}} />
+                            style={{ width: 15, height: 15}}
+                            source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24.105" height="12.233" viewBox="0 0 24.105 12.233">
+                            <path id="Path_2031" data-name="Path 2031" d="M-1634.662,58.446h3.792l8.08,8.08,8.08-8.08h4.153l-12.233,12.233Z" transform="translate(1634.662 -58.446)" fill="#3c3f3f"/>
+                          </svg>`}} />
 
         }else{
-          // ic_collapse = <Image
-          //               style={{width: 20, height: 20}}
-          //               source={require('../../Images/collapse_up.svg')}
-          //               // resizeMode={FastImage.resizeMode.contain}
-          //           />
-
           ic_collapse =  <Image
-                            style={{ width: 20, height: 20}}
-                            source={{uri:`data:image/svg+xml;utf8,<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                            width="60.000000pt" height="60.000000pt" viewBox="0 0 60.000000 60.000000"
-                            preserveAspectRatio="xMidYMid meet">
-                           <metadata>
-                           Created by potrace 1.15, written by Peter Selinger 2001-2017
-                           </metadata>
-                           <g transform="translate(0.000000,60.000000) scale(0.100000,-0.100000)"
-                           fill="#000000" stroke="none">
-                           <path d="M197 342 c-94 -94 -97 -98 -82 -120 9 -12 25 -27 37 -33 18 -10 28
-                           -4 84 52 l64 63 64 -63 c56 -56 66 -62 84 -52 12 6 28 21 37 33 15 22 12 26
-                           -82 120 -54 54 -100 98 -103 98 -3 0 -49 -44 -103 -98z m198 -2 c85 -86 88
-                           -90 75 -114 -23 -45 -40 -41 -107 26 l-63 62 -63 -62 c-67 -67 -84 -71 -107
-                           -26 -13 24 -10 28 75 114 49 50 92 90 95 90 3 0 46 -40 95 -90z"/>
-                           <path d="M213 329 c-46 -45 -83 -85 -83 -89 0 -4 8 -14 19 -24 17 -16 21 -13
-                           85 51 l66 68 66 -68 c64 -64 68 -67 85 -51 11 10 19 20 19 24 0 8 -156 163
-                           -168 167 -4 2 -44 -34 -89 -78z"/>
-                           </g>
-                           </svg>
-                           `}} />
+                            style={{ width: 15, height: 15}}
+                            source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24.105" height="12.233" viewBox="0 0 24.105 12.233">
+                            <path id="Path_2031" data-name="Path 2031" d="M-1634.662,70.679h3.792l8.08-8.08,8.08,8.08h4.153l-12.233-12.233Z" transform="translate(1634.662 -58.446)" fill="#3c3f3f"/>
+                          </svg>`}} />
         }
 
         return (
@@ -501,7 +458,7 @@ class FriendsPage extends React.Component{
                 {section + "("+ member_size +")"}
                 </Text>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', justifyContent:'center', alignItems: 'center', marginRight:10 }}>
                 {ic_collapse}
             </View>
             </View>
