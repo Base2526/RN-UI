@@ -934,20 +934,33 @@ export function watchTaskEvent(uid, dispatch) {
     })
 
     // track online/offline
+    let flag = false
     const oldRealTimeDb = firebase.database();
     const onlineRef = oldRealTimeDb.ref('.info/connected');
     onlineRef.on('value', snapshot => {
+        // console.log('-- 0')
         oldRealTimeDb.ref('user_presence/' + uid).orderByChild("udid").equalTo(DeviceInfo.getUniqueID()).once('value').then(function (snapshot) { 
-            // console.log('-- 1')
+            // console.log('-- 1', snapshot.val())
             if(snapshot.val() === null){
-                oldRealTimeDb.ref('user_presence/' + uid).push({
+                /* 
+                    แก้ปัณหาโดยการใช้ flag ไปก่อนเพราะว่าจะมีการ push data ที่มี udid ซํ้ากัน
+                    ซึ่งในความเป็นจิงไม่ถูกต้อง
+                    ** ลองเทส ดึงข้อมูลออกมาตรวจสอบก้ยังไม่สำเร็จจึงแก้ปัญหาโดยการใช้ flag ไปก่อน
+                */
+                if(!flag){
+                    flag = true
+                    oldRealTimeDb.ref('user_presence/' + uid).push({
                             'platform': Platform.OS,
                             'udid': DeviceInfo.getUniqueID(),
                             'bundle_identifier': DeviceInfo.getBundleId(),
                             'model_number': DeviceInfo.getModel(),
                             'status':'online'
                         });
+                }else{
+                    return;
+                }
             }else{
+                // console.log('-- 3', Object.keys(snapshot.val())[0])
                 // console.log(snapshot.key); 
                 // console.log(snapshot.val()); 
                 // console.log(Object.keys(snapshot.val())[0]);
@@ -970,7 +983,22 @@ export function watchTaskEvent(uid, dispatch) {
                         'status':'offline'
                     });
             } 
-        });             
+        });     
+        
+
+//        reference.orderByChild("name").equalTo(user.getName()).addListenerForSingleValueEvent(new ValueEventListener() {
+//         @Override
+//         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+//             if(dataSnapshot.exists())
+//              // do what you want
+//         }
+
+//         @Override
+//         public void onCancelled(@NonNull DatabaseError databaseError) {
+
+//         }
+//   )};
     });
 }
 
