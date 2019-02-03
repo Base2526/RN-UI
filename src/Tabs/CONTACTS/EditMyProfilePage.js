@@ -25,6 +25,8 @@ import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
 import MyModal from '../../Utils/MyModal'
 
+import {randomKey} from '../../Utils/Helpers'
+
 // More info on all the options is below in the API Reference... just some common use cases shown here
 const options = {
     title: 'Select Avatar',
@@ -44,6 +46,16 @@ class EditMyProfilePage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
         // title: "Edit Profile",
+        headerStyle: {
+            backgroundColor: 'rgba(186, 53, 100, 1.0)',
+  
+            // ios navigationoptions underline hide
+            borderBottomWidth: 0,
+  
+            // android navigationoptions underline hide
+            elevation: 0,
+            shadowOpacity: 0
+          },
         headerLeft: (
             <View style={{marginLeft:10}}>
                 <TouchableOpacity
@@ -52,7 +64,7 @@ class EditMyProfilePage extends React.Component{
                         const { params = {} } = navigation.state
                         params.handleCancel()
                     }}>
-                    <Text style={{fontSize:18, color:'black'}}>CANCEL</Text>
+                    <Text style={{fontSize:18, color:'white'}}>CANCEL</Text>
                 </TouchableOpacity>
             </View>
         ),
@@ -65,7 +77,7 @@ class EditMyProfilePage extends React.Component{
                     const { params = {} } = navigation.state
                     params.handleSave()
                 }}>
-                <Text style={{fontSize:18, color:'black'}}>SAVE</Text>
+                <Text style={{fontSize:18, color:'white'}}>SAVE</Text>
             </TouchableOpacity>
             </View>
         ),
@@ -86,6 +98,9 @@ class EditMyProfilePage extends React.Component{
             intereste_in: [{id:43, name:'Women'}, {id:44, name:'Men'}],
             is_open_modal_gender: false,
             is_open_modal_InteresteIn: false,
+
+            // phones:[],
+            // emails:[]
         }
     }
 
@@ -229,9 +244,9 @@ class EditMyProfilePage extends React.Component{
                             <View
                                 style={{
                                     height: 1,
-                                    width: "86%",
+                                    width: "100%",
                                     backgroundColor: "#CED0CE",
-                                    marginLeft: "14%",
+                                    // marginLeft: "14%",
                                     position:'absolute',
                                     bottom: 0,
                                     right: 0,
@@ -293,6 +308,160 @@ class EditMyProfilePage extends React.Component{
         })
     }
 
+    phonesList(){
+        // this.state.profiles.phones
+        console.log(this.state.profiles)
+        console.log(this.state.profiles.phones)
+
+        // http://tobyho.com/2011/01/28/checking-types-in-javascript/
+        // if(this.state.profiles.phones instanceof Array || this.state.profiles.phones instanceof Object){
+        //     if(this.state.profiles.phones instanceof Array){
+        //         if(this.state.profiles.phones.length == 0){
+        //             return;
+        //         }
+        //     }
+
+        //     if(this.state.profiles.phones instanceof Object){
+        //         if (Object.keys(this.state.profiles.phones).length == 0) {
+        //             return;
+        //         }
+        //     }
+        // }
+
+        return Object.entries(this.state.profiles.phones).map(([key, value]) => {
+            return(<Cell
+                key={key}
+                cellStyle="Subtitle"
+                titleTextColor="#007AFF"
+                hideSeparator={true} 
+                cellContentView={
+                <View style={{flexDirection:'row'}}>
+                    <View style={{flex:1, flexDirection:'row'}}>
+                        <Text style={{fontSize: 22,  }}>
+                            {value.phone_number} 
+                        </Text>
+                        <TouchableOpacity
+                            style={{alignSelf:'flex-end'}}
+                            onPress={()=>{
+                                alert('Verify')
+                            }}>
+                            <Text style={{fontSize: 16, color:'blue', marginLeft:10, textAlignVertical:'bottom'}}>
+                                {value.isVerify ? '': 'Verify'}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{flex:1, 
+                                flexDirection:'row', 
+                                position:'absolute', 
+                                right:0,
+                                bottom:0}}>
+                        <TouchableOpacity 
+                            style={{justifyContent: 'center', 
+                                    alignItems: 'center',
+                                    zIndex: 10,
+                                    marginRight:10}}
+                            onPress={()=>{
+                                this.props.navigation.navigate("AddAnotherPhone", {title:'Edit phone', mode: 'edit', key, value, onAddAnotherPhone: this.onAddAnotherPhone})
+                            }}>
+                            <Text style={{color:'gray', fontSize:16}}>Edit</Text>
+                        </TouchableOpacity> 
+                        <TouchableOpacity 
+                            style={{justifyContent: 'center', 
+                                    alignItems: 'center',
+                                    zIndex: 10,}}
+                            onPress={()=>{
+                                Alert.alert(
+                                    'Delete',
+                                    'Are sure delete phone ?',
+                                    [
+                                    //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                                      {text: 'Cancel', onPress: () => {
+
+                                      }, style: 'cancel'},
+                                      {text: 'Delete', onPress: () => {
+                                        let phones = this.state.profiles.phones
+
+                                        var newPhones = _.filter(phones, function(v, k) {
+                                            return k != key;
+                                        });
+
+                                        let p = {...this.state.profiles, phones:newPhones }
+                                        this.setState({profiles:p})
+                                      }},
+                                    ],
+                                    { cancelable: false }
+                                  )
+                            }}>
+                            <Text style={{color:'red', fontSize:16}}>Delete</Text>
+                        </TouchableOpacity> 
+                    </View>
+                </View>
+            }
+        />)
+        })
+    }
+
+    emailsList(){
+
+        console.log(this.state.profiles)
+        console.log(this.state.profiles.mails)
+        // this.state.profiles.phones
+
+        return Object.entries(this.state.profiles.mails).map(([key, value]) => {
+            // console.log(data)
+            // console.log(key)
+            return(<Cell
+                    key={key}
+                    cellStyle="Subtitle"
+                    titleTextColor="#007AFF"
+                    hideSeparator={true} 
+                    cellContentView={
+                    <View style={{flexDirection:'row'}}>
+                        <View style={{flex:1, flexDirection:'row'}}>
+                            <Text style={{flex:1, fontSize: 16,  }}>
+                                {value.name}
+                            </Text>
+                        </View>
+                        <View style={{flex:1, 
+                                    flexDirection:'row', 
+                                    position:'absolute', 
+                                    right:0,
+                                    bottom:0}}>
+                            <TouchableOpacity 
+                                style={{justifyContent: 'center', 
+                                        alignItems: 'center',
+                                        zIndex: 10,
+                                        marginRight:10}}
+                                onPress={()=>{
+                                    this.props.navigation.navigate("AddAnotherPhone", {'title':'Edit phone', 'mode': 'edit'})
+                                }}>
+                                <Text style={{color:'gray', fontSize:16}}>Edit</Text>
+                            </TouchableOpacity> 
+                            <TouchableOpacity 
+                                style={{justifyContent: 'center', 
+                                        alignItems: 'center',
+                                        zIndex: 10,}}
+                                onPress={()=>{
+                                    Alert.alert(
+                                        'Delete',
+                                        'Are sure delete phone ?',
+                                        [
+                                        //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                                          {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                                          {text: 'Delete', onPress: () => console.log('Delete Pressed')},
+                                        ],
+                                        { cancelable: false }
+                                      )
+                                }}>
+                                <Text style={{color:'red', fontSize:16}}>Delete</Text>
+                            </TouchableOpacity> 
+                        </View>
+                    </View>
+                }
+            />)
+        })
+    }
+
     profilePicture = () => {
         ImagePicker.showImagePicker(options, (response) => {
             console.log('Response = ', response);
@@ -342,6 +511,54 @@ class EditMyProfilePage extends React.Component{
             }
         });
     }
+
+    onAddAnotherPhone = (result) =>{
+        console.log(result)
+        // console.log(randomKey())
+
+        if(Object.keys(this.state.profiles.phones).length == 0){
+            // กรณียังไม่เคยมี
+            let p = {...this.state.profiles, phones:{[randomKey()]:result.value} }
+            this.setState({profiles:p})
+        }else{
+            if(result.mode == 'add'){  
+                let p = {...this.state.profiles, phones:{...this.state.profiles.phones, [randomKey()]:result.value} }
+                this.setState({profiles:p})
+            }else if(result.mode == 'edit'){
+
+                console.log('edit')
+                console.log(this.state.profiles.phones)
+
+                let phones = this.state.profiles.phones
+
+                let value = null
+                _.each(phones, function(_v, _k) { 
+                    if(_k === result.key){
+                        value = _v
+                    }
+                });
+
+                if(value !== null){
+                    let newPhones = {...phones, [result.key]:result.value}
+                    console.log(newPhones)
+
+                    let p = {...this.state.profiles, phones:{...phones, [result.key]:result.value} }
+                    this.setState({profiles:p})
+
+                    console.log(p)
+                }
+            }
+        }
+
+    }
+
+    onAddAnotherEmail = (values) =>{
+        console.log(values)
+    }
+
+    onAddAnotherWebsite = (values) =>{
+        console.log(values)
+    }
     
     render(){
 
@@ -376,12 +593,6 @@ class EditMyProfilePage extends React.Component{
                     intereste_in.push(value[0].name)
                 }
             });
-
-            // let n = intereste_in.join(", ")
-            // console.log(n)
-
-            // intereste_in.join(", ")
-            // 
         }
 
         return(
@@ -613,8 +824,6 @@ class EditMyProfilePage extends React.Component{
                         }
                     />
                 </Section>
-
-                
                 <Section
                     sectionPaddingTop={5}
                     sectionPaddingBottom={0}
@@ -727,7 +936,7 @@ class EditMyProfilePage extends React.Component{
                                     </Text>
                                 </View>
                                 <View style={{position:'absolute', right:0}}>
-                                    <Text>
+                                    <Text style={{ fontSize: 22}} >
                                         {gender}
                                     </Text>
                                 </View>
@@ -752,6 +961,7 @@ class EditMyProfilePage extends React.Component{
                                 </View>
                                 <View style={{flex: 1, }}>
                                     <DatePicker
+                                        ref={(ref)=>this.datePickerRef=ref}
                                         style={{width: 200}}
                                         date={this.state.date}
                                         mode="date"
@@ -780,7 +990,7 @@ class EditMyProfilePage extends React.Component{
                             </View>
                         }
                         onPress={()=>{
-                            
+                            this.datePickerRef.onPressDate()
                         }}
                     />
 
@@ -803,7 +1013,7 @@ class EditMyProfilePage extends React.Component{
                                 </Text>
                             </View>
                             <View style={{position:'absolute', right:0}}>
-                                <Text>
+                                <Text style={{ fontSize: 22}}>
                                     {intereste_in.length == 0 ? "None": intereste_in.join(", ")}
                                 </Text>
                             </View>
@@ -865,8 +1075,10 @@ class EditMyProfilePage extends React.Component{
                             </View>
                         }
                     />
+
+                    {this.phonesList()}
                     
-                    <Cell
+                    {/* <Cell
                         cellStyle="Subtitle"
                         titleTextColor="#007AFF"
                         hideSeparator={true} 
@@ -915,9 +1127,6 @@ class EditMyProfilePage extends React.Component{
                                 </View>
                             </View>
                         }
-                        // onPress={()=>{
-                        //     // this.openModalInteresteIn()
-                        // }}
                     />
                     <Cell
                         cellStyle="Subtitle"
@@ -967,10 +1176,8 @@ class EditMyProfilePage extends React.Component{
                                 </View>
                             </View>
                         }
-                        // onPress={()=>{
-                        //     // this.openModalInteresteIn()
-                        // }}
-                    />
+                       
+                    /> */}
                     <Cell
                         cellStyle="Subtitle"
                         titleTextColor="#007AFF"
@@ -984,7 +1191,7 @@ class EditMyProfilePage extends React.Component{
                             </View>
                         }
                         onPress={()=>{
-                            this.props.navigation.navigate("AddAnotherPhone", {'title':"Add another phone", 'mode': 'add'})
+                            this.props.navigation.navigate("AddAnotherPhone", {'title':"Add phone", 'mode': 'add', onAddAnotherPhone: this.onAddAnotherPhone})
                         }}
                     />
                 </Section>
@@ -1014,7 +1221,9 @@ class EditMyProfilePage extends React.Component{
                                         borderRadius:5, 
                                         borderWidth:.5,
                                         padding:5,
-                                        marginBottom:10}}
+                                        marginBottom:10,
+                                        minHeight:150,
+                                        textAlignVertical: "top"}}
                                 placeholder="input address"
                                 multiline={true}
                                 underlineColorAndroid='transparent'
@@ -1052,7 +1261,7 @@ class EditMyProfilePage extends React.Component{
                             </View>
                         }
                         onPress={()=>{
-                            this.props.navigation.navigate("AddAnotherWebsite")
+                            this.props.navigation.navigate("AddAnotherWebsite", {'title':"Add website", 'mode': 'add', onAddAnotherWebsite: this.onAddAnotherWebsite})
                         }}
                     />
                 </Section>
@@ -1073,6 +1282,7 @@ class EditMyProfilePage extends React.Component{
                             </View>
                         }
                     />
+                    {this.emailsList()}
                     <Cell
                         cellStyle="Subtitle"
                         titleTextColor="#007AFF"
@@ -1086,7 +1296,8 @@ class EditMyProfilePage extends React.Component{
                             </View>
                         }
                         onPress={()=>{
-                            this.props.navigation.navigate("AddAnotherEmail")
+                            // this.props.navigation.navigate("AddAnotherEmail")   
+                            this.props.navigation.navigate("AddAnotherEmail", {'title':"Add email", 'mode': 'add', onAddAnotherEmail: this.onAddAnotherEmail}) 
                         }}
                     />
                 </Section>

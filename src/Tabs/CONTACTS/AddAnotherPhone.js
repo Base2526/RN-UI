@@ -8,47 +8,82 @@ import { connect } from 'react-redux';
 import {getStatusBarHeight} from '../../Utils/Helpers'
 
 import * as actions from '../../Actions'
-import {getUid} from '../../Utils/Helpers'
+import {validateMobile} from '../../Utils/Helpers'
 
 class AddAnotherPhone extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
         // title: "Add another phone",
         title: `${navigation.state.params.title}`,
+        headerTintColor: 'white',
+        headerStyle: {
+            backgroundColor: 'rgba(186, 53, 100, 1.0)',
+  
+            // ios navigationoptions underline hide
+            borderBottomWidth: 0,
+  
+            // android navigationoptions underline hide
+            elevation: 0,
+            shadowOpacity: 0
+          },
+        headerRight: (
+            <View style={{marginRight:10}}>
+            <TouchableOpacity
+                style={{padding:5}}
+                onPress={() => {
+                    const { params = {} } = navigation.state
+                    params.handleSave()
+                }}>
+                <Text style={{fontSize:18, color:'white'}}>{navigation.state.params.mode == 'add' ? 'ADD' : 'UPDATE'}</Text>
+            </TouchableOpacity>
+            </View>
+        ),
     })
 
     constructor(props){
         super(props)
         this.state ={
-            friend: '',
+            mode:'add',
+            key:'',
             text: ''
         }
     }
 
     componentDidMount(){
+        this.props.navigation.setParams({handleSave: this.handleSave })
+
         const { navigation } = this.props;
         const mode = navigation.getParam('mode', null);
+        // console.log(mode)
+        if(mode === 'edit'){
+            const key = navigation.getParam('key', null);
+            const value = navigation.getParam('value', null);
 
-        console.log(mode)
-
-        // if(friend.hasOwnProperty('change_friend_name')){
-        //     this.setState({friend, text:friend.change_friend_name})
-        // }else{
-        //     this.setState({friend, text:friend.profile.name})
-        // }
+            this.setState({mode, key, text:value.phone_number})
+        }
     }
 
-    onSave = () => {
-        // this.setState({name:this.state.text})
+    handleSave = () => {
+        /**
+        const { navigation } = this.props;
+        navigation.goBack();
+        navigation.state.params.onAddAnotherEmail(newData);
+        */
 
-        // this.props.navigation.goBack()
+        if(!validateMobile(this.state.text)){
+            // this.setState({text:''})
+            alert('Not a valid Phone Number')
+        }else{
+            // console.log('validate phone')
 
-        // console.log(this.state.friend)
+            /**
+             * เช็ดว่ามีอยู่ในระบบแล้วหรือไหม
+             **/
 
-        // this.props.actionChangeFriendsName(this.props.uid, this.state.friend.friend_id, this.state.text, (result)=>{
-        //     // console.log(result)
-        //     this.props.navigation.goBack()
-        // })
+            const { navigation } = this.props;
+            navigation.goBack();
+            navigation.state.params.onAddAnotherPhone({value: {phone_number: this.state.text, isVerify:false}, mode:this.state.mode, key:this.state.key });
+        }
     }
 
     render(){
@@ -63,22 +98,9 @@ class AddAnotherPhone extends React.Component{
                             onChangeText={(text) => this.setState({text})}
                             value={this.state.text}
                             clearButtonMode='while-editing'
+                            keyboardType="numeric"
                             placeholder= {this.state.text}
                         />
-                        <View style={{alignItems:'center', marginTop:10}}>
-                            <TouchableOpacity
-                             style={{padding:10, 
-                                    borderColor:'gray', 
-                                    borderWidth:1, 
-                                    width:120, 
-                                    borderRadius:15, 
-                                    alignItems:'center'}}
-                                onPress={()=>{
-                                    this.onSave()
-                                }}>
-                                <Text style={{fontSize:18}}>Save</Text>
-                            </TouchableOpacity>
-                        </View>
                     </View>
                 </View>)
     }
@@ -86,8 +108,14 @@ class AddAnotherPhone extends React.Component{
 
 const mapStateToProps = (state) => {
     console.log(state)
+
+    if(!state._persist.rehydrated){
+        return {}
+    }
+      
     return({
-        uid:getUid(state)
+        // uid:getUid(state)
+        auth:state.auth
     })
 }
   
