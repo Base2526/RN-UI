@@ -573,8 +573,8 @@ function me_user_insert(&$edit, $account, $category) {
 
           $mid_value = array();
           $mid_value[$my_id_item_id] = array( "value"    => $my_id, 
-                                              "is_edit"  => "1", 
-                                              "enabled"  => "1");
+                                              "is_edit"  => true, 
+                                              "enabled"  => true);
 
           $sound_call_waiting_value = array();
           $sound_call_waiting_value[$sound_call_waiting_item_id] = array("nid"    => "396", 
@@ -713,8 +713,8 @@ function me_user_insert(&$edit, $account, $category) {
 
         $mid_value = array();
         $mid_value[$my_id_item_id] = array("value"     => $my_id, 
-                                      "is_edit"   => "1", 
-                                      "enabled"   => "1");
+                                      "is_edit"   => true, 
+                                      "enabled"   => true);
 
 
         $sound_call_waiting_value = array();
@@ -4066,7 +4066,7 @@ function onLoadProfile($uid, $mode){
               
               $my_id_value   =  $data_my_id->field_profile_my_id_value[LANGUAGE_NONE][0]['value'];
               $my_id_is_edit =  $data_my_id->field_profile_my_id_is_edit[LANGUAGE_NONE][0]['value'];
-              $my_id[$v_my_id['value']] = array('enabled'=>'1', 'is_edit'=>$my_id_is_edit, 'value'=>$my_id_value);
+              $my_id[$v_my_id['value']] = array('enabled'=>true, 'is_edit'=>$my_id_is_edit, 'value'=>$my_id_value);
           }
         }
 

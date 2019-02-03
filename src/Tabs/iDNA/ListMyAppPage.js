@@ -181,9 +181,9 @@ class ListMyAppPage extends React.Component{
       if(application_category != null){
         this.props.params.navigation.navigate("ManageMyApplicationPage", {item})
       }else{
-
+        this.setState({showSpinner: true})
         this.props.actionApplicationCategory().then((result) => {
-          console.log(result)
+          this.setState({showSpinner: false})
           if(result.status){
             this.props.params.navigation.navigate("ManageMyApplicationPage", {item})
           }

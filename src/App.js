@@ -79,14 +79,13 @@ AppDrawer = createDrawerNavigator({
       drawerLabel: () => null
     }
   },
-  // Profile: {
-  //   screen: Profile,
+//   AuthStack: {
+//     screen: AuthStack,
   //   navigationOptions: {
   //     drawerLabel: 'Profile',
   //     drawerIcon: ({ tintColor }) => <Icon name="user-circle" size={17} />,
   //   }
-  // },
-  
+//   },
 }, drawerNavigatorConfig);
 
 const defaultGetStateForAction = AppDrawer.router.getStateForAction;

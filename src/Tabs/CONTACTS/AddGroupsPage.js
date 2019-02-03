@@ -88,7 +88,6 @@ class AddGroupsPage extends React.Component{
         headerStyle: {
           backgroundColor: 'rgba(186, 53, 100, 1.0)',
 
-
           // ios navigationoptions underline hide
           borderBottomWidth: 0,
 
@@ -143,10 +142,6 @@ class AddGroupsPage extends React.Component{
     }
 
     componentDidMount() {
-      // this.makeRemoteRequest();
-
-      // console.log(RNFetchBlob)
-
       setTimeout(() => {this.setState({renderContent: true})}, 0);
 
       this.props.navigation.setParams({ handleCreateGroup: this.handleCreateGroup })
@@ -157,8 +152,6 @@ class AddGroupsPage extends React.Component{
         loading: false,
         refreshing: false
       });
-
-      // console.log(this.state.sections[0].data[0].list.length)
     }
 
     onLayout(e) {
@@ -185,42 +178,13 @@ class AddGroupsPage extends React.Component{
       }else if(seleteds.length === 0){
         alert("Select friend is empty.")
       }else{
-        console.log('-success-')
-
-        // console.log(this.state.avatarSource.uri)
-        // console.log(this.state.avatarSource.uri.replace('file://', ''))
-  
-        // console.log(RNFetchBlob.wrap(this.state.avatarSource.uri.replace('file://', '')))
-        
         this.setState({loading:true})
-
-        // ImgToBase64.getBase64String(this.state.avatarSource.uri)
-        // .then(base64String => {
-          //  console.log(base64String)
-
         this.props.actionCreateGroup(this.props.uid, groupName, seleteds, this.state.avatarSource.uri).then((result) => {
           console.log(result)
 
           this.setState({loading:false})
           if(result.status){
-            // this.props.navigation.navigate("App") 
-
-            let {item_id, group, group_detail} = result.data
-
             this.props.navigation.goBack()
-
-            // let item_id = result
-            // console.log(item_id)
-            // console.log(group)
-            // console.log(group_detail)
-
-            // group_update({'group_id':item_id,'value':group}, v=>{
-            //   console.log(v)
-            // })
-
-            // groupDetail_update({'group_id':item_id, 'value':group_detail}, v=>{
-            //   console.log(v)
-            // })
           }else{
 
           }
@@ -264,65 +228,25 @@ class AddGroupsPage extends React.Component{
 
         switch(friend.status){
           case Constant.FRIEND_STATUS_FRIEND:{
-            // console.log('1, --' + key)
-            
             friend_member.push({...friend, ...{'friend_id':key}});
             break
           }
 
           case Constant.FRIEND_STATUS_FRIEND_CANCEL:{
-            // console.log('2, --' + key)
             break
           }
 
           case Constant.FRIEND_STATUS_FRIEND_REQUEST:{
-            // console.log('3, --' + key)
             break
           }
 
           case Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND:{
-            // console.log('4, --' + key)
             break
           }
         }
       }
-
-      // console.log(friend_member)
       return friend_member
     }
-
-    makeRemoteRequest = () => {
-      const { page, seed } = this.state;
-      const url = `https://randomuser.me/api/?seed=${seed}&page=${page}&results=20`;
-      this.setState({ loading: true });
-  
-      fetch(url)
-        .then(res => res.json())
-        .then(res => {
-          this.setState({
-            data: page === 1 ? res.results : [...this.state.data, ...res.results],
-            error: res.error || null,
-            loading: false,
-            refreshing: false
-          });
-        })
-        .catch(error => {
-          this.setState({ error, loading: false });
-        });
-    };
-  
-    renderSeparator = () => {
-      return (
-        <View
-          style={{
-            height: 1,
-            width: "86%",
-            backgroundColor: "#CED0CE",
-            marginLeft: "14%"
-          }}
-        />
-      );
-    };
 
     onSelectImage = () => {
       /**

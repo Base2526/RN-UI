@@ -10,7 +10,8 @@ import {Modal,
         Image,
         Dimensions,
         FlatList} from 'react-native'
-import {DrawerNavigator, DrawerItems, createDrawerNavigator, SafeAreaView} from 'react-navigation'
+import {DrawerItems, 
+        NavigationActions, DrawerActions} from 'react-navigation'
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import FastImage from 'react-native-fast-image'
 import { ifIphoneX } from 'react-native-iphone-x-helper'
@@ -90,6 +91,7 @@ class DrawerMenu extends React.Component{
             x:100,
             modalVisible: false,
             
+            data_my_application: []
         }
 
         this.onPressLearnMore = this.onPressLearnMore.bind(this)
@@ -98,6 +100,44 @@ class DrawerMenu extends React.Component{
 
     componentDidMount(){
         setTimeout(() => {this.setState({renderContent: true})}, 0);
+        
+        let {my_applications} = this.props.auth.users
+        this.onLoadDataMyApplication(my_applications)
+
+        console.log(this.props)
+
+        this.navigateToScreen = this.navigateToScreen.bind(this)
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log(nextProps.auth)
+
+        let {my_applications} = nextProps.auth.users
+        this.onLoadDataMyApplication(my_applications)
+    }
+
+    navigateToScreen = (route) => {
+        // alert('navigateToScreen')
+        
+        const navigateAction = NavigationActions.navigate({
+          routeName: route
+        });
+        this.props.navigation.dispatch(navigateAction);
+        this.props.navigation.dispatch(DrawerActions.closeDrawer())
+    }
+
+    onLoadDataMyApplication = (my_applications) =>{
+        let data_my_application = []
+        Object.entries(my_applications).forEach(([key, value]) => {
+
+            if(value.status){
+                data_my_application.push({key, item_id: key, ...value})
+            }else{
+            //   unPublishedMember.push({key, item_id: key, ...value})
+            }
+        })
+        console.log(data_my_application)
+        this.setState({data_my_application})
     }
 
     onPressLearnMore(){
@@ -245,18 +285,39 @@ class DrawerMenu extends React.Component{
     }
 
     renderItemMyApplicaton({ item, index }) {
-        // console.log(this)
-        return <TouchableOpacity>
-                <View style={{
-                    margin: 5,
-                    height: calculatorWidthHeightItem(5),
-                    width: calculatorWidthHeightItem(5),
-                    backgroundColor: '#CCC',
-                    justifyContent:'center',
-                    alignItems:'center'
-                }}>
-                    <Text>{index}</Text>
-                </View>
+        // console.log(item)
+        if ('empty' in item) {
+            return <View style={{
+                height: calculatorWidthHeightItem(5), 
+                width: calculatorWidthHeightItem(5), 
+                flex:1,
+                // borderColor: "green", 
+                // borderWidth: 1, 
+                justifyContent:'center', 
+                alignItems:'center',
+                backgroundColor: 'transparent',}} />;
+        }
+      
+        let _this = this
+        // image_url
+        return <TouchableOpacity
+                    style={{margin: 5}}
+                    onPress={()=>{
+                        // this.props.params.navigation.navigate
+                        console.log(_this)
+                        // this.navigateToScreen()
+                    }}>
+                    <FastImage
+                        style={{width: calculatorWidthHeightItem(5), 
+                                height: calculatorWidthHeightItem(5),
+                                }}
+                        source={{
+                            uri: item.image_url,
+                            headers:{ Authorization: 'someAuthToken' },
+                            priority: FastImage.priority.normal,
+                        }}
+                        resizeMode={FastImage.resizeMode.cover}
+                    />
                 </TouchableOpacity>
     }
     
@@ -276,14 +337,12 @@ class DrawerMenu extends React.Component{
     }
 
     render(){
-        let {renderContent} = this.state;
+        let {renderContent, data_my_application} = this.state;
         let props = this.props
 
         if(this.state.x === 100){
             menu = <DrawerItems {...props} />
-
             collapse = require('../Images/collapse_down.png')
-
             other_user =<View style={{ position:'absolute', right: 0}}>
                             <TouchableOpacity style={ styles.imageContainer2 }>
                                 <Image style={ styles.image2 } source={{ uri: 'http://www.free-avatars.com/data/media/37/cat_avatar_0597.jpg' }} />
@@ -294,7 +353,6 @@ class DrawerMenu extends React.Component{
                         </View>
         }else{
             menu = this.renderManageAccounts()
-
             collapse = require('../Images/collapse_up.png')
         }
 
@@ -302,9 +360,7 @@ class DrawerMenu extends React.Component{
             return <View style={{flex: 1}}></View>
         }
         
-
         let {users} = this.props.auth
-
         return(
             <View style={{flex:1}}>
             { renderContent &&
@@ -364,12 +420,13 @@ class DrawerMenu extends React.Component{
                             <Text>My Application</Text>
                             <FlatList
                                 contentContainerStyle={styles.list}
-                                data={formatData(data, 4)}
+                                data={formatData(data_my_application, 4)}
                                 numColumns={4}
                                 scrollEnabled={false}
                                 renderItem={this.renderItemMyApplicaton}
-                                contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
-                                key = {this.state.orientation}/>
+                                // contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
+                                key = {this.state.orientation}
+                                extraData={data_my_application}/>
                         </View>
                         <View>
                         <Text>Following</Text>
