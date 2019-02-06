@@ -15,7 +15,7 @@ class EditStatusMessagePage extends React.Component{
     static navigationOptions = ({ navigation }) => {
         return {
             title: "Edit status message",
-            headerTintColor: 'white',
+            headerTintColor: '#C7D8DD',
             headerStyle: {
                 backgroundColor: 'rgba(186, 53, 100, 1.0)',
                 // ios navigationoptions underline hide
@@ -33,7 +33,7 @@ class EditStatusMessagePage extends React.Component{
                         const { params = {} } = navigation.state
                         params.handleSave()
                     }}>
-                    <Text style={{fontSize:18, color:'white'}}>SAVE</Text>
+                    <Text style={{fontSize:18, color:'#C7D8DD', fontWeight:'bold'}}>Save</Text>
                 </TouchableOpacity>
                 </View>
             ),

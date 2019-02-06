@@ -6,7 +6,8 @@ import {View,
         TextInput,
         ScrollView,
         SafeAreaView,
-        Dimensions} from 'react-native'
+        Dimensions,
+        Image} from 'react-native'
 import { connect } from 'react-redux';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -19,11 +20,11 @@ import { isIphoneX } from 'react-native-iphone-x-helper'
 var _ = require('lodash');
 import Spinner from 'react-native-loading-spinner-overlay';
 
-import Image from 'react-native-remote-svg'
-
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
 import MyModal from '../../Utils/MyModal'
+
+import MyIcon from '../../config/icon-font.js';
 
 import {getUid, randomKey} from '../../Utils/Helpers'
 
@@ -32,7 +33,7 @@ class EditMyProfilePage extends React.Component{
     static navigationOptions = ({ navigation }) => {
         return {
             title: "Edit Profile",
-            headerTintColor: 'white',
+            headerTintColor: '#C7D8DD',
             headerStyle: {
                 backgroundColor: 'rgba(186, 53, 100, 1.0)',
                 // ios navigationoptions underline hide
@@ -51,14 +52,10 @@ class EditMyProfilePage extends React.Component{
                             const { params = {} } = navigation.state
                             params.handleCancel()
                         }}>
-                        <Image
-                            style={{ width: 20, height: 20}}
-                            source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18.577" height="18.577" viewBox="0 0 18.577 18.577">
-                            <g id="x" transform="translate(-297.142 213.314) rotate(-45)">
-                            <line id="Line_105" data-name="Line 105" x2="24.159" transform="translate(348.867 72.412)" fill="none" stroke="#b5cdd1" stroke-width="2"/>
-                            <path id="Path_1996" data-name="Path 1996" d="M0,0H24.271" transform="translate(360.947 60.276) rotate(90)" fill="none" stroke="#b5cdd1" stroke-width="2"/>
-                            </g>
-                        </svg>`}} />
+                        <MyIcon
+                            name={'cancel'}
+                            size={25}
+                            color={'#C7D8DD'} />
                     </TouchableOpacity>
                 </View>
             ),
@@ -74,7 +71,7 @@ class EditMyProfilePage extends React.Component{
             profiles: {},
             profile_picture: '',
             background_picture: '',
-            date: Moment(new Date()).format('MMMM DD, YYYY'),
+            date: Moment(new Date()).format('YYYY-MM-DD'),
             gender: Constant.gender,
             intereste_in: Constant.intereste_in,
             is_open_modal_gender: false,
@@ -212,13 +209,34 @@ class EditMyProfilePage extends React.Component{
                             }
                             */
 
-                            this.props.actionInteresteInProfile(this.props.uid, data.id, (result) => {
-                                console.log(result)
-    
-                                // this.setState({loading:false})
-                            })
+                            if(this.state.profiles.intereste_in !== undefined){
+                                let intereste_in = this.state.profiles.intereste_in
+                                let f = _.find(intereste_in,  function(v, k) { 
+                                    return v.id == data.id
+                                })
 
-                            // export const actionInteresteInProfile = (uid, interestein_id, callback) 
+                                if(f !== undefined){
+
+                                    var interestein_key = _.findKey(intereste_in, function(item) {
+                                        return item.id == data.id;
+                                    });
+
+                                    this.props.actionInteresteInProfile(this.props.uid, interestein_key, data.id, !f.enable, (result) => {
+                                        console.log(result)
+                                    })
+
+                                    return
+                                }else{
+                                    this.props.actionInteresteInProfile(this.props.uid, undefined, data.id, true, (result) => {
+                                        console.log(result)
+                                    })
+                                }  
+                            }else{
+                                this.props.actionInteresteInProfile(this.props.uid, undefined, data.id, true, (result) => {
+                                    console.log(result)
+                                })
+                            }   
+
                         }}>
                         <View
                             style={{
@@ -265,18 +283,17 @@ class EditMyProfilePage extends React.Component{
             return (
                 <TouchableOpacity key={data.id} 
                     onPress={() => {
-                        let p = {...this.state.profiles, gender:data.id }
-                        this.setState({profiles:p})
-                        // console.log(p)
-
-                        // actionGenderProfile
-
-                        // this.setState({loading:true})
-                        this.props.actionGenderProfile(this.props.uid, data.id, (result) => {
-                            console.log(result)
-
-                            // this.setState({loading:false})
-                        })
+                        if(this.state.profiles.gender !== undefined){
+                            if(this.state.profiles.gender != data.id){
+                                this.props.actionGenderProfile(this.props.uid, data.id, (result) => {
+                                    console.log(result)
+                                })
+                            }
+                        }else{
+                            this.props.actionGenderProfile(this.props.uid, data.id, (result) => {
+                                console.log(result)
+                            })
+                        }
                     }}>
                     <View
                         style={{
@@ -327,7 +344,7 @@ class EditMyProfilePage extends React.Component{
                 cellContentView={
                 <View style={{flexDirection:'row'}}>
                     <View style={{flex:1, flexDirection:'row'}}>
-                        <Text style={{fontSize: 22,  }}>
+                        <Text style={{fontSize: 22, color:'gray' }}>
                             {value.phone_number} 
                         </Text>
                         <TouchableOpacity
@@ -344,7 +361,8 @@ class EditMyProfilePage extends React.Component{
                                 flexDirection:'row', 
                                 position:'absolute', 
                                 right:0,
-                                bottom:0}}>
+                                bottom:0,
+                                padding:5}}>
                         <TouchableOpacity 
                             style={{justifyContent: 'center', 
                                     alignItems: 'center',
@@ -369,17 +387,6 @@ class EditMyProfilePage extends React.Component{
 
                                       }, style: 'cancel'},
                                       {text: 'Delete', onPress: () => {
-                                        // let phones = this.state.profiles.phones
-
-                                        // var newPhones = _.filter(phones, function(v, k) {
-                                        //     return k != key;
-                                        // });
-
-                                        // let p = {...this.state.profiles, phones:newPhones }
-                                        // this.setState({profiles:p})
-
-                                        // 
-
                                         this.setState({loading:true})
                                         this.props.actionRemovePhoneProfile(this.props.uid, key, (result) => {
                                             console.log(result)
@@ -414,14 +421,15 @@ class EditMyProfilePage extends React.Component{
                     hideSeparator={false} 
                     cellContentView={
                     <View style={{flex:1,}}>
-                        <View style={{flex:1,}}>
-                            <Text style={{flex:1, fontSize: 16,  }}>
+                        <View style={{flex:1, padding:5}}>
+                            <Text style={{flex:1, fontSize: 22, color:'gray',  }}>
                                 {value.email}
                             </Text>
                         </View>
                         <View style={{flex:1, 
                                     flexDirection:'row',
-                                    justifyContent:'flex-end'}}>
+                                    justifyContent:'flex-end',
+                                    padding:5}}>
                             <TouchableOpacity 
                                 style={{justifyContent: 'center', 
                                         alignItems: 'center',
@@ -491,15 +499,15 @@ class EditMyProfilePage extends React.Component{
                 // accessory="DisclosureIndicator"
                 cellContentView={
                 <View style={{flex:1}}>
-                    <View style={{flex:1}}>
-                        <Text style={{fontSize: 16  }}>
+                    <View style={{flex:1, padding:5}}>
+                        <Text style={{fontSize: 22, color:'gray' }}>
                             {value.url}
                         </Text>
                     </View>
                     <View style={{flex:1, 
-                                // backgroundColor:'green', 
                                 flexDirection:'row',
-                                justifyContent:'flex-end'}}>
+                                justifyContent:'flex-end',
+                                padding:5}}>
                         <TouchableOpacity 
                             style={{justifyContent: 'center', 
                                     alignItems: 'center',
@@ -744,25 +752,10 @@ class EditMyProfilePage extends React.Component{
         this.setState({profiles:p})
     }
     
-    compareObject(){
-
-        console.log(this.state.profiles)
-        console.log(this.props.profiles)
-
-        // if(_.isEqual(this.state.profiles, this.props.profiles)){
-        //     this.setState({isModify:false})
-        // }else{
-        //     this.setState({isModify:true})
-        // }
-    }
-
     render(){
-
         if (Object.keys(this.state.profiles).length == 0) {
             return(<View style={{flex:1, backgroundColor:'white'}}></View>)
         }
-
-        this.compareObject()
 
         // ส่วนของ my id
         let my_id = ''
@@ -798,7 +791,7 @@ class EditMyProfilePage extends React.Component{
         }
 
 
-        let birthday = ''
+        let birthday = 'Not set'
         if(this.state.profiles.birthday !== undefined){
             birthday = this.state.profiles.birthday
         }
@@ -935,30 +928,11 @@ class EditMyProfilePage extends React.Component{
                             </TouchableOpacity>
                             <TouchableOpacity style={{position:'absolute', right:0, bottom:0, padding:5, margin:5}}
                                             onPress={()=>{this.profilePicture()}}>
-                                <Image style={{ width: 25, height: 25}}
-                                    source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="21.05" height="21.05" viewBox="0 0 21.05 21.05">
-                                    <g id="Group_477" data-name="Group 477" transform="translate(-91.95 -175.4)">
-                                    <g id="Ellipse_43" data-name="Ellipse 43" transform="translate(91.95 175.4)" fill="#fff" stroke="#c6d7dd" stroke-width="1">
-                                        <ellipse cx="10.525" cy="10.525" rx="10.525" ry="10.525" stroke="none"/>
-                                        <ellipse cx="10.525" cy="10.525" rx="10.025" ry="10.025" fill="none"/>
-                                    </g>
-                                    <g id="Group_343" data-name="Group 343" transform="translate(95.206 180.136)">
-                                        <g id="Path_1779" data-name="Path 1779" transform="translate(0 0)" fill="#fff">
-                                        <path d="M 10.79541206359863 11.34874057769775 L 3.159631967544556 11.34874057769775 C 1.693111896514893 11.34874057769775 0.5000019073486328 10.15562057495117 0.5000019073486328 8.689081192016602 L 0.5000019073486328 3.159660816192627 C 0.5000019073486328 1.693120718002319 1.693111896514893 0.5000007748603821 3.159631967544556 0.5000007748603821 L 10.79541206359863 0.5000007748603821 C 12.26193237304688 0.5000007748603821 13.45504188537598 1.693120718002319 13.45504188537598 3.159660816192627 L 13.45504188537598 8.689081192016602 C 13.45504188537598 10.15562057495117 12.26193237304688 11.34874057769775 10.79541206359863 11.34874057769775 Z" stroke="none"/>
-                                        <path d="M 3.159631729125977 1.000000953674316 C 1.968811988830566 1.000000953674316 1.000001907348633 1.968820571899414 1.000001907348633 3.159660339355469 L 1.000001907348633 8.689081192016602 C 1.000001907348633 9.879920959472656 1.968811988830566 10.84874057769775 3.159631729125977 10.84874057769775 L 10.79541206359863 10.84874057769775 C 11.98623180389404 10.84874057769775 12.95504188537598 9.879920959472656 12.95504188537598 8.689081192016602 L 12.95504188537598 3.159660339355469 C 12.95504188537598 1.968820571899414 11.98623180389404 1.000000953674316 10.79541206359863 1.000000953674316 L 3.159631729125977 1.000000953674316 M 3.159631729125977 9.5367431640625e-07 L 10.79541206359863 9.5367431640625e-07 C 12.54042148590088 9.5367431640625e-07 13.95504188537598 1.414630889892578 13.95504188537598 3.159660339355469 L 13.95504188537598 8.689081192016602 C 13.95504188537598 10.43411064147949 12.54042148590088 11.84874057769775 10.79541206359863 11.84874057769775 L 3.159631729125977 11.84874057769775 C 1.41461181640625 11.84874057769775 1.9073486328125e-06 10.43411064147949 1.9073486328125e-06 8.689081192016602 L 1.9073486328125e-06 3.159660339355469 C 1.9073486328125e-06 1.414630889892578 1.41461181640625 9.5367431640625e-07 3.159631729125977 9.5367431640625e-07 Z" stroke="none" fill="#8fb3c1"/>
-                                        </g>
-                                        <g id="Path_1778" data-name="Path 1778" transform="translate(4.476 3.423)" fill="#fff">
-                                        <path d="M 2.501375675201416 4.502800941467285 C 1.397815704345703 4.502800941467285 0.4999956786632538 3.604980945587158 0.4999956786632538 2.501400947570801 C 0.4999956786632538 1.397820949554443 1.397815704345703 0.5000009536743164 2.501375675201416 0.5000009536743164 C 3.604935646057129 0.5000009536743164 4.502755641937256 1.397820949554443 4.502755641937256 2.501400947570801 C 4.502755641937256 3.604980945587158 3.604935646057129 4.502800941467285 2.501375675201416 4.502800941467285 Z" stroke="none"/>
-                                        <path d="M 2.501375675201416 1.000000953674316 C 1.673515558242798 1.000000953674316 0.9999957084655762 1.673531055450439 0.9999957084655762 2.501400947570801 C 0.9999957084655762 3.329270839691162 1.673515558242798 4.002800941467285 2.501375675201416 4.002800941467285 C 3.329235553741455 4.002800941467285 4.002755641937256 3.329270839691162 4.002755641937256 2.501400947570801 C 4.002755641937256 1.673531055450439 3.329235553741455 1.000000953674316 2.501375675201416 1.000000953674316 M 2.501375675201416 9.5367431640625e-07 C 3.882845640182495 9.5367431640625e-07 5.002755641937256 1.119910955429077 5.002755641937256 2.501400947570801 C 5.002755641937256 3.882890939712524 3.882845640182495 5.002800941467285 2.501375675201416 5.002800941467285 C 1.119905710220337 5.002800941467285 -4.291534423828125e-06 3.882890939712524 -4.291534423828125e-06 2.501400947570801 C -4.291534423828125e-06 1.119910955429077 1.119905710220337 9.5367431640625e-07 2.501375675201416 9.5367431640625e-07 Z" stroke="none" fill="#8fb3c1"/>
-                                        </g>
-                                        <g id="Path_1777" data-name="Path 1777" transform="translate(2.106 1.58)" fill="#8fb3c1">
-                                        <path d="M 1.316509366035461 0.5532206296920776 L 0.5266094207763672 0.5532206296920776 C 0.5119394063949585 0.5532206296920776 0.4999994039535522 0.5412806272506714 0.4999994039535522 0.5266106128692627 C 0.4999994039535522 0.511940598487854 0.5119394063949585 0.5000005960464478 0.5266094207763672 0.5000005960464478 L 1.316509366035461 0.5000005960464478 C 1.33117938041687 0.5000005960464478 1.343119382858276 0.511940598487854 1.343119382858276 0.5266106128692627 C 1.343119382858276 0.5412806272506714 1.33117938041687 0.5532206296920776 1.316509366035461 0.5532206296920776 Z" stroke="none"/>
-                                        <path d="M 0.5266094207763672 5.960464477539062e-07 L 1.316509366035461 5.960464477539062e-07 C 1.607349395751953 5.960464477539062e-07 1.843119382858276 0.235770583152771 1.843119382858276 0.5266106128692627 C 1.843119382858276 0.8174506425857544 1.607349395751953 1.053220629692078 1.316509366035461 1.053220629692078 L 0.5266094207763672 1.053220629692078 C 0.2357693910598755 1.053220629692078 -5.960464477539062e-07 0.8174506425857544 -5.960464477539062e-07 0.5266106128692627 C -5.960464477539062e-07 0.235770583152771 0.2357693910598755 5.960464477539062e-07 0.5266094207763672 5.960464477539062e-07 Z" stroke="none" fill="#8fb3c1"/>
-                                        </g>
-                                    </g>
-                                    </g>
-                                </svg>                                                                    
-                                    `}} />
+                                <MyIcon
+                                    name={'camera'}
+                                    size={20}
+                                    color={'#C7D8DD'} 
+                                    />
                             </TouchableOpacity>
                         </View>
                         }
@@ -1010,30 +984,11 @@ class EditMyProfilePage extends React.Component{
                                 onPress={()=>{
                                     this.backgroundPicture()
                                 }}>
-                                 <Image style={{ width: 25, height: 25}}
-                                    source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="21.05" height="21.05" viewBox="0 0 21.05 21.05">
-                                    <g id="Group_477" data-name="Group 477" transform="translate(-91.95 -175.4)">
-                                    <g id="Ellipse_43" data-name="Ellipse 43" transform="translate(91.95 175.4)" fill="#fff" stroke="#c6d7dd" stroke-width="1">
-                                        <ellipse cx="10.525" cy="10.525" rx="10.525" ry="10.525" stroke="none"/>
-                                        <ellipse cx="10.525" cy="10.525" rx="10.025" ry="10.025" fill="none"/>
-                                    </g>
-                                    <g id="Group_343" data-name="Group 343" transform="translate(95.206 180.136)">
-                                        <g id="Path_1779" data-name="Path 1779" transform="translate(0 0)" fill="#fff">
-                                        <path d="M 10.79541206359863 11.34874057769775 L 3.159631967544556 11.34874057769775 C 1.693111896514893 11.34874057769775 0.5000019073486328 10.15562057495117 0.5000019073486328 8.689081192016602 L 0.5000019073486328 3.159660816192627 C 0.5000019073486328 1.693120718002319 1.693111896514893 0.5000007748603821 3.159631967544556 0.5000007748603821 L 10.79541206359863 0.5000007748603821 C 12.26193237304688 0.5000007748603821 13.45504188537598 1.693120718002319 13.45504188537598 3.159660816192627 L 13.45504188537598 8.689081192016602 C 13.45504188537598 10.15562057495117 12.26193237304688 11.34874057769775 10.79541206359863 11.34874057769775 Z" stroke="none"/>
-                                        <path d="M 3.159631729125977 1.000000953674316 C 1.968811988830566 1.000000953674316 1.000001907348633 1.968820571899414 1.000001907348633 3.159660339355469 L 1.000001907348633 8.689081192016602 C 1.000001907348633 9.879920959472656 1.968811988830566 10.84874057769775 3.159631729125977 10.84874057769775 L 10.79541206359863 10.84874057769775 C 11.98623180389404 10.84874057769775 12.95504188537598 9.879920959472656 12.95504188537598 8.689081192016602 L 12.95504188537598 3.159660339355469 C 12.95504188537598 1.968820571899414 11.98623180389404 1.000000953674316 10.79541206359863 1.000000953674316 L 3.159631729125977 1.000000953674316 M 3.159631729125977 9.5367431640625e-07 L 10.79541206359863 9.5367431640625e-07 C 12.54042148590088 9.5367431640625e-07 13.95504188537598 1.414630889892578 13.95504188537598 3.159660339355469 L 13.95504188537598 8.689081192016602 C 13.95504188537598 10.43411064147949 12.54042148590088 11.84874057769775 10.79541206359863 11.84874057769775 L 3.159631729125977 11.84874057769775 C 1.41461181640625 11.84874057769775 1.9073486328125e-06 10.43411064147949 1.9073486328125e-06 8.689081192016602 L 1.9073486328125e-06 3.159660339355469 C 1.9073486328125e-06 1.414630889892578 1.41461181640625 9.5367431640625e-07 3.159631729125977 9.5367431640625e-07 Z" stroke="none" fill="#8fb3c1"/>
-                                        </g>
-                                        <g id="Path_1778" data-name="Path 1778" transform="translate(4.476 3.423)" fill="#fff">
-                                        <path d="M 2.501375675201416 4.502800941467285 C 1.397815704345703 4.502800941467285 0.4999956786632538 3.604980945587158 0.4999956786632538 2.501400947570801 C 0.4999956786632538 1.397820949554443 1.397815704345703 0.5000009536743164 2.501375675201416 0.5000009536743164 C 3.604935646057129 0.5000009536743164 4.502755641937256 1.397820949554443 4.502755641937256 2.501400947570801 C 4.502755641937256 3.604980945587158 3.604935646057129 4.502800941467285 2.501375675201416 4.502800941467285 Z" stroke="none"/>
-                                        <path d="M 2.501375675201416 1.000000953674316 C 1.673515558242798 1.000000953674316 0.9999957084655762 1.673531055450439 0.9999957084655762 2.501400947570801 C 0.9999957084655762 3.329270839691162 1.673515558242798 4.002800941467285 2.501375675201416 4.002800941467285 C 3.329235553741455 4.002800941467285 4.002755641937256 3.329270839691162 4.002755641937256 2.501400947570801 C 4.002755641937256 1.673531055450439 3.329235553741455 1.000000953674316 2.501375675201416 1.000000953674316 M 2.501375675201416 9.5367431640625e-07 C 3.882845640182495 9.5367431640625e-07 5.002755641937256 1.119910955429077 5.002755641937256 2.501400947570801 C 5.002755641937256 3.882890939712524 3.882845640182495 5.002800941467285 2.501375675201416 5.002800941467285 C 1.119905710220337 5.002800941467285 -4.291534423828125e-06 3.882890939712524 -4.291534423828125e-06 2.501400947570801 C -4.291534423828125e-06 1.119910955429077 1.119905710220337 9.5367431640625e-07 2.501375675201416 9.5367431640625e-07 Z" stroke="none" fill="#8fb3c1"/>
-                                        </g>
-                                        <g id="Path_1777" data-name="Path 1777" transform="translate(2.106 1.58)" fill="#8fb3c1">
-                                        <path d="M 1.316509366035461 0.5532206296920776 L 0.5266094207763672 0.5532206296920776 C 0.5119394063949585 0.5532206296920776 0.4999994039535522 0.5412806272506714 0.4999994039535522 0.5266106128692627 C 0.4999994039535522 0.511940598487854 0.5119394063949585 0.5000005960464478 0.5266094207763672 0.5000005960464478 L 1.316509366035461 0.5000005960464478 C 1.33117938041687 0.5000005960464478 1.343119382858276 0.511940598487854 1.343119382858276 0.5266106128692627 C 1.343119382858276 0.5412806272506714 1.33117938041687 0.5532206296920776 1.316509366035461 0.5532206296920776 Z" stroke="none"/>
-                                        <path d="M 0.5266094207763672 5.960464477539062e-07 L 1.316509366035461 5.960464477539062e-07 C 1.607349395751953 5.960464477539062e-07 1.843119382858276 0.235770583152771 1.843119382858276 0.5266106128692627 C 1.843119382858276 0.8174506425857544 1.607349395751953 1.053220629692078 1.316509366035461 1.053220629692078 L 0.5266094207763672 1.053220629692078 C 0.2357693910598755 1.053220629692078 -5.960464477539062e-07 0.8174506425857544 -5.960464477539062e-07 0.5266106128692627 C -5.960464477539062e-07 0.235770583152771 0.2357693910598755 5.960464477539062e-07 0.5266094207763672 5.960464477539062e-07 Z" stroke="none" fill="#8fb3c1"/>
-                                        </g>
-                                    </g>
-                                    </g>
-                                </svg>                                                                    
-                                    `}} />
+                                <MyIcon
+                                    name={'camera'}
+                                    size={20}
+                                    color={'#C7D8DD'} 
+                                    />
                             </TouchableOpacity>
                         </View>
                         }
@@ -1161,6 +1116,7 @@ class EditMyProfilePage extends React.Component{
                         titleTextColor="#007AFF"
                         hideSeparator={true} 
                         accessory="DisclosureIndicator"
+                        // title="Birthday"
                         cellContentView={
                             <View style={{flex:1, flexDirection:'row'}}>
                                 <View style={{flex: 1,
@@ -1169,9 +1125,13 @@ class EditMyProfilePage extends React.Component{
                                         Birthday
                                     </Text>
                                 </View>
+                                <View style={{position:'absolute', right:0, alignSelf: 'center',}}>
+                                    <Text style={{fontSize:16, color:'gray'}}>{birthday}</Text>
+                                </View>
+
                                 {/* Moment(new Date(birthday)).format('MMMM DD, YYYY') */}
                                 <View style={{flex: 1, }}>
-                                    <DatePicker
+                                    {/* <DatePicker
                                         ref={(ref)=>this.datePickerRef=ref}
                                         style={{width: 200, color:'gray' }}
                                         date={birthday}
@@ -1183,6 +1143,8 @@ class EditMyProfilePage extends React.Component{
                                         confirmBtnText="Confirm"
                                         cancelBtnText="Cancel"
                                         // customArrowIcon={null} 
+
+                                        hideText={true}
                                         // iconSource={require('../../Images/google_calendar.png')}
                                         customStyles={{
                                             dateIcon: {
@@ -1203,6 +1165,42 @@ class EditMyProfilePage extends React.Component{
                                                 // this.setState({loading:false})
                                             })
                                         }}
+                                        />  */}
+
+
+                                        <DatePicker
+                                            ref={(ref)=>this.datePickerRef=ref}
+                                            style={{width: 200}}
+                                            date={Moment(birthday).format('YYYY-MM-DD')}
+                                            mode="date"
+                                            placeholder="select date"
+                                            format="YYYY-MM-DD"
+                                            minDate="1920-01-01"
+                                            maxDate={this.state.date}
+                                            confirmBtnText="Confirm"
+                                            cancelBtnText="Cancel"
+                                            hideText={true}
+                                            customStyles={{
+                                            dateIcon: {
+                                                position: 'absolute',
+                                                width:0,
+                                                height:0,
+                                            },
+                                            dateInput: {
+                                                marginLeft: 36
+                                            }
+                                            // ... You can check the source to find the other keys.
+                                            }}
+                                            onDateChange={(date) => {
+                                                // this.setState({date: date})
+
+                                                // console.log(Moment(date).format('MMMM DD, YYYY'))
+                                                // format="MMMM DD, YYYY"
+                                                this.props.actionBirthdayProfile(this.props.uid, Moment(date).format('MMMM DD, YYYY'), (result) => {
+                                                    console.log(result)
+                                                    // this.setState({loading:false})
+                                                })
+                                            }}
                                         />
                                 </View>
                             </View>
@@ -1297,7 +1295,7 @@ class EditMyProfilePage extends React.Component{
                         accessory="DisclosureIndicator"
                         cellContentView={
                             <TextInput
-                                style={{ fontSize: 16, flex: 1, color :"gray", marginBottom:10}}
+                                style={{ fontSize: 22, flex: 1, color :"gray", marginBottom:10}}
                                 placeholder="None"
                                 value={this.state.profiles.address}
                                 editable={false} 

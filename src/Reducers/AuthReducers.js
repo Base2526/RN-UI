@@ -360,14 +360,14 @@ export default (state= INITIAL_STATE, action)=>{
                             // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
                             intereste_in : {
                                 ...state.users.profiles.intereste_in,
-                                [action.interestein_key]:{id: action.interestein_id, enable: true}
+                                [action.interestein_key]:{id: action.interestein_id, enable: action.interestein_status}
                             }
                         }
                     }
                 }
                 return v
             }else{
-                let newValue = {...value, enable:!value.enable}
+                let newValue = {...value, enable:action.interestein_status}
 
                 let v = {
                     ...state,

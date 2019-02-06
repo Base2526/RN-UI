@@ -16,9 +16,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import FastImage from 'react-native-fast-image'
 import { ifIphoneX } from 'react-native-iphone-x-helper'
 import { connect } from 'react-redux';
-
 import * as actions from '../Actions'
-import TestSVG from '../test/TestSVG'
 
 const formatData = (data, numColumns) => {
     // เป้นการ ลบ item ที่มี ​field ออกทั้งหมด เพราะว่าเรารองรับการ orientation srceen ด้วย
@@ -128,6 +126,7 @@ class DrawerMenu extends React.Component{
 
     onLoadDataMyApplication = (my_applications) =>{
         let data_my_application = []
+        /*
         Object.entries(my_applications).forEach(([key, value]) => {
 
             if(value.status){
@@ -136,7 +135,8 @@ class DrawerMenu extends React.Component{
             //   unPublishedMember.push({key, item_id: key, ...value})
             }
         })
-        console.log(data_my_application)
+        */
+
         this.setState({data_my_application})
     }
 
@@ -275,11 +275,21 @@ class DrawerMenu extends React.Component{
                     justifyContent:'center',
                     alignItems:'center'
                 }}>
-                    <TestSVG 
+                    {/* <TestSVG 
                       width={calculatorWidthHeightItem(5)}
                       height={calculatorWidthHeightItem(5)}
                       strokeWidth={3}
-                      image_uri={''}/>
+                      image_uri={''}/> */}
+
+                    <FastImage
+                      style={{width: calculatorWidthHeightItem(5), height: calculatorWidthHeightItem(5), borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
+                      source={{
+                        uri: '',
+                        headers:{ Authorization: 'someAuthToken' },
+                        priority: FastImage.priority.normal,
+                      }}
+                      resizeMode={FastImage.resizeMode.cover}
+                    />
                 </View>
                 </TouchableOpacity>
     }
@@ -389,11 +399,20 @@ class DrawerMenu extends React.Component{
                                     marginLeft:10,
                                     alignItems:'center'}}>
                             <TouchableOpacity style={{}}>
-                                <TestSVG 
+                                {/* <TestSVG 
                                     width={80}
                                     height={80}
                                     strokeWidth={3}
-                                    image_uri={users.profiles.image_url}/> 
+                                    image_uri={users.profiles.image_url}/>  */}
+                                <FastImage
+                                    style={{width: 80, height: 80, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
+                                    source={{
+                                        uri: users.profiles.image_url,
+                                        headers:{ Authorization: 'someAuthToken' },
+                                        priority: FastImage.priority.normal,
+                                    }}
+                                    resizeMode={FastImage.resizeMode.cover}
+                                    />
                             </TouchableOpacity> 
                             <View style={{marginRight: 90,}}>
                             <Text style={{paddingLeft:10, 
@@ -416,7 +435,7 @@ class DrawerMenu extends React.Component{
                                 contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
                                 key = {this.state.orientation}/>
                         </View>
-                        <View>
+                        {/* <View>
                             <Text>My Application</Text>
                             <FlatList
                                 contentContainerStyle={styles.list}
@@ -427,8 +446,8 @@ class DrawerMenu extends React.Component{
                                 // contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
                                 key = {this.state.orientation}
                                 extraData={data_my_application}/>
-                        </View>
-                        <View>
+                        </View> */}
+                        {/* <View>
                         <Text>Following</Text>
                         <FlatList
                             contentContainerStyle={styles.list}
@@ -438,7 +457,7 @@ class DrawerMenu extends React.Component{
                             renderItem={this.renderItemFollowing}
                             contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
                             key = {this.state.orientation}/>
-                    </View>
+                    </View> */}
                     </ScrollView>
                 </View>  
             }

@@ -15,7 +15,7 @@ class EditDisplayNamePage extends React.Component{
     static navigationOptions = ({ navigation }) => {
         return {
             title: "Edit display name",
-            headerTintColor: 'white',
+            headerTintColor: '#C7D8DD',
             headerStyle: {
                 backgroundColor: 'rgba(186, 53, 100, 1.0)',
                 // ios navigationoptions underline hide
@@ -33,7 +33,7 @@ class EditDisplayNamePage extends React.Component{
                         const { params = {} } = navigation.state
                         params.handleSave()
                     }}>
-                    <Text style={{fontSize:18, color:'white'}}>SAVE</Text>
+                    <Text style={{fontSize:18, color:'#C7D8DD', fontWeight:'bold'}}>Save</Text>
                 </TouchableOpacity>
                 </View>
             ),
@@ -59,23 +59,23 @@ class EditDisplayNamePage extends React.Component{
         if(this.state.text.length == 0){
             alert('Name is empty?')
         }else{
-
-            this.setState({loading:true})
-            this.props.actionEditDisplayNameProfile(this.props.uid, this.state.text, (result) => {
-                console.log(result)
-
-                this.setState({loading:false})
-
+            if(this.props.profiles.name === this.state.text){
                 const { navigation } = this.props;
                 navigation.goBack();
-            })
+            }else{
+                this.setState({loading:true})
+                this.props.actionEditDisplayNameProfile(this.props.uid, this.state.text, (result) => {
+                    console.log(result)
+
+                    this.setState({loading:false})
+
+                    const { navigation } = this.props;
+                    navigation.goBack();
+                })
+            }
         }
     }
 
-    componentWillReceiveProps(nextProps) {
-    //   console.log(nextProps)
-    }
-      
     render() {
         return (<View style={{margin:10}}>
                     <Spinner

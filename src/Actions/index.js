@@ -693,8 +693,22 @@ export const actionGenderProfile = (uid, gender_id, callback) => dispatch =>{
 }
 
 // InteresteIn
-export const actionInteresteInProfile = (uid, interestein_id, callback) => dispatch =>{
+export const actionInteresteInProfile = (uid, interestein_key, interestein_id, interestein_status, callback) => dispatch =>{
 
+    if(interestein_key === undefined){
+        interestein_key = randomKey()
+    }
+
+    dispatch({ type: INTERESTE_IN_PROFILE, interestein_key, interestein_id, interestein_status});
+
+    firebase.firestore().collection('profiles').doc(uid).collection('intereste_in').doc(interestein_key).set({
+        id: interestein_id,
+        enable: interestein_status,
+    }, { merge: true});
+
+    
+
+    /*
     let key = randomKey()
     dispatch({ type: INTERESTE_IN_PROFILE, interestein_key:key, interestein_id});
 
@@ -720,8 +734,6 @@ export const actionInteresteInProfile = (uid, interestein_id, callback) => dispa
                     });
                 }).then(result => {
                     console.log('Transaction success!');
-
-                   
                 }).catch(err => {
                     console.log('Transaction failure:', err);
                 });               
@@ -730,7 +742,7 @@ export const actionInteresteInProfile = (uid, interestein_id, callback) => dispa
         // UPDATE_INTERESTE_IN_PROFILE
     })
 
-    
+    */
     callback({'status':true})
 }
 
@@ -1027,6 +1039,21 @@ export function watchTaskEvent(uid, dispatch) {
     }, (error) => {
         //...
         console.log(error)
+    })
+
+    // track profile > intereste_in
+    firebase.firestore().collection('profiles').doc(uid).collection('intereste_in').onSnapshot((querySnapshot) => {
+        querySnapshot.docChanges.forEach(function(change) {
+
+            let doc_id   = change.doc.id
+            let doc_data = change.doc.data()
+            if (change.type === 'added') {  
+                dispatch({ type: INTERESTE_IN_PROFILE, interestein_key:doc_id, interestein_id:doc_data.id, interestein_status:doc_data.enable});
+            }
+            if (change.type === 'modified') {
+                dispatch({ type: INTERESTE_IN_PROFILE, interestein_key:doc_id, interestein_id:doc_data.id, interestein_status:doc_data.enable});
+            }
+        })
     })
 
     // track friends

@@ -12,7 +12,7 @@ import {getUid, validateEmail} from '../../Utils/Helpers'
 class AddAnotherEmail extends React.Component{
     static navigationOptions = ({ navigation }) => ({
         title: `${navigation.state.params.title}`,
-        headerTintColor: 'white',
+        headerTintColor: '#C7D8DD',
         headerStyle: {
             backgroundColor: 'rgba(186, 53, 100, 1.0)',
   
@@ -31,7 +31,7 @@ class AddAnotherEmail extends React.Component{
                     const { params = {} } = navigation.state
                     params.handleSave()
                 }}>
-                <Text style={{fontSize:18, color:'white'}}>{navigation.state.params.mode == 'add' ? 'ADD' : 'UPDATE'}</Text>
+                <Text style={{fontSize:18, color:'#C7D8DD', fontWeight:'bold'}}>{navigation.state.params.mode == 'add' ? 'Add' : 'Update'}</Text>
             </TouchableOpacity>
             </View>
         ),
