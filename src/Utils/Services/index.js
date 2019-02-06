@@ -302,3 +302,49 @@ export const application_category = () =>{
             console.error(error);
         });
 }
+
+export const update_picture_profile  = (uid, image_uri) =>{
+    var data = new FormData();
+    data.append('idna', {
+        uri: image_uri, 
+        name: 'imageName.png',
+        type: 'image/png'
+    })
+    data.append("uid", uid)
+
+    return fetch(Constant.UPDATE_PICTURE_PROFILE, {
+        headers: Constant.FETCH_HEADERS,
+        method: 'POST',
+        body: data
+    }).then((response) => {
+        return response.json()
+    }).then((responseJson) => {
+        return responseJson;
+    }).catch((error) => {
+    return {'status': false, 'message': error}
+    })
+}
+
+// 
+
+export const update_picture_bg_profile  = (uid, image_uri) =>{
+    var data = new FormData();
+    data.append('idna', {
+        uri: image_uri, 
+        name: 'imageName.png',
+        type: 'image/png'
+    })
+    data.append("uid", uid)
+
+    return fetch(Constant.UPDATE_PICTURE_BG_PROFILE, {
+        headers: Constant.FETCH_HEADERS,
+        method: 'POST',
+        body: data
+    }).then((response) => {
+        return response.json()
+    }).then((responseJson) => {
+        return responseJson;
+    }).catch((error) => {
+        return {'status': false, 'message': error}
+    })
+}

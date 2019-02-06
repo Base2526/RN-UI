@@ -1,7 +1,7 @@
 import React from 'react';
-import {View, Text} from 'react-native'
+import {View, Text, Image} from 'react-native'
 import { createBottomTabNavigator, createStackNavigator } from 'react-navigation';
-import Image from 'react-native-remote-svg'
+// import Image from 'react-native-remote-svg'
 
 import ContactsScreen from './CONTACTS';
 import RecentScreen from './RECENT';
@@ -16,7 +16,7 @@ const SettingsTabs = createBottomTabNavigator({
             tabBarLabel: ({ routes, index, focused }) => (<View style={{flex:1, alignItems:'center'}}><Text style={{color:focused ? '#D52A6B' : '#BCD1D5'}}>Contacts</Text></View>),
             tabBarIcon: ({ tintColor, focused }) => (
                 <View style={{padding:5,}}>
-                    <Image
+                    {/* <Image
                         style={{ width: 22, height: 22}}
                         source={{uri:focused ? `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="25.983" height="25.999" viewBox="0 0 25.983 25.999">
                         <g id="contracts" transform="translate(-0.5 0.5)">
@@ -30,7 +30,21 @@ const SettingsTabs = createBottomTabNavigator({
                         <path id="Union_25" data-name="Union 25" d="M7.092,25h0A28.867,28.867,0,0,1,2.54,21.371a12.5,12.5,0,0,1-1.5-1.984,7.479,7.479,0,0,1-.372-.694,5.694,5.694,0,0,1-.62-2.069A4.048,4.048,0,0,1,0,16a3.77,3.77,0,0,1,3.71-3.82,3.705,3.705,0,0,1,3.427,2.351,3.7,3.7,0,0,1,3.425-2.351,3.581,3.581,0,0,1,.606.051,3.589,3.589,0,0,0-.205,1.2,3.645,3.645,0,0,0,.049.59c0,.193.068,1.948,2.446,4.5.04.047.085.1.13.145A11.176,11.176,0,0,1,11.4,21.71,28.6,28.6,0,0,1,7.093,25ZM17.93,21.96h0a30.15,30.15,0,0,1-4.341-3.293,6.414,6.414,0,0,0,.635-2.043A3.954,3.954,0,0,0,14.273,16a3.773,3.773,0,0,0-3.1-3.768,3.655,3.655,0,0,1,6.8-.193,3.649,3.649,0,0,1,7.01,1.393,3.69,3.69,0,0,1-.049.6,8.359,8.359,0,0,1-2.767,4.815,27.949,27.949,0,0,1-4.235,3.118ZM3.5,6.061A3.5,3.5,0,1,1,7,9.56,3.5,3.5,0,0,1,3.5,6.061ZM14.342,3.5a3.5,3.5,0,1,1,3.5,3.5A3.5,3.5,0,0,1,14.342,3.5Z" transform="translate(1 0)" fill="#b5ccd1" stroke="rgba(0,0,0,0)" stroke-width="1"/>
                       </g>
                     </svg>
-                    `}} />
+                    `}} /> */}
+
+                    {/* 
+                    
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25.983" height="25.999" viewBox="0 0 25.983 25.999">
+  <g id="contracts" transform="translate(-0.5 0.5)">
+    <rect id="Rectangle_550" data-name="Rectangle 550" width="25" height="25" transform="translate(1)" fill="none"/>
+    <path id="Union_25" data-name="Union 25" d="M7.092,25h0A28.867,28.867,0,0,1,2.54,21.371a12.5,12.5,0,0,1-1.5-1.984,7.479,7.479,0,0,1-.372-.694,5.694,5.694,0,0,1-.62-2.069A4.048,4.048,0,0,1,0,16a3.77,3.77,0,0,1,3.71-3.82,3.705,3.705,0,0,1,3.427,2.351,3.7,3.7,0,0,1,3.425-2.351,3.581,3.581,0,0,1,.606.051,3.589,3.589,0,0,0-.205,1.2,3.645,3.645,0,0,0,.049.59c0,.193.068,1.948,2.446,4.5.04.047.085.1.13.145A11.176,11.176,0,0,1,11.4,21.71,28.6,28.6,0,0,1,7.093,25ZM17.93,21.96h0a30.15,30.15,0,0,1-4.341-3.293,6.414,6.414,0,0,0,.635-2.043A3.954,3.954,0,0,0,14.273,16a3.773,3.773,0,0,0-3.1-3.768,3.655,3.655,0,0,1,6.8-.193,3.649,3.649,0,0,1,7.01,1.393,3.69,3.69,0,0,1-.049.6,8.359,8.359,0,0,1-2.767,4.815,27.949,27.949,0,0,1-4.235,3.118ZM3.5,6.061A3.5,3.5,0,1,1,7,9.56,3.5,3.5,0,0,1,3.5,6.061ZM14.342,3.5a3.5,3.5,0,1,1,3.5,3.5A3.5,3.5,0,0,1,14.342,3.5Z" transform="translate(1 0)" fill="#b5ccd1" stroke="rgba(0,0,0,0)" stroke-width="1"/>
+  </g>
+</svg>
+                    */}
+                    <Image
+                        style={{width: 22, height: 22}}
+                        source={focused ? require('../Images/icon-tab-contacts-selected.png'): require('../Images/icon-tab-contacts.png')}
+                    />
                 </View>
             )
         }
@@ -67,7 +81,7 @@ const SettingsTabs = createBottomTabNavigator({
             tabBarLabel: ({ routes, index, focused }) => (<View style={{flex:1, alignItems:'center'}}><Text style={{color:focused ? '#D52A6B' : '#BCD1D5'}}>iDNA</Text></View>),
             tabBarIcon: ({ tintColor, focused}) => (
                 <View style={{padding:5}}>
-                    <Image
+                    {/* <Image
                         style={{ width: 22, height: 22}}
                         source={{uri:focused ? `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25">
                         <g id="idna" transform="translate(-1)">
@@ -111,7 +125,13 @@ const SettingsTabs = createBottomTabNavigator({
                         </g>
                       </g>
                     </svg>
-                    `}} />
+                    `}} /> */}
+
+                    
+                    <Image
+                        style={{width: 22, height: 22}}
+                        source={focused ? require('../Images/icon-tab-center-selected.png'): require('../Images/icon-tab-center.png')}
+                    />
                 </View>
             )
         }
@@ -123,7 +143,7 @@ const SettingsTabs = createBottomTabNavigator({
             tabBarLabel: ({ routes, index, focused }) => (<View style={{flex:1, alignItems:'center'}}><Text style={{ color:focused ? '#D52A6B' : '#BCD1D5'}}>Settings</Text></View>),
             tabBarIcon: ({ tintColor, focused }) => (
                 <View style={{padding:5}}>
-                    <Image
+                    {/* <Image
                         style={{ width: 25, height: 25}}
                         source={{uri:focused ? `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25">
                         <g id="setting" transform="translate(-1)">
@@ -156,7 +176,14 @@ const SettingsTabs = createBottomTabNavigator({
                           <path id="Path_437" data-name="Path 437" d="M925.966,2127.41a3.842,3.842,0,0,0,1.274,2.362,14.553,14.553,0,0,0,2.327,1.8,14.312,14.312,0,0,0,2.2-1.634,4.371,4.371,0,0,0,1.441-2.53" transform="translate(-908.237 -2125.206)" fill="#b5ccd1"/>
                         </g>
                       </g>
-                    </svg>`}} />
+                    </svg>`}} /> */}
+
+                    {/* icon-menu.png */}
+
+                    <Image
+                        style={{width: 22, height: 22}}
+                        source={focused ? require('../Images/icon-tab-more-selected.png'): require('../Images/icon-tab-more.png')}
+                    />
                 </View>
             )
         }

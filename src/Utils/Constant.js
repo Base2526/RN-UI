@@ -25,6 +25,9 @@ module.exports = {
     CREATE_MY_APPLICATION: API_URL + END_POINT + '/create_my_application',
     APPLICATION_CATEGORY: API_URL + END_POINT + '/application_category',
     
+    UPDATE_PICTURE_PROFILE: API_URL + END_POINT + '/update_picture_profile',
+    UPDATE_PICTURE_BG_PROFILE: API_URL + END_POINT + '/update_picture_bg_profile',
+
     FETCH_HEADERS: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -76,4 +79,7 @@ module.exports = {
     GROUP_STATUS_MEMBER_CANCELED: '38', 
     GROUP_STATUS_MEMBER_DECLINE: '37',
     GROUP_STATUS_MEMBER_LEAVE: '39',
+
+    gender: [{id:29, name:'Female'}, {id:28, name:'Male'}, {id:42, name:'Custom'}],
+    intereste_in: [{id:43, name:'Women'}, {id:44, name:'Men'}]
 };

@@ -544,7 +544,7 @@ function me_user_insert(&$edit, $account, $category) {
     $bundle_identifier  = $getallheaders['bundle_identifier'];
     $version_application= $getallheaders['version_application'];
 
-    $my_id = generateMyID($account->uid);
+    // $my_id = generateMyID($account->uid);
 
     // module_load_include('module', 'opentok', 'opentok');
     // $opentok_session_id = opentok_create_session($account->uid)->__toString();
@@ -571,10 +571,12 @@ function me_user_insert(&$edit, $account, $category) {
           // $profile->field_opentok_session_id[LANGUAGE_NONE][0]['value'] = $opentok_session_id;
           // profile2_save($profile);
 
+          /*
           $mid_value = array();
           $mid_value[$my_id_item_id] = array( "value"    => $my_id, 
                                               "is_edit"  => true, 
                                               "enabled"  => true);
+                                              */
 
           $sound_call_waiting_value = array();
           $sound_call_waiting_value[$sound_call_waiting_item_id] = array("nid"    => "396", 
@@ -596,7 +598,7 @@ function me_user_insert(&$edit, $account, $category) {
                           "url_my_qrcode"   => $url_my_qrcode,
                           "image_url"       => getDefualtProfilePicture(),
                           "bg_url"          => getDefualtBackgroundCardPicture(),
-                          "my_id"           => $mid_value,
+                          // "my_id"           => $mid_value,
                           "sound_call_waiting"  => $sound_call_waiting_value,
                           "badge"           => '0',
                           "badges"          => array($badges_item_id=>$badges),
@@ -694,9 +696,9 @@ function me_user_insert(&$edit, $account, $category) {
 
         $profile = profile2_by_uid_load($account->uid, 'main');
 
-        $my_id = generateMyID($account->uid);
+        // $my_id = generateMyID($account->uid);
 
-        $my_id_item_id = setDefualtMyID($profile, $my_id);
+        // $my_id_item_id = setDefualtMyID($profile, $my_id);
         $badges_item_id = setDefualtBadges($profile);
 
         $sound_call_waiting_item_id = setDefualtSoundCallWaiting($profile);
@@ -711,10 +713,10 @@ function me_user_insert(&$edit, $account, $category) {
         // profile2_save($profile);
 
 
-        $mid_value = array();
-        $mid_value[$my_id_item_id] = array("value"     => $my_id, 
-                                      "is_edit"   => true, 
-                                      "enabled"   => true);
+        // $mid_value = array();
+        // $mid_value[$my_id_item_id] = array("value"     => $my_id, 
+        //                               "is_edit"   => true, 
+        //                               "enabled"   => true);
 
 
         $sound_call_waiting_value = array();
@@ -736,7 +738,7 @@ function me_user_insert(&$edit, $account, $category) {
                         "url_my_qrcode"   => $url_my_qrcode,
                         "image_url"       => getDefualtProfilePicture(),
                         "bg_url"          => getDefualtBackgroundCardPicture(),
-                        "my_id"           => $mid_value,
+                        // "my_id"           => $mid_value,
                         "sound_call_waiting"  => $sound_call_waiting_value,
                         "badge"           => '0',
                         "badges"          => array($badges_item_id=>$badges),
@@ -1931,10 +1933,10 @@ function me_services_resources()
         ),
       ),
     ),
-    'update_picture_bg'=>array(
+    'update_picture_bg_profile'=>array(
       'create' =>array(
         'help'=>'idna Update Profile BG',
-        'callback'=>'update_picture_bg',
+        'callback'=>'update_picture_bg_profile',
         'access callback' => 'user_access',
         'access arguments' => array('access content'),
         'access arguments append' => FALSE,
@@ -3858,7 +3860,7 @@ function onLoadProfile($uid, $mode){
                            "sound_call_waiting" => (object)$sound_call_waitings,
                            "mails"          => (object)$emails,
                            "phones"         => (object)$phones,
-                           "my_id"          => (object)$my_id,
+                          //  "my_id"          => (object)$my_id,
                            "image_url"      => $profile_image_url,
                            "bg_url"         => $profile_bg_url,
                            "badges"         => (object)$badges,
@@ -4135,7 +4137,7 @@ function onLoadProfile($uid, $mode){
                            "sound_call_waiting" => (object)$sound_call_waitings,
                            "mails"          => (object)$emails,
                            "phones"         => (object)$phones,
-                           "my_id"          => (object)$my_id,
+                          //  "my_id"          => (object)$my_id,
                            "image_url"      => $profile_image_url,
                            "bg_url"         => $profile_bg_url,
                            "badges"         => (object)$badges,
@@ -9322,7 +9324,7 @@ function update_picture_profile(){
     return $result;
   }
   
-  if (empty($_REQUEST['uid']) || empty($_FILES["idna"]["tmp_name"])) {
+  if (empty($_REQUEST['uid']) || empty($_FILES["idna"])) {
     $result['result']   = FALSE;
     $result['message']  = "function : update_picture_profile, parameter";
     $result['_REQUEST'] = $_REQUEST;
@@ -9330,7 +9332,7 @@ function update_picture_profile(){
     return $result;
   }
 
-  global $firebase;
+  // global $firebase;
   $uid   = $_REQUEST['uid'];
 
   $time_start = microtime(true);
@@ -9364,7 +9366,11 @@ function update_picture_profile(){
   $data_update = array(
       "image_url"  =>$url
   );
-  $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/profiles/", $data_update);
+  
+  // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/profiles/", $data_update);
+  
+  firestore_db()->collection(FIRESTORE_PROFILES)->document($uid)->set($data_update, ['merge' => true]);
+  
   // Firebase : update image url profile
 
   /*
@@ -9693,7 +9699,7 @@ function chat_upload_video(){
 }
 
 
-function update_picture_bg(){
+function update_picture_bg_profile(){
   $result = array();
 
   if (!check_header()) {
@@ -9711,21 +9717,21 @@ function update_picture_bg(){
 
   // return $result;
 
-  if (empty($_REQUEST['uid']) || empty($_REQUEST['image'])) {
+  if (empty($_REQUEST['uid']) || empty($_FILES["idna"])) {
     $result['result'] = FALSE;
-    $result['message']  = "function : update_picture_bg, parameter";
-    $result['_REQUEST']  = $_REQUEST;
+    $result['message']  = "function : update_picture_bg_profile, parameter";
+    // $result['_REQUEST']  = $_REQUEST;
     return $result;
   }
 
   global $firebase;
 
   $uid   = $_REQUEST['uid'];
-  $image = $_REQUEST['image'];
+  // $image = $_REQUEST['image'];
 
   $profile = profile2_by_uid_load($uid, 'main');
 
-  if($image != ""){
+  // if($image != ""){
 
     /*
     // http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
@@ -9759,14 +9765,51 @@ function update_picture_bg(){
     // Firebase : update image url profile
     */
 
+    // $binary =  file_get_contents($_FILES["idna"]["tmp_name"]);
+
+    $profile = profile2_by_uid_load($uid, 'main');
+
+    // http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
+    $binary =  file_get_contents($_FILES["idna"]["tmp_name"]);//base64_decode($image);
+  
+    //Create the directory if it does not already exist, otherwise check the permissions
+    $directory = 'public://';
+    file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+  
+    $currentDate = date("Ymd");
+    $file_name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
+    
+    //Saves a file to the specified destination and creates a database entry.
+    $image_url = (array)klovers_file_save_data($uid, $binary, $directory. '/' . $file_name, FILE_EXISTS_RENAME);
+    
+    // save รูป profile
+    $profile->field_picture_bg[LANGUAGE_NONE][0] = $image_url;
+    profile2_save($profile);
+  
+    // $image_url['uri']
+    //   // dpm(image_style_url('medium',$uri));
+    // $url = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+    $url = file_create_url(image_style_url('medium', $image_url['uri']));
+    // $url = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
+  
+    // Firebase : update image url profile
+    $data_update = array(
+        "bg_url"  =>$url
+    );
+    
+    // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/profiles/", $data_update);
+    
+    firestore_db()->collection(FIRESTORE_PROFILES)->document($uid)->set($data_update, ['merge' => true]);
+  
+
     $result['result'] = TRUE;  
     $result['url']    = $url;
     // $result['uri']    = $uri;
     return $result;
-  }else{
-    $result['result'] = FALSE; 
-    return $result; 
-  }  
+  // }else{
+  //   $result['result'] = FALSE; 
+  //   return $result; 
+  // }  
 }
 
 /*

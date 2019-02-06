@@ -344,7 +344,7 @@ class AddGroupsPage extends React.Component{
                   placeholderTextColor = "gray"
                   autoCapitalize = "none"
                   ref= {(el) => { this.groupName = el; }}
-                  onChangeText = {this.handleEmail}
+                  onChangeText = {this.handleGroupName}
                   value={this.state.groupName}/>
             </View>
 
@@ -381,7 +381,7 @@ class AddGroupsPage extends React.Component{
       );
     };
 
-    handleEmail = (groupName) => {
+    handleGroupName = (groupName) => {
         this.setState({ groupName })
     }
 

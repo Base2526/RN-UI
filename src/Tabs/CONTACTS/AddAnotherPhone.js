@@ -5,10 +5,10 @@ import {View,
         TouchableOpacity,
         TextInput} from 'react-native';
 import { connect } from 'react-redux';
-import {getStatusBarHeight} from '../../Utils/Helpers'
+import Spinner from 'react-native-loading-spinner-overlay';
 
 import * as actions from '../../Actions'
-import {validateMobile} from '../../Utils/Helpers'
+import {validateMobile, getUid} from '../../Utils/Helpers'
 
 class AddAnotherPhone extends React.Component{
 
@@ -45,7 +45,11 @@ class AddAnotherPhone extends React.Component{
         this.state ={
             mode:'add',
             key:'',
-            text: ''
+            text: '',
+            loading: false,
+
+            error: false,
+            error_message : ''
         }
     }
 
@@ -64,11 +68,7 @@ class AddAnotherPhone extends React.Component{
     }
 
     handleSave = () => {
-        /**
-        const { navigation } = this.props;
-        navigation.goBack();
-        navigation.state.params.onAddAnotherEmail(newData);
-        */
+        this.setState({error: false})
 
         if(!validateMobile(this.state.text)){
             // this.setState({text:''})
@@ -80,18 +80,58 @@ class AddAnotherPhone extends React.Component{
              * เช็ดว่ามีอยู่ในระบบแล้วหรือไหม
              **/
 
+            /*
             const { navigation } = this.props;
             navigation.goBack();
             navigation.state.params.onAddAnotherPhone({value: {phone_number: this.state.text, isVerify:false}, mode:this.state.mode, key:this.state.key });
+            */
+
+           if(this.state.mode === 'add'){
+                this.setState({loading: true})
+                this.props.actionAddPhoneProfile(this.props.uid, this.state.text, (result) => {
+                    console.log(result)
+                    
+                    this.setState({loading:false})
+                    if(result.status){
+                        const { navigation } = this.props;
+                        navigation.goBack();
+                    }else{
+                        // this.setState({loading:false}, ()=>{
+                        //     alert(result.message)
+                        // })
+
+                        this.setState({
+                            error: true,
+                            error_message: result.message
+                        })
+                    }
+                })
+           }else if(this.state.mode === 'edit'){
+                this.setState({loading: true})
+                this.props.actionEditPhoneProfile(this.props.uid, this.state.key,this.state.text, (result) => {
+                    this.setState({loading:false})
+                    if(result.status){
+                        const { navigation } = this.props;
+                        navigation.goBack();
+                    }else{
+                        this.setState({
+                            error: true,
+                            error_message: result.message
+                        })
+                    }
+                })
+           }
         }
     }
 
     render(){
-
-        // let {name} = this.state
-
         return( <View style={{flex:1}}>
-                    
+                    <Spinner
+                        visible={this.state.loading}
+                        textContent={'Wait...'}
+                        textStyle={{color: '#FFF'}}
+                        overlayColor={'rgba(0,0,0,0.5)'}
+                    />
                     <View style={{margin:20}}>
                         <TextInput
                             style={{ fontSize: 22, padding:10, borderColor:'gray', borderWidth:.5}}
@@ -99,8 +139,14 @@ class AddAnotherPhone extends React.Component{
                             value={this.state.text}
                             clearButtonMode='while-editing'
                             keyboardType="numeric"
-                            placeholder= {this.state.text}
-                        />
+                            placeholder= 'input phone number'
+                            maxLength={10} />
+                        <View style={{position:'absolute', bottom:0}}>
+                            <Text style={{color:'red'}}>{this.state.error?this.state.error_message:''}</Text>
+                        </View>
+                        <View style={{alignItems:'flex-end'}}>
+                            <Text style={{color:'gray'}}>{this.state.text.length}/10</Text>
+                        </View>
                     </View>
                 </View>)
     }
@@ -114,7 +160,7 @@ const mapStateToProps = (state) => {
     }
       
     return({
-        // uid:getUid(state)
+        uid:getUid(state),
         auth:state.auth
     })
 }

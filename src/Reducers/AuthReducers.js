@@ -26,7 +26,30 @@ import {USER_LOGIN_SUCCESS,
         MODIFIED_MY_APPLICATION,
         REMOVED_MY_APPLICATION,
         UPDATE_STATUS_MY_APPLICATION,
-        ADD_APPLICATION_CATEGORY}  from '../Actions/types'
+        ADD_APPLICATION_CATEGORY,
+        UPDATE_PICTURE_PROFILE,
+        UPDATE_PICTURE_BG_PROFILE,
+        EDIT_DISPLAY_NAME_PROFILE,
+        EDIT_STATUS_MESSAGE_PROFILE,
+        EDIT_MY_ID_PROFILE,
+        GENDER_PROFILE,
+        INTERESTE_IN_PROFILE,
+        BIRTHDAY_PROFILE,
+
+        ADD_PHONE_PROFILE,
+        EDIT_PHONE_PROFILE,
+        REMOVE_PHONE_PROFILE,
+
+        ADDRESS_PROFILE,
+
+        ADD_WEBSITE_PROFILE,
+        EDIT_WEBSITE_PROFILE,
+        REMOVE_WEBSITE_PROFILE,
+    
+        ADD_EMAIL_PROFILE,
+        EDIT_EMAIL_PROFILE,
+        REMOVE_EMAIL_PROFILE,
+        }  from '../Actions/types'
 
 const INITIAL_STATE = {users:null,
                        provider:'',
@@ -36,7 +59,7 @@ const INITIAL_STATE = {users:null,
                        application_category: null
                        }
 
-import {isEquivalent2Object} from '../Utils/Helpers'
+import {isEquivalent2Object, randomKey} from '../Utils/Helpers'
 
 export default (state= INITIAL_STATE, action)=>{
     console.log(action)
@@ -169,7 +192,495 @@ export default (state= INITIAL_STATE, action)=>{
                 // console.log(v)
                 return v
             }
+            return state
+        }
 
+        case UPDATE_PICTURE_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            // let profiles = state.users.profiles;
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        image_url:action.image_url
+                    }
+                }
+            }
+
+            // console.log(v)
+            return v
+        }
+
+        case UPDATE_PICTURE_BG_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            // let profiles = state.users.profiles;
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        bg_url:action.bg_url
+                    }
+                }
+            }
+
+            return v
+        }
+
+        case EDIT_DISPLAY_NAME_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        name:action.name
+                    }
+                }
+            }
+
+            return v
+        }
+
+        case EDIT_STATUS_MESSAGE_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        status_message:action.status_message
+                    }
+                }
+            }
+
+            return v
+        }
+
+        case EDIT_MY_ID_PROFILE: {
+            if(state.users === null){
+                return state
+            }
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        my_id:action.my_id
+                    }
+                }
+            }
+            return v
+        }
+
+        // dispatch({ type: GENDER_PROFILE, gender:gender_id});
+
+        case GENDER_PROFILE: {
+            if(state.users === null){
+                return state
+            }
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        gender:action.gender_id
+                    }
+                }
+            }
+            return v
+        }
+
+        case BIRTHDAY_PROFILE : {
+            if(state.users === null){
+                return state
+            }
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        birthday:action.birthday
+                    }
+                }
+            }
+            return v
+        }
+
+        // INTERESTE_IN_PROFILE
+        case INTERESTE_IN_PROFILE :{
+            if(state.users === null){
+                return state
+            }
+
+            let intereste_in = state.users.profiles.intereste_in
+
+            let key = 0
+            let value = null
+            _.each(intereste_in, function(_v, _k) { 
+                if(_v.id == action.interestein_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            if(key == 0){
+                // กรณียังไม่เคยมี
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                            intereste_in : {
+                                ...state.users.profiles.intereste_in,
+                                [action.interestein_key]:{id: action.interestein_id, enable: true}
+                            }
+                        }
+                    }
+                }
+                return v
+            }else{
+                let newValue = {...value, enable:!value.enable}
+
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            intereste_in : {
+                                ...state.users.profiles.intereste_in,
+                                [key]:newValue
+                            }
+                        }
+                    }
+                }
+
+                return v
+            }
+
+            return state
+        }
+
+        case ADD_PHONE_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                        phones : {
+                            ...state.users.profiles.phones,
+                            [action.phone_key]:{phone_number: action.phone_number, is_verify:action.is_verify}
+                        }
+                    }
+                }
+            }
+            return v
+        }
+
+        case EDIT_PHONE_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let phones = state.users.profiles.phones
+            if(Object.keys(phones).length == 0){
+                return state
+            }
+
+            let value = null
+            _.each(phones, function(_v, _k) { 
+                if(_k === action.phone_key){
+                    value = _v
+                }
+            });
+
+            if(value !== null){
+                let newPhones = {...phones, [action.phone_key]:{phone_number: action.phone_number}}
+
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                            phones : {
+                                ...state.users.profiles.phones, ...newPhones
+                            }
+                        }
+                    }
+                }
+                // console.log(v)
+                return v
+            }
+
+            return state
+        }
+
+        case REMOVE_PHONE_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let phones = {...state.users.profiles.phones}
+            if(Object.keys(phones).length == 0){
+                return state
+            }
+
+            let newPhones = _.omit(phones, action.phone_key)
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        phones : newPhones
+                    }
+                }
+            }
+            return v
+        }
+
+        case ADDRESS_PROFILE : {
+            if(state.users === null){
+                return state
+            }
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        address:action.address
+                    }
+                }
+            }
+            return v
+        }
+
+
+        /* 
+        ADD_WEBSITE_PROFILE,
+        EDIT_WEBSITE_PROFILE,
+        REMOVE_WEBSITE_PROFILE
+        */
+        case ADD_WEBSITE_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                        websites : {
+                            ...state.users.profiles.websites,
+                            [action.website_key]:{url: action.url}
+                        }
+                    }
+                }
+            }
+
+            // console.log(v)
+            return v
+        }
+
+        case EDIT_WEBSITE_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let websites = state.users.profiles.websites
+            if(Object.keys(websites).length == 0){
+                return state
+            }
+
+            let value = null
+            _.each(websites, function(_v, _k) { 
+                if(_k === action.website_key){
+                    value = _v
+                }
+            });
+
+            if(value !== null){
+                let newWebsites = {...websites, [action.website_key]:{url: action.url}}
+
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                            websites : {
+                                ...state.users.profiles.websites, ...newWebsites
+                            }
+                        }
+                    }
+                }
+                // console.log(v)
+                return v
+            }
+
+            return state
+        }
+
+        case REMOVE_WEBSITE_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let websites = {...state.users.profiles.websites}
+            if(Object.keys(websites).length == 0){
+                return state
+            }
+
+            let newWebsites = _.omit(websites, action.website_key)
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        websites : newWebsites
+                    }
+                }
+            }
+            return v
+        }
+
+        /*
+        ADD_EMAIL_PROFILE,
+        EDIT_EMAIL_PROFILE,
+        REMOVE_EMAIL_PROFILE,
+        */
+        case ADD_EMAIL_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                        emails : {
+                            ...state.users.profiles.emails,
+                            [action.email_key]:{email: action.email}
+                        }
+                    }
+                }
+            }
+
+            // console.log(v)
+            return v
+        }
+
+        case EDIT_EMAIL_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let emails = state.users.profiles.emails
+            if(Object.keys(emails).length == 0){
+                return state
+            }
+
+            let value = null
+            _.each(emails, function(_v, _k) { 
+                if(_k === action.email_key){
+                    value = _v
+                }
+            });
+
+            if(value !== null){
+                let newEmails = {...emails, [action.email_key]:{email: action.email}}
+
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                            emails : {
+                                ...state.users.profiles.emails, ...newEmails
+                            }
+                        }
+                    }
+                }
+                // console.log(v)
+                return v
+            }
+
+            return state
+        }
+
+        case REMOVE_EMAIL_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let emails = {...state.users.profiles.emails}
+            if(Object.keys(emails).length == 0){
+                return state
+            }
+
+            let newEmails = _.omit(emails, action.email_key)
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        emails : newEmails
+                    }
+                }
+            }
+            // return v
             return state
         }
 
@@ -250,8 +761,6 @@ export default (state= INITIAL_STATE, action)=>{
                         }
                     }
                 }
-                // console.log(v)
-
                 return v;
             }
 

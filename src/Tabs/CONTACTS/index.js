@@ -45,6 +45,12 @@ import AddAnotherEmail from './AddAnotherEmail'
 import AddGroupsSelectMemberPage from './AddGroupsSelectMemberPage'
 import AddClasssSelectMemberPage from './AddClasssSelectMemberPage'
 
+import EditDisplayNamePage from './EditDisplayNamePage'
+import EditStatusMessagePage from './EditStatusMessagePage'
+import EditMyIDPage from './EditMyIDPage'
+
+import EditAddressPage from './EditAddressPage'
+
 const index = createStackNavigator({
     'Home': {
         screen: Home,
@@ -94,6 +100,7 @@ const index = createStackNavigator({
         // title: 'My Profile',
       }
     },
+    
     'FriendProfilePage': {
       screen: FriendProfilePage,
       navigationOptions: {
@@ -190,6 +197,10 @@ const BasicInfoNavigator = createStackNavigator(
   'AddAnotherPhone': {screen: AddAnotherPhone},
   'AddAnotherWebsite': {screen: AddAnotherWebsite},
   'AddAnotherEmail': {screen: AddAnotherEmail},
+  'EditDisplayNamePage':{screen: EditDisplayNamePage},
+  'EditStatusMessagePage':{screen: EditStatusMessagePage},
+  'EditMyIDPage':{screen: EditMyIDPage},
+  'EditAddressPage':{screen: EditAddressPage}
 },
 {
   // headerMode: 'none',
@@ -278,7 +289,11 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
       routeName === 'AddAnotherPhone' ||
       routeName === 'AddAnotherEmail' || 
       routeName === 'AddAnotherWebsite' ||
-      routeName === 'EditMyProfilePage'
+      routeName === 'EditMyProfilePage' ||
+      routeName === 'EditDisplayNamePage' ||
+      routeName === 'EditStatusMessagePage' ||
+      routeName === 'EditMyIDPage' ||
+      routeName === 'EditAddressPage'
       ) {
     navigationOptions.tabBarVisible = false;
   }

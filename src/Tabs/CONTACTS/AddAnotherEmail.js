@@ -5,16 +5,24 @@ import {View,
         TouchableOpacity,
         TextInput} from 'react-native';
 import { connect } from 'react-redux';
-import {getStatusBarHeight} from '../../Utils/Helpers'
 
 import * as actions from '../../Actions'
-import {getUid} from '../../Utils/Helpers'
+import {getUid, validateEmail} from '../../Utils/Helpers'
 
 class AddAnotherEmail extends React.Component{
-
     static navigationOptions = ({ navigation }) => ({
-        // title: "Add email",
         title: `${navigation.state.params.title}`,
+        headerTintColor: 'white',
+        headerStyle: {
+            backgroundColor: 'rgba(186, 53, 100, 1.0)',
+  
+            // ios navigationoptions underline hide
+            borderBottomWidth: 0,
+  
+            // android navigationoptions underline hide
+            elevation: 0,
+            shadowOpacity: 0
+        },
         headerRight: (
             <View style={{marginRight:10}}>
             <TouchableOpacity
@@ -23,7 +31,7 @@ class AddAnotherEmail extends React.Component{
                     const { params = {} } = navigation.state
                     params.handleSave()
                 }}>
-                <Text style={{fontSize:18, color:'black'}}>ADD</Text>
+                <Text style={{fontSize:18, color:'white'}}>{navigation.state.params.mode == 'add' ? 'ADD' : 'UPDATE'}</Text>
             </TouchableOpacity>
             </View>
         ),
@@ -32,8 +40,12 @@ class AddAnotherEmail extends React.Component{
     constructor(props){
         super(props)
         this.state ={
-            friend: '',
-            text: ''
+            mode:'add',
+            key:'',
+            text: '',
+
+            error: false,
+            error_message : ''
         }
     }
 
@@ -42,15 +54,63 @@ class AddAnotherEmail extends React.Component{
 
         const { navigation } = this.props;
         const mode = navigation.getParam('mode', null);
-        console.log(mode)
+  
+        if(mode === 'edit'){
+            const key = navigation.getParam('key', null);
+            const value = navigation.getParam('value', null);
+
+            this.setState({mode, key, text:value.email})
+        }
     }
 
     handleSave = () => {
-        /**
-        const { navigation } = this.props;
-        navigation.goBack();
-        navigation.state.params.onAddAnotherEmail(newData);
-          */
+        if(!validateEmail(this.state.text)){
+            // this.setState({text:''})
+            alert('Not a valid email')
+        }else{
+            console.log('validate phone')
+
+            /**
+             * เช็ดว่ามีอยู่ในระบบแล้วหรือไหม
+             **/
+            // const { navigation } = this.props;
+            // navigation.goBack();
+            // navigation.state.params.onAddAnotherEmail({value: {name: this.state.text, isVerify:false}, mode:this.state.mode, key:this.state.key });
+
+            if(this.state.mode === 'add'){
+                this.setState({loading: true})
+                this.props.actionAddEmailProfile(this.props.uid, this.state.text, (result) => {
+                    // console.log(result)
+                    
+                    this.setState({loading:false})
+                    if(result.status){
+                        const { navigation } = this.props;
+                        navigation.goBack();
+                    }else{
+                        this.setState({
+                            error: true,
+                            error_message: result.message
+                        })
+                    }
+                })
+            }else if(this.state.mode === 'edit'){
+                this.setState({loading: true})
+                this.props.actionEditEmailProfile(this.props.uid, this.state.key, this.state.text, (result) => {
+                    this.setState({loading:false})
+
+                    if(result.status){
+                       
+                        const { navigation } = this.props;
+                        navigation.goBack();
+                    }else{
+                        this.setState({
+                            error: true,
+                            error_message: result.message
+                        })
+                    }
+                })
+            }
+        }
     }
 
     render(){
@@ -63,14 +123,23 @@ class AddAnotherEmail extends React.Component{
                             clearButtonMode='while-editing'
                             keyboardType="email-address"
                             placeholder= {this.state.text}
+                            multiline={true}
+                            autoCapitalize = 'none'
+                            maxLength={50}
                         />
+                        <View style={{position:'absolute', bottom:0}}>
+                            <Text style={{color:'red'}}>{this.state.error?this.state.error_message:''}</Text>
+                        </View>
+                        <View style={{alignItems:'flex-end'}}>
+                            <Text style={{color:'gray'}}>{this.state.text.length}/50</Text>
+                        </View>
                     </View>
                 </View>)
     }
 }
 
 const mapStateToProps = (state) => {
-    console.log(state)
+    // console.log(state)
     return({
         uid:getUid(state)
     })

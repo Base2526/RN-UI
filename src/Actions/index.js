@@ -28,10 +28,34 @@ import {USER_LOGIN_SUCCESS,
         MODIFIED_MY_APPLICATION,
         REMOVED_MY_APPLICATION,
         UPDATE_STATUS_MY_APPLICATION,
-        ADD_APPLICATION_CATEGORY} from './types'
+        ADD_APPLICATION_CATEGORY,
+        UPDATE_PICTURE_PROFILE,
+        UPDATE_PICTURE_BG_PROFILE,
+        EDIT_DISPLAY_NAME_PROFILE,
+        EDIT_STATUS_MESSAGE_PROFILE,
+        EDIT_MY_ID_PROFILE,
+        GENDER_PROFILE,
+        INTERESTE_IN_PROFILE,
+        BIRTHDAY_PROFILE,
+    
+        ADD_PHONE_PROFILE,
+        EDIT_PHONE_PROFILE,
+        REMOVE_PHONE_PROFILE,
+    
+        ADDRESS_PROFILE,
 
-import {saveAsyncStorage, loadAsyncStorage} from '../Utils/Helpers'
+        ADD_WEBSITE_PROFILE,
+        EDIT_WEBSITE_PROFILE,
+        REMOVE_WEBSITE_PROFILE,
+    
+        ADD_EMAIL_PROFILE,
+        EDIT_EMAIL_PROFILE,
+        REMOVE_EMAIL_PROFILE,} from './types'
+
+import {randomKey} from '../Utils/Helpers'
 import Constant from '../Utils/Constant'
+
+// import {isEquivalent2Object, randomKey} from '../Utils/Helpers'
 
 import {login, 
         people_you_may_khow, 
@@ -39,7 +63,9 @@ import {login,
         create_group,
         create_class,
         application_category,
-        create_my_application} from '../Utils/Services'
+        create_my_application,
+        update_picture_profile,
+        update_picture_bg_profile} from '../Utils/Services'
 
 // export const emailChanged = (text) =>{
 //     return({
@@ -590,6 +616,282 @@ export const actionUpdateStatusMyApplication = (uid, my_application_id, callback
 
     callback({'status':true})
 }
+
+export const actionUpdatePictureProfile = (uid, image_uri, callback) => dispatch =>{
+    return update_picture_profile(uid, image_uri).then(data => {
+        if((data instanceof Array)){
+            return {'status':false, 'message': data}
+        }else{
+            if(!data.result){
+                return {'status':false, 'message': data}
+            }else{
+                dispatch({ type: UPDATE_PICTURE_PROFILE, image_url:data.image_url});
+                return {'status':true}
+            }
+        }
+    })
+}
+
+// UPDATE_PICTURE_BG_PROFILE
+export const actionUpdatePictureBGProfile = (uid, image_uri, callback) => dispatch =>{
+    return update_picture_bg_profile(uid, image_uri).then(data => {
+        if((data instanceof Array)){
+            return {'status':false, 'message': data}
+        }else{
+            if(!data.result){
+                return {'status':false, 'message': data}
+            }else{
+                dispatch({ type: UPDATE_PICTURE_BG_PROFILE, bg_url:data.bg_url});
+                return {'status':true}
+            }
+        }
+    })
+}
+
+// EDIT_DISPLAY_NAME_PROFILE
+export const actionEditDisplayNameProfile = (uid, name, callback) => dispatch =>{
+    firebase.firestore().collection('profiles').doc(uid).set({
+        name,
+    }, { merge: true});
+
+    dispatch({ type: EDIT_DISPLAY_NAME_PROFILE, name});
+
+    callback({'status':true, uid, name})
+}
+
+// EDIT_STATUS_MESSAGE_PROFILE
+export const actionEditStatusMessageProfile = (uid, status_message, callback) => dispatch =>{
+    firebase.firestore().collection('profiles').doc(uid).set({
+        status_message,
+    }, { merge: true});
+
+    dispatch({ type: EDIT_STATUS_MESSAGE_PROFILE, status_message});
+
+    callback({'status':true, uid, status_message})
+}
+
+// EDIT_MY_ID_PROFILE
+export const actionEditMyIDProfile = (uid, my_id, callback) => dispatch =>{
+    firebase.firestore().collection('profiles').doc(uid).set({
+        my_id,
+    }, { merge: true});
+
+    dispatch({ type: EDIT_MY_ID_PROFILE, my_id});
+
+    callback({'status':true})
+}
+
+// Gender
+export const actionGenderProfile = (uid, gender_id, callback) => dispatch =>{
+    firebase.firestore().collection('profiles').doc(uid).set({
+        gender:gender_id,
+    }, { merge: true});
+
+    dispatch({ type: GENDER_PROFILE, gender:gender_id});
+
+    callback({'status':true})
+}
+
+// InteresteIn
+export const actionInteresteInProfile = (uid, interestein_id, callback) => dispatch =>{
+
+    let key = randomKey()
+    dispatch({ type: INTERESTE_IN_PROFILE, interestein_key:key, interestein_id});
+
+    firebase.firestore().collection('profiles').doc(uid).collection('intereste_in').where("id", "==", interestein_id).get().then(snapshot => {
+        
+        if(snapshot.size == 0){
+            firebase.firestore().collection('profiles').doc(uid).collection('intereste_in').doc(key).set({
+                id: interestein_id,
+                enable: true,
+            })
+        }else{
+
+            // dispatch({ type: UPDATE_INTERESTE_IN_PROFILE, interestein_id});
+
+            snapshot.docs.forEach(doc => {
+                // https://firebase.google.com/docs/firestore/manage-data/transactions
+                var intereste_inRef = firebase.firestore().collection('profiles').doc(uid).collection('intereste_in').doc(doc.id);
+
+                var transaction = firebase.firestore().runTransaction(t => {
+                    return t.get(intereste_inRef)
+                    .then(doc => {
+                        t.update(intereste_inRef, {enable: !doc.data().enable});
+                    });
+                }).then(result => {
+                    console.log('Transaction success!');
+
+                   
+                }).catch(err => {
+                    console.log('Transaction failure:', err);
+                });               
+            });
+        }
+        // UPDATE_INTERESTE_IN_PROFILE
+    })
+
+    
+    callback({'status':true})
+}
+
+// BIRTHDAY_PROFILE
+export const actionBirthdayProfile = (uid, date, callback) => dispatch =>{
+    firebase.firestore().collection('profiles').doc(uid).set({
+        birthday:date,
+    }, { merge: true});
+
+    dispatch({ type: BIRTHDAY_PROFILE, birthday:date});
+
+    callback({'status':true})
+}
+
+export const actionAddPhoneProfile = (uid, phone_number, callback) => dispatch =>{
+
+    let key = randomKey()
+
+    firebase.firestore().collection('profiles').doc(uid).collection('phones').where("phone_number", "==", phone_number).get().then(snapshot => {
+        if(snapshot.size == 0){
+            firebase.firestore().collection('profiles').doc(uid).collection('phones').doc(key).set({
+                phone_number,
+                is_verify:false
+            })
+
+            dispatch({ type: ADD_PHONE_PROFILE, phone_key:key, phone_number, is_verify:false});
+            callback({'status':true})
+        }else{
+
+            callback({'status':false, 'message':'Duplicate phone number'})
+        }
+    })
+}
+
+export const actionEditPhoneProfile = (uid, phone_key ,phone_number, callback) => dispatch =>{
+    firebase.firestore().collection('profiles').doc(uid).collection('phones').where("phone_number", "==", phone_number).get().then(snapshot => {
+        if(snapshot.size == 0){
+            firebase.firestore().collection('profiles').doc(uid).collection('phones').doc(phone_key).set({
+                phone_number,
+            }, { merge: true});
+        
+            dispatch({ type: EDIT_PHONE_PROFILE, phone_key, phone_number});
+
+            callback({'status':true})
+        }else{
+            callback({'status':false, 'message':'Duplicate phone number'})
+        }
+    })
+}
+
+export const actionRemovePhoneProfile = (uid, phone_key, callback) => dispatch =>{
+    firebase.firestore().collection('profiles').doc(uid).collection('phones').doc(phone_key).delete()
+    dispatch({ type: REMOVE_PHONE_PROFILE, phone_key});
+    callback({'status':true})
+}
+
+// Address
+export const actionAddressProfile = (uid, address, callback) => dispatch =>{
+    firebase.firestore().collection('profiles').doc(uid).set({
+        address,
+    }, { merge: true});
+
+    dispatch({ type: ADDRESS_PROFILE, address});
+
+    callback({'status':true})
+}
+
+// websites
+/* 
+ADD_WEBSITE_PROFILE,
+EDIT_WEBSITE_PROFILE,
+REMOVE_WEBSITE_PROFILE
+*/
+export const actionAddWebsiteProfile = (uid, url, callback) => dispatch =>{
+
+    let key = randomKey()
+
+    firebase.firestore().collection('profiles').doc(uid).collection('websites').where("url", "==", url).get().then(snapshot => {
+        if(snapshot.size == 0){
+            firebase.firestore().collection('profiles').doc(uid).collection('websites').doc(key).set({
+                url
+            })
+
+            dispatch({ type: ADD_WEBSITE_PROFILE, website_key:key, url});
+            callback({'status':true})
+        }else{
+
+            callback({'status':false, 'message':'Duplicate website.'})
+        }
+    })
+}
+
+export const actionEditWebsiteProfile = (uid, website_key ,url, callback) => dispatch =>{
+    firebase.firestore().collection('profiles').doc(uid).collection('websites').where("url", "==", url).get().then(snapshot => {
+        if(snapshot.size == 0){
+            firebase.firestore().collection('profiles').doc(uid).collection('websites').doc(website_key).set({
+                url,
+            }, { merge: true});
+        
+            dispatch({ type: EDIT_WEBSITE_PROFILE, website_key, url});
+
+            callback({'status':true})
+        }else{
+            callback({'status':false, 'message':'Duplicate website'})
+        }
+    })
+}
+
+export const actionRemoveWebsiteProfile = (uid, website_key, callback) => dispatch =>{
+    firebase.firestore().collection('profiles').doc(uid).collection('websites').doc(website_key).delete()
+    dispatch({ type: REMOVE_WEBSITE_PROFILE, website_key});
+    callback({'status':true})
+}
+
+// Emails
+/**
+ADD_EMAIL_PROFILE,
+EDIT_EMAIL_PROFILE,
+REMOVE_EMAIL_PROFILE,
+*/
+export const actionAddEmailProfile = (uid, email, callback) => dispatch =>{
+
+    let key = randomKey()
+
+    firebase.firestore().collection('profiles').doc(uid).collection('emails').where("email", "==", email).get().then(snapshot => {
+        if(snapshot.size == 0){
+            firebase.firestore().collection('profiles').doc(uid).collection('emails').doc(key).set({
+                email
+            })
+
+            dispatch({ type: ADD_EMAIL_PROFILE, email_key:key, email});
+            callback({'status':true})
+        }else{
+
+            callback({'status':false, 'message':'Duplicate email.'})
+        }
+    })
+}
+
+export const actionEditEmailProfile = (uid, email_key, email, callback) => dispatch =>{
+    firebase.firestore().collection('profiles').doc(uid).collection('emails').where("email", "==", email).get().then(snapshot => {
+        if(snapshot.size == 0){
+            firebase.firestore().collection('profiles').doc(uid).collection('emails').doc(email_key).set({
+                email,
+            }, { merge: true});
+        
+            dispatch({ type: EDIT_EMAIL_PROFILE, email_key, email});
+
+            callback({'status':true})
+        }else{
+            callback({'status':false, 'message':'Duplicate email'})
+        }
+    })
+}
+
+export const actionRemoveEmailProfile = (uid, email_key, callback) => dispatch =>{
+    firebase.firestore().collection('profiles').doc(uid).collection('emails').doc(email_key).delete()
+    dispatch({ type: REMOVE_EMAIL_PROFILE, email_key});
+    callback({'status':true})
+}
+
 
 let unsubscribe = null;
 

@@ -3,23 +3,27 @@ import {FlatList,
         StyleSheet, 
         View, 
         Text, 
-        Alert, 
         Platform, 
         TouchableOpacity,
         ScrollView,
-        SafeAreaView,} from 'react-native'
+        Linking,
+    SafeAreaView} from 'react-native'
 
 import { Header } from 'react-navigation';
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
-import { isIphoneX } from 'react-native-iphone-x-helper';
+import { isIphoneX, ifIphoneX } from 'react-native-iphone-x-helper';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import Share, {ShareSheet, Button} from 'react-native-share';
+import Moment from 'moment'
+var _ = require('lodash');
 
 import {getStatusBarHeight} from '../../Utils/Helpers'
 import * as actions from '../../Actions'
 import Image from 'react-native-remote-svg'
 import TestSVG from '../../test/TestSVG'
+
+import Constant from '../../Utils/Constant'
 
 let shareOptions = {
     title: "React Native",
@@ -108,25 +112,165 @@ class MyProfilePage extends React.Component{
         this.props.navigation.navigate("EditMyProfilePage")
     }
 
+    phonesList(){
+        return Object.entries(this.props.auth.users.profiles.phones).map(([key, value]) => {
+            return(<Cell
+                key={key}
+                cellStyle="Subtitle"
+                titleTextColor="#007AFF"
+                hideSeparator={false} 
+                cellContentView={
+                <View style={{flexDirection:'row'}}>
+                    <View style={{flex:1, flexDirection:'row'}}>
+                        <Text style={{fontSize: 22,  }}>
+                            {value.phone_number} 
+                        </Text>
+                        <TouchableOpacity
+                            style={{alignSelf:'flex-end'}}
+                            onPress={()=>{
+                                alert('Verify')
+                            }}>
+                            <Text style={{fontSize: 16, color:'blue', marginLeft:10, textAlignVertical:'bottom'}}>
+                                {value.is_verify ? '': ''}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            }
+        />)
+        })
+    }
+
+
+    emailsList(){
+
+        if(this.props.auth.users.profiles.emails === undefined){
+            return;
+        }
+
+        return Object.entries(this.props.auth.users.profiles.emails).map(([key, value]) => {
+            return(<Cell
+                    key={key}
+                    cellStyle="Subtitle"
+                    titleTextColor="#007AFF"
+                    hideSeparator={false} 
+                    accessory="DisclosureIndicator"
+                    cellContentView={
+                    <View style={{flex:1,}}>
+                        <View style={{flex:1,}}>
+                            <Text style={{flex:1, fontSize: 16, marginTop:10 }}>
+                                {value.email}
+                            </Text>
+                        </View>
+                    </View>
+                    }
+                    onPress={()=>{
+                        // this.openURL('mailto:' + value.email);
+
+                        Linking.openURL('mailto:support@example.com')
+                    }}
+                    />)
+        })
+    }
+
+    websitesList(){
+        // return(<View><Text>test</Text></View>)
+        if(this.props.auth.users.profiles.websites === undefined){
+            return;
+        }
+
+        return Object.entries(this.props.auth.users.profiles.websites).map(([key, value]) => {
+            return(<Cell
+                    key={key}
+                    cellStyle="Subtitle"
+                    titleTextColor="#007AFF"
+                    hideSeparator={false} 
+                    accessory="DisclosureIndicator"
+                    cellContentView={
+                    <View style={{flex:1}}>
+                        <View style={{flex:1}}>
+                            <Text style={{flex:1, fontSize:16, marginTop:10, marginBottom:10, color:'blue'}}>
+                                {value.url}
+                            </Text>
+                        </View>
+                    </View>
+                    }
+                    onPress={()=>{
+                        Linking.openURL(value.url)
+                    }}
+                />)
+        })
+    }
+
     render() {
-        let {name, image_url} = this.props.auth.users.profiles
+        let {name, image_url, bg_url, status_message, my_id, gender} = this.props.auth.users.profiles
         // let{name, image_url} = this.props.auth.users.profiles;
-        return (<ScrollView style={{ flex: 1,}}>
+
+        
+        let __ = Constant.gender.filter(function(item){
+            return item.id == gender;
+        })
+
+        let text_gender = ''
+        if(__.length > 0){
+            text_gender = __[0].name
+        }
+
+        let birthday = ''
+        if(this.props.auth.users.profiles.birthday !== undefined){
+            birthday = this.props.auth.users.profiles.birthday
+
+        }
+
+        // intereste_in
+        let intereste_in = []
+        if(this.props.auth.users.profiles.intereste_in !== undefined){
+            _.each(this.props.auth.users.profiles.intereste_in,  function(v, k) { 
+                if(v.enable){
+                    let f = Constant.intereste_in.find(k => k.id==v.id)
+                    intereste_in.push(f.name)
+                }
+            })
+        }
+
+        // value={this.props.auth.users.profiles.address}
+        let address = ''
+        if(this.props.auth.users.profiles.address !== undefined){
+            address = this.props.auth.users.profiles.address
+        }
+
+        // isIphoneX() ? 25 : 0
+        return (<ScrollView style={{ flex: 1, marginBottom:isIphoneX() ? 50 : 0 }}>
                 <View style={{flex:1, backgroundColor:'gray'}}>
                     {/* <BackgroundImage style={{paddingTop:this.getHeaderInset()}} auth={this.props.auth} /> */}
                     <View style={{flex:1, paddingTop: this.getHeaderInset(), flexDirection:'row'}}>
                         <FastImage
                             style={StyleSheet.absoluteFill}
-                            source={require('../../Images/boxpink.png')}
+                            // source={require('../../Images/boxpink.png')}
+                            source={{
+                                uri: bg_url,
+                                headers:{ Authorization: 'someAuthToken' },
+                                priority: FastImage.priority.normal,
+                            }}
                             resizeMode={FastImage.resizeMode.cover}
                         />
                         <View style={{flexDirection:'row', margin:20}}>
                         <TouchableOpacity>
-                            <TestSVG 
+                            {/* <TestSVG 
                                 width={100}
                                 height={100}
                                 strokeWidth={3}
-                                image_uri={image_url}/> 
+                                image_uri={image_url}/>  */}
+
+                            <FastImage
+                                style={{width: 100, height: 100, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
+                                source={{
+                                uri: image_url,
+                                headers:{ Authorization: 'someAuthToken' },
+                                priority: FastImage.priority.normal,
+                                }}
+                                resizeMode={FastImage.resizeMode.cover}
+                            />
                         </TouchableOpacity>
                         <View style = {{
                             justifyContent: 'center',
@@ -189,7 +333,7 @@ class MyProfilePage extends React.Component{
                                                 Status message
                                             </Text>
                                             <Text style={{ fontSize:18 }}>
-                                                The most valuable lessons in life cannot be taught, they must be experienced.
+                                                {status_message == "" ? "Not set" : status_message}
                                             </Text>
                                         </View>
                                     </View>
@@ -224,7 +368,7 @@ class MyProfilePage extends React.Component{
                                                 My ID
                                             </Text>
                                             <Text style={{ fontSize:18 }}>
-                                                XUASDFOPMNBSSS
+                                                {my_id == "" ? "Not set" : my_id}
                                             </Text>
                                         </View>
                                         
@@ -242,7 +386,7 @@ class MyProfilePage extends React.Component{
                                                 Gender
                                             </Text>
                                             <Text style={{ fontSize:18 }}>
-                                                Male
+                                                {text_gender}
                                             </Text>
                                         </View>
                                     </View>
@@ -259,7 +403,8 @@ class MyProfilePage extends React.Component{
                                                 Birthday
                                             </Text>
                                             <Text style={{ fontSize:18 }}>
-                                                January 4, 1983
+                                                {birthday != ''? Moment(new Date(birthday)).format('MMMM DD, YYYY'):'Not set'}
+                                                {/*  */}
                                             </Text>
                                         </View>
                                     </View>
@@ -276,7 +421,7 @@ class MyProfilePage extends React.Component{
                                                 Interested In
                                             </Text>
                                             <Text style={{ fontSize:18 }}>
-                                                Women
+                                                {intereste_in.length == 0 ? "None": intereste_in.join(", ")}
                                             </Text>
                                         </View>
                                         
@@ -302,45 +447,24 @@ class MyProfilePage extends React.Component{
                                     </View>
                                 }
                             />
-                            <Cell
-                                cellStyle="Basic"
-                                contentContainerStyle={{  }} 
-                                hideSeparator={true}
-                                cellContentView={
-                                    <View style={{flex:1, marginBottom:10}}>
-                                        <View >
-                                            <Text style={{ }}>
-                                            Mobile
-                                            </Text>
-                                            <Text style={{ fontSize:18 }}>
-                                                0988264820
-                                            </Text>
-                                        </View>
-                                    </View>
-                                }
-                            />
-                            <Cell
-                                cellStyle="Basic"
-                                contentContainerStyle={{ }} 
-                                hideSeparator={true}
-                                cellContentView={
-                                    <View style={{flex:1, marginBottom:10}}>
-                                        <View >
-                                            <Text style={{ }}>
-                                            Home
-                                            </Text>
-                                            <Text style={{ fontSize:18}}>
-                                                0988264820
-                                            </Text>
-                                        </View>
-                                    </View>
-                                }
-                            />
 
                             <Cell
+                                cellStyle="Subtitle"
+                                titleTextColor="#007AFF"
+                                hideSeparator={true} 
+                                cellContentView={
+                                    <View style={{flex:1, flexDirection:'row'}}>
+                                        <Text style={{flex:1, fontSize: 16,  }}>
+                                        Mobile phones
+                                        </Text>
+                                    </View>
+                                }
+                            />
+                            {this.phonesList()}
+                            <Cell
                                 cellStyle="Basic"
                                 contentContainerStyle={{ }} 
-                                hideSeparator={true}
+                                hideSeparator={false}
                                 cellContentView={
                                     <View style={{flex:1, marginBottom:10}}>
                                         <View >
@@ -348,7 +472,7 @@ class MyProfilePage extends React.Component{
                                             Address
                                             </Text>
                                             <Text style={{ fontSize:18}}>
-                                            ซอยสุขสวัสดิ์ 26 บางปะกอก
+                                            {address}
                                             </Text>
                                         </View>
                                     </View>
@@ -364,13 +488,12 @@ class MyProfilePage extends React.Component{
                                             <Text style={{ }}>
                                             Website
                                             </Text>
-                                            <Text style={{ fontSize:18}}>
-                                            www.klovers.org
-                                            </Text>
+                                           
                                         </View>
                                     </View>
                                 }
                             />
+                            {this.websitesList()}
                             <Cell
                                 cellStyle="Basic"
                                 contentContainerStyle={{ padding:10 }} 
@@ -381,13 +504,12 @@ class MyProfilePage extends React.Component{
                                             <Text style={{ }}>
                                                 Email
                                             </Text>
-                                            <Text style={{ fontSize:18 }}>
-                                                android.somkid@gmail.com
-                                            </Text>
+                                            
                                         </View>
                                     </View>
                                 }
                             />
+                            {this.emailsList()}
                         </Section>
                     </TableView>
                     </View>

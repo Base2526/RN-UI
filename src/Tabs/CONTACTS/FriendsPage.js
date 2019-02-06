@@ -161,11 +161,21 @@ class FriendsPage extends React.Component{
                       this._itemOnPress(rowItem, rowId, sectionId)
                     }}
                     >
-                    <TestSVG 
+                    {/* <TestSVG 
                       width={80}
                       height={80}
                       strokeWidth={3}
-                      image_uri={rowItem.image_url}/>
+                      image_uri={rowItem.image_url}/> */}
+
+                    <FastImage
+                      style={{width: 80, height: 80, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
+                      source={{
+                        uri: rowItem.image_url,
+                        headers:{ Authorization: 'someAuthToken' },
+                        priority: FastImage.priority.normal,
+                      }}
+                      resizeMode={FastImage.resizeMode.cover}
+                    />
                   </TouchableOpacity>
                   <View>
                     <Text style={{fontSize: 18, 
@@ -173,12 +183,12 @@ class FriendsPage extends React.Component{
                                   color: '#222',
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
-                        Name : {rowItem.name}
+                        {rowItem.name}
                     </Text>
                     <Text style={{fontSize: 13, 
                                 color: '#222',
                                 paddingLeft: 10}}>
-                        Status : {rowItem.status}
+                        {rowItem.status}
                     </Text>
                   </View>
               </View>
@@ -330,11 +340,21 @@ class FriendsPage extends React.Component{
                   onPress={()=>{
                     this._itemOnPress(rowItem, rowId, sectionId)
                   }}>
-                      <TestSVG 
+                      {/* <TestSVG 
                         width={80}
                         height={80}
                         strokeWidth={3}
-                        image_uri={rowItem.profile.image_url}/>
+                        image_uri={rowItem.profile.image_url}/> */}
+
+                      <FastImage
+                        style={{width: 80, height: 80, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
+                        source={{
+                          uri: rowItem.profile.image_url,
+                          headers:{ Authorization: 'someAuthToken' },
+                          priority: FastImage.priority.normal,
+                        }}
+                        resizeMode={FastImage.resizeMode.cover}
+                      />
                 </TouchableOpacity>
                 <View>
                     <Text style={{fontSize: 18, 
@@ -342,12 +362,12 @@ class FriendsPage extends React.Component{
                                   color: '#222',
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
-                         Name : {rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.profile.name}
+                        {rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.profile.name}
                     </Text>
                     <Text style={{fontSize: 13, 
                                 color: '#222',
                                 paddingLeft: 10}}>
-                        Status : {rowItem.profile.status_message}
+                        {rowItem.profile.status_message}
                     </Text>
                 </View>
                 { rowItem.status === Constant.FRIEND_STATUS_FRIEND_REQUEST ?
