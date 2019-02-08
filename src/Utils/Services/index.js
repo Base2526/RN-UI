@@ -326,7 +326,6 @@ export const update_picture_profile  = (uid, image_uri) =>{
 }
 
 // 
-
 export const update_picture_bg_profile  = (uid, image_uri) =>{
     var data = new FormData();
     data.append('idna', {
@@ -336,7 +335,33 @@ export const update_picture_bg_profile  = (uid, image_uri) =>{
     })
     data.append("uid", uid)
 
+    console.log(data)
+
+    // return {'status': false, 'message': 'test'}
     return fetch(Constant.UPDATE_PICTURE_BG_PROFILE, {
+        headers: Constant.FETCH_HEADERS,
+        method: 'POST',
+        body: data
+    }).then((response) => {
+        return response.json()
+    }).then((responseJson) => {
+        return responseJson;
+    }).catch((error) => {
+        return {'status': false, 'message': error}
+    })
+}
+
+export const update_group_picture_profile = (uid, group_id, image_uri) =>{
+    var data = new FormData();
+    data.append('idna', {
+        uri: image_uri, 
+        name: 'imageName.png',
+        type: 'image/png'
+    })
+    data.append("uid", uid)
+    data.append("group_id", group_id)
+
+    return fetch(Constant.UPDATE_GROUP_PICTURE_PROFILE, {
         headers: Constant.FETCH_HEADERS,
         method: 'POST',
         body: data

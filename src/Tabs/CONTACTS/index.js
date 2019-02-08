@@ -51,6 +51,8 @@ import EditMyIDPage from './EditMyIDPage'
 
 import EditAddressPage from './EditAddressPage'
 
+import EditGroupNamePage from './EditGroupNamePage'
+
 const index = createStackNavigator({
     'Home': {
         screen: Home,
@@ -149,9 +151,9 @@ const index = createStackNavigator({
         title: 'Search',
       }
     },
-    'ListGroupMemberPage': {
-      screen: ListGroupMemberPage,
-    },
+    // 'ListGroupMemberPage': {
+    //   screen: ListGroupMemberPage,
+    // },
     'ManageClasssPage':{
       screen: ManageClasssPage
     }
@@ -206,6 +208,34 @@ const BasicInfoNavigator = createStackNavigator(
   // headerMode: 'none',
 },);
 
+
+const MyQRcodeNavigator = createStackNavigator(
+{
+  'MyQRcode': {screen: MyQRcode},
+  'MyQRcode_QRCodeReaderPage' : {screen:QRCodeReaderPage}
+},
+{
+  // headerMode: 'none',
+},);
+
+const ListGroupMemberNavigator = createStackNavigator(
+  {
+    'ListGroupMemberPage': {screen: ListGroupMemberPage},
+  },
+  {
+    // headerMode: 'none',
+  },);
+
+const GroupSettingsNavigator = createStackNavigator(
+  {
+    'GroupSettingsPage': {screen: GroupSettingsPage},
+    'EditGroupNamePage': {screen: EditGroupNamePage}
+  },
+  {
+    // headerMode: 'none',
+  },
+);
+
 // const ContactInfoNavigator = createStackNavigator(
 // {
 //   // 'MyProfileEditContactInfoPage': {screen: MyProfileEditContactInfoPage},
@@ -222,17 +252,17 @@ const MainModalNavigator = createStackNavigator(
   {
     'index': { screen: index },
     'GroupsQRcode': { screen: GroupsQRcode },
-    // 'ListGroupMemberPage': { screen: ListGroupMemberPage,},
+    'ListGroupMemberNavigator': { screen: ListGroupMemberNavigator,},
     // 'ListClassUserPageX': {
     //   screen: ListClassUserPage,
       
     // },
-    'GroupSettingsPage': {screen: GroupSettingsPage},
+    'GroupSettingsNavigator': {screen: GroupSettingsNavigator},
     'GroupMemberInvite': {screen: GroupMemberInvite},
     'ClasssSettingsPage': {screen: ClasssSettingsPage},
     'ClasssMemberAddFriend': {screen: ClasssMemberAddFriend},
     'ChangeFriendsName': {screen: ChangeFriendsName},
-    'MyQRcode': {screen: MyQRcode},
+    'MyQRcodeNavigator': {screen: MyQRcodeNavigator},
     'BasicInfoNavigator': {screen: BasicInfoNavigator},
 
     // 'ContactInfoNavigator': {screen: ContactInfoNavigator}
@@ -293,7 +323,11 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
       routeName === 'EditDisplayNamePage' ||
       routeName === 'EditStatusMessagePage' ||
       routeName === 'EditMyIDPage' ||
-      routeName === 'EditAddressPage'
+      routeName === 'EditAddressPage' ||
+      routeName === 'MyQRcode' ||
+      routeName === 'MyQRcode_QRCodeReaderPage' ||
+      routeName === 'GroupSettingsPage' ||
+      routeName === 'EditGroupNamePage'
       ) {
     navigationOptions.tabBarVisible = false;
   }

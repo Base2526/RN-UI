@@ -21,11 +21,8 @@ var _ = require('lodash');
 
 import {getStatusBarHeight} from '../../Utils/Helpers'
 import * as actions from '../../Actions'
-// import Image from 'react-native-remote-svg'
-// import TestSVG from '../../test/TestSVG'
 
 import Constant from '../../Utils/Constant'
-
 import MyIcon from '../../config/icon-font.js';
 
 let shareOptions = {
@@ -45,7 +42,9 @@ class MyProfilePage extends React.Component{
                 <TouchableOpacity style={{paddingRight:10}}
                     onPress={()=>{
                         const { params = {} } = navigation.state
-                        params.handleEdit()
+                        if(Object.keys(params).length !== 0){
+                            params.handleEdit()
+                        }
                     }}>
                     <MyIcon
                         name={'edit'}
@@ -56,7 +55,9 @@ class MyProfilePage extends React.Component{
                 <TouchableOpacity style={{paddingRight:10}}
                     onPress={()=>{
                         const { params = {} } = navigation.state
-                        params.handleShare()
+                        if(Object.keys(params).length !== 0){
+                            params.handleShare()
+                        }
                     }}>
                     <MyIcon
                         name={'share'}
@@ -110,6 +111,8 @@ class MyProfilePage extends React.Component{
     }
 
     phonesList(){
+
+        console.log(this.props.auth.users.profiles.phones)
         return Object.entries(this.props.auth.users.profiles.phones).map(([key, value]) => {
             return(<Cell
                 key={key}
@@ -167,7 +170,7 @@ class MyProfilePage extends React.Component{
     }
 
     websitesList(){
-        // return(<View><Text>test</Text></View>)
+        
         if(this.props.auth.users.profiles.websites === undefined){
             return;
         }
@@ -204,6 +207,8 @@ class MyProfilePage extends React.Component{
             my_id = "Not set"
         } 
 
+        // console.log(my_id)
+
         // Gender
         let text_gender = 'Not set'
         if(gender !== undefined){  
@@ -235,7 +240,7 @@ class MyProfilePage extends React.Component{
         }
 
         // value={this.props.auth.users.profiles.address}
-        let address = ''
+        let address = 'Not set'
         if(this.props.auth.users.profiles.address !== undefined){
             address = this.props.auth.users.profiles.address
         }
@@ -257,12 +262,6 @@ class MyProfilePage extends React.Component{
                         />
                         <View style={{flexDirection:'row', margin:20}}>
                         <TouchableOpacity>
-                            {/* <TestSVG 
-                                width={100}
-                                height={100}
-                                strokeWidth={3}
-                                image_uri={image_url}/>  */}
-
                             <FastImage
                                 style={{width: 100, height: 100, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
                                 source={{
@@ -355,7 +354,7 @@ class MyProfilePage extends React.Component{
                                     </View>
                                 }
                                 onPress={()=>{
-                                    this.props.navigation.navigate("MyQRcode")
+                                    this.props.navigation.navigate("MyQRcodeNavigator")
                                 }}
                             />
                             <Cell
@@ -447,31 +446,32 @@ class MyProfilePage extends React.Component{
                                     </View>
                                 }
                             />
-
                             <Cell
                                 cellStyle="Subtitle"
                                 titleTextColor="#007AFF"
                                 hideSeparator={true} 
+                                contentContainerStyle={{ padding:10 }} 
                                 cellContentView={
-                                    <View style={{flex:1, flexDirection:'row'}}>
-                                        <Text style={{flex:1, fontSize: 16,  }}>
+                                    <View style={{flex:1}}>
+                                        <Text style={{flex:1,}}>
                                         Mobile phones
                                         </Text>
+                                        {Object.keys(this.props.auth.users.profiles.phones).length == 0 ? <Text style={{flex:1, fontSize:18}}>Not set</Text> :<View />}
                                     </View>
                                 }
                             />
                             {this.phonesList()}
                             <Cell
                                 cellStyle="Basic"
-                                contentContainerStyle={{ }} 
-                                hideSeparator={false}
+                                contentContainerStyle={{ padding:10 }} 
+                                hideSeparator={true}
                                 cellContentView={
                                     <View style={{flex:1, marginBottom:10}}>
                                         <View >
                                             <Text style={{ }}>
                                             Address
                                             </Text>
-                                            <Text style={{ fontSize:18}}>
+                                            <Text style={{fontSize:18}}>
                                             {address}
                                             </Text>
                                         </View>
@@ -480,7 +480,7 @@ class MyProfilePage extends React.Component{
                             />
                             <Cell
                                 cellStyle="Basic"
-                                contentContainerStyle={{ }} 
+                                contentContainerStyle={{ padding:10 }} 
                                 hideSeparator={true}
                                 cellContentView={
                                     <View style={{flex:1, marginBottom:10}}>
@@ -488,7 +488,7 @@ class MyProfilePage extends React.Component{
                                             <Text style={{ }}>
                                             Website
                                             </Text>
-                                           
+                                           {this.props.auth.users.profiles.websites === undefined ? <Text style={{flex:1, fontSize:18}}>Not set</Text> :<View />}
                                         </View>
                                     </View>
                                 }
@@ -504,7 +504,7 @@ class MyProfilePage extends React.Component{
                                             <Text style={{ }}>
                                                 Email
                                             </Text>
-                                            
+                                            {this.props.auth.users.profiles.emails === undefined ? <Text style={{flex:1, fontSize:18}}>Not set</Text> :<View />}
                                         </View>
                                     </View>
                                 }

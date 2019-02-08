@@ -101,7 +101,8 @@ class EditAddressPage extends React.Component{
                                     padding:10, 
                                     borderColor:'gray', 
                                     borderWidth:.5,
-                                    minHeight:150}}
+                                    minHeight:150,
+                                    textAlignVertical: 'top'}}
                             onChangeText={(text) => this.setState({text})}
                             value={this.state.text}
                             clearButtonMode='while-editing'
@@ -113,7 +114,6 @@ class EditAddressPage extends React.Component{
                 </View>)
     }
 }
-
 
 const mapStateToProps = (state) => {
   console.log(state)

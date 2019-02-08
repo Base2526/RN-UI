@@ -149,3 +149,29 @@ exports.updateStatusFriend = functions.firestore
 
     return true;
 })
+
+exports.deleteGroups = functions.firestore
+    .document('groups/{groupId}')
+    .onDelete((snap, context) => {
+        // Get an object representing the document prior to deletion
+        // e.g. {'name': 'Marie', 'age': 66}
+        const deletedValue = snap.data();
+
+        // console.log(context.params.groupId);
+        // console.log(deletedValue);
+
+        // perform desired operations ...
+
+        // DELETE_CHAT_GROUP
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.DELETE_CHAT_GROUP, form: {deletedValue, context}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+
+        return true;
+});

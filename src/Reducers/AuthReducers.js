@@ -17,6 +17,7 @@ import {USER_LOGIN_SUCCESS,
         UPDATE_STATUS_FRIEND,
         ADD_GROUP,
         DELETE_GROUP,
+        UPDATE_GROUP_PICTURE_PROFILE,
         SELECT_ADD_CLASS,
         CLASS_MEMBERS,
         FRIEND_MUTE,
@@ -895,7 +896,7 @@ export default (state= INITIAL_STATE, action)=>{
            
             // เป็น การลบ object ที่มี key ตรงกันออก
             // https://stackoverflow.com/questions/3455405/how-do-i-remove-a-key-from-a-javascript-object
-            let data = _.omit(groups,action.group_id)
+            let data = _.omit(groups, action.group_id)
 
             let v = {
                 ...state,
@@ -904,6 +905,45 @@ export default (state= INITIAL_STATE, action)=>{
                     groups :data
                 }
             }
+            return v
+        }
+
+        case UPDATE_GROUP_PICTURE_PROFILE:{
+
+            if(state.users === null){
+                return state
+            }
+
+            let groups = state.users.groups
+
+            let key = 0
+            let value = null
+            _.each(groups, function(_v, _k) { 
+                if(_k === action.group_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            let newValue = {...value, 
+                                group_profile: {
+                                    ...value.group_profile,
+                                    image_url:action.image_url
+                                }
+                            }
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    groups : {
+                        ...state.users.groups,
+                        [action.group_id]: newValue
+                    }
+                }
+            }
+
+            // console.log(v)
             return v
         }
 

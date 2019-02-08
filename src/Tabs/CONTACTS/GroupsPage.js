@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 import FastImage from 'react-native-fast-image'
 import Swipeout from 'react-native-swipeout'
 import * as actions from '../../Actions'
+import {getUid} from '../../Utils/Helpers'
 
 class GroupsPage extends React.Component{
     constructor(props) {
@@ -28,7 +29,8 @@ class GroupsPage extends React.Component{
         rowID: null,
       };
     }
-  
+
+    // invited you to group
     componentDidMount() {
       setTimeout(() => {this.setState({renderContent: true})}, 0);
 
@@ -46,6 +48,8 @@ class GroupsPage extends React.Component{
         let group =  this.props.groups[key]
         group_member.push({...group, group_id:key});
       }
+      
+      console.log(group_member)
       return group_member
     }
 
@@ -92,7 +96,34 @@ class GroupsPage extends React.Component{
 
     renderItem = ({item, index}) => { 
       // console.log(index)
-      let swipeoutRight = [{
+      let swipeoutRight = [{component:<View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
+                                        <Text style={{fontWeight:'bold', color:'white', fontSize:16, textAlign:'center'}}>DELETE GROUP</Text>
+                                      </View>,
+                            backgroundColor: 'blue',
+                              onPress: () => { 
+                                Alert.alert(
+                                  '',
+                                  'การลบกลุ่มจะลบได้เฉพาะตอนเทสระบบเท่านั้น',
+                                  [
+                                  //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                                    {text: 'Cancel', onPress: () => {
+
+                                    }, style: 'cancel'},
+                                    {text: 'OK', onPress: () => {
+                                      console.log(item) // group_id
+
+                                      this.setState({loading:true})
+                                      this.props.actionDeleteGroup(this.props.uid, item.group_id, (result) => {
+                                        console.log(result)
+
+                                        this.setState({loading:false})
+                                      })
+                                    }},
+                                  ],
+                                  { cancelable: false }
+                                )
+                              }
+                            },{
                             component:<View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
                                         <Text style={{fontWeight:'bold', color:'white', fontSize:16, textAlign:'center'}}>LEAVE GROUP</Text>
                                       </View>,
@@ -111,7 +142,6 @@ class GroupsPage extends React.Component{
                             }
                           }]
 
-      // console.log(this.state.rowID)
       return(
         <Swipeout 
           style={{backgroundColor:'white'}} 
@@ -157,7 +187,7 @@ class GroupsPage extends React.Component{
                                 fontWeight: '600', 
                                 paddingBottom:5
                               }}>
-                      {item.group_profile.name} ({ Object.keys(item.group_profile.members).length })
+                      {item.group_profile.name} ({ Object.keys(item.group_profile.members).length})
                   </Text>
                 </View>
             </View>
@@ -166,18 +196,20 @@ class GroupsPage extends React.Component{
     }
   
     render() {
-      let {renderContent} = this.state;
+      let {renderContent, data} = this.state;
 
       if(!this.props.hasOwnProperty('groups')){
         return <View style={{flex: 1}}></View>
       }
+
+      console.log(data)
 
       return (
         <View style={{flex:1}}>
         {
           renderContent && 
           <FlatList
-            data={this.state.data}
+            data={data}
             renderItem={this.renderItem}
             keyExtractor={item => item.item_id}
             ItemSeparatorComponent={this.renderSeparator}
@@ -203,6 +235,7 @@ const mapStateToProps = (state) => {
 
   // groups
   return{
+    uid:getUid(state),
     // auth:state.auth
     groups:state.auth.users.groups
   }

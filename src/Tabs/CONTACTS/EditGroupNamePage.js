@@ -10,11 +10,11 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import * as actions from '../../Actions'
 import {getUid} from '../../Utils/Helpers'
 
-class EditStatusMessagePage extends React.Component{
+class EditGroupNamePage extends React.Component{
 
     static navigationOptions = ({ navigation }) => {
         return {
-            title: "Edit status message",
+            title: "Edit group name",
             headerTintColor: '#C7D8DD',
             headerStyle: {
                 backgroundColor: 'rgba(186, 53, 100, 1.0)',
@@ -44,6 +44,7 @@ class EditStatusMessagePage extends React.Component{
       super(props);
 
       this.state = {
+          data:{},
           text:'',
           loading:false
       }
@@ -52,26 +53,51 @@ class EditStatusMessagePage extends React.Component{
     componentDidMount() {
         this.props.navigation.setParams({handleSave: this.handleSave })
 
-        this.setState({text:this.props.profiles.status_message})
+        const { navigation } = this.props;
+        const group = navigation.getParam('group', null);
+        console.log(group)
+
+        this.setState({data:group, text:group.group_profile.name})
     }
 
     handleSave = () => {
-        this.setState({loading:true}) // status_message
-        this.props.actionEditStatusMessageProfile(this.props.uid, this.state.text, (result) => {
-            console.log(result)
+        if(this.state.text.length == 0){
+            alert('Group name is empty?')
+        }else{
+            console.log(this.state.data.group_profile.name)
+            console.log(this.state.text)
+            if(this.state.data.group_profile.name === this.state.text){
+                const { navigation } = this.props;
+                navigation.goBack();
+            }else{
+                // console.log('process', this.state.data.group_id)
+                this.setState({loading:true})
+                this.props.actionEditGroupNameProfile(this.props.uid, this.state.data.group_id, this.state.text, (result) => {
+                    console.log(result)
 
-            this.setState({loading:false})
+                    this.setState({loading:false})
 
-            const { navigation } = this.props;
-            navigation.goBack();
-        })
+                    const { navigation } = this.props;
+                    navigation.goBack();
+                })
+            }
+        }
+    }
+
+    handleGroupName = (text) => {
+        this.setState({text})
     }
 
     componentWillReceiveProps(nextProps) {
-    //   console.log(nextProps)
+        console.log(nextProps);
     }
-      
+
     render() {
+        let {text} = this.state
+        // if( text == ''){
+        //     return(<View style={{flex:1, backgroundColor:'white'}}></View>)
+        // }
+
         return (<View style={{margin:10}}>
                     <Spinner
                         visible={this.state.loading}
@@ -80,39 +106,18 @@ class EditStatusMessagePage extends React.Component{
                         overlayColor={'rgba(0,0,0,0.5)'}
                     />
                     <View style={{alignItems:'flex-end', padding:5}}>
-                        <Text>{this.state.text.length}/500</Text>
+                        <Text>{text.length}/30</Text>
                     </View>
                     <View>
                         <TextInput
-                            style={{fontSize: 22, 
-                                    padding:10, 
-                                    borderColor:'gray', 
-                                    borderWidth:.5,
-                                    minHeight:150,
-                                    textAlignVertical: 'top'
-                                    }}
+                            style={{ fontSize: 22, padding:10, borderColor:'gray', borderWidth:.5}}
                             onChangeText={(text) => this.setState({text})}
-                            value={this.state.text}
+                            value={text}
                             clearButtonMode='while-editing'
-                            maxLength={500}
-                            multiline = {true}
-                            placeholder= {this.state.text}
+                            maxLength={30}
+                            onChangeText = {this.handleGroupName}
+                            placeholder={text}
                         />
-
-                        {/* <TextInput
-                            style={{fontSize: 22, 
-                                    padding:10, 
-                                    borderColor:'gray', 
-                                    borderWidth:.5,
-                                    minHeight:150,
-                                    textAlignVertical: 'top'}}
-                            onChangeText={(text) => this.setState({text})}
-                            value={this.state.text}
-                            clearButtonMode='while-editing'
-                            maxLength={500}
-                            multiline = {true}
-                            placeholder= {this.state.text}
-                        /> */}
                     </View>
                 </View>)
     }
@@ -134,4 +139,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, actions)(EditStatusMessagePage);
+export default connect(mapStateToProps, actions)(EditGroupNamePage);

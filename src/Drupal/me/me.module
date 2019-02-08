@@ -1953,6 +1953,27 @@ function me_services_resources()
         ),
       ),
     ),
+
+    'update_group_picture_profile'=>array(
+      'create' =>array(
+        'help'=>'Update group picture profile',
+        'callback'=>'update_group_picture_profile',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+        /* กรณีที่เราต้องการ pass parameter */
+        'args' => array(
+          array(
+           'name' => 'parameters',
+           'type' => 'array',
+           'description' => '',
+           'source' => 'param',
+           'optional' => TRUE,
+           'default value' => array(),
+          ),
+        ),
+      ),
+    ),
     'update_profile'=>array(
       'create' =>array(
         'help'=>'Services แก้ไข Display Name, Status ของ User',
@@ -2555,6 +2576,28 @@ function me_services_resources()
         ),
       ),
     ),
+
+    // 'delete_chat_group'=>array(
+    //   'create' =>array(
+    //     'help'=>'Services ลบ Chat group',
+    //     'callback'=>'delete_chat_group',
+    //     'access callback' => 'user_access',
+    //     'access arguments' => array('access content'),
+    //     'access arguments append' => FALSE,
+    //     /* กรณีที่เราต้องการ pass parameter */
+    //     'args' => array(
+    //       array(
+    //        'name' => 'parameters',
+    //        'type' => 'array',
+    //        'description' => '',
+    //        'source' => 'param',
+    //        'optional' => TRUE,
+    //        'default value' => array(),
+    //       ),
+    //     ),
+    //   ),
+    // ),
+
     // 
     'user_for_friend_editupdate'=>array(
       'create' =>array(
@@ -9812,6 +9855,63 @@ function update_picture_bg_profile(){
   // }  
 }
 
+function update_group_picture_profile(){
+  $result = array();
+
+  if (!check_header()) {
+    $result['result']   = FALSE;
+    $result['message']  = "check_header()";
+    return $result;
+  }
+
+  if (empty($_REQUEST['uid']) || empty($_REQUEST['group_id']) || empty($_FILES["idna"])) {
+    $result['result'] = FALSE;
+    $result['message']  = "function : update_picture_bg_profile, parameter";
+    // $result['_REQUEST']  = $_REQUEST;
+    return $result;
+  }
+
+  $uid = $_REQUEST['uid'];
+  $group_id = $_REQUEST['group_id'];
+
+
+  try{
+    $binary =  file_get_contents($_FILES["idna"]["tmp_name"]);//base64_decode($image);
+    
+    //Create the directory if it does not already exist, otherwise check the permissions
+    $directory = 'public://';
+    file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+
+    $currentDate = date("Ymd");
+    $file_name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
+    
+    //Saves a file to the specified destination and creates a database entry.
+    $file = (array)klovers_file_save_data($uid, $binary, $directory. '/' . $file_name, FILE_EXISTS_RENAME);
+
+    watchdog(TAG, 'update_group_picture_profile: %group_id, %v', array('%group_id'=>$group_id, '%v'=> serialize($file) ), WATCHDOG_INFO);
+
+    $a_file = (array)$file;
+    // บันทึกลง group
+    $node_group   = node_load($group_id);  
+    $node_group_wrapper = entity_metadata_wrapper('node', $node_group);
+    $node_group_wrapper->field_image_chat_group->set($a_file);
+    $node_group_wrapper->save();
+
+    $image_url = file_create_url(image_style_url('medium', $a_file['uri']));
+
+    // update firestore image_url
+    firestore_db()->collection(FIRESTORE_GROUPS)->document($group_id)->set(array("image_url"  => $image_url), ['merge' => true]);
+  
+    $result['result'] = TRUE; 
+    $result['image_url'] = $image_url;
+    return $result;
+  } catch (Exception $e) {
+    $result['result']   = FALSE;
+    $result['message']    = $e->getMessage();
+    return $result;
+  }
+}
+
 /*
   function ใช้สำหรับ update ชือของ creator post, comment, reply
 */
@@ -13795,7 +13895,8 @@ function create_chat_group(){
 
   $node->field_image_chat_group[LANGUAGE_NONE][0]       = $image_url;
   $node->field_object_id[LANGUAGE_NONE][0]['value']     = $chat_id;
-  // $node->field_status_group[LANGUAGE_NONE][0]['value']  = "open";
+  // $node->field_profile_my_qrcode[LANGUAGE_NONE][0]      = generatorQRCodeForGroupChat($uid, $group_id);
+
 
   $node->language = LANGUAGE_NONE;
   $node->status   = 1;
@@ -13803,11 +13904,15 @@ function create_chat_group(){
   $node = node_submit($node);
   node_save($node);
 
+  // เป็นการสร้าง qrcode for group chat เราจะสั่งให้รัน background process
+  background_process_start('generatorQRCodeForGroupChat', $param_uid, $node->nid);
+
+  // generatorQRCodeForGroupChat($param_uid, $node->nid);
+
   /*
   invited: 35
   joined : 36
   */
-
   $user_profile = profile2_by_uid_load($param_uid, 'main');
 
   $user_name    = $user_profile->field_profile_display_name[LANGUAGE_NONE][0]['value'];
@@ -13831,6 +13936,8 @@ function create_chat_group(){
 
   $m_profile['status'] = '36';
   $f_members[$member_field_entity->item_id] = $m_profile;
+
+  firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('members')->document($member_field_entity->item_id)->set($m_profile, ['merge' => true]);
 
 
   /*
@@ -13910,6 +14017,7 @@ function create_chat_group(){
     $m_profile['status'] = '35';
     $f_members[$member_field_entity->item_id] = $m_profile;
     
+    firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('members')->document($member_field_entity->item_id)->set($m_profile, ['merge' => true]);
 
     // โหลดเพือนขึ้นมาเพือบันทึก field_chat_group
     $members_friend_profile = profile2_by_uid_load($members_friend_id, 'main');
@@ -13979,7 +14087,8 @@ function create_chat_group(){
 
   // FIRESTORE_GROUPS
   // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_CHAT_GROUPS . '/' . $node->nid, $f_item);
-  firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->set($f_item);
+  firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->set($f_item, ['merge' => true]);
+
 
   $result['result']       = TRUE;
   $result['group_detail'] = $f_item;
@@ -14003,7 +14112,64 @@ function create_chat_group(){
   return  $result;
 }
 
+function delete_chat_group(){
+  $result = array();
 
+  if (!check_header()) {
+    $result['result'] = FALSE;
+    $result['message']= "check_header()";
+    return $result;
+  }
+
+	$param = $_REQUEST['context']['params'];
+	if (empty($param['groupId'])) {
+	  $result['result'] 	= FALSE;
+		$result['message'] 	= "function delete_chat_group : parameter";
+	  return $result;
+	}
+  
+	$groupId      = $param['groupId'];
+  $deletedValue = $_REQUEST['deletedValue'];
+  
+  // ลบ node group by group_id
+  node_delete($groupId);
+
+  $group    = node_load($groupId); 
+
+  firestore_delete_collection(firestore_db()->collection("groups")->document($groupId)->collection("members"), 100);
+
+  if (isset($group->field_members_group[LANGUAGE_NONE])) {
+    foreach ($group->field_members_group[LANGUAGE_NONE] as $k_members_group => $v_members_group) {
+      $item_members_group = field_collection_item_load($v_members_group['value']);
+
+      $item_members_group_friend_id = $item_members_group->field_members_group_friend_id[LANGUAGE_NONE][0]['value'];
+      // $item_members_group_status    = $item_members_group->field_mg_status[LANGUAGE_NONE][0]['tid'];
+
+      // $groups_detail_node_members_group[$item_members_group_friend_id] = array('item_id'=>$v_members_group['value'], 
+      firestore_db()->collection(FIRESTORE_USERS)->document($item_members_group_friend_id)->collection(FIRESTORE_GROUPS)->document($groupId)->delete();                                                                 //  'status'   =>$item_members_group_status);
+    }
+  }
+
+  // ลบข้อมูลที่เป็น field_collection_item ออกทั้งหมด
+  $query    = new EntityFieldQuery();
+	$entities = $query->entityCondition('entity_type', 'field_collection_item')
+				  ->entityCondition('bundle', 'field_chat_group')
+				  ->fieldCondition('field_group_id', 'value', $groupId, '=')
+				  ->execute();
+  
+	if (!empty($entities['field_collection_item'])) {  
+	  $items =  array_keys($entities['field_collection_item']);
+	  foreach ($items as $key => $value) {
+			entity_delete_multiple('field_collection_item', array($value));
+	  }
+	}
+
+  $result['result'] = TRUE;
+  $result['groupId'] = $groupId;
+  $result['deletedValue'] = $deletedValue;
+
+	return  $result;
+}
 /*
   การสร้าง กลุ่มสนทนา(Group chat)
 */

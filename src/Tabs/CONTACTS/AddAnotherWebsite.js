@@ -138,7 +138,7 @@ class AddAnotherWebsite extends React.Component{
                                     borderColor:'gray', 
                                     borderWidth:.5,
                                     minHeight:150,
-                                    borderRadius:5, 
+                                    // borderRadius:5, 
                                     textAlignVertical: "top"
                                 }}
                             onChangeText={(text) => this.setState({text})}

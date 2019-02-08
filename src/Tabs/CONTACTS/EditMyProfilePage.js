@@ -6,8 +6,7 @@ import {View,
         TextInput,
         ScrollView,
         SafeAreaView,
-        Dimensions,
-        Image} from 'react-native'
+        Dimensions,} from 'react-native'
 import { connect } from 'react-redux';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -19,20 +18,18 @@ import Moment from 'moment'
 import { isIphoneX } from 'react-native-iphone-x-helper'
 var _ = require('lodash');
 import Spinner from 'react-native-loading-spinner-overlay';
+import Modal from 'react-native-modalbox';
 
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
 import MyModal from '../../Utils/MyModal'
-
 import MyIcon from '../../config/icon-font.js';
-
 import {getUid, randomKey} from '../../Utils/Helpers'
 
 class EditMyProfilePage extends React.Component{
-
     static navigationOptions = ({ navigation }) => {
         return {
-            title: "Edit Profile",
+            title: "Edit My Profile",
             headerTintColor: '#C7D8DD',
             headerStyle: {
                 backgroundColor: 'rgba(186, 53, 100, 1.0)',
@@ -66,7 +63,6 @@ class EditMyProfilePage extends React.Component{
         super(props)
 
         Moment.locale('en');
-
         this.state ={
             profiles: {},
             profile_picture: '',
@@ -81,23 +77,15 @@ class EditMyProfilePage extends React.Component{
     }
 
     componentDidMount() {
-        this.props.navigation.setParams({handleSave: this.handleSave })
         this.props.navigation.setParams({handleCancel: this.handleCancel })
         
         let {profiles} = this.props
         this.setState({profiles})
-
-        // console.log()
     }
 
     componentWillReceiveProps(nextProps) {
-        // console.log('componentWillReceiveProps')
         let {profiles} = nextProps 
         this.setState({profiles})
-    }
-
-    handleSave = () => {
-        alert('save')
     }
 
     handleCancel = () => {
@@ -105,13 +93,13 @@ class EditMyProfilePage extends React.Component{
     }
 
     openModalGender(){
-        // this.refs.modalGender.open()
-        this.setState({is_open_modal_gender: true})
+        this.refs.modalGender.open()
+        // this.setState({is_open_modal_gender: true})
     }
 
     openModalInteresteIn(){
-        // this.refs.modalInteresteIn.open()
-        this.setState({is_open_modal_InteresteIn: true})
+        this.refs.modalInteresteIn.open()
+        // this.setState({is_open_modal_InteresteIn: true})
     }
 
     getHeightInteresteIn(){
@@ -751,6 +739,10 @@ class EditMyProfilePage extends React.Component{
         let p = {...this.state.profiles, address }
         this.setState({profiles:p})
     }
+
+    // onRequestClose = () =>{
+    //     console.log('onRequestClose')
+    // }
     
     render(){
         if (Object.keys(this.state.profiles).length == 0) {
@@ -798,48 +790,52 @@ class EditMyProfilePage extends React.Component{
 
         return(
         <SafeAreaView style={{flex:1}}>
-
             <Spinner
                 visible={this.state.loading}
                 textContent={'Wait...'}
                 textStyle={{color: '#FFF'}}
                 overlayColor={'rgba(0,0,0,0.5)'}
             />
-            {/* <Modal 
+            <Modal 
                 style={{zIndex:10, 
                         height:this.getHeightGender(), 
-                        borderTopLeftRadius:15, 
-                        borderTopRightRadius:15}} 
+                        // borderTopLeftRadius:15, 
+                        // borderTopRightRadius:15
+                    }} 
                 position={"bottom"} 
                 ref={"modalGender"}
                 // backdropPressToClose={false}
                 swipeToClose={true}
                 swipeArea={50}  
-                > */}
-                <MyModal style={{height: this.getHeightGender()}} 
+                coverScreen={true}
+                // visible={this.state.is_open_modal_gender}
+                >
+                {/* <MyModal style={{height: this.getHeightGender()}} 
                                 isOpen={this.state.is_open_modal_gender} 
                                 position={"bottom"}
-                                onRequestClose={()=>{ this.setState({is_open_modal_gender:false}) }} >
+                                onRequestClose={()=>{ this.setState({is_open_modal_gender:false}) }} > */}
                     <ScrollView>
                         <View
                             style={{marginLeft:10, marginRight:10, marginBottom:20, marginTop:5, flex:1}}>
                             {this.renderGender()}
                         </View>
                     </ScrollView>
-                </MyModal>
-            {/* </Modal> */}
+                {/* </MyModal> */}
+            </Modal>
             {/*  */}
 
-            {/* <Modal 
+            <Modal 
                 style={{zIndex:10, 
                         height:this.getHeightInteresteIn(), 
-                        borderTopLeftRadius:15, 
-                        borderTopRightRadius:15}} 
+                        // borderTopLeftRadius:15, 
+                        // borderTopRightRadius:15
+                    }} 
                 position={"bottom"} 
                 ref={"modalInteresteIn"}
                 backdropPressToClose={true}
                 swipeToClose={true}
-                swipeArea={50}> */}
+                swipeArea={50}
+                coverScreen={true}>
 {/* 
                 <View 
                     style={{height:35}}>
@@ -868,18 +864,18 @@ class EditMyProfilePage extends React.Component{
                 </View>
                  */}
                  
-                 <MyModal style={{height: this.getHeightInteresteIn()}} 
+                 {/* <MyModal style={{height: this.getHeightInteresteIn()}} 
                                 isOpen={this.state.is_open_modal_InteresteIn} 
                                 position={"bottom"}
-                                onRequestClose={()=>{ this.setState({is_open_modal_InteresteIn:false}) }} >
+                                onRequestClose={()=>{ this.setState({is_open_modal_InteresteIn:false}) }} > */}
                     <ScrollView>
                         <View
                             style={{marginLeft:10, marginRight:10, marginBottom:20, marginTop:5, flex:1}}>
                             {this.renderInteresteIn()}
                         </View>
                     </ScrollView>
-                </MyModal>
-            {/* </Modal> */}
+                {/* </MyModal> */}
+            </Modal>
 
             <KeyboardAwareScrollView>
                 

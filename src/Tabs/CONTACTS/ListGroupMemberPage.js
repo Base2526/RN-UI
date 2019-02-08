@@ -9,8 +9,6 @@ import {FlatList,
         Image} from 'react-native'
 
 import ExpandableList from 'react-native-expandable-section-flatlist'
-
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
 
@@ -21,26 +19,49 @@ import ImageWithDefault from '../../Utils/ImageWithDefault'
 import * as actions from '../../Actions'
 
 import Constant from '../../Utils/Constant'
-import DictStyle from './dictStyle'
-
-import {getStatusBarHeight} from '../../Utils/Helpers'
+import MyIcon from '../../config/icon-font.js';
 
 class ListGroupMemberPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
-        title: "Members",
-        headerTintColor: 'white',
-        headerRight: (
-            <View style={{flexDirection:'row', flex:1}}>
+        title: "List members",
+        headerTintColor: '#C7D8DD',
+        headerStyle: {
+            backgroundColor: 'rgba(186, 53, 100, 1.0)',
+  
+            // ios navigationoptions underline hide
+            borderBottomWidth: 0,
+  
+            // android navigationoptions underline hide
+            elevation: 0,
+            shadowOpacity: 0
+          },
+        headerLeft: (
+            <View style={{paddingLeft:10}}>
                 <TouchableOpacity 
-                    style={{paddingRight:10}}
                     onPress={()=>{
                         // GroupMemberInvite
                         const { params = {} } = navigation.state
                         params.handleInvite()
                     }}>
-                    <Text style={{color:'white', fontSize:18}}>Invite</Text>
+                    <Text style={{color:'#C7D8DD', fontSize:18, fontWeight:'bold'}}>Invite</Text>
                 </TouchableOpacity> 
+            </View>
+        ),
+        headerRight: (
+            <View style={{marginRight:10}}>
+                <TouchableOpacity
+                    style={{padding:5}}
+                    // disabled={isModify ? false: true}
+                    onPress={() => {
+                        const { params = {} } = navigation.state
+                        params.handleCancel()
+                    }}>
+                    <MyIcon
+                        name={'cancel'}
+                        size={25}
+                        color={'#C7D8DD'} />
+                </TouchableOpacity>
             </View>
         ),
     });
@@ -61,6 +82,7 @@ class ListGroupMemberPage extends React.Component{
     }
 
     componentWillMount(){
+        this.props.navigation.setParams({handleCancel: this.handleCancel })
         this.props.navigation.setParams({ handleInvite: this.handleInvite })
 
         const { navigation } = this.props;
@@ -92,6 +114,10 @@ class ListGroupMemberPage extends React.Component{
         this.setState({
             data: [{title: 'Members',member: members}, {title: 'Pending', member: pending}]
         })
+    }
+
+    handleCancel = () => {
+        this.props.navigation.goBack(null)
     }
 
     FlatListItemSeparator = () => {
@@ -173,7 +199,10 @@ class ListGroupMemberPage extends React.Component{
             case Constant.GROUP_STATUS_MEMBER_INVITED:{
                 swipeoutRight = [
                     {
-                        component: <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}><Text style={{color:'white'}}>Cancel</Text></View>,
+                        // component: <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}><Text style={{color:'white'}}>Cancel</Text></View>,
+                        component:  <View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'red'}}>
+                                        <Text style={{fontWeight:'bold', color:'white', fontSize:14}}>CANCEL</Text>
+                                    </View>,
                         backgroundColor: 'red',
                         onPress: () => { 
                             alert('Cancel')
@@ -185,7 +214,10 @@ class ListGroupMemberPage extends React.Component{
             case Constant.GROUP_STATUS_MEMBER_JOINED:{
                 swipeoutRight = [
                     {
-                        component: <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}><Text style={{color:'white'}}>Delete</Text></View>,
+                        // component: <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}><Text style={{color:'white'}}>Delete</Text></View>,
+                        component:  <View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'red'}}>
+                                        <Text style={{fontWeight:'bold', color:'white', fontSize:14}}>DELETE</Text>
+                                    </View>,
                         backgroundColor: 'red',
                         onPress: () => { 
                             alert('Delete')
@@ -257,10 +289,12 @@ class ListGroupMemberPage extends React.Component{
                         justifyContent: 'space-between', 
                         alignItems: 'center', 
                         borderBottomWidth: 0.5,
-                        borderBottomColor: DictStyle.colorSet.lineColor }}>
+                        // borderBottomColor: DictStyle.colorSet.lineColor 
+                        }}>
             <View style={{ flexDirection: 'row', 
                         alignItems: 'center'}}>
-                <Text style={{ fontSize: DictStyle.fontSet.mSize, 
+                <Text style={{ 
+                                // fontSize: DictStyle.fontSet.mSize, 
                                 color: 'gray',
                                 paddingLeft: 10,
                                 fontWeight:'700' }}>

@@ -371,6 +371,7 @@ class DrawerMenu extends React.Component{
         }
         
         let {users} = this.props.auth
+
         return(
             <View style={{flex:1}}>
             { renderContent &&
@@ -389,9 +390,20 @@ class DrawerMenu extends React.Component{
                                 paddingTop: 30
                             })
                         }}>
-                        <FastImage
+                        {/* <FastImage
                             style={StyleSheet.absoluteFill}
                             source={require('../Images/boxpink.png')}
+                            // users.profiles.bg_url
+                            resizeMode={FastImage.resizeMode.cover}
+                        /> */}
+                        <FastImage
+                            style={StyleSheet.absoluteFill}
+                            // source={require('../../Images/boxpink.png')}
+                            source={{
+                                uri: users.profiles.bg_url,
+                                headers:{ Authorization: 'someAuthToken' },
+                                priority: FastImage.priority.normal,
+                            }}
                             resizeMode={FastImage.resizeMode.cover}
                         />
                         <View style={{flexDirection:'row', 

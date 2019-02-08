@@ -94,7 +94,7 @@ const _header = props => (
     </View>
   );
 
-const ImageHeader = (props) => {
+const ImageHeader = (props, navigation) => {
     let bg_url = '';
     if(props.navigation.state.routes[0].params !== undefined){
         if(props.navigation.state.routes[0].params.hasOwnProperty('bg_url')){
@@ -102,18 +102,19 @@ const ImageHeader = (props) => {
         }
     }
 
+    console.log(props.navigation.state.routes[0].params, bg_url)
     /**
      source={require('../Images/boxpink.png')}
      */
     return(<View style={{ backgroundColor: '#eee', height: getHeaderInset(true) }}>
         <FastImage
             style={StyleSheet.absoluteFill}
-            source={require('../../Images/boxpink.png')}
-            // source={{
-            //     uri: bg_url,
-            //     headers:{ Authorization: 'someAuthToken' },
-            //     priority: FastImage.priority.normal,
-            // }}
+            // source={require('../../Images/boxpink.png')}
+            source={{
+                uri: bg_url,
+                headers:{ Authorization: 'someAuthToken' },
+                priority: FastImage.priority.normal,
+            }}
             resizeMode={FastImage.resizeMode.cover}
         />
       <_header {...props} style={{ backgroundColor: 'transparent' }}/>
@@ -148,7 +149,7 @@ class ContactsHome extends Component {
         if(navigation.state.params !== undefined){
             // console.log(navigation.state.params)
             const { bg_url } =navigation.state.params;
-            // console.log(bg_url)
+            console.log(bg_url)
         }
 
         // if(!this.props.hasOwnProperty('auth') 
@@ -156,7 +157,7 @@ class ContactsHome extends Component {
         return {
             title: "Contacts",
             tabBarVisible: false,
-            header: (props) => <ImageHeader {...props} />,
+            header: (props) => <ImageHeader {...props} {...navigation}/>,
             headerLeft: (
                 <TouchableOpacity
                     style={Styles.headerButton}
@@ -196,12 +197,6 @@ class ContactsHome extends Component {
                             const { params = {} } = navigation.state
                             params.handleHeaderRightContactsMenu()
                         } }>
-                        
-                        {/* <Image
-                            style={{width: 35, height: 20}}
-                            source={require('../../Images/collapse_down_menu.png')}
-                            // resizeMode={FastImage.resizeMode.contain}
-                        />  */}
                     </TouchableOpacity>
                 </View>
             ),

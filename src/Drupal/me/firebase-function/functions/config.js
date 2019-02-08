@@ -14,7 +14,9 @@ let constants = {
     END_POINT_IDNA: '/api',
     PATH_API_TEST: '/api_test',
     UPDATE_PROFILE: '/update_profile',
-    UPDATE_FOR_FRIEND_EDITUPDATE:'/user_for_friend_editupdate'
+    UPDATE_FOR_FRIEND_EDITUPDATE:'/user_for_friend_editupdate',
+
+    DELETE_CHAT_GROUP:'/delete_chat_group',
 };
 
 module.exports = Object.freeze(constants); 

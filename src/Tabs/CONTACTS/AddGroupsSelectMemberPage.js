@@ -1,13 +1,3 @@
-// import React from 'react'
-// import {View, Text} from 'react-native'
-
-// export default class AddGroupsSelectMemberPage extends React.Component {
-
-//     render(){
-//         return(<View><Text>AddGroupsSelectMemberPage</Text></View>)
-//     }
-// }
-
 import React from 'react'
 import {View, 
         Alert, 
@@ -16,21 +6,16 @@ import {View,
         TouchableOpacity,} from 'react-native'
 import { connect } from 'react-redux';
 var _ = require('lodash');
+import FastImage from 'react-native-fast-image'
 
-import Image from 'react-native-remote-svg'
-// import SubmitButton from 'react-native-submit-button';
-
-// import ImageWithDefault from '../../Utils/ImageWithDefault'
-import {getStatusBarHeight} from '../../Utils/Helpers'
 import * as actions from '../../Actions'
-
-import ImageWithDefault from '../../Utils/ImageWithDefault'
+import MyIcon from '../../config/icon-font.js';
 
 class AddGroupsSelectMemberPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
-        title: "",
-        headerTintColor: 'white',
+        title: "Select member",
+        headerTintColor: '#C7D8DD',
         headerStyle: {
             backgroundColor: 'rgba(186, 53, 100, 1.0)',
         },
@@ -41,7 +26,7 @@ class AddGroupsSelectMemberPage extends React.Component{
                 const { params = {} } = navigation.state
                 params.handleAddMember()
               }}>
-              <Text style={{fontSize:18, fontWeight:'600', color:'white'}}>Add</Text>
+              <Text style={{fontSize:18, fontWeight:'bold', color:'#C7D8DD'}}>Add</Text>
             </TouchableOpacity>
           ),
     })
@@ -135,46 +120,63 @@ class AddGroupsSelectMemberPage extends React.Component{
             seleted = !this.state.data[index].seleted
         }
 
-        return(<View style={{flex:1, 
-                    height:80, 
-                    padding:10, 
-                    marginRight:10,
-                    backgroundColor:'white', 
-                    flexDirection:'row',
-                    alignItems:'center',}}>
-                    <View style={{padding:10}}>
-                        <TouchableOpacity 
-                            style={{padding:5}}
-                            onPress={()=>{
-                                this.onSeleted(index)
-                            }}>
+        return(<TouchableOpacity 
+            onPress={()=>{
+                this.onSeleted(index)
+            }}>
+            <View style={{flex:1, 
+                height:80, 
+                padding:10, 
+                marginRight:10,
+                backgroundColor:'white', 
+                flexDirection:'row',
+                alignItems:'center',
+                paddingLeft:5, 
+                paddingRight:10}}>
+                <TouchableOpacity 
+                    style={{paddingLeft:5, 
+                            paddingRight:10}}
+                    onPress={()=>{
+                        this.onSeleted(index)
+                    }}
+                    >
+                    <MyIcon
+                        name={'dot-circled'}
+                        size={30}
+                        color={seleted ? '#E9E9E9' : '#DF2D6C'} />
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    style={{height: 60,
+                            width: 60,
+                            borderRadius: 30
+                    }}
+                    onPress={()=>{
+                        this.onSeleted(index)
+                    }}>
+                    {/* <ImageWithDefault 
+                    source={{uri: item.profile.image_url}}
+                    style={{width: 60, height: 60, borderRadius: 30, borderColor:'gray', borderWidth:1}}/> */}
 
-                            {/* <Image
-                                style={{ width: 30, height: 30}}
-                                source={ seleted ? require('../../Images/icon-unselect.svg') : require('../../Images/icon-select.svg')}
-                            /> */}
-                            <Image
-                                style={{ width: 30, height: 30}}
-                                source={{uri:seleted ? `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24.178" height="24.181" viewBox="0 0 24.178 24.181">
-                                <g id="Group_489" data-name="Group 489" transform="translate(-207.998 -121.569)">
-                                <ellipse id="NoPath_-_Copy_36_" data-name="NoPath - Copy (36)" cx="12.089" cy="12.091" rx="12.089" ry="12.091" transform="translate(207.998 121.569)" fill="#e6e6e6"/>
-                                </g>
-                            </svg>`:
-                            `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 734.86 734.86"><defs><style>.cls-1{fill:#df2d6c;}.cls-2{fill:#fff;}</style></defs><title>select</title><g id="Layer_2" data-name="Layer 2"><circle class="cls-1" cx="367.43" cy="367.43" r="367.43"/></g><g id="Layer_4" data-name="Layer 4"><path class="cls-2" d="M638,347.51c0,1,0,2.06,0,3.08v.13q0,1.47-.12,2.94c0,.89-.1,1.78-.17,2.66,0,.29,0,.58-.06.86-.06.84-.14,1.68-.23,2.52a0,0,0,0,1,0,.05C624,494.49,399,660.15,399,660.15S167,491.58,160.16,353.64c0-1-.09-2-.12-3.05s0-2,0-3.08a119.49,119.49,0,0,1,239,0,119.49,119.49,0,0,1,239,0Z" transform="translate(-31.55 -27.41)"/></g></svg>`}} />
-                        </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity 
-                        style={{height: 60,
-                                width: 60,
-                                borderRadius: 30}}>
-                        <ImageWithDefault 
-                        source={{uri: item.profile.image_url}}
-                        style={{width: 60, height: 60, borderRadius: 30, borderColor:'gray', borderWidth:1}}/>
-                    </TouchableOpacity>
-                    <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                        <Text style={{fontSize:18}}>{item.profile.name}</Text>
-                    </View>
-                </View>)
+                        <FastImage
+                            style={{width: 60, 
+                                    height: 60, 
+                                    borderRadius: 30, 
+                                    borderWidth:.5,
+                                    borderColor:'gray'
+                            }}
+                            source={{
+                            uri: item.profile.image_url,
+                            headers:{ Authorization: 'someAuthToken' },
+                            priority: FastImage.priority.normal,
+                            }}
+                            resizeMode={FastImage.resizeMode.cover}
+                        />
+                </TouchableOpacity>
+                <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
+                    <Text style={{fontSize:18}}>{item.profile.name}</Text>
+                </View>
+            </View>
+            </TouchableOpacity>)
 
     }
 

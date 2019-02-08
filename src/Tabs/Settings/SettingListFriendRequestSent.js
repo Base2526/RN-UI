@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
-import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
+import FastImage from 'react-native-fast-image'
 import {getUid} from '../../Utils/Helpers'
 
 class SettingListFriendRequestSent extends React.Component{
@@ -93,9 +93,20 @@ class SettingListFriendRequestSent extends React.Component{
               }}>
                 <TouchableOpacity 
                     style={{}}>
-                      <PlaceHolderFastImage 
-                        source={{uri:item.profile.image_url}}
-                        style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/>
+                    <FastImage
+                        style={{width: 60, 
+                                height: 60, 
+                                borderRadius: 10,  
+                                borderWidth:1, 
+                                borderColor:'gray'
+                              }}
+                        source={{
+                          uri: item.profile.image_url,
+                          headers:{ Authorization: 'someAuthToken' },
+                          priority: FastImage.priority.normal,
+                        }}
+                        resizeMode={FastImage.resizeMode.cover}
+                    />
                 </TouchableOpacity>
                 <View>
                     <Text style={{fontSize: 18, 

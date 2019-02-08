@@ -14,4 +14,9 @@
 .icon-collapse-down:before { content: '\e80c'; } /* '' */
 .icon-menu-down:before { content: '\e80d'; } /* '' */
 .icon-contacts-search:before { content: '\e80e'; } /* '' */
+.icon-chat:before { content: '\e80f'; } /* '' */
+.icon-settings:before { content: '\e810'; } /* '' */
+.icon-star-empty:before { content: '\e811'; } /* '' */
+.icon-star:before { content: '\e812'; } /* '' */
 .icon-menu:before { content: '\f0c9'; } /* '' */
+.icon-dot-circled:before { content: '\f192'; } /* '' */

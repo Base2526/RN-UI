@@ -19,6 +19,7 @@ import {USER_LOGIN_SUCCESS,
         UPDATE_STATUS_FRIEND,
         ADD_GROUP,
         DELETE_GROUP,
+        UPDATE_GROUP_PICTURE_PROFILE,
         SELECT_ADD_CLASS,
         CLASS_MEMBERS,
         FRIEND_MUTE,
@@ -65,7 +66,8 @@ import {login,
         application_category,
         create_my_application,
         update_picture_profile,
-        update_picture_bg_profile} from '../Utils/Services'
+        update_picture_bg_profile,
+        update_group_picture_profile} from '../Utils/Services'
 
 // export const emailChanged = (text) =>{
 //     return({
@@ -348,36 +350,60 @@ export const actionAddFriend = (uid, friend_id) => dispatch =>{
 
 // create_group
 export const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
-
-    // (uid, group_name, members, uri)
     return create_group(uid, group_name, members, uri).then(data => {
-        // this.setState({isShowSpinner:false})
-
-        // dispatch({ type: LOADING, isLoading:false})
-
-        // console.log(data)
         if((data instanceof Array)){
-            // error message
-            // alert(data[0])
-            // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data[0] });
-
             return {'status':false, 'message': data}
         }else{
             if(!data.result){
-                // alert(data.message)
-                // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data.message });
-        
                 return {'status':false, 'message': data}
             }else{
-                // console.log(data.data.friend_profiles)
-                // console.log(data.data.user)
-                // console.log(data.data.user_profile)
-                // saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.USER, "user": data.data});
-                // dispatch({ type: LOGIN_USER_SUCCESS, provider: Constant.PROVIDERS.USER, user: data.data });
+
+
+                console.log(data)
+
+                // dispatch({ type: ADD_GROUP, group_id:docSnapshot.id, data:v });
+
                 return {'status':true, 'data':data}
             }
         }
     })
+}
+
+export const actionUpdateGroupPictureProfile = (uid, group_id, image_uri) => dispatch =>{
+
+    return update_group_picture_profile(uid, group_id, image_uri).then(data => {
+        console.log(data)
+        if((data instanceof Array)){
+            return {'status':false, 'message': data}
+        }else{
+            if(!data.result){
+                return {'status':false, 'message': data}
+            }else{
+                dispatch({ type: UPDATE_GROUP_PICTURE_PROFILE, group_id, image_url:data.image_url});
+                return {'status':true}
+            }
+        }
+    })
+}
+
+// EDIT_GROUP_NAME_PROFILE
+export const actionEditGroupNameProfile = (uid, group_id, group_name, callback) => dispatch =>{
+    firebase.firestore().collection('groups').doc(group_id).set({
+        name:group_name,
+    }, { merge: true});
+
+    // dispatch({ type: EDIT_DISPLAY_NAME_PROFILE, name});
+
+    callback({'status':true})
+}
+
+
+export const actionDeleteGroup = (uid, group_id, callback) => dispatch =>{
+    firebase.firestore().collection('groups').doc(group_id).delete()
+
+    dispatch({ type: DELETE_GROUP, group_id});
+    
+    callback({'status':true})
 }
 
 export const actionCreateClass = (uid, class_name, uri) => dispatch =>{
@@ -1053,8 +1079,84 @@ export function watchTaskEvent(uid, dispatch) {
             if (change.type === 'modified') {
                 dispatch({ type: INTERESTE_IN_PROFILE, interestein_key:doc_id, interestein_id:doc_data.id, interestein_status:doc_data.enable});
             }
+
+            if (change.type === 'removed') {
+                
+            }
         })
     })
+
+    // track profile > phones
+    firebase.firestore().collection('profiles').doc(uid).collection('phones').onSnapshot((querySnapshot) => {
+        querySnapshot.docChanges.forEach(function(change) {
+
+            let doc_id   = change.doc.id
+            let doc_data = change.doc.data()
+            if (change.type === 'added') {  
+                // console.log(change.type, doc_id, doc_data)
+                
+                dispatch({ type: ADD_PHONE_PROFILE, phone_key:doc_id, phone_number:doc_data.phone_number, is_verify:doc_data.is_verify});
+            }
+            if (change.type === 'modified') {
+                // console.log(change.type, doc_id, doc_data)
+               
+                dispatch({ type: EDIT_PHONE_PROFILE, phone_key:doc_id, phone_number:doc_data.phone_number});
+            }
+
+            if (change.type === 'removed') {
+                dispatch({ type: REMOVE_PHONE_PROFILE, phone_key:doc_id});
+            }
+        })
+    })
+
+    // track profile > websites
+    firebase.firestore().collection('profiles').doc(uid).collection('websites').onSnapshot((querySnapshot) => {
+        querySnapshot.docChanges.forEach(function(change) {
+
+            let doc_id   = change.doc.id
+            let doc_data = change.doc.data()
+
+            if (change.type === 'added') {  
+                // console.log(change.type, doc_id, doc_data)
+                
+                dispatch({ type: ADD_WEBSITE_PROFILE, website_key:doc_id, url:doc_data.url});
+            }
+            if (change.type === 'modified') {
+                // console.log(change.type, doc_id, doc_data)
+               
+                dispatch({ type: EDIT_WEBSITE_PROFILE, website_key:doc_id, url:doc_data.url});
+            }
+
+            if (change.type === 'removed') {
+                dispatch({ type: REMOVE_WEBSITE_PROFILE, website_key:doc_id});
+            }
+        })
+    })
+
+    // track profile > emails
+    firebase.firestore().collection('profiles').doc(uid).collection('emails').onSnapshot((querySnapshot) => {
+        querySnapshot.docChanges.forEach(function(change) {
+
+            let doc_id   = change.doc.id
+            let doc_data = change.doc.data()
+
+            if (change.type === 'added') {  
+                // console.log(change.type, doc_id, doc_data)
+                
+                dispatch({ type: ADD_EMAIL_PROFILE, email_key:doc_id, email:doc_data.email});
+            }
+            if (change.type === 'modified') {
+                // console.log(change.type, doc_id, doc_data)
+            
+                dispatch({ type: EDIT_EMAIL_PROFILE, email_key:doc_id, email:doc_data.email});
+            }
+
+            if (change.type === 'removed') {
+                dispatch({ type: REMOVE_EMAIL_PROFILE, email_key:doc_id});
+            }
+        })
+    })
+    
 
     // track friends
     firebase.firestore().collection('users').doc(uid).collection('friends').onSnapshot((querySnapshot) => {

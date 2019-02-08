@@ -579,7 +579,7 @@ function user_for_friend_delete(){
 /*
 	ถุกเรียกใช้ firebase เท่านั้น. delete_member_group_chat
 */
-function delete_chat_group(){
+function _delete_chat_group(){
 	$result = array();
   
 	if (!check_header()) {
@@ -642,7 +642,7 @@ function delete_chat_group(){
   
 	  $items =  array_keys($entities['field_collection_item']);
 	  foreach ($items as $key => $value) {
-		entity_delete_multiple('field_collection_item', array($value));
+			entity_delete_multiple('field_collection_item', array($value));
 	  }
 	}
   
@@ -1066,7 +1066,51 @@ function generatorQRCode($account, $platform, $bundleidentifier){
 	  watchdog("idna", 'Erorr = %message', array('%message' => $e->getMessage()), WATCHDOG_ERROR);
 	}
 }
-    
+
+// ;
+function generatorQRCodeForGroupChat($uid, $group_id){
+	$file = array();
+
+	// Gen QRCode
+	//set it to writable location, a place for temp generated PNG files
+	$PNG_TEMP_DIR = PATH_FOLDER_QRCODE;//config_pages_get(CONFIG_PAGES_TYPE, 'field_path_folder_qrcode'); 
+
+	//Create the directory if it does not already exist, otherwise check the permissions
+	file_prepare_directory($PNG_TEMP_DIR, FILE_CREATE_DIRECTORY);
+
+	$text     = dec_enc('encrypt', $group_id);
+	$errorCorrectionLevel = "M";
+	$matrixPointSize = 8;
+
+	// ios
+	$filename = $PNG_TEMP_DIR.'/'.md5($text.'|'.$errorCorrectionLevel.'|'.$matrixPointSize).'.png';
+	QRcode::png(URL_SERVER() . "/qe?&bi=" . dec_enc('encrypt', BUNDLE_IDENTIFIER)  . "&bii=" . $text, $filename, $errorCorrectionLevel, $matrixPointSize, 2);  
+
+	$currentDate = date("Ymd");
+	$name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
+	$image = file_get_contents($filename); 
+	//Saves a file to the specified destination and creates a database entry.
+	$file = klovers_file_save_data($uid, $image, 'public://' . $name, FILE_EXISTS_RENAME);
+	
+	// Delete file ที่  QRCode  สร้างขึ้นมาเพราะว่าเราเก็บเข้าระบบแล้ว
+	unlink($filename);
+	// Gen QRCode
+
+
+	// watchdog(TAG, 'generatorQRCodeForGroupChat : %group_id - %file', array('%group_id'=>$group_id, '%file'=>serialize($file)), WATCHDOG_INFO);
+
+	$a_file = (array)$file;
+
+	// บันทึกลง group
+	$node_group   = node_load($group_id);  
+	$node_group_wrapper = entity_metadata_wrapper('node', $node_group);
+	$node_group_wrapper->field_profile_my_qrcode->set($a_file);
+	$node_group_wrapper->save();
+
+	$f_item = array("qrcode_url"  => file_create_url(image_style_url('medium', $a_file['uri'])));
+
+	firestore_db()->collection(FIRESTORE_GROUPS)->document($group_id)->set($f_item, ['merge' => true]);
+}
 /*
    เป็นการ redirect url store
 */ 
@@ -1075,9 +1119,9 @@ function qe(){
 	switch (dec_enc('decrypt', $_REQUEST['bi'])) {
 		case BUNDLE_IDENTIFIER:{  // 
 		  if($detect->is('iPod') || $detect->is('iPhone') || $detect->is('iPad')){
-			header('Location: ' . DEFUALT_IOS_URL_STORE_IDNA); // <-apple store link here
+				header('Location: ' . DEFUALT_IOS_URL_STORE_IDNA); // <-apple store link here
 		  }else if($detect->is('Android')){ 
-			header('Location: ' . DEFUALT_ANDROID_URL_STORE_IDNA); // <-play store link here
+				header('Location: ' . DEFUALT_ANDROID_URL_STORE_IDNA); // <-play store link here
 		  }
 		  break;
 		}
@@ -1331,5 +1375,17 @@ function ___user_login($uid, $nid, $data){
 	// }
 
 	firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_DEVICE_ACCESS)->document($nid)->set($data);
+}
+
+function firestore_delete_collection($collectionReference, $batchSize)
+{
+    $documents = $collectionReference->limit($batchSize)->documents();
+    while (!$documents->isEmpty()) {
+        foreach ($documents as $document) {
+            printf('Deleting document %s' . PHP_EOL, $document->id());
+            $document->reference()->delete();
+        }
+        $documents = $collectionReference->limit($batchSize)->documents();
+    }
 }
 ?>
