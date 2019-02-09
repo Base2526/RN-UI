@@ -265,21 +265,10 @@ class ListGroupMemberPage extends React.Component{
             console.log('000001')
             return ;
         }
-  
-        let ic_collapse;
-        if(state){
-        ic_collapse = <Image
-                        style={{width: 20, height: 20}}
-                        source={require('../../Images/collapse_down.png')}
-                        // resizeMode={FastImage.resizeMode.contain}
-                    />
-        }else{
-            ic_collapse = <Image
-                          style={{width: 20, height: 20}}
-                          source={require('../../Images/collapse_up.png')}
-                          // resizeMode={FastImage.resizeMode.contain}
-                    />
-        }
+
+        let ic_collapse = <MyIcon name={state ? 'collapse-up' : 'collapse-down'}
+                                  size={8}
+                                  color={'#C7D8DD'} />
   
         return (
             <View

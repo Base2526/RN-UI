@@ -17,6 +17,22 @@ import * as actions from '../../Actions'
 import GroupMemberInviteItem from '../../test/GroupMemberInviteItem'
 
 class GroupMemberInvite extends React.Component{
+    
+    static navigationOptions = ({ navigation }) => ({
+        title: "Invite members",
+        headerTintColor: '#C7D8DD',
+        headerStyle: {
+            backgroundColor: 'rgba(186, 53, 100, 1.0)',
+  
+            // ios navigationoptions underline hide
+            borderBottomWidth: 0,
+  
+            // android navigationoptions underline hide
+            elevation: 0,
+            shadowOpacity: 0
+          },
+    })
+    
     constructor(props) {
         super(props)
 
@@ -79,41 +95,15 @@ class GroupMemberInvite extends React.Component{
       };
 
     render(){
-        return(<View style={{flex:1}}>
-                    <View style={{ height:40, 
-                                marginTop:getStatusBarHeight(), 
-                                justifyContent:'center', 
-                                paddingLeft:10}}>
-                        <Text style={{fontSize:22}}>Invite friend</Text>
-                        <TouchableOpacity 
-                            style={{
-                                    borderWidth: 1, 
-                                    borderColor: 'red',
-                                    borderRadius: 15,
-                                    height:30, 
-                                    width:30,
-                                    justifyContent: 'center', 
-                                    alignItems: 'center',
-                                    position:'absolute',
-                                    right:0,
-                                    margin:10
-                                        }}
-                            onPress={()=>{
-                                this.props.navigation.goBack()
-                            }}>
-                            <Text style={{color:'red', fontSize:16}}>X</Text>
-                        </TouchableOpacity> 
-                    </View>
-                    <View>
-                    <FlatList
-                        style={{marginBottom:getStatusBarHeight() + 40}}
-                        data={this.state.data}
-                        renderItem={this.renderItem}
-                        extraData={this.state.data}
-                        ItemSeparatorComponent={this.renderSeparator}
-                    />
-                    </View>
-                </View>)
+        return(<View style={{flex:1}}> 
+                <FlatList
+                    style={{}}
+                    data={this.state.data}
+                    renderItem={this.renderItem}
+                    extraData={this.state.data}
+                    ItemSeparatorComponent={this.renderSeparator}
+                />
+               </View>)
     }
 }
 

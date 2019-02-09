@@ -5,12 +5,15 @@ import {View,
         FlatList, 
         ActivityIndicator, 
         TouchableOpacity} from 'react-native'
-
+import ExpandableList from 'react-native-expandable-section-flatlist'
 import { connect } from 'react-redux';
 import FastImage from 'react-native-fast-image'
 import Swipeout from 'react-native-swipeout'
+
+import Constant from '../../Utils/Constant'
 import * as actions from '../../Actions'
 import {getUid} from '../../Utils/Helpers'
+import MyIcon from '../../config/icon-font.js';
 
 class GroupsPage extends React.Component{
     constructor(props) {
@@ -35,7 +38,7 @@ class GroupsPage extends React.Component{
       setTimeout(() => {this.setState({renderContent: true})}, 0);
 
       this.setState({
-        data: this.loadData(),
+        // data: this.loadData(),
         error: null,
         loading: false,
         refreshing: false
@@ -43,14 +46,70 @@ class GroupsPage extends React.Component{
     }
 
     loadData=()=>{
-      let group_member = []
+      // let group_member = []
+      // for (var key in this.props.groups) {
+      //   let group =  this.props.groups[key]
+
+      //   console.log(group.status)
+      //   group_member.push({...group, group_id:key});
+      // }
+      
+      // console.log(group_member)
+      // return group_member
+
+      /*
+      GROUP_STATUS_MEMBER_INVITED: '35',
+      GROUP_STATUS_MEMBER_JOINED: '36',
+      GROUP_STATUS_MEMBER_CANCELED: '38', 
+      GROUP_STATUS_MEMBER_DECLINE: '37',
+      GROUP_STATUS_MEMBER_LEAVE: '39',
+        */
+
+      let group_invited = []
+      let group_joined = []
+      let group_favorites = []
       for (var key in this.props.groups) {
         let group =  this.props.groups[key]
-        group_member.push({...group, group_id:key});
+        console.log(group)
+        switch(group.status){ // GROUP_STATUS_MEMBER_INVITED
+          case Constant.GROUP_STATUS_MEMBER_INVITED:{
+            group_invited.push({...group, group_id:key})
+            break;
+          }
+
+          case Constant.GROUP_STATUS_MEMBER_JOINED:{
+            
+
+            if(group.is_favorites !== undefined && group.is_favorites){
+              group_favorites.push({...group, group_id:key})
+            }else{
+              group_joined.push({...group, group_id:key})
+            }
+            break;
+          }
+        }
       }
-      
-      console.log(group_member)
-      return group_member
+
+      let groups = {
+        title: 'Groups',
+        member:group_joined
+      }
+
+      let invited = {
+        title: 'Groups invitations',
+        member:group_invited
+      }
+
+      let favorites = {
+        title:'Favorites',
+        member:group_favorites
+      }
+
+      console.log(group_joined)
+      console.log(group_invited)
+      console.log(group_favorites)
+
+      return [favorites, invited, groups];    
     }
 
     componentWillReceiveProps(nextProps) {      
@@ -70,6 +129,8 @@ class GroupsPage extends React.Component{
       return (
         <View
           style={{
+            position:'absolute',
+            bottom: 0,
             height: 1,
             width: "100%",
             backgroundColor: "#CED0CE",
@@ -187,12 +248,237 @@ class GroupsPage extends React.Component{
                                 fontWeight: '600', 
                                 paddingBottom:5
                               }}>
-                      {item.group_profile.name} ({ Object.keys(item.group_profile.members).length})
+                      {item.group_profile.name} ({ Object.keys(item.members).length})
                   </Text>
                 </View>
             </View>
           </TouchableOpacity>
       </Swipeout>)
+    }
+
+    _renderSection = (section, sectionId, state)  => {
+      let member_size = this.loadData()[sectionId].member.length
+      if(member_size == 0){
+        return ;
+      }
+
+      let ic_collapse = <MyIcon
+                          name={state ? 'collapse-up' : 'collapse-down'}
+                          size={8}
+                          color={'#C7D8DD'} />
+
+      return (
+          <View
+              style={{ 
+                      height: 30, 
+                      flexDirection: 'row',
+                      justifyContent: 'space-between', 
+                      alignItems: 'center', 
+                      borderBottomWidth: 0.5,
+                      borderBottomColor: '#E4E4E4' }}>
+          <View style={{ flexDirection: 'row', 
+                        alignItems: 'center'}}>
+              <Text style={{ fontSize: 13, 
+                              color: 'gray',
+                              paddingLeft: 10,
+                              fontWeight:'700' }}>
+              {section + "("+ member_size +")"}
+              </Text>
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent:'center', alignItems: 'center', marginRight:10 }}>
+              {ic_collapse}
+          </View>
+          </View>
+      )
+    }
+
+    _renderRow = (rowItem, rowId, sectionId) => {
+
+      switch(sectionId){
+        // favorites
+        case 0:{
+
+          break;
+        }
+
+        // invited
+        case 1:{
+          return(<TouchableOpacity 
+                    key={rowItem.item_id} 
+                    onPress={() => {
+                      this.props.params.navigation.navigate("ManageGroupPage", {'group_id': rowItem.group_id}) 
+                    }}>
+                    <View
+                      style={{
+                        alignItems: 'center', 
+                        padding: 10,
+                        flexDirection: 'row'
+                      }}>
+                        <TouchableOpacity
+                          style={{width: 80, height: 80, borderRadius: 40}}
+                          onPress={() => {
+                            this.props.params.navigation.navigate("ManageGroupPage", {'group_id': rowItem.group_id}) 
+                          }}>
+                          <FastImage
+                              style={{width: 80, height: 80, borderRadius: 40, borderWidth:.5, borderColor:'gray'}}
+                              source={{
+                                uri: rowItem.group_profile.image_url,
+                                headers:{ Authorization: 'someAuthToken' },
+                                priority: FastImage.priority.normal,
+                              }}
+                              resizeMode={FastImage.resizeMode.cover}
+                            />
+                        </TouchableOpacity>
+                        <View style={{paddingLeft: 10}}>
+                          <Text style={{fontSize: 18, 
+                                        fontWeight: '600', 
+                                        paddingBottom:5
+                                      }}>
+                              {rowItem.group_profile.name} ({ Object.keys(rowItem.members).length })
+                          </Text>
+                        </View>
+                    </View>
+                  
+                    <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
+                      <TouchableOpacity
+                        style={{padding:5, 
+                                borderColor:'green', 
+                                borderRadius:10, 
+                                borderWidth:.5,
+                                marginRight:5}}
+                        onPress={()=>{
+                          alert('Join')
+                        }}>
+                        <Text style={{color:'green'}}>Join</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={{padding:5, 
+                                borderColor:'red', 
+                                borderRadius:10, 
+                                borderWidth:.5}}
+                        onPress={()=>{
+                          // alert('Decline')
+                          // group_id
+
+                          console.log(rowItem)
+                          // this.setState({loading:true})
+                          // this.props.actionMemberDeclineGroup(this.props.uid, (result) => {
+                          //   console.log(result)
+
+                          //   this.setState({loading:false})
+                          // })
+                        }}>
+                        <Text style={{color:'red'}}>Decline</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </TouchableOpacity>)
+        }
+
+        // groups
+        case 2:{
+
+          break;
+        }
+      }
+      
+      let swipeoutRight = [{component:<View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
+                                        <Text style={{fontWeight:'bold', color:'white', fontSize:16, textAlign:'center'}}>DELETE GROUP</Text>
+                                      </View>,
+                            backgroundColor: 'blue',
+                              onPress: () => { 
+                                Alert.alert(
+                                  '',
+                                  'การลบกลุ่มจะลบได้เฉพาะตอนเทสระบบเท่านั้น',
+                                  [
+                                  //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                                    {text: 'Cancel', onPress: () => {
+
+                                    }, style: 'cancel'},
+                                    {text: 'OK', onPress: () => {
+                                      console.log(item) // group_id
+
+                                      this.setState({loading:true})
+                                      this.props.actionDeleteGroup(this.props.uid, item.group_id, (result) => {
+                                        console.log(result)
+
+                                        this.setState({loading:false})
+                                      })
+                                    }},
+                                  ],
+                                  { cancelable: false }
+                                )
+                              }
+                            },{
+                            component:<View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
+                                        <Text style={{fontWeight:'bold', color:'white', fontSize:16, textAlign:'center'}}>LEAVE GROUP</Text>
+                                      </View>,
+                            backgroundColor: 'red',
+                            onPress: () => { 
+                              Alert.alert(
+                                '',
+                                'If you leave this group, you\'ll no longer be able to see its member list or chat history Continue?',
+                                [
+                                //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                                  {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                                  {text: 'OK', onPress: () => console.log('OK Pressed')},
+                                ],
+                                { cancelable: false }
+                              )
+                            }
+                          }]
+
+      return(
+        <Swipeout 
+          style={{backgroundColor:'white'}} 
+          right={swipeoutRight}
+          rowID={rowId}
+          sectionID={0}
+          onOpen={(sectionId, rowId) => {
+            this.setState({
+              sectionID: sectionId,
+              rowID: rowId,
+            })
+          }}
+          close={!(this.state.rowID === rowId)}
+          >
+          <TouchableOpacity 
+            key={rowItem.item_id} 
+            onPress={() => {
+              this.props.params.navigation.navigate("ManageGroupPage", {'group_id': rowItem.group_id}) 
+            }}>
+            <View
+              style={{
+                alignItems: 'center', 
+                padding: 10,
+                flexDirection: 'row'
+              }}>
+                <TouchableOpacity
+                  style={{width: 80, height: 80, borderRadius: 40}}
+                  onPress={() => {
+                    this.props.params.navigation.navigate("ManageGroupPage", {'group_id': rowItem.group_id}) 
+                  }}>
+                  <FastImage
+                      style={{width: 80, height: 80, borderRadius: 40, borderWidth:.5, borderColor:'gray'}}
+                      source={{
+                        uri: rowItem.group_profile.image_url,
+                        headers:{ Authorization: 'someAuthToken' },
+                        priority: FastImage.priority.normal,
+                      }}
+                      resizeMode={FastImage.resizeMode.cover}
+                    />
+                </TouchableOpacity>
+                <View style={{paddingLeft: 10}}>
+                  <Text style={{fontSize: 18, 
+                                fontWeight: '600', 
+                                paddingBottom:5
+                              }}>
+                      {rowItem.group_profile.name} ({ Object.keys(rowItem.members).length})
+                  </Text>
+                </View>
+            </View>
+          </TouchableOpacity>
+      </Swipeout>)
+
     }
   
     render() {
@@ -208,15 +494,20 @@ class GroupsPage extends React.Component{
         <View style={{flex:1}}>
         {
           renderContent && 
-          <FlatList
-            data={data}
-            renderItem={this.renderItem}
-            keyExtractor={item => item.item_id}
-            ItemSeparatorComponent={this.renderSeparator}
-            ListFooterComponent={this.renderFooter}
-            onEndReachedThreshold={50}
-            extraData={this.state}
-          />  
+          <ExpandableList
+              ref={instance => this.ExpandableList = instance}
+              dataSource={this.loadData()}
+              headerKey="title"
+              memberKey="member"
+              renderRow={this._renderRow}
+              headerOnPress={(i, state) => {
+                // console.log(i, state)
+                // alert('headerOnPress')
+              } }
+              renderSectionHeaderX={this._renderSection}
+              openOptions={[0, 1, 2, 3]}
+              // onScroll={this.props.handleScroll}
+            />
         }
         </View>
       );

@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import { ifIphoneX } from 'react-native-iphone-x-helper';
 var _ = require('lodash');
 
-import Image from 'react-native-remote-svg'
+import Spinner from 'react-native-loading-spinner-overlay';
 
 import {getHeaderInset} from '../../Utils/Helpers'
 import * as actions from '../../Actions'
@@ -29,6 +29,7 @@ class ManageGroupPage extends React.Component{
     constructor(){
         super();
         this.state = { 
+            loading:false,
             renderContent: false,
             group:{}
         }
@@ -175,10 +176,16 @@ class ManageGroupPage extends React.Component{
             return(<View style={{flex:1, backgroundColor:'#DF2D6C'}}></View>)
         }
 
-        console.log(group)
+        // console.log(group)
 
         return (
                 <View style={{flex:1, backgroundColor:'#DF2D6C', paddingTop:getHeaderInset()}}>
+                    <Spinner
+                        visible={this.state.loading}
+                        textContent={'Wait...'}
+                        textStyle={{color: '#FFF'}}
+                        overlayColor={'rgba(0,0,0,0.5)'}
+                    />
                     <View style={{ alignItems:'center'}}>
                         <TouchableOpacity
                             style={{paddingTop:10}}>
@@ -195,9 +202,21 @@ class ManageGroupPage extends React.Component{
                         <View style={{padding:5, flexDirection:'row'}}>
                             <TouchableOpacity
                                 style={{justifyContent:'center', alignItems:'center'}}
-                                >
+                                onPress={()=>{
+                                    let is_favorites = false;
+                                    if(group.is_favorites !== undefined){
+                                        is_favorites = group.is_favorites
+                                    }
+
+                                    this.setState({loading:true})
+                                    this.props.actionFavoritesGroup(this.props.uid, group.group_id, !is_favorites, (result) => {
+                                        console.log(result)
+
+                                        this.setState({loading:false})
+                                    })
+                                }}>
                                 <MyIcon
-                                    name={'star-empty'} // star
+                                    name={group.is_favorites ? 'star' : 'star-empty' } // star
                                     size={30}
                                     color={'#C7D8DD'} />
                             </TouchableOpacity>

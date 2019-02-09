@@ -20,6 +20,10 @@ import {USER_LOGIN_SUCCESS,
         ADD_GROUP,
         DELETE_GROUP,
         UPDATE_GROUP_PICTURE_PROFILE,
+        ADDED_GROUP_MEMBER,
+        MODIFIED_GROUP_MEMBER,
+        REMOVED_GROUP_MEMBER,
+        FAVORITES_GROUP,
         SELECT_ADD_CLASS,
         CLASS_MEMBERS,
         FRIEND_MUTE,
@@ -397,6 +401,41 @@ export const actionEditGroupNameProfile = (uid, group_id, group_name, callback) 
     callback({'status':true})
 }
 
+// favorites group
+export const actionFavoritesGroup = (uid, group_id, favorite_status, callback) => dispatch => {
+    
+    dispatch({ type: FAVORITES_GROUP, group_id, favorite_status});
+
+    // console.log(uid, group_id, favorite_status)
+    // dispatch({ type: INTERESTE_IN_PROFILE, interestein_key, interestein_id, interestein_status});
+    firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).set({
+        is_favorites: favorite_status,
+    }, { merge: true});
+
+    callback({'status':true})
+}
+
+// Decline Group
+/*
+การปฎิเสจคำขอให้เข้ากลุ่มสนทนา
+* ขั้นตอนการทำงาน
+    - ลบ users/{user_id}/groups/{group_id} และ update redux local
+    - update status == GROUP_STATUS_MEMBER_DECLINE groups/{group_id}/members/{item_id}/status = GROUP_STATUS_MEMBER_DECLINE
+*/
+export const actionMemberDeclineGroup = (uid, callback) => dispatch => {
+    
+    /*
+    dispatch({ type: FAVORITES_GROUP, group_id, favorite_status});
+
+    // console.log(uid, group_id, favorite_status)
+    // dispatch({ type: INTERESTE_IN_PROFILE, interestein_key, interestein_id, interestein_status});
+    firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).set({
+        is_favorites: favorite_status,
+    }, { merge: true});
+    */
+
+    callback({'status':true})
+}
 
 export const actionDeleteGroup = (uid, group_id, callback) => dispatch =>{
     firebase.firestore().collection('groups').doc(group_id).delete()
@@ -580,33 +619,11 @@ export const actionFriendBlock = (uid, friend_id, callback) => dispatch=> {
 }
 
 // friend mute/unmute
-export const actionFriendMute = (uid, friend_id, callback) => dispatch=> {
-    var muteRef =  firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
-
-    firebase.firestore().runTransaction(t => {
-        return t.get(muteRef)
-        .then(doc => {
-            // console.log(doc.data().mute)
-            // Add one person to the city population
-            // var newPopulation = doc.data().population + 1;
-            // t.update(cityRef, {population: newPopulation});
-            // t.update(classsRef, {mute: !doc.data().status});
-
-            if(doc.data().mute === undefined){
-                t.set(muteRef, {
-                    mute: true,
-                }, { merge: true});
-            }else{
-                t.update(muteRef, {mute: !doc.data().mute});
-            }
-        });
-    }).then(result => {
-        console.log('Transaction success!');
-    }).catch(err => {
-        console.log('Transaction failure:', err);
-    });
-
-    dispatch({ type: FRIEND_MUTE, friend_id});
+export const actionFriendMute = (uid, friend_id, mute, callback) => dispatch=> {
+    dispatch({ type: FRIEND_MUTE, friend_id, mute});
+    firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
+        mute,
+    }, { merge: true});
 
     callback({'status':true})
 }
@@ -1307,7 +1324,7 @@ export function watchTaskEvent(uid, dispatch) {
                 // doc.id จะมีค่าเท่ากันกับ  docSnapshot.id 
 
                 if(docSnapshot.data() !== undefined){
-                    // console.log(docSnapshot.id, " => ", docSnapshot.data());
+                    // console.log(doc.id, " => ", doc.data());
 
                     let v = {...doc.data(), group_profile:docSnapshot.data()}
 
@@ -1317,7 +1334,44 @@ export function watchTaskEvent(uid, dispatch) {
                     /** จะมีบั๊ก ไม่รู้ว่าตอนไหนจะมีการ insert object ลงไปเราต้องลบออก ค่อยมาไล่เช็ดทีหลัง */
                     dispatch({ type: DELETE_GROUP, group_id:docSnapshot.id});
                 }
-           })
+            })
+
+            firebase.firestore().collection('groups').doc(doc.id).collection('members').onSnapshot((querySnapshot) => {
+                querySnapshot.docChanges.forEach(function(change) {
+                    console.log(doc.id, change.doc.id)
+                    
+                    if (change.type === 'added') {
+                        console.log('added: ', doc.id, change.doc.id, change.doc.data());
+
+                        let group_id = doc.id
+                        let item_id = change.doc.id
+                        let data = change.doc.data()
+                        // ADDED_GROUP_MEMBER
+
+                        dispatch({ type: ADDED_GROUP_MEMBER, group_id, item_id, data});
+                    }
+                    if (change.type === 'modified') {
+                        console.log('modified: ', doc.id, change.doc.id, change.doc.data());
+
+                        let group_id = doc.id
+                        let item_id = change.doc.id
+                        let data = change.doc.data()
+                        // MODIFIED_GROUP_MEMBER
+
+                        dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, item_id, data});
+                    }
+                    if (change.type === 'removed') {
+                        console.log('removed: ', doc.id, change.doc.id, change.doc.data());
+
+                        let group_id = doc.id
+                        let item_id = change.doc.id
+                        let data = change.doc.data()
+                        // REMOVED_GROUP_MEMBER
+
+                        dispatch({ type: REMOVED_GROUP_MEMBER, group_id, item_id});
+                    }
+                })
+            })
         })
     })
     

@@ -165,11 +165,6 @@ class AddGroupsPage extends React.Component{
         alert("Select friend is empty.")
       }else{
 
-        // console.log(this.props.uid)
-        // console.log(groupName)
-        // console.log(seleteds)
-        // console.log(this.state.avatarSource.uri)
-        
         this.setState({loading:true})
         this.props.actionCreateGroup(this.props.uid, groupName, seleteds, this.state.avatarSource.uri).then((result) => {
           console.log(result)
@@ -256,15 +251,12 @@ class AddGroupsPage extends React.Component{
         } else if (response.customButton) {
           console.log('User tapped custom button: ', response.customButton);
         } else {
-          const source = { uri: response.uri };
-
-          // You can also display the image using data:
-          // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+          const source = { uri: response.uri }
 
           this.setState({
             avatarSource: source,
           });
-          console.log(this.state.avatarSource.uri)
+          // console.log(this.state.avatarSource.uri)
         }
       });
     }

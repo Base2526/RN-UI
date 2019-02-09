@@ -115,7 +115,6 @@ class SettingListHide extends React.Component{
                     <TouchableOpacity
                     onPress={()=>{
                         
-
                         Alert.alert(
                             '',
                             '',

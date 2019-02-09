@@ -25,6 +25,11 @@ export const ADD_GROUP              = "add_group"
 export const DELETE_GROUP           = "delete_group"
 // actionUpdateGroupPictureProfile
 export const UPDATE_GROUP_PICTURE_PROFILE   = "update_group_picture_profile"
+export const FAVORITES_GROUP        = "favorites_group"
+
+export const ADDED_GROUP_MEMBER     = "added_group_member"
+export const MODIFIED_GROUP_MEMBER  = "modified_group_member" // modified
+export const REMOVED_GROUP_MEMBER   = "removed_group_member"
 
 export const SELECT_ADD_CLASS       = "select_add_class"
 export const CLASS_MEMBERS          = "class_members"

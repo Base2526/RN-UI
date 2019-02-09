@@ -18,5 +18,7 @@
 .icon-settings:before { content: '\e810'; } /* '' */
 .icon-star-empty:before { content: '\e811'; } /* '' */
 .icon-star:before { content: '\e812'; } /* '' */
+.icon-volume-off:before { content: '\e813'; } /* '' */
+.icon-volume-low:before { content: '\e814'; } /* '' */
 .icon-menu:before { content: '\f0c9'; } /* '' */
 .icon-dot-circled:before { content: '\f192'; } /* '' */

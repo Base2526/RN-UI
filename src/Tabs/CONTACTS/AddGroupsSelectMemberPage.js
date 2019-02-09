@@ -7,12 +7,12 @@ import {View,
 import { connect } from 'react-redux';
 var _ = require('lodash');
 import FastImage from 'react-native-fast-image'
-
 import * as actions from '../../Actions'
 import MyIcon from '../../config/icon-font.js';
 
-class AddGroupsSelectMemberPage extends React.Component{
+import Constant from '../../Utils/Constant'
 
+class AddGroupsSelectMemberPage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
         title: "Select member",
         headerTintColor: '#C7D8DD',
@@ -47,9 +47,6 @@ class AddGroupsSelectMemberPage extends React.Component{
         const { navigation, auth } = this.props;
         const data = navigation.getParam('members', null);
 
-        // console.log(members)
-
-        // let members = group.group_profile.members
         let friends = auth.users.friends
 
         let key = []
@@ -61,7 +58,9 @@ class AddGroupsSelectMemberPage extends React.Component{
         _.each(friends, function(_v, _k) { 
             let find = key.find(k => k.friend_id==_k)
             if(find === undefined){
-                newData.push({..._v, friend_id:_k})
+                if(_v.status == Constant.FRIEND_STATUS_FRIEND){
+                    newData.push({..._v, friend_id:_k})
+                }
             }else{
                 newData.push(find)
             }
@@ -125,7 +124,7 @@ class AddGroupsSelectMemberPage extends React.Component{
                 this.onSeleted(index)
             }}>
             <View style={{flex:1, 
-                height:80, 
+                height:100, 
                 padding:10, 
                 marginRight:10,
                 backgroundColor:'white', 
@@ -138,39 +137,30 @@ class AddGroupsSelectMemberPage extends React.Component{
                             paddingRight:10}}
                     onPress={()=>{
                         this.onSeleted(index)
-                    }}
-                    >
+                    }}>
                     <MyIcon
                         name={'dot-circled'}
                         size={30}
                         color={seleted ? '#E9E9E9' : '#DF2D6C'} />
                 </TouchableOpacity>
                 <TouchableOpacity 
-                    style={{height: 60,
-                            width: 60,
-                            borderRadius: 30
-                    }}
                     onPress={()=>{
                         this.onSeleted(index)
                     }}>
-                    {/* <ImageWithDefault 
-                    source={{uri: item.profile.image_url}}
-                    style={{width: 60, height: 60, borderRadius: 30, borderColor:'gray', borderWidth:1}}/> */}
-
-                        <FastImage
-                            style={{width: 60, 
-                                    height: 60, 
-                                    borderRadius: 30, 
-                                    borderWidth:.5,
-                                    borderColor:'gray'
-                            }}
-                            source={{
-                            uri: item.profile.image_url,
-                            headers:{ Authorization: 'someAuthToken' },
-                            priority: FastImage.priority.normal,
-                            }}
-                            resizeMode={FastImage.resizeMode.cover}
-                        />
+                    <FastImage
+                        style={{width: 80, 
+                                height: 80, 
+                                borderRadius: 40, 
+                                borderWidth:.5,
+                                borderColor:'gray'
+                        }}
+                        source={{
+                        uri: item.profile.image_url,
+                        headers:{ Authorization: 'someAuthToken' },
+                        priority: FastImage.priority.normal,
+                        }}
+                        resizeMode={FastImage.resizeMode.cover}
+                    />
                 </TouchableOpacity>
                 <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
                     <Text style={{fontSize:18}}>{item.profile.name}</Text>

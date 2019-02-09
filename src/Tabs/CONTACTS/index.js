@@ -221,6 +221,7 @@ const MyQRcodeNavigator = createStackNavigator(
 const ListGroupMemberNavigator = createStackNavigator(
   {
     'ListGroupMemberPage': {screen: ListGroupMemberPage},
+    'GroupMemberInvite': {screen: GroupMemberInvite},
   },
   {
     // headerMode: 'none',
@@ -258,7 +259,7 @@ const MainModalNavigator = createStackNavigator(
       
     // },
     'GroupSettingsNavigator': {screen: GroupSettingsNavigator},
-    'GroupMemberInvite': {screen: GroupMemberInvite},
+    
     'ClasssSettingsPage': {screen: ClasssSettingsPage},
     'ClasssMemberAddFriend': {screen: ClasssMemberAddFriend},
     'ChangeFriendsName': {screen: ChangeFriendsName},
@@ -327,7 +328,8 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
       routeName === 'MyQRcode' ||
       routeName === 'MyQRcode_QRCodeReaderPage' ||
       routeName === 'GroupSettingsPage' ||
-      routeName === 'EditGroupNamePage'
+      routeName === 'EditGroupNamePage' ||
+      routeName === 'GroupMemberInvite'
       ) {
     navigationOptions.tabBarVisible = false;
   }

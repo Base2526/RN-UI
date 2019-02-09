@@ -18,6 +18,10 @@ import {USER_LOGIN_SUCCESS,
         ADD_GROUP,
         DELETE_GROUP,
         UPDATE_GROUP_PICTURE_PROFILE,
+        FAVORITES_GROUP,
+        ADDED_GROUP_MEMBER,
+        MODIFIED_GROUP_MEMBER,
+        REMOVED_GROUP_MEMBER,
         SELECT_ADD_CLASS,
         CLASS_MEMBERS,
         FRIEND_MUTE,
@@ -752,17 +756,23 @@ export default (state= INITIAL_STATE, action)=>{
 
             if(key != 0){
 
-                let v = {
-                    ...state,
-                    users : {
-                        ...state.users,
-                        friends : {
-                            ...state.users.friends,
-                            [action.friend_id]:{...value, ...action.data}
+
+                if(!_.isEqual(value, action.data)){
+                    // console.log('Not Equal')
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            friends : {
+                                ...state.users.friends,
+                                [action.friend_id]:{...value, ...action.data}
+                            }
                         }
                     }
+                    return v;
+                }else{
+                    // console.log('Equal')
                 }
-                return v;
             }
 
             return state;
@@ -773,6 +783,7 @@ export default (state= INITIAL_STATE, action)=>{
                 return state
             }
 
+            // console.log('FRIEND_PROFILE')
             let friends = state.users.friends
 
             let key = 0
@@ -867,9 +878,7 @@ export default (state= INITIAL_STATE, action)=>{
                 }
             });
 
-            // console.log(key, " | ", value)
-
-            // if(key == 0){
+            if(key == 0){
                 let v = {
                     ...state,
                     users : {
@@ -882,7 +891,32 @@ export default (state= INITIAL_STATE, action)=>{
                 }
                 // console.log(v)
                 return v
-            // }
+            }else{
+
+                // console.log(_.isEqual(value, action.data))
+                // console.log(isEquivalent2Object(value, action.data))
+                if(!_.isEqual(value, action.data)){
+
+                    console.log(value)
+                    console.log(action.data)
+                    
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            groups : {
+                                ...state.users.groups,
+                                [action.group_id]: action.data
+                            }
+                        }
+                    }
+                    // console.log(v)
+                    return v
+                }else{
+                    // console.log(value)
+                    // console.log(action.data)
+                }
+            }
 
             return state
         }
@@ -893,19 +927,29 @@ export default (state= INITIAL_STATE, action)=>{
             }
 
             let groups = state.users.groups
-           
-            // เป็น การลบ object ที่มี key ตรงกันออก
-            // https://stackoverflow.com/questions/3455405/how-do-i-remove-a-key-from-a-javascript-object
-            let data = _.omit(groups, action.group_id)
+            // console.log(groups)
 
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    groups :data
+            let f = _.find(groups,  function(v, k) { 
+                return k == action.group_id
+            })
+
+            if(f !== undefined){
+                console.log(groups)
+                // เป็น การลบ object ที่มี key ตรงกันออก
+                // https://stackoverflow.com/questions/3455405/how-do-i-remove-a-key-from-a-javascript-object
+                let data = _.omit(groups, action.group_id)
+
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        groups :data
+                    }
                 }
+                return v
             }
-            return v
+
+            return state
         }
 
         case UPDATE_GROUP_PICTURE_PROFILE:{
@@ -945,6 +989,193 @@ export default (state= INITIAL_STATE, action)=>{
 
             // console.log(v)
             return v
+        }
+
+        case FAVORITES_GROUP:{
+
+            if(state.users === null){
+                return state
+            }
+
+            let groups = state.users.groups
+
+            let key = 0
+            let value = null
+            _.each(groups, function(_v, _k) { 
+                if(_k === action.group_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            if(value.is_favorites === undefined){
+                value = {...value, is_favorites:true}
+            }else{
+                value = {...value, is_favorites:!value.is_favorites}
+            }
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    groups : {
+                        ...state.users.groups,
+                        [action.group_id]: value
+                    }
+                }
+            }
+
+            // console.log(v)
+            return v
+        }
+
+        case ADDED_GROUP_MEMBER:{
+            if(state.users === null){
+                return state
+            }
+
+            let groups = state.users.groups
+
+            let key = 0
+            let value = null
+            _.each(groups, function(_v, _k) { 
+                if(_k === action.group_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            if(value.members === undefined){
+                let newValue = {...value, 
+                                    members: {
+                                        ...value.members,
+                                        [action.item_id]:action.data
+                                    }
+                                }
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        groups : {
+                            ...state.users.groups,
+                            [action.group_id]: newValue
+                        }
+                    }
+                }
+                return v
+            }else{
+                let newValue = {...value, 
+                                    members: {
+                                        ...value.members,
+                                        [action.item_id]:action.data
+                                    }
+                                }
+
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        groups : {
+                            ...state.users.groups,
+                            [action.group_id]: newValue
+                        }
+                    }
+                }
+                return v
+            }
+        }
+
+        case MODIFIED_GROUP_MEMBER:{
+            if(state.users === null){
+                return state
+            }
+            
+            let groups = state.users.groups
+
+            let key = 0
+            let value = null
+            _.each(groups, function(_v, _k) { 
+                if(_k === action.group_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            if(value.members !== undefined){
+                let m_key = 0
+                let m_value = null
+                _.each(value.members, function(_vv, _kk) { 
+                    if(_kk === action.item_id){
+                        m_key = _kk
+                        m_value = _vv
+                    }
+                });
+
+                if(!_.isEqual(m_value, action.data)){
+                    
+                    let newValue = {...value, 
+                        members: {
+                            ...value.members,
+                            [action.item_id]:action.data
+                        }
+                    }
+    
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            groups : {
+                                ...state.users.groups,
+                                [action.group_id]: newValue
+                            }
+                        }
+                    }
+                    return v
+                }
+            }
+
+            return state
+        }
+
+        case REMOVED_GROUP_MEMBER:{
+            if(state.users === null){
+                return state
+            }
+
+            let groups = state.users.groups
+
+            let key = 0
+            let value = null
+            _.each(groups, function(_v, _k) { 
+                if(_k === action.group_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            if(value.members !== undefined){
+   
+                let newMembers = _.omit(value.members, action.item_id)
+
+                let newValue = {...value, 
+                    members: newMembers
+                }
+
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        groups : {
+                            ...state.users.groups,
+                            [action.group_id]: newValue
+                        }
+                    }
+                }
+
+                return v
+            }
+
+            return state
         }
 
         case SELECT_ADD_CLASS:{
@@ -1073,14 +1304,8 @@ export default (state= INITIAL_STATE, action)=>{
                 }
             });
 
-            if(value.mute === undefined){
-                value = {...value, mute:true}
-            }else{
-                value = {...value, mute:!value.mute}
-            }
-            // console.log(value)
+            value = {...value, mute:action.mute}
 
-            // friends
             let v = {
                 ...state,
                 users : {
@@ -1091,8 +1316,9 @@ export default (state= INITIAL_STATE, action)=>{
                     }
                 }
             }
-            // console.log(v)
-            return v
+
+            console.log(v)
+            return state
         }
 
         case FRIEND_HIDE:{

@@ -76,11 +76,11 @@ module.exports = {
     FRIEND_STATUS_FRIEND_REMOVE: '41',
 
     // Members group status invited
-    GROUP_STATUS_MEMBER_INVITED: '35',
-    GROUP_STATUS_MEMBER_JOINED: '36',
-    GROUP_STATUS_MEMBER_CANCELED: '38', 
-    GROUP_STATUS_MEMBER_DECLINE: '37',
-    GROUP_STATUS_MEMBER_LEAVE: '39',
+    GROUP_STATUS_MEMBER_INVITED: '35', // ส่งคำเชิญถึงเพือนให้เข้าร่วมกลุ่มสนทนา
+    GROUP_STATUS_MEMBER_JOINED: '36',  // ตอบรับการเข้าร่วมกลุ่มสนทนา
+    GROUP_STATUS_MEMBER_CANCELED: '38',// เป็นการ cancel การ invite โดยผู้เชิญ
+    GROUP_STATUS_MEMBER_DECLINE: '37', // การปฎิเสธการเข้าร่วมกลุ่มสนทนา
+    GROUP_STATUS_MEMBER_LEAVE: '39',   // กรณีสมาชิกออกจากกลุ่ม
 
     gender: [{id:29, name:'Female'}, {id:28, name:'Male'}, {id:42, name:'Custom'}],
     intereste_in: [{id:43, name:'Women'}, {id:44, name:'Men'}]
