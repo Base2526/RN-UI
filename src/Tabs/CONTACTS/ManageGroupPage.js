@@ -9,7 +9,6 @@ import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
 import { ifIphoneX } from 'react-native-iphone-x-helper';
 var _ = require('lodash');
-
 import Spinner from 'react-native-loading-spinner-overlay';
 
 import {getHeaderInset} from '../../Utils/Helpers'
@@ -47,7 +46,7 @@ class ManageGroupPage extends React.Component{
         
         Object.entries(groups).forEach(([key, value]) => {
             if(group_id === key){
-                let {members} = value.group_profile
+                let {members} = value
 
                 let newMembers = {...members}
                 Object.entries(members).forEach(([mkey, mvalue]) => {
@@ -64,11 +63,12 @@ class ManageGroupPage extends React.Component{
                     }
 
                     let group = {...{group_id:key, ...value}, 
-                                group_profile:{
-                                    ...value.group_profile,
+                                    group_profile:{
+                                        ...value.group_profile,
+                                        members:newMembers
+                                    },
                                     members:newMembers
                                 }
-                            }
 
                     this.setState({
                         group
@@ -79,12 +79,8 @@ class ManageGroupPage extends React.Component{
         });
     }
 
-    // loadData = (groups) =>{
-
-    // }
-
     itemMembers = (group) =>{
-        let {members} = group.group_profile
+        let {members} = group
         return Object.keys(members).map((key, v) => {
             if(v > 3){
                 return;
@@ -132,12 +128,11 @@ class ManageGroupPage extends React.Component{
         // console.log(group_id)
 
         let groups = nextProps.auth.users.groups;
-
         let friends = auth.users.friends
         
         Object.entries(groups).forEach(([key, value]) => {
             if(group_id === key){
-                let {members} = value.group_profile
+                let {members} = value
 
                 let newMembers = {...members}
                 Object.entries(members).forEach(([mkey, mvalue]) => {
@@ -154,11 +149,12 @@ class ManageGroupPage extends React.Component{
                     }
 
                     let group = {...{group_id:key, ...value}, 
-                                group_profile:{
-                                    ...value.group_profile,
+                                    group_profile:{
+                                        ...value.group_profile,
+                                        members:newMembers
+                                    },
                                     members:newMembers
                                 }
-                            }
 
                     this.setState({
                         group
@@ -176,8 +172,7 @@ class ManageGroupPage extends React.Component{
             return(<View style={{flex:1, backgroundColor:'#DF2D6C'}}></View>)
         }
 
-        // console.log(group)
-
+        console.log(group)
         return (
                 <View style={{flex:1, backgroundColor:'#DF2D6C', paddingTop:getHeaderInset()}}>
                     <Spinner
@@ -231,7 +226,7 @@ class ManageGroupPage extends React.Component{
                                 onPress={()=>{
                                     this.props.navigation.navigate('ListGroupMemberPage', {group})
                                 }}>
-                                <Text style={{color:'white', fontWeight:'bold'}}>{Object.keys(group.group_profile.members).length}+</Text>
+                                <Text style={{color:'white', fontWeight:'bold'}}>{Object.keys(group.members).length}+</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -257,14 +252,6 @@ class ManageGroupPage extends React.Component{
                                 color={'#C7D8DD'} />
                             <Text style={{fontWeight:'bold', color:'#BCD1D5', fontSize:16}}>CHAT</Text>
                         </TouchableOpacity>
-                        {/* <TouchableOpacity style={{marginRight:30, marginLeft:30,  alignItems:'center'}}
-                            onPress={()=>{
-                                this.props.navigation.navigate('GroupsQRcode')
-                            }}
-                            >
-                            
-                            <Text style={{fontWeight:'bold', color:'#BCD1D5', fontSize:16}}>QR</Text>
-                        </TouchableOpacity> */}
                         <TouchableOpacity style={{marginLeft:30 ,alignItems:'center'}}
                             onPress={()=>{
                                 this.props.navigation.navigate('GroupSettingsPage', {group})

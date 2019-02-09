@@ -9,6 +9,8 @@ import ExpandableList from 'react-native-expandable-section-flatlist'
 import { connect } from 'react-redux';
 import FastImage from 'react-native-fast-image'
 import Swipeout from 'react-native-swipeout'
+import Spinner from 'react-native-loading-spinner-overlay';
+var _ = require('lodash');
 
 import Constant from '../../Utils/Constant'
 import * as actions from '../../Actions'
@@ -65,6 +67,8 @@ class GroupsPage extends React.Component{
       GROUP_STATUS_MEMBER_LEAVE: '39',
         */
 
+      console.log(this.props)
+
       let group_invited = []
       let group_joined = []
       let group_favorites = []
@@ -120,9 +124,9 @@ class GroupsPage extends React.Component{
         group_member.push({...group, group_id:key});
       }
 
-      this.setState({
-        data: group_member,
-      });
+      // this.setState({
+      //   data: group_member,
+      // });
     }
     
     renderSeparator = () => {
@@ -257,6 +261,7 @@ class GroupsPage extends React.Component{
     }
 
     _renderSection = (section, sectionId, state)  => {
+      // console.log(this.loadData()[sectionId].member)
       let member_size = this.loadData()[sectionId].member.length
       if(member_size == 0){
         return ;
@@ -294,6 +299,7 @@ class GroupsPage extends React.Component{
 
     _renderRow = (rowItem, rowId, sectionId) => {
 
+      console.log(rowItem)
       switch(sectionId){
         // favorites
         case 0:{
@@ -347,7 +353,18 @@ class GroupsPage extends React.Component{
                                 borderWidth:.5,
                                 marginRight:5}}
                         onPress={()=>{
-                          alert('Join')
+                          let members = rowItem.members
+                          let uid = this.props.uid
+                          var member_item_id = _.findKey(members, function(item) {
+                            return item.friend_id == uid
+                          })
+
+                          this.setState({loading:true})
+                          this.props.actionMemberJoinGroup(this.props.uid, rowItem.group_id, member_item_id, (result) => {
+                            console.log(result)
+
+                            this.setState({loading:false})
+                          })
                         }}>
                         <Text style={{color:'green'}}>Join</Text>
                       </TouchableOpacity>
@@ -357,16 +374,18 @@ class GroupsPage extends React.Component{
                                 borderRadius:10, 
                                 borderWidth:.5}}
                         onPress={()=>{
-                          // alert('Decline')
-                          // group_id
+                          let members = rowItem.members
+                          let uid = this.props.uid
+                          var member_item_id = _.findKey(members, function(item) {
+                            return item.friend_id == uid
+                          })
 
-                          console.log(rowItem)
-                          // this.setState({loading:true})
-                          // this.props.actionMemberDeclineGroup(this.props.uid, (result) => {
-                          //   console.log(result)
+                          this.setState({loading:true})
+                          this.props.actionMemberDeclineGroup(this.props.uid, rowItem.group_id, member_item_id, (result) => {
+                            console.log(result)
 
-                          //   this.setState({loading:false})
-                          // })
+                            this.setState({loading:false})
+                          })
                         }}>
                         <Text style={{color:'red'}}>Decline</Text>
                       </TouchableOpacity>
@@ -472,7 +491,7 @@ class GroupsPage extends React.Component{
                                 fontWeight: '600', 
                                 paddingBottom:5
                               }}>
-                      {rowItem.group_profile.name} ({ Object.keys(rowItem.members).length})
+                      {rowItem.group_profile.name} ({ Object.keys(rowItem.members).length })
                   </Text>
                 </View>
             </View>
@@ -482,16 +501,22 @@ class GroupsPage extends React.Component{
     }
   
     render() {
-      let {renderContent, data} = this.state;
+      let {renderContent} = this.state;
 
       if(!this.props.hasOwnProperty('groups')){
         return <View style={{flex: 1}}></View>
       }
 
-      console.log(data)
+      // console.log(data)
 
       return (
         <View style={{flex:1}}>
+        <Spinner
+          visible={this.state.loading}
+          textContent={'Wait...'}
+          textStyle={{color: '#FFF'}}
+          overlayColor={'rgba(0,0,0,0.5)'}
+        />
         {
           renderContent && 
           <ExpandableList

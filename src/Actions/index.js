@@ -6,7 +6,6 @@ const { LoginButton, AccessToken, LoginManager } = FBSDK;
 import DeviceInfo from 'react-native-device-info';
 var _ = require('lodash');
 
-
 import {USER_LOGIN_SUCCESS,
         USER_LOGIN_FAIL,
         USER_LOGOUT,
@@ -24,6 +23,8 @@ import {USER_LOGIN_SUCCESS,
         MODIFIED_GROUP_MEMBER,
         REMOVED_GROUP_MEMBER,
         FAVORITES_GROUP,
+        MEMBER_JOIN_GROUP,
+        MEMBER_DECLINE_GROUP,
         SELECT_ADD_CLASS,
         CLASS_MEMBERS,
         FRIEND_MUTE,
@@ -415,6 +416,26 @@ export const actionFavoritesGroup = (uid, group_id, favorite_status, callback) =
     callback({'status':true})
 }
 
+// Join Group
+/* 
+การตอบ ตกลงเพือเข้าร่วมกลุ่ม
+* ขั้นตอนการทำงาน
+    - update status GROUP_STATUS_MEMBER_JOINED : users/{user_id}/groups/{group_id}/status = GROUP_STATUS_MEMBER_JOINED
+    - update status == GROUP_STATUS_MEMBER_JOINED groups/{group_id}/members/{item_id}/status = GROUP_STATUS_MEMBER_JOINED
+*/
+export const actionMemberJoinGroup = (uid, group_id, member_item_id, callback) => dispatch => {
+    firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).set({
+        status: Constant.GROUP_STATUS_MEMBER_JOINED,
+    }, { merge: true});
+
+    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_item_id).set({
+        status: Constant.GROUP_STATUS_MEMBER_JOINED,
+    }, { merge: true});
+
+    dispatch({ type: MEMBER_JOIN_GROUP, group_id, member_item_id})
+    callback({'status':true})
+}
+
 // Decline Group
 /*
 การปฎิเสจคำขอให้เข้ากลุ่มสนทนา
@@ -422,7 +443,7 @@ export const actionFavoritesGroup = (uid, group_id, favorite_status, callback) =
     - ลบ users/{user_id}/groups/{group_id} และ update redux local
     - update status == GROUP_STATUS_MEMBER_DECLINE groups/{group_id}/members/{item_id}/status = GROUP_STATUS_MEMBER_DECLINE
 */
-export const actionMemberDeclineGroup = (uid, callback) => dispatch => {
+export const actionMemberDeclineGroup = (uid, group_id, member_item_id, callback) => dispatch => {
     
     /*
     dispatch({ type: FAVORITES_GROUP, group_id, favorite_status});
@@ -434,6 +455,12 @@ export const actionMemberDeclineGroup = (uid, callback) => dispatch => {
     }, { merge: true});
     */
 
+    firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).delete()
+    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_item_id).set({
+        status: Constant.GROUP_STATUS_MEMBER_DECLINE,
+    }, { merge: true});
+
+    dispatch({ type: MEMBER_DECLINE_GROUP, group_id, member_item_id});
     callback({'status':true})
 }
 
@@ -1327,7 +1354,7 @@ export function watchTaskEvent(uid, dispatch) {
                     // console.log(doc.id, " => ", doc.data());
 
                     let v = {...doc.data(), group_profile:docSnapshot.data()}
-
+                    console.log(v)
                     dispatch({ type: ADD_GROUP, group_id:docSnapshot.id, data:v });
                 }else{
 

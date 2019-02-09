@@ -26,6 +26,8 @@ export const DELETE_GROUP           = "delete_group"
 // actionUpdateGroupPictureProfile
 export const UPDATE_GROUP_PICTURE_PROFILE   = "update_group_picture_profile"
 export const FAVORITES_GROUP        = "favorites_group"
+export const MEMBER_JOIN_GROUP      = "member_join_group" // Join Group
+export const MEMBER_DECLINE_GROUP   = "member_decline_group"
 
 export const ADDED_GROUP_MEMBER     = "added_group_member"
 export const MODIFIED_GROUP_MEMBER  = "modified_group_member" // modified

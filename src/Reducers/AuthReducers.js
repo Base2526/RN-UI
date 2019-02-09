@@ -19,6 +19,8 @@ import {USER_LOGIN_SUCCESS,
         DELETE_GROUP,
         UPDATE_GROUP_PICTURE_PROFILE,
         FAVORITES_GROUP,
+        MEMBER_JOIN_GROUP,
+        MEMBER_DECLINE_GROUP,
         ADDED_GROUP_MEMBER,
         MODIFIED_GROUP_MEMBER,
         REMOVED_GROUP_MEMBER,
@@ -65,6 +67,8 @@ const INITIAL_STATE = {users:null,
                        }
 
 import {isEquivalent2Object, randomKey} from '../Utils/Helpers'
+
+import Constant from '../Utils/Constant'
 
 export default (state= INITIAL_STATE, action)=>{
     console.log(action)
@@ -897,8 +901,8 @@ export default (state= INITIAL_STATE, action)=>{
                 // console.log(isEquivalent2Object(value, action.data))
                 if(!_.isEqual(value, action.data)){
 
-                    console.log(value)
-                    console.log(action.data)
+                    // console.log(value)
+                    // console.log(action.data)
                     
                     let v = {
                         ...state,
@@ -906,10 +910,11 @@ export default (state= INITIAL_STATE, action)=>{
                             ...state.users,
                             groups : {
                                 ...state.users.groups,
-                                [action.group_id]: action.data
+                                [action.group_id]: {...value, ...action.data}
                             }
                         }
                     }
+                    // console.log(state)
                     // console.log(v)
                     return v
                 }else{
@@ -1028,6 +1033,97 @@ export default (state= INITIAL_STATE, action)=>{
             // console.log(v)
             return v
         }
+
+        case MEMBER_JOIN_GROUP:{
+            if(state.users === null){
+                return state
+            }
+
+            let groups = state.users.groups
+            let key = 0
+            let value = null
+            _.each(groups, function(_v, _k) { 
+                if(_k === action.group_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            if(value.members !== undefined){
+                let member_item_id = action.member_item_id
+
+                let member = _.find(value.members,  function(v, k) { 
+                    return k == member_item_id
+                })
+
+                if(member !== undefined){      
+                    let newGroup = {...value, 
+                                        members: {
+                                            ...value.members,
+                                            [member_item_id]:{...member, status:Constant.GROUP_STATUS_MEMBER_JOINED}
+                                        }
+                                    }
+
+                    let v = {
+                            ...state,
+                            users : {
+                                ...state.users,
+                                groups : {
+                                    ...state.users.groups,
+                                    [action.group_id]: newGroup
+                                }
+                            }
+                        }
+
+                    return v
+                }
+            }
+            
+            return state
+        }
+
+        case MEMBER_DECLINE_GROUP:{
+
+            if(state.users === null){
+                return state
+            }
+
+            let groups = state.users.groups
+            let key = 0
+            let value = null
+            _.each(groups, function(_v, _k) { 
+                if(_k === action.group_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            if(value.members !== undefined){
+                let member_item_id = action.member_item_id
+
+                let member = _.find(value.members,  function(v, k) { 
+                    return k == member_item_id
+                })
+
+                if(member !== undefined){   
+                    let newGroup = {...value, members: _.omit(value.members, member_item_id)}
+                    
+                    let v = {...state,
+                                users : {
+                                    ...state.users,
+                                    groups : {
+                                        ...state.users.groups,
+                                        [action.group_id]: newGroup
+                                    }
+                                }
+                            }
+
+                    return v
+                }
+            }
+            return state
+        }
+
 
         case ADDED_GROUP_MEMBER:{
             if(state.users === null){
