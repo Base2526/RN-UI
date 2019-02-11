@@ -298,12 +298,10 @@ class GroupsPage extends React.Component{
     }
 
     _renderRow = (rowItem, rowId, sectionId) => {
-
       console.log(rowItem)
       switch(sectionId){
         // favorites
         case 0:{
-
           break;
         }
 
@@ -340,7 +338,7 @@ class GroupsPage extends React.Component{
                                         fontWeight: '600', 
                                         paddingBottom:5
                                       }}>
-                              {rowItem.group_profile.name} ({ Object.keys(rowItem.members).length })
+                              {rowItem.group_profile.name} { rowItem.members === undefined ? '' : "(" + Object.keys(rowItem.members).length +")" }
                           </Text>
                         </View>
                     </View>
@@ -359,12 +357,17 @@ class GroupsPage extends React.Component{
                             return item.friend_id == uid
                           })
 
-                          this.setState({loading:true})
-                          this.props.actionMemberJoinGroup(this.props.uid, rowItem.group_id, member_item_id, (result) => {
-                            console.log(result)
-
-                            this.setState({loading:false})
-                          })
+                          if(member_item_id !== undefined){
+                            this.setState({loading:true})
+                            this.props.actionMemberJoinGroup(this.props.uid, rowItem.group_id, member_item_id, (result) => {
+                              console.log(result)
+                              setTimeout(() => {
+                                this.setState({loading:false})
+                              }, 100);
+                            })
+                          }else{
+                            console.log(member_item_id)
+                          }
                         }}>
                         <Text style={{color:'green'}}>Join</Text>
                       </TouchableOpacity>
@@ -380,12 +383,18 @@ class GroupsPage extends React.Component{
                             return item.friend_id == uid
                           })
 
-                          this.setState({loading:true})
-                          this.props.actionMemberDeclineGroup(this.props.uid, rowItem.group_id, member_item_id, (result) => {
-                            console.log(result)
+                          if(member_item_id !== undefined){
+                            this.setState({loading:true})
+                            this.props.actionMemberDeclineGroup(this.props.uid, rowItem.group_id, member_item_id, (result) => {
+                              console.log(result)
 
-                            this.setState({loading:false})
-                          })
+                              setTimeout(() => {
+                                this.setState({loading:false})
+                              }, 100);
+                            })
+                          }else{
+                            console.log(member_item_id)
+                          }
                         }}>
                         <Text style={{color:'red'}}>Decline</Text>
                       </TouchableOpacity>
@@ -491,7 +500,7 @@ class GroupsPage extends React.Component{
                                 fontWeight: '600', 
                                 paddingBottom:5
                               }}>
-                      {rowItem.group_profile.name} ({ Object.keys(rowItem.members).length })
+                      {rowItem.group_profile.name} { rowItem.members === undefined ? '' : "(" + Object.keys(rowItem.members).length +")" }
                   </Text>
                 </View>
             </View>
@@ -506,8 +515,6 @@ class GroupsPage extends React.Component{
       if(!this.props.hasOwnProperty('groups')){
         return <View style={{flex: 1}}></View>
       }
-
-      // console.log(data)
 
       return (
         <View style={{flex:1}}>

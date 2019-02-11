@@ -88,7 +88,7 @@ exports.updateMyApplications = functions.firestore
         /* ... */
         // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
         var objectValue = JSON.parse(body);
-        console.log(objectValue);
+        // console.log(objectValue);
         if (!objectValue.result) {
             // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
         }
@@ -100,26 +100,12 @@ exports.updateMyApplications = functions.firestore
 exports.updateProfiles = functions.firestore
     .document('profiles/{userId}')
     .onUpdate((change, context) => {
-        // Get an object representing the document
-        // e.g. {'name': 'Marie', 'age': 66}
         const newValue = change.after.data();
-
-        // console.log(newValue);
-
-        // ...or the previous value before this update
-        // const previousValue = change.before.data();
-
-        // access a particular field as you would any JS property
-        // const name = newValue.name;
-
-        // perform desired operations ...
-        // console.log(change);
-
         request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.UPDATE_PROFILE, form: {newValue, context}, headers: config.headers}, function(err,httpResponse,body){ 
             /* ... */
             // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
             var objectValue = JSON.parse(body);
-            console.log(objectValue);
+            // console.log(objectValue);
             if (!objectValue.result) {
                 // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
             }
@@ -127,13 +113,208 @@ exports.updateProfiles = functions.firestore
         return true;
 });
 
+exports.createProfiles_phones = functions.firestore
+    .document('profiles/{userId}/phones/{phoneId}')
+    .onCreate((snap, context) => {
+        const newValue = snap.data();
+        let mode = 'added';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PROFILE_PHONES, form: {context, mode, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
+
+exports.updateProfiles_phones = functions.firestore
+    .document('profiles/{userId}/phones/{phoneId}')
+    .onUpdate((change, context) => {
+        const newValue = change.after.data();
+        let mode = 'modified';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PROFILE_PHONES, form: {context, mode, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
+
+exports.deleteProfiles_phones = functions.firestore
+    .document('profiles/{userId}/phones/{phoneId}')
+    .onDelete((snap, context) => {
+        let mode = 'removed';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PROFILE_PHONES, form: {context, mode}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
+
+exports.createProfiles_emails = functions.firestore
+    .document('profiles/{userId}/emails/{emailId}')
+    .onCreate((snap, context) => {
+        const newValue = snap.data();
+        let mode = 'added';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PROFILE_EMAILS, form: {context, mode, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
+
+exports.updateProfiles_emails = functions.firestore
+    .document('profiles/{userId}/emails/{emailId}')
+    .onUpdate((change, context) => {
+        const newValue = change.after.data();
+        let mode = 'modified';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PROFILE_EMAILS, form: {context, mode, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
+
+exports.deleteProfiles_emails = functions.firestore
+    .document('profiles/{userId}/emails/{emailId}')
+    .onDelete((snap, context) => {
+        let mode = 'removed';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PROFILE_EMAILS, form: {context, mode}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
+
+exports.createProfiles_websites = functions.firestore
+    .document('profiles/{userId}/websites/{websiteId}')
+    .onCreate((snap, context) => {
+        const newValue = snap.data();
+        let mode = 'added';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PROFILE_WEBSITES, form: {context, mode, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
+
+exports.updateProfiles_websites = functions.firestore
+    .document('profiles/{userId}/websites/{websiteId}')
+    .onUpdate((change, context) => {
+        const newValue = change.after.data();
+        let mode = 'modified';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PROFILE_WEBSITES, form: {context, mode, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
+
+exports.deleteProfiles_websites = functions.firestore
+    .document('profiles/{userId}/websites/{websiteId}')
+    .onDelete((snap, context) => {
+        let mode = 'removed';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PROFILE_WEBSITES, form: {context, mode}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
+
+// my id
+exports.createProfiles_myID = functions.firestore
+    .document('profiles/{userId}/my_ids/{myIDId}')
+    .onCreate((snap, context) => {
+        const newValue = snap.data();
+        let mode = 'added';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PROFILE_MYIDS, form: {context, mode, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
+
+exports.deleteProfiles_myID = functions.firestore
+    .document('profiles/{userId}/my_ids/{myIDId}')
+    .onDelete((snap, context) => {
+        let mode = 'removed';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PROFILE_MYIDS, form: {context, mode}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
+
 // UpdateStatusFriend
 exports.updateStatusFriend = functions.firestore
     .document('users/{userId}/friends/{friendId}')
     .onUpdate((change, context) =>{
 
     const newValue = change.after.data();
-    console.log(newValue);
+    // console.log(newValue);
 
     // user_for_friend_editupdate
 
@@ -141,7 +322,7 @@ exports.updateStatusFriend = functions.firestore
         /* ... */
         // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
         var objectValue = JSON.parse(body);
-        console.log(objectValue);
+        // console.log(objectValue);
         if (!objectValue.result) {
             // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
         }
@@ -167,7 +348,7 @@ exports.deleteGroups = functions.firestore
             /* ... */
             // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
             var objectValue = JSON.parse(body);
-            console.log(objectValue);
+            // console.log(objectValue);
             if (!objectValue.result) {
                 // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
             }

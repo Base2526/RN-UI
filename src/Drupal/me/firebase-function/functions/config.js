@@ -14,6 +14,10 @@ let constants = {
     END_POINT_IDNA: '/api',
     PATH_API_TEST: '/api_test',
     UPDATE_PROFILE: '/update_profile',
+    PROFILE_EMAILS: '/profile_emails',
+    PROFILE_WEBSITES: '/profile_websites',
+    PROFILE_PHONES: '/profile_phones',
+    PROFILE_MYIDS: '/profile_myids',
     UPDATE_FOR_FRIEND_EDITUPDATE:'/user_for_friend_editupdate',
 
     DELETE_CHAT_GROUP:'/delete_chat_group',

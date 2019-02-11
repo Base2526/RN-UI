@@ -5,22 +5,54 @@ import {View,
         TouchableOpacity,
         TextInput} from 'react-native';
 import { connect } from 'react-redux';
-import {getStatusBarHeight} from '../../Utils/Helpers'
+import Spinner from 'react-native-loading-spinner-overlay';
 
 import * as actions from '../../Actions'
 import {getUid} from '../../Utils/Helpers'
 
 class ChangeFriendsName extends React.Component{
 
+    static navigationOptions = ({ navigation }) => {
+        return {
+            title: "Change friend name",
+            headerTintColor: '#C7D8DD',
+            headerStyle: {
+                backgroundColor: 'rgba(186, 53, 100, 1.0)',
+                // ios navigationoptions underline hide
+                borderBottomWidth: 0,
+    
+                // android navigationoptions underline hide
+                elevation: 0,
+                shadowOpacity: 0
+            },
+            headerRight: (
+                <View style={{marginRight:10}}>
+                <TouchableOpacity
+                    style={{padding:5}}
+                    onPress={() => {
+                        const { params = {} } = navigation.state
+                        params.handleSave()
+                    }}>
+                    <Text style={{fontSize:18, color:'#C7D8DD', fontWeight:'bold'}}>Save</Text>
+                </TouchableOpacity>
+                </View>
+            ),
+        }
+    }
+
+
     constructor(props){
         super(props)
         this.state ={
             friend: '',
-            text: ''
+            text: '',
+            loading:false
         }
     }
 
     componentDidMount(){
+        this.props.navigation.setParams({handleSave: this.handleSave })
+
         const { navigation } = this.props;
         const friend = navigation.getParam('friend', null);
 
@@ -31,72 +63,46 @@ class ChangeFriendsName extends React.Component{
         }
     }
 
-    onSave = () => {
-        // this.setState({name:this.state.text})
+    handleSave = () => {
+        if(this.state.text.length == 0){
+            alert('Name is empty?')
+        }else{
 
-        // this.props.navigation.goBack()
-
-        // console.log(this.state.friend)
-
-        this.props.actionChangeFriendsName(this.props.uid, this.state.friend.friend_id, this.state.text, (result)=>{
-            // console.log(result)
-            this.props.navigation.goBack()
-        })
+        }
     }
 
+    // onSave = () => {
+    //     // this.setState({name:this.state.text})
+
+    //     // this.props.navigation.goBack()
+
+    //     // console.log(this.state.friend)
+
+    //     this.props.actionChangeFriendsName(this.props.uid, this.state.friend.friend_id, this.state.text, (result)=>{
+    //         // console.log(result)
+    //         this.props.navigation.goBack()
+    //     })
+    // }
+
     render(){
-
-        // let {name} = this.state
-
-        return( <View style={{flex:1}}>
-                    <View style={{ height:40, 
-                            marginTop:getStatusBarHeight(), 
-                            justifyContent:'center', 
-                            paddingLeft:10}}>
-                        <Text style={{fontSize:22}}>Change friend's name</Text>
-                        <TouchableOpacity 
-                            style={{
-                                    borderWidth: 1, 
-                                    borderColor: 'red',
-                                    borderRadius: 15,
-                                    height:30, 
-                                    width:30,
-                                    justifyContent: 'center', 
-                                    alignItems: 'center',
-                                    position:'absolute',
-                                    right:0,
-                                    margin:10,
-                                    zIndex: 10,
-                                        }}
-                            onPress={()=>{
-                                this.props.navigation.goBack()
-                            }}>
-                            <Text style={{color:'red', fontSize:16}}>X</Text>
-                        </TouchableOpacity> 
+        return( <View style={{flex:1, margin:10}}>
+                    <Spinner
+                        visible={this.state.loading}
+                        textContent={'Wait...'}
+                        textStyle={{color: '#FFF'}}
+                        overlayColor={'rgba(0,0,0,0.5)'}
+                    />
+                    <View style={{alignItems:'flex-end', padding:5}}>
+                        <Text>{this.state.text.length}/30</Text>
                     </View>
-                    <View style={{margin:20}}>
-                        <TextInput
-                            style={{ fontSize: 22, padding:10, borderColor:'gray', borderWidth:.5}}
-                            onChangeText={(text) => this.setState({text})}
-                            value={this.state.text}
-                            clearButtonMode='while-editing'
-                            placeholder= {this.state.text}
-                        />
-                        <View style={{alignItems:'center', marginTop:10}}>
-                            <TouchableOpacity
-                             style={{padding:10, 
-                                    borderColor:'gray', 
-                                    borderWidth:1, 
-                                    width:120, 
-                                    borderRadius:15, 
-                                    alignItems:'center'}}
-                                onPress={()=>{
-                                    this.onSave()
-                                }}>
-                                <Text style={{fontSize:18}}>Save</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                    <TextInput
+                        style={{ fontSize: 22, padding:10, borderColor:'gray', borderWidth:.5}}
+                        onChangeText={(text) => this.setState({text})}
+                        value={this.state.text}
+                        clearButtonMode='while-editing'
+                        maxLength={30}
+                        placeholder= {this.state.text}
+                    />
                 </View>)
     }
 }

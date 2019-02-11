@@ -1983,7 +1983,42 @@ function me_services_resources()
         'access arguments append' => FALSE,
       ),
     ),
-
+    'profile_phones'=>array(
+      'create' =>array(
+        'help'=>'Services เพิ่ม,แก้ไข,ลบ profile phone',
+        'callback'=>'profile_phones',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+      ),
+    ),
+    'profile_emails'=>array(
+      'create' =>array(
+        'help'=>'Services เพิ่ม,แก้ไข,ลบ profile email',
+        'callback'=>'profile_emails',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+      ),
+    ),
+    'profile_websites'=>array(
+      'create' =>array(
+        'help'=>'Services เพิ่ม,แก้ไข,ลบ profile website',
+        'callback'=>'profile_websites',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+      ),
+    ),
+    'profile_myids'=>array(
+      'create' =>array(
+        'help'=>'Services เพิ่ม,แก้ไข,ลบ profile my id',
+        'callback'=>'profile_myids',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+      ),
+    ),
     'update_device_access'=>array(
       'create' =>array(
         'help'=>'Services แก้ไขข้อมูล device access ซึ่งถูก เรียกใช้งานจาก triggered firebase',
@@ -3518,7 +3553,7 @@ function onLoadProfile($uid, $mode){
               }
             }
 
-            $groups[$group_id]['detail'] = array("chat_id"    => $groups_detail_node_chat_id,
+            $groups[$group_id]['group_profile'] = array("chat_id"    => $groups_detail_node_chat_id,
                                                  "name"       => $groups_detail_node_name,
                                                  "creator_id" => $groups_detail_node->uid,
                                                  "members"    => $groups_detail_node_members_group,
@@ -10304,50 +10339,28 @@ function update_profile(){
     return $result;
   }
 
-  /*
-  $result['result'] = TRUE;
-  $result['newValue'] = $_REQUEST['newValue']['name'];
-  $result['userId'] = $_REQUEST['context']['params']['userId'];
-
-  return $result;
-  */
-  // if (empty($_REQUEST['uid']) || empty($_REQUEST['data'])) {
-  //   $result['result'] = FALSE;
-  //   $result['message']  = "function : update_profile, parameter";
-  //   return $result;
-  // }
-
-  /*
-  $param = json_decode(file_get_contents('php://input'), true);
-  if (empty($param['uid']) || empty($param['data'])) {
-    $result['result'] = FALSE;
-    $result['message'] = "function update_profile : parameter";
-    return $result;
-  }
-  */
-
   if (empty($_REQUEST['context']['params']['userId']) || empty($_REQUEST['newValue'])) {
     $result['result'] = FALSE;
     $result['message'] = "function update_profile : parameter";
     return $result;
   }
 
-  global $firebase;
+  // global $firebase;
   $uid    = $_REQUEST['context']['params']['userId'];
   $data   = $_REQUEST['newValue'];
 
   // Load Profile ขึ้นมาเพือจะทำการแก้ไข
   $profile = profile2_by_uid_load($uid, 'main');
 
+  // watchdog(TAG, 'Firestore : update_profile: %uid - %data', array('%uid'=>$uid, '%data'=>serialize($data) ), WATCHDOG_INFO);
+
   $check = 0;
-  // name
+  // Profile name
   if (array_key_exists('name', $data)) {
     if (strcmp($profile->field_profile_name[LANGUAGE_NONE][0]['value'], $data['name']) != 0) {
-      # code...
-      // 
-      $profile->field_profile_name[LANGUAGE_NONE][0]['value'] =$data['name'] ;//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['name']) ;
-
-
+      $profile->field_profile_name[LANGUAGE_NONE][0]['value'] = $data['name'] ;//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['name']) ;
+      
+      /*
       // เราต้องวิ่งไป update chat_group ด้วย
       if(isset($profile->field_chat_group[LANGUAGE_NONE])){
         foreach ($profile->field_chat_group[LANGUAGE_NONE] as $chat_group_k => $chat_group_v) {
@@ -10379,7 +10392,7 @@ function update_profile(){
                 $chat_group_node_wrapper->field_members_group_friend_name->set($data['name']);
                 $chat_group_node_wrapper->save();
 
-                $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_CHAT_GROUPS . '/' . $chat_group_item_group_id .'/members/'. $members_group_v['value'] . '/' , array('friend_name'=>$data['name']));
+                // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_CHAT_GROUPS . '/' . $chat_group_item_group_id .'/members/'. $members_group_v['value'] . '/' , array('friend_name'=>$data['name']));
 
                 break;
               }
@@ -10387,21 +10400,19 @@ function update_profile(){
           }
         }
       }
-
       update_creator_name_post($uid, $data['name']);
+      */
 
       $check++;
     }
 
     if (strcmp($profile->field_profile_display_name[LANGUAGE_NONE][0]['value'], $data['name']) != 0) {
-      # code...
-      $profile->field_profile_display_name[LANGUAGE_NONE][0]['value'] = $data['name'];//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['name']);
-
+      $profile->field_profile_display_name[LANGUAGE_NONE][0]['value'] = $data['name'];
       $check++;
     }
   }
 
-  // My ID 
+  // Profile my id
   if (array_key_exists('my_id', $data)) {
     foreach ($data['my_id'] as $key => $value) {
       $item_load = field_collection_item_load($key);
@@ -10424,13 +10435,10 @@ function update_profile(){
     }
   }
 
-  // status message
+  // Profile status message
   if (array_key_exists('status_message', $data)) {
     if (strcmp($profile->field_profile_status_message[LANGUAGE_NONE][0]['value'], $data['status_message']) != 0) {
-      # code...
-
-      $profile->field_profile_status_message[LANGUAGE_NONE][0]['value'] = $data['status_message'];//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['status_message']);
-
+      $profile->field_profile_status_message[LANGUAGE_NONE][0]['value'] = $data['status_message'];
       $check++;
     }
   }
@@ -10463,6 +10471,7 @@ function update_profile(){
   }
   */
 
+  /*
   if (array_key_exists('badges', $data)) {
     foreach ($data['badges'] as $badges_key => $badges_value) {
       $badges_item_load = field_collection_item_load($badges_key);
@@ -10514,157 +10523,171 @@ function update_profile(){
       }
     }
   }
+  */
 
   // mails
-  if (array_key_exists("mails", $data)) {
-    // $mails = $data['mails'];
-    foreach ($data['mails'] as $key => $value) {
-      $item_load = field_collection_item_load($key);
-      if ($item_load) {
-        if ($item_load->field_email_text[LANGUAGE_NONE][0]['value'] != $value['name'] ) {
-          $wrapper = entity_metadata_wrapper('field_collection_item', $item_load);
-          $wrapper->field_email_text->set($value['name']);
-          $wrapper->save();
-        }
-      }else{
-        $val['field_name'] = 'field_profile_multi_email';
-        $val['field_email_text'][LANGUAGE_NONE][0]['value'] = $value['name'];
+  // if (array_key_exists("mails", $data)) {
+  //   // $mails = $data['mails'];
+  //   foreach ($data['mails'] as $key => $value) {
+  //     $item_load = field_collection_item_load($key);
+  //     if ($item_load) {
+  //       // update
+  //       // if ($item_load->field_email_text[LANGUAGE_NONE][0]['value'] != $value['name'] ) {
+  //       if (strcmp($item_load->field_email_text[LANGUAGE_NONE][0]['value'], $value['name']) != 0) {
+  //         $wrapper = entity_metadata_wrapper('field_collection_item', $item_load);
+  //         $wrapper->field_email_text->set($value['name']);
+  //         $wrapper->save();
+  //       }
+  //     }else{
+  //       // add new
+  //       $val['field_name'] = 'field_profile_multi_email';
+  //       $val['field_email_text'][LANGUAGE_NONE][0]['value'] = $value['name'];
 
-        $field_entity = entity_create('field_collection_item', $val);
-        $field_entity->setHostEntity('profile2', $profile);
-        $field_entity->save();
-      }
-    }
-  }
+  //       $field_entity = entity_create('field_collection_item', $val);
+  //       $field_entity->setHostEntity('profile2', $profile);
+  //       $field_entity->save();
+  //     }
+  //   }
+  // }
 
-  // phone 
-  if (array_key_exists("phones", $data)) {
-    foreach ($data['phones'] as $key => $value) {
-      $item_load = field_collection_item_load($key);
-      if ($item_load) {
-        if ($item_load->field_phone_number[LANGUAGE_NONE][0]['value'] != $value['name'] ) {
-          $wrapper = entity_metadata_wrapper('field_collection_item', $item_load);
-          $wrapper->field_phone_number->set($value['name']);
-          $wrapper->save();
-        }
-      }else{
-        $val['field_name'] = 'field_profile_multi_email';
-        $val['field_phone_number'][LANGUAGE_NONE][0]['value'] = $value['name'];
+  // phones
+  // if (array_key_exists("phones", $data)) {
+  //   foreach ($data['phones'] as $key => $value) {
+  //     $item_load = field_collection_item_load($key);
+  //     if ($item_load) {
+  //       // update
+  //       // if ($item_load->field_phone_number[LANGUAGE_NONE][0]['value'] != $value['name'] ) {
+  //       if (strcmp($item_load->field_phone_number[LANGUAGE_NONE][0]['value'], $value['name']) != 0) {
+  //         $wrapper = entity_metadata_wrapper('field_collection_item', $item_load);
+  //         $wrapper->field_phone_number->set($value['name']);
+  //         $wrapper->save();
+  //       }
+  //     }else{
+  //       // add new
+  //       $val['field_name'] = 'field_profile_multi_phone';
+  //       $val['field_phone_number'][LANGUAGE_NONE][0]['value'] = $value['name'];
 
-        $field_entity = entity_create('field_collection_item', $val);
-        $field_entity->setHostEntity('profile2', $profile);
-        $field_entity->save();
-      }
-    }
-  }
+  //       $field_entity = entity_create('field_collection_item', $val);
+  //       $field_entity->setHostEntity('profile2', $profile);
+  //       $field_entity->save();
+  //     }
+  //   }
+  // }
 
   // address
   if (array_key_exists('address', $data)) {
-    if (isset($profile->field_profile_address[LANGUAGE_NONE])) {
-      if (strcmp($profile->field_profile_address[LANGUAGE_NONE][0]['value'], $data['address']) != 0) {
-        # code...
-
-
-        $profile->field_profile_address[LANGUAGE_NONE][0]['value'] = $data['address'];//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['address']);
-
-        $check++;
-      }
+    // if (isset($profile->field_profile_address[LANGUAGE_NONE])) {
+    if (strcmp($profile->field_profile_address[LANGUAGE_NONE][0]['value'], $data['address']) != 0) {
+      # code...
+      $profile->field_profile_address[LANGUAGE_NONE][0]['value'] = $data['address'];//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['address']);
+      $check++;
     }
+    // }
   }
 
   // gender 
   if (array_key_exists('gender', $data)) {
-    if (isset($profile->field_profile_gender[LANGUAGE_NONE])) {
+    // if (isset($profile->field_profile_gender[LANGUAGE_NONE])) {
       if (strcmp($profile->field_profile_gender[LANGUAGE_NONE][0]['tid'], $data['gender']) != 0) {
         # code...
         $profile->field_profile_gender[LANGUAGE_NONE][0]['tid'] = $data['gender'];
 
         $check++;
       }
+    // }
+  }
+
+  // intereste_in
+  if (array_key_exists('intereste_in', $data)) {
+    $profile->field_profile_intereste_in[LANGUAGE_NONE] = '_none';
+    $intereste_in = array();
+    foreach ($data['intereste_in'] as $k => $v) {
+      // watchdog(TAG, '1, intereste_in: %key-%value', array('%key'=> $k, '%value'=>$v ), WATCHDOG_INFO);
+      $intereste_in[] = array("tid"=>array($v));
+      $check++;
     }
+    $profile->field_profile_intereste_in[LANGUAGE_NONE] = $intereste_in;
   }
 
   // field_profile_school
-  if (array_key_exists('school', $data)) {
-    if (isset($profile->field_profile_school[LANGUAGE_NONE])) {
-      if (strcmp($profile->field_profile_school[LANGUAGE_NONE][0]['value'], $data['school']) != 0) {
-        # code...
-        $profile->field_profile_school[LANGUAGE_NONE][0]['value'] = $data['school'];//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['school']);
+  // if (array_key_exists('school', $data)) {
+  //   if (isset($profile->field_profile_school[LANGUAGE_NONE])) {
+  //     if (strcmp($profile->field_profile_school[LANGUAGE_NONE][0]['value'], $data['school']) != 0) {
+  //       # code...
+  //       $profile->field_profile_school[LANGUAGE_NONE][0]['value'] = $data['school'];//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['school']);
 
-        $check++;
-      }
-    }
-  }
+  //       $check++;
+  //     }
+  //   }
+  // }
 
   // field_profile_company
-  if (array_key_exists('company', $data)) {
-    if (isset($profile->field_profile_company[LANGUAGE_NONE])) {
-      if (strcmp($profile->field_profile_company[LANGUAGE_NONE][0]['value'], $data['company']) != 0) {
-        # code...
-        $profile->field_profile_company[LANGUAGE_NONE][0]['value'] = $data['company'];//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['company']);
+  // if (array_key_exists('company', $data)) {
+  //   if (isset($profile->field_profile_company[LANGUAGE_NONE])) {
+  //     if (strcmp($profile->field_profile_company[LANGUAGE_NONE][0]['value'], $data['company']) != 0) {
+  //       # code...
+  //       $profile->field_profile_company[LANGUAGE_NONE][0]['value'] = $data['company'];//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['company']);
 
-        $check++;
-      }
-    }
-  }
+  //       $check++;
+  //     }
+  //   }
+  // }
 
   // birthday
   if (array_key_exists('birthday', $data)) {
-    if (isset($profile->field_profile_birthday[LANGUAGE_NONE])) {
-      if (strcmp($profile->field_profile_birthday[LANGUAGE_NONE][0]['value'], $data['birthday']) != 0) {
-        # code...
-        $profile->field_profile_birthday[LANGUAGE_NONE][0]['value'] = $data['birthday'];
-
-        $check++;
-      }
+    // if (isset($profile->field_profile_birthday[LANGUAGE_NONE])) {
+    if (strcmp($profile->field_profile_birthday[LANGUAGE_NONE][0]['value'], $data['birthday']) != 0) {
+      # code...
+      $profile->field_profile_birthday[LANGUAGE_NONE][0]['value'] = $data['birthday'];
+      $check++;
     }
+    // }
   }
 
   // line_id
-  if (array_key_exists('line_id', $data)) {
-    if (isset($profile->field_profile_line_id[LANGUAGE_NONE])) {
-      if (strcmp($profile->field_profile_line_id[LANGUAGE_NONE][0]['value'], $data['line_id']) != 0) {
-        # code...
-        $profile->field_profile_line_id[LANGUAGE_NONE][0]['value'] = $data['line_id'];//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['line_id']);
-
-        $check++;
-      }
-    }
-  }
+  // if (array_key_exists('line_id', $data)) {
+  //   if (isset($profile->field_profile_line_id[LANGUAGE_NONE])) {
+  //     if (strcmp($profile->field_profile_line_id[LANGUAGE_NONE][0]['value'], $data['line_id']) != 0) {
+  //       # code...
+  //       $profile->field_profile_line_id[LANGUAGE_NONE][0]['value'] = $data['line_id'];//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['line_id']);
+  //       $check++;
+  //     }
+  //   }
+  // }
 
 
   // field_sound_call_waiting
   // sound_call_waiting
-  if (array_key_exists('sound_call_waiting', $data)) {
-    foreach ($data['sound_call_waiting'] as $sound_call_waiting_key => $sound_call_waiting_value) {
-      $sound_call_waiting_item_load = field_collection_item_load($sound_call_waiting_key);
-      if ($sound_call_waiting_item_load) {
-        if ($sound_call_waiting_item_load->field_sound_call_waiting_item_id[LANGUAGE_NONE][0]['value'] != $sound_call_waiting_value['nid'] ) {
-          $wrapper = entity_metadata_wrapper('field_collection_item', $sound_call_waiting_item_load);
-          $wrapper->field_sound_call_waiting_item_id->set($sound_call_waiting_value['nid']);
-          $wrapper->field_sound_call_waiting_title->set($sound_call_waiting_value['title']);   
-          $wrapper->field_sound_call_waiting_uri->set($sound_call_waiting_value['sound_url']);    
-          $wrapper->save();
+  // if (array_key_exists('sound_call_waiting', $data)) {
+  //   foreach ($data['sound_call_waiting'] as $sound_call_waiting_key => $sound_call_waiting_value) {
+  //     $sound_call_waiting_item_load = field_collection_item_load($sound_call_waiting_key);
+  //     if ($sound_call_waiting_item_load) {
+  //       if ($sound_call_waiting_item_load->field_sound_call_waiting_item_id[LANGUAGE_NONE][0]['value'] != $sound_call_waiting_value['nid'] ) {
+  //         $wrapper = entity_metadata_wrapper('field_collection_item', $sound_call_waiting_item_load);
+  //         $wrapper->field_sound_call_waiting_item_id->set($sound_call_waiting_value['nid']);
+  //         $wrapper->field_sound_call_waiting_title->set($sound_call_waiting_value['title']);   
+  //         $wrapper->field_sound_call_waiting_uri->set($sound_call_waiting_value['sound_url']);    
+  //         $wrapper->save();
 
-          // watchdog(TAG, 'sound_call_waiting: %v', array('%v'=> serialize($value) ), WATCHDOG_INFO);
-          $check++;
-        }
-      }else{
+  //         // watchdog(TAG, 'sound_call_waiting: %v', array('%v'=> serialize($value) ), WATCHDOG_INFO);
+  //         $check++;
+  //       }
+  //     }else{
 
-        // watchdog(TAG, 'else sound_call_waiting: %v', array('%v'=> serialize($value) ), WATCHDOG_INFO);
-        $sound_call_waiting_v['field_name'] = 'sound_call_waiting';
-        $sound_call_waiting_v['field_sound_call_waiting_item_id'][LANGUAGE_NONE][0]['value'] = $sound_call_waiting_value['nid'];
-        $sound_call_waiting_v['field_sound_call_waiting_title'][LANGUAGE_NONE][0]['value']   = $sound_call_waiting_value['title'];
-        $sound_call_waiting_v['field_sound_call_waiting_uri'][LANGUAGE_NONE][0]['value']     = $sound_call_waiting_value['sound_url'];
+  //       // watchdog(TAG, 'else sound_call_waiting: %v', array('%v'=> serialize($value) ), WATCHDOG_INFO);
+  //       $sound_call_waiting_v['field_name'] = 'sound_call_waiting';
+  //       $sound_call_waiting_v['field_sound_call_waiting_item_id'][LANGUAGE_NONE][0]['value'] = $sound_call_waiting_value['nid'];
+  //       $sound_call_waiting_v['field_sound_call_waiting_title'][LANGUAGE_NONE][0]['value']   = $sound_call_waiting_value['title'];
+  //       $sound_call_waiting_v['field_sound_call_waiting_uri'][LANGUAGE_NONE][0]['value']     = $sound_call_waiting_value['sound_url'];
 
-        $field_entity = entity_create('field_collection_item', $sound_call_waiting_v);
-        $field_entity->setHostEntity('profile2', $profile);
-        $field_entity->save();
+  //       $field_entity = entity_create('field_collection_item', $sound_call_waiting_v);
+  //       $field_entity->setHostEntity('profile2', $profile);
+  //       $field_entity->save();
 
-        $check++;
-      }
-    }
-  }
+  //       $check++;
+  //     }
+  //   }
+  // }
 
   if (array_key_exists('device_access', $data)) {
     foreach ($data['device_access'] as $device_access_key => $device_access_value) {
@@ -10703,6 +10726,294 @@ function update_profile(){
   
   $result['result'] = TRUE;
   return  $result;
+}
+
+// updateProfiles_phones
+function profile_phones(){
+  $result = array();
+  if (!check_header()) {
+    $result['result']   = FALSE;
+    $result['message']  = "check_header()";
+    return $result;
+  }
+
+  $uid      = $_REQUEST['context']['params']['userId'];
+  $objectId = $_REQUEST['context']['params']['phoneId'];
+  $mode     = $_REQUEST['mode'];
+
+  if (empty($uid) || empty($objectId) || empty($mode)) {
+    $result['result'] = FALSE;
+    $result['message'] = "function profile_phones : parameter";
+    return $result;
+  }
+
+  // Load Profile ขึ้นมาเพือจะทำการแก้ไข
+  $profile = profile2_by_uid_load($uid, 'main');
+
+  // watchdog(TAG, 'Firestore : profile_emails: %uid - %objectId - %data - %mode', array( '%uid'=>$uid, '%objectId'=>$objectId, '%data'=>serialize($data), '%mode'=>$mode ), WATCHDOG_INFO);
+
+  // added
+  if(strcasecmp($mode, 'added') == 0){
+    $data     = $_REQUEST['newValue'];
+
+    $value = array();
+    $value['field_name'] = 'field_profile_multi_phone'; // field collection name
+
+    $value['field_phone_number'][LANGUAGE_NONE][0]['value'] = $data['phone_number'];
+    $value['field_object_id'][LANGUAGE_NONE][0]['value']  = $objectId;
+
+    // Create the field collection entry and associate it with the profile
+    $field_entity = entity_create('field_collection_item', $value);
+    $field_entity->setHostEntity('profile2', $profile);
+    $field_entity->save();
+
+    $result['result'] = TRUE;
+    return $result;
+  }
+
+  // modified && removed
+  $collection_query    = new EntityFieldQuery();
+  $collection_output   = $collection_query->entityCondition('entity_type', 'field_collection_item')
+                              ->entityCondition('bundle', 'field_profile_multi_phone')
+                              ->fieldCondition('field_object_id', 'value', $objectId, '=')
+                              ->execute();
+
+  if(strcasecmp($mode, 'modified') == 0){
+    $data     = $_REQUEST['newValue'];
+
+    if (!empty($collection_output['field_collection_item'])) {
+      $collection_item = field_collection_item_load(array_keys($collection_output['field_collection_item'])[0]);
+      
+      $wrapper = entity_metadata_wrapper('field_collection_item', $collection_item);
+      $wrapper->field_phone_number->set($data['phone_number']); // 
+      $wrapper->save();
+    }
+  }
+
+  if(strcasecmp($mode, 'removed') == 0){
+    if (!empty($collection_output['field_collection_item'])) {
+      entity_delete_multiple('field_collection_item', array(array_keys($collection_output['field_collection_item'])[0]));
+    }
+  }
+
+  $result['result'] = TRUE;
+  return $result;
+}
+
+// updateProfiles_emails
+function profile_emails(){
+  $result = array();
+  if (!check_header()) {
+    $result['result']   = FALSE;
+    $result['message']  = "check_header()";
+    return $result;
+  }
+
+  $uid      = $_REQUEST['context']['params']['userId'];
+  $objectId = $_REQUEST['context']['params']['emailId'];
+  $mode     = $_REQUEST['mode'];
+
+  if (empty($uid) || empty($objectId) || empty($mode)) {
+    $result['result'] = FALSE;
+    $result['message'] = "function profile_emails : parameter";
+    return $result;
+  }
+
+  // Load Profile ขึ้นมาเพือจะทำการแก้ไข
+  $profile = profile2_by_uid_load($uid, 'main');
+
+  // watchdog(TAG, 'Firestore : profile_emails: %uid - %objectId - %data - %mode', array( '%uid'=>$uid, '%objectId'=>$objectId, '%data'=>serialize($data), '%mode'=>$mode ), WATCHDOG_INFO);
+
+  // added
+  if(strcasecmp($mode, 'added') == 0){
+    $data     = $_REQUEST['newValue'];
+
+    $value = array();
+    $value['field_name'] = 'field_profile_multi_email'; // field collection name
+
+    $value['field_email_text'][LANGUAGE_NONE][0]['value'] = $data['email'];
+    $value['field_object_id'][LANGUAGE_NONE][0]['value']  = $objectId;
+
+    // Create the field collection entry and associate it with the profile
+    $field_entity = entity_create('field_collection_item', $value);
+    $field_entity->setHostEntity('profile2', $profile);
+    $field_entity->save();
+
+    $result['result'] = TRUE;
+    return $result;
+  }
+
+  // modified && removed
+  $collection_query    = new EntityFieldQuery();
+  $collection_output   = $collection_query->entityCondition('entity_type', 'field_collection_item')
+                              ->entityCondition('bundle', 'field_profile_multi_email')
+                              ->fieldCondition('field_object_id', 'value', $objectId, '=')
+                              ->execute();
+
+  if(strcasecmp($mode, 'modified') == 0){
+    $data     = $_REQUEST['newValue'];
+
+    if (!empty($collection_output['field_collection_item'])) {
+      $collection_item = field_collection_item_load(array_keys($collection_output['field_collection_item'])[0]);
+      
+      $wrapper = entity_metadata_wrapper('field_collection_item', $collection_item);
+      $wrapper->field_email_text->set($data['email']); // 
+      $wrapper->save();
+    }
+  }
+
+  if(strcasecmp($mode, 'removed') == 0){
+    if (!empty($collection_output['field_collection_item'])) {
+      entity_delete_multiple('field_collection_item', array(array_keys($collection_output['field_collection_item'])[0]));
+    }
+  }
+
+  $result['result'] = TRUE;
+  return $result;
+}
+
+// updateProfiles_websites
+function profile_websites(){
+  $result = array();
+  if (!check_header()) {
+    $result['result']   = FALSE;
+    $result['message']  = "check_header()";
+    return $result;
+  }
+
+  $uid      = $_REQUEST['context']['params']['userId'];
+  $objectId = $_REQUEST['context']['params']['websiteId'];
+  $mode     = $_REQUEST['mode'];
+
+  if (empty($uid) || empty($objectId) || empty($mode)) {
+    $result['result'] = FALSE;
+    $result['message'] = "function profile_websites : parameter";
+    return $result;
+  }
+
+  // Load Profile ขึ้นมาเพือจะทำการแก้ไข
+  $profile = profile2_by_uid_load($uid, 'main');
+
+  // watchdog(TAG, 'Firestore : profile_emails: %uid - %objectId - %data - %mode', array( '%uid'=>$uid, '%objectId'=>$objectId, '%data'=>serialize($data), '%mode'=>$mode ), WATCHDOG_INFO);
+
+  // added
+  if(strcasecmp($mode, 'added') == 0){
+    $data     = $_REQUEST['newValue'];
+
+    $value = array();
+    $value['field_name'] = 'field_profile_multi_website'; // field collection name
+
+    $value['field_website_text'][LANGUAGE_NONE][0]['value'] = $data['url'];
+    $value['field_object_id'][LANGUAGE_NONE][0]['value']  = $objectId;
+
+    // Create the field collection entry and associate it with the profile
+    $field_entity = entity_create('field_collection_item', $value);
+    $field_entity->setHostEntity('profile2', $profile);
+    $field_entity->save();
+
+    $result['result'] = TRUE;
+    return $result;
+  }
+
+  // modified && removed
+  $collection_query    = new EntityFieldQuery();
+  $collection_output   = $collection_query->entityCondition('entity_type', 'field_collection_item')
+                                ->entityCondition('bundle', 'field_profile_multi_website')
+                                ->fieldCondition('field_object_id', 'value', $objectId, '=')
+                                ->execute();
+
+  if(strcasecmp($mode, 'modified') == 0){
+    $data     = $_REQUEST['newValue'];
+
+    if (!empty($collection_output['field_collection_item'])) {
+      $collection_item = field_collection_item_load(array_keys($collection_output['field_collection_item'])[0]);
+      
+      $wrapper = entity_metadata_wrapper('field_collection_item', $collection_item);
+      $wrapper->field_website_text->set($data['url']); // 
+      $wrapper->save();
+    }
+  }
+
+  if(strcasecmp($mode, 'removed') == 0){
+    if (!empty($collection_output['field_collection_item'])) {
+      entity_delete_multiple('field_collection_item', array(array_keys($collection_output['field_collection_item'])[0]));
+    }
+  }
+
+  $result['result'] = TRUE;
+  return $result;
+}
+
+// updateProfiles_myids
+function profile_myids(){
+  $result = array();
+  if (!check_header()) {
+    $result['result']   = FALSE;
+    $result['message']  = "check_header()";
+    return $result;
+  }
+
+  $uid      = $_REQUEST['context']['params']['userId'];
+  $objectId = $_REQUEST['context']['params']['myIDId'];
+  $mode     = $_REQUEST['mode'];
+
+  if (empty($uid) || empty($objectId) || empty($mode)) {
+    $result['result'] = FALSE;
+    $result['message'] = "function profile_myids : parameter";
+    return $result;
+  }
+
+  // Load Profile ขึ้นมาเพือจะทำการแก้ไข
+  $profile = profile2_by_uid_load($uid, 'main');
+
+  // watchdog(TAG, 'Firestore : profile_emails: %uid - %objectId - %data - %mode', array( '%uid'=>$uid, '%objectId'=>$objectId, '%data'=>serialize($data), '%mode'=>$mode ), WATCHDOG_INFO);
+
+  // added
+  if(strcasecmp($mode, 'added') == 0){
+    $data     = $_REQUEST['newValue'];
+
+    $value = array();
+    $value['field_name'] = 'field_profile_my_id'; // field collection name
+
+    $value['field_profile_my_id_value'][LANGUAGE_NONE][0]['value'] = $data['id'];
+    $value['field_object_id'][LANGUAGE_NONE][0]['value']  = $objectId;
+
+    // Create the field collection entry and associate it with the profile
+    $field_entity = entity_create('field_collection_item', $value);
+    $field_entity->setHostEntity('profile2', $profile);
+    $field_entity->save();
+
+    $result['result'] = TRUE;
+    return $result;
+  }
+
+  // removed 
+  $collection_query    = new EntityFieldQuery();
+  $collection_output   = $collection_query->entityCondition('entity_type', 'field_collection_item')
+                                ->entityCondition('bundle', 'field_profile_my_id')
+                                ->fieldCondition('field_object_id', 'value', $objectId, '=')
+                                ->execute();
+
+  // if(strcasecmp($mode, 'modified') == 0){
+  //   $data     = $_REQUEST['newValue'];
+
+  //   if (!empty($collection_output['field_collection_item'])) {
+  //     $collection_item = field_collection_item_load(array_keys($collection_output['field_collection_item'])[0]);
+      
+  //     $wrapper = entity_metadata_wrapper('field_collection_item', $collection_item);
+  //     $wrapper->field_website_text->set($data['value']); // 
+  //     $wrapper->save();
+  //   }
+  // }
+
+  if(strcasecmp($mode, 'removed') == 0){
+    if (!empty($collection_output['field_collection_item'])) {
+      entity_delete_multiple('field_collection_item', array(array_keys($collection_output['field_collection_item'])[0]));
+    }
+  }
+
+  $result['result'] = TRUE;
+  return $result;
 }
 
 function create_my_card()
@@ -14080,7 +14391,7 @@ function create_chat_group(){
   $f_item = array("chat_id"    => $chat_id,
                   "name"       => $param_name,
                   "creator_id" => $param_uid,
-                  "members"    => $f_members,
+                  // "members"    => $f_members,
                   // "image_url"  => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
                   "image_url"  => file_create_url(image_style_url('medium', $image_url['uri']))
                 );

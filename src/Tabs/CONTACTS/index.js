@@ -156,7 +156,10 @@ const index = createStackNavigator({
     // },
     'ManageClasssPage':{
       screen: ManageClasssPage
-    }
+    },
+    'ChangeFriendsName': {
+      screen: ChangeFriendsName
+    },
 },{
 //   initialRouteName: 'Base',
 // headerMode: "screen",
@@ -262,7 +265,7 @@ const MainModalNavigator = createStackNavigator(
     
     'ClasssSettingsPage': {screen: ClasssSettingsPage},
     'ClasssMemberAddFriend': {screen: ClasssMemberAddFriend},
-    'ChangeFriendsName': {screen: ChangeFriendsName},
+    
     'MyQRcodeNavigator': {screen: MyQRcodeNavigator},
     'BasicInfoNavigator': {screen: BasicInfoNavigator},
 
@@ -329,7 +332,8 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
       routeName === 'MyQRcode_QRCodeReaderPage' ||
       routeName === 'GroupSettingsPage' ||
       routeName === 'EditGroupNamePage' ||
-      routeName === 'GroupMemberInvite'
+      routeName === 'GroupMemberInvite' ||
+      routeName === 'ChangeFriendsName'
       ) {
     navigationOptions.tabBarVisible = false;
   }

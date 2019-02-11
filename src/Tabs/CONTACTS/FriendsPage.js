@@ -12,8 +12,6 @@ import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 
 import FastImage from 'react-native-fast-image'
-import Image from 'react-native-remote-svg'
-
 import Spinner from 'react-native-loading-spinner-overlay';
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
@@ -63,12 +61,13 @@ class FriendsPage extends React.Component{
         }
 
         let friendRequestSent_member = []
-        let friendRequest_member = [];
+        let friendRequest_member = []
         let friend_member = []
+
+        let favorite_member = [] 
         for (var key in this.props.auth.users.friends) {
 
           let friend =  this.props.auth.users.friends[key]
-
           switch(friend.status){
             case Constant.FRIEND_STATUS_FRIEND:{
 
@@ -86,6 +85,12 @@ class FriendsPage extends React.Component{
               }else if(friend.block !== undefined){
                 if(!friend.block){
                   friend_member.push({...friend, friend_id:key});
+                }
+              } 
+              
+              if(friend.is_favorite !== undefined){
+                if(friend.is_favorite){
+                  favorite_member.push({...friend, friend_id:key});
                 }
               }
               break
@@ -112,12 +117,17 @@ class FriendsPage extends React.Component{
           }
         }
 
-        let friendRequest = {
+
+        let favorites = {title: 'Favorites',
+          member: favorite_member
+        }
+
+        let friendRequests = {
           title:'Friend Request',
           member: friendRequest_member
         }
 
-        let friendRequestSent = {
+        let friendRequestSents = {
           title: 'Friend Request Sent',
           member: friendRequestSent_member
         }
@@ -126,8 +136,7 @@ class FriendsPage extends React.Component{
           member: friend_member
         }
 
-        // console.log([profile, friends, friendRequestSent])
-        return [profile, friendRequest, friendRequestSent, friends];        
+        return [profile, favorites, friendRequests, friendRequestSents, friends];        
     }
 
     _itemOnPress=(item, rowId, sectionId)=>{
@@ -521,7 +530,7 @@ class FriendsPage extends React.Component{
                 // alert('headerOnPress')
               } }
               renderSectionHeaderX={this._renderSection}
-              openOptions={[0, 1, 2, 3]}
+              openOptions={[0, 1, 2, 3, 4]}
               // onScroll={this.props.handleScroll}
             />
           }

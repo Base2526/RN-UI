@@ -39,6 +39,7 @@ export const CLASS_MEMBERS          = "class_members"
 export const FRIEND_MUTE            = "friend_mute"
 export const FRIEND_HIDE            = "friend_hide"
 export const FRIEND_BLOCK           = "friend_block"
+export const FRIEND_FAVORITE        = "friend_favorite"
 
 
 export const ADDED_MY_APPLICATION    = "added_my_application"
@@ -52,7 +53,7 @@ export const UPDATE_PICTURE_PROFILE         = 'update_picture_profile'
 export const UPDATE_PICTURE_BG_PROFILE      = 'update_picture_bg_profile'
 export const EDIT_DISPLAY_NAME_PROFILE      = 'edit_display_name_profile'
 export const EDIT_STATUS_MESSAGE_PROFILE    = 'edit_status_message_profile'
-export const EDIT_MY_ID_PROFILE             = 'edit_my_id_profile'
+// export const EDIT_MY_ID_PROFILE             = 'edit_my_id_profile'
 export const GENDER_PROFILE                 = 'gender_profile'
 export const INTERESTE_IN_PROFILE           = 'intereste_in_profile'
 export const BIRTHDAY_PROFILE               = 'birthday_profile'
@@ -70,3 +71,7 @@ export const REMOVE_WEBSITE_PROFILE         = 'remove_website_profile'
 export const ADD_EMAIL_PROFILE              = 'add_email_profile'
 export const EDIT_EMAIL_PROFILE             = 'edit_email_profile'
 export const REMOVE_EMAIL_PROFILE           = 'remove_email_profile'
+
+export const ADD_MY_ID_PROFILE              = 'add_my_id_profile'
+export const EDIT_MY_ID_PROFILE             = 'edit_my_id_profile'
+export const REMOVE_MY_ID_PROFILE           = 'remove_my_id_profile'

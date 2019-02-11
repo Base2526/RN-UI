@@ -39,7 +39,7 @@ import {USER_LOGIN_SUCCESS,
         UPDATE_PICTURE_BG_PROFILE,
         EDIT_DISPLAY_NAME_PROFILE,
         EDIT_STATUS_MESSAGE_PROFILE,
-        EDIT_MY_ID_PROFILE,
+        // EDIT_MY_ID_PROFILE,
         GENDER_PROFILE,
         INTERESTE_IN_PROFILE,
         BIRTHDAY_PROFILE,
@@ -56,12 +56,15 @@ import {USER_LOGIN_SUCCESS,
     
         ADD_EMAIL_PROFILE,
         EDIT_EMAIL_PROFILE,
-        REMOVE_EMAIL_PROFILE,} from './types'
+        REMOVE_EMAIL_PROFILE,
+    
+        ADD_MY_ID_PROFILE,
+        EDIT_MY_ID_PROFILE,
+        REMOVE_MY_ID_PROFILE,
+        FRIEND_FAVORITE,} from './types'
 
 import {randomKey} from '../Utils/Helpers'
 import Constant from '../Utils/Constant'
-
-// import {isEquivalent2Object, randomKey} from '../Utils/Helpers'
 
 import {login, 
         people_you_may_khow, 
@@ -74,20 +77,6 @@ import {login,
         update_picture_bg_profile,
         update_group_picture_profile} from '../Utils/Services'
 
-// export const emailChanged = (text) =>{
-//     return({
-//         type: "EMAIL_CHANGED",
-//         payload: text
-//     })
-// }
-
-// export const passwordChanged = (text) =>{
-//     return({
-//         type:"PASSWORD_CHANGED",
-//         payload:text
-//     })
-// }
-
 export const actionApplicationCategory = () =>dispatch =>{
     return application_category().then(data=>{
         if(data.result){
@@ -98,6 +87,7 @@ export const actionApplicationCategory = () =>dispatch =>{
         return {'status':false}
     })
 }
+
 // uid, group_name, members, uri
 export const actionCreateMyApplication = (uid, application_name, category, subcategory, uri) =>dispatch =>{
     // 
@@ -111,47 +101,16 @@ export const actionCreateMyApplication = (uid, application_name, category, subca
 }
 
 export const actionLogin = ({email, password}) => dispatch => {
-    // firebase.auth().signInWithEmailAndPassword(email, password)
-    //   .then((user) => {
-    //     // console.log(user)
-    //     dispatch({ type: LOGIN_USER_SUCCESS, payload: user });
-    //   })
-    //   .catch((error)=>{
-    //     // console.log(error)
-    //     dispatch({ type: LOGIN_USER_FAIL, payload: error.message });
-    //   });
-
-    // console.log('action_login : ' + email +", "+password)
-
-
-    // dispatch({ type: LOADING, isLoading:true})
-
     return login(email, password).then(data => {
-        // this.setState({isShowSpinner:false})
-
-        // dispatch({ type: LOADING, isLoading:false})
-
-        console.log(data)
         if((data instanceof Array)){
-            // error message
-            // alert(data[0])
             dispatch({ type: USER_LOGIN_FAIL, provider: Constant.PROVIDERS.USER, error: data[0] });
 
             return {'status':false, 'error_message': data[0]}
         }else{
             if(!data.result){
-                // alert(data.message)
                 dispatch({ type: USER_LOGIN_FAIL, provider: Constant.PROVIDERS.USER, error: data.message });
-        
                 return {'status':false, 'error_message': data.message}
             }else{
-                // console.log(data.data.friend_profiles)
-                // console.log(data.data.user)
-                // console.log(data.data.user_profile)
-                // saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.USER, "user": data.data});
-
-                // console.log(data.data.users)
-
                 dispatch({ type: USER_LOGIN_SUCCESS, provider: Constant.PROVIDERS.USER, users: data.data.users });
                 return {'status':true, 'data': data.data}
             }
@@ -164,40 +123,11 @@ export const loginWithFacebook = () => {
         LoginManager.logInWithReadPermissions(["public_profile"]).then(
             (result) => {
 
-                
-                // if (result.isCancelled) {
-                //     console.log("Login cancelled");
-                // } else {
-                //     // this.setState({
-                //     //   loading:true
-                //     // })
-                //     saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.FACEBOOK}).then((data)=>{
-                //         if(data.status){
-                //           // let {navigator} = _this
-                //           _this.navigation.navigate("Main")
-    
-                //         }
-                //     }).catch((error)=>{
-                //         console.log(error)
-                //     })
-                // }
-
                 if(result.isCancelled){
                     console.log("login with fb : 0")
                 }else{
                     console.log("login with fb : 1")
                     console.log(result)
-                    // save data to local
-                    // saveAsyncStorage(Constant.USER_LOGIN, {"data":result, "provider": Constant.PROVIDERS.FACEBOOK}).then((data)=>{
-                    //     // if(data.status){
-                    //     //   // let {navigator} = _this
-                    //     //   _this.navigation.navigate("Main")
-    
-                    //     // }
-                    //     dispatch({ type: LOGIN_USER_SUCCESS, payload: result, provider: Constant.PROVIDERS.FACEBOOK });
-                    // }).catch((error)=>{
-                    //     console.log(error)
-                    // })
                 }
             },(error)=> {
                 console.log("login with fb : -1")
@@ -407,7 +337,7 @@ export const actionFavoritesGroup = (uid, group_id, favorite_status, callback) =
     
     dispatch({ type: FAVORITES_GROUP, group_id, favorite_status});
 
-    // console.log(uid, group_id, favorite_status)
+    console.log(uid, group_id, favorite_status)
     // dispatch({ type: INTERESTE_IN_PROFILE, interestein_key, interestein_id, interestein_status});
     firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).set({
         is_favorites: favorite_status,
@@ -440,21 +370,10 @@ export const actionMemberJoinGroup = (uid, group_id, member_item_id, callback) =
 /*
 การปฎิเสจคำขอให้เข้ากลุ่มสนทนา
 * ขั้นตอนการทำงาน
-    - ลบ users/{user_id}/groups/{group_id} และ update redux local
+    - ลบกลุ่มออกจาก  users/{user_id}/groups/{group_id} และ remove group redux local
     - update status == GROUP_STATUS_MEMBER_DECLINE groups/{group_id}/members/{item_id}/status = GROUP_STATUS_MEMBER_DECLINE
 */
 export const actionMemberDeclineGroup = (uid, group_id, member_item_id, callback) => dispatch => {
-    
-    /*
-    dispatch({ type: FAVORITES_GROUP, group_id, favorite_status});
-
-    // console.log(uid, group_id, favorite_status)
-    // dispatch({ type: INTERESTE_IN_PROFILE, interestein_key, interestein_id, interestein_status});
-    firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).set({
-        is_favorites: favorite_status,
-    }, { merge: true});
-    */
-
     firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).delete()
     firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_item_id).set({
         status: Constant.GROUP_STATUS_MEMBER_DECLINE,
@@ -466,39 +385,18 @@ export const actionMemberDeclineGroup = (uid, group_id, member_item_id, callback
 
 export const actionDeleteGroup = (uid, group_id, callback) => dispatch =>{
     firebase.firestore().collection('groups').doc(group_id).delete()
-
     dispatch({ type: DELETE_GROUP, group_id});
-    
     callback({'status':true})
 }
 
 export const actionCreateClass = (uid, class_name, uri) => dispatch =>{
-
-    // (uid, group_name, members, uri)
     return create_class(uid, class_name, uri).then(data => {
-        // this.setState({isShowSpinner:false})
-
-        // dispatch({ type: LOADING, isLoading:false})
-
-        // console.log(data)
         if((data instanceof Array)){
-            // error message
-            // alert(data[0])
-            // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data[0] });
-
             return {'status':false, 'message': data}
         }else{
             if(!data.result){
-                // alert(data.message)
-                // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data.message });
-        
                 return {'status':false, 'message': data}
             }else{
-                // console.log(data.data.friend_profiles)
-                // console.log(data.data.user)
-                // console.log(data.data.user_profile)
-                // saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.USER, "user": data.data});
-                // dispatch({ type: LOGIN_USER_SUCCESS, provider: Constant.PROVIDERS.USER, user: data.data });
                 return {'status':true, 'data':data}
             }
         }
@@ -507,12 +405,6 @@ export const actionCreateClass = (uid, class_name, uri) => dispatch =>{
 
 export const actionUpdateStatusFriend = (uid, friend_id, status, callback) => dispatch=>{
     // console.log('-------------- actionAcceptFriend()')
-
-    // return {'status':true}
-
-    // console.log(dispatch)
-    //  UPDATE_STATUS_FRIEND
-
     // update status เพือ่นของเรา
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).update({status})
 
@@ -530,8 +422,6 @@ export const actionSelectClass = (class_id, uid, friend_id, callback) => dispatc
 
     firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').where('friend_id', '==', friend_id).get().then(snapshot => {
         
-        // console.log(snapshot.docs)
-        // console.log(snapshot.size)
         if(snapshot.size == 0){
             firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').add({
                 friend_id,
@@ -539,26 +429,12 @@ export const actionSelectClass = (class_id, uid, friend_id, callback) => dispatc
             })
         }else{
             snapshot.docs.forEach(doc => {
-                //console.log(JSON.parse(doc._document.data.toString()))
-                // console.log(doc.id)
-                // console.log(doc.data())
-                // firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(doc.id).set({
-                //     status: !doc.data().status
-                // },
-                // { merge: true });
-
                 // https://firebase.google.com/docs/firestore/manage-data/transactions
                 var classsRef = firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(doc.id);
 
                 var transaction = firebase.firestore().runTransaction(t => {
                 return t.get(classsRef)
                     .then(doc => {
-
-                    // console.log(doc)
-                    // Add one person to the city population
-                    // var newPopulation = doc.data().population + 1;
-                    // t.update(cityRef, {population: newPopulation});
-
                         t.update(classsRef, {status: !doc.data().status});
                     });
                 }).then(result => {
@@ -590,12 +466,6 @@ export const actionFriendHide = (uid, friend_id, callback) => dispatch=> {
     firebase.firestore().runTransaction(t => {
         return t.get(hideRef)
         .then(doc => {
-            // console.log(doc.data().mute)
-            // Add one person to the city population
-            // var newPopulation = doc.data().population + 1;
-            // t.update(cityRef, {population: newPopulation});
-            // t.update(classsRef, {mute: !doc.data().status});
-
             if(doc.data().hide === undefined){
                 t.set(hideRef, {
                     hide: true,
@@ -621,12 +491,6 @@ export const actionFriendBlock = (uid, friend_id, callback) => dispatch=> {
     firebase.firestore().runTransaction(t => {
         return t.get(blockRef)
         .then(doc => {
-            // console.log(doc.data().mute)
-            // Add one person to the city population
-            // var newPopulation = doc.data().population + 1;
-            // t.update(cityRef, {population: newPopulation});
-            // t.update(classsRef, {mute: !doc.data().status});
-
             if(doc.data().block === undefined){
                 t.set(blockRef, {
                     block: true,
@@ -655,35 +519,22 @@ export const actionFriendMute = (uid, friend_id, mute, callback) => dispatch=> {
     callback({'status':true})
 }
 
-// Published/Unpublished my application
-export const actionUpdateStatusMyApplication = (uid, my_application_id, callback) => dispatch =>{
-    var statusRef =  firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(my_application_id);
+// FRIEND_FAVORITE
+export const actionFriendFavirite = (uid, friend_id, favorite_status, callback) => dispatch=> {
+    dispatch({ type: FRIEND_FAVORITE, friend_id, favorite_status});
+    firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
+        is_favorite: favorite_status,
+    }, { merge: true});
+    callback({'status':true, uid, friend_id, favorite_status})
+}
 
-    firebase.firestore().runTransaction(t => {
-        return t.get(statusRef)
-        .then(doc => {
-            // console.log(doc.data().mute)
-            // Add one person to the city population
-            // var newPopulation = doc.data().population + 1;
-            // t.update(cityRef, {population: newPopulation});
-            // t.update(classsRef, {mute: !doc.data().status});
+// My application published/unpublished 
+export const actionUpdateStatusMyApplication = (uid, my_application_id, status, callback) => dispatch =>{
+    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(my_application_id).set({
+        status,
+    }, { merge: true});
 
-            if(doc.data().status === undefined){
-                t.set(statusRef, {
-                    status: true,
-                }, { merge: true});
-            }else{
-                t.update(statusRef, {status: !doc.data().status});
-            }
-        });
-    }).then(result => {
-        console.log('Transaction success!');
-    }).catch(err => {
-        console.log('Transaction failure:', err);
-    });
-
-    dispatch({ type: UPDATE_STATUS_MY_APPLICATION, my_application_id});
-
+    dispatch({ type: UPDATE_STATUS_MY_APPLICATION, my_application_id, my_application_status:status});
     callback({'status':true})
 }
 
@@ -724,9 +575,9 @@ export const actionEditDisplayNameProfile = (uid, name, callback) => dispatch =>
         name,
     }, { merge: true});
 
-    dispatch({ type: EDIT_DISPLAY_NAME_PROFILE, name});
+    dispatch({ type:EDIT_DISPLAY_NAME_PROFILE, profile_name:name});
 
-    callback({'status':true, uid, name})
+    callback({'status':true})
 }
 
 // EDIT_STATUS_MESSAGE_PROFILE
@@ -741,15 +592,15 @@ export const actionEditStatusMessageProfile = (uid, status_message, callback) =>
 }
 
 // EDIT_MY_ID_PROFILE
-export const actionEditMyIDProfile = (uid, my_id, callback) => dispatch =>{
-    firebase.firestore().collection('profiles').doc(uid).set({
-        my_id,
-    }, { merge: true});
+// export const actionEditMyIDProfile = (uid, my_id, callback) => dispatch =>{
+//     firebase.firestore().collection('profiles').doc(uid).set({
+//         my_id,
+//     }, { merge: true});
 
-    dispatch({ type: EDIT_MY_ID_PROFILE, my_id});
+//     dispatch({ type: EDIT_MY_ID_PROFILE, my_id});
 
-    callback({'status':true})
-}
+//     callback({'status':true})
+// }
 
 // Gender
 export const actionGenderProfile = (uid, gender_id, callback) => dispatch =>{
@@ -763,56 +614,14 @@ export const actionGenderProfile = (uid, gender_id, callback) => dispatch =>{
 }
 
 // InteresteIn
-export const actionInteresteInProfile = (uid, interestein_key, interestein_id, interestein_status, callback) => dispatch =>{
+export const actionInteresteInProfile = (uid, intereste_in, callback) => dispatch =>{
 
-    if(interestein_key === undefined){
-        interestein_key = randomKey()
-    }
+    dispatch({ type: INTERESTE_IN_PROFILE, intereste_in});
 
-    dispatch({ type: INTERESTE_IN_PROFILE, interestein_key, interestein_id, interestein_status});
-
-    firebase.firestore().collection('profiles').doc(uid).collection('intereste_in').doc(interestein_key).set({
-        id: interestein_id,
-        enable: interestein_status,
+    firebase.firestore().collection('profiles').doc(uid).set({
+        intereste_in
     }, { merge: true});
 
-    
-
-    /*
-    let key = randomKey()
-    dispatch({ type: INTERESTE_IN_PROFILE, interestein_key:key, interestein_id});
-
-    firebase.firestore().collection('profiles').doc(uid).collection('intereste_in').where("id", "==", interestein_id).get().then(snapshot => {
-        
-        if(snapshot.size == 0){
-            firebase.firestore().collection('profiles').doc(uid).collection('intereste_in').doc(key).set({
-                id: interestein_id,
-                enable: true,
-            })
-        }else{
-
-            // dispatch({ type: UPDATE_INTERESTE_IN_PROFILE, interestein_id});
-
-            snapshot.docs.forEach(doc => {
-                // https://firebase.google.com/docs/firestore/manage-data/transactions
-                var intereste_inRef = firebase.firestore().collection('profiles').doc(uid).collection('intereste_in').doc(doc.id);
-
-                var transaction = firebase.firestore().runTransaction(t => {
-                    return t.get(intereste_inRef)
-                    .then(doc => {
-                        t.update(intereste_inRef, {enable: !doc.data().enable});
-                    });
-                }).then(result => {
-                    console.log('Transaction success!');
-                }).catch(err => {
-                    console.log('Transaction failure:', err);
-                });               
-            });
-        }
-        // UPDATE_INTERESTE_IN_PROFILE
-    })
-
-    */
     callback({'status':true})
 }
 
@@ -974,138 +783,77 @@ export const actionRemoveEmailProfile = (uid, email_key, callback) => dispatch =
     callback({'status':true})
 }
 
+// my id
+export const actionAddMyIDProfile = (uid, id, callback) => dispatch =>{
+    let key = randomKey()
+    // firebase.firestore().collection('profiles').doc(uid).collection('my_ids').where("id", "==", id).get().then(snapshot => {
+    //     console.log(snapshot.size)
+    //     if(snapshot.size == 0){
+    //         firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(key).set({
+    //             id,
+    //             enable:false
+    //         }, { merge: true})
+
+    //         dispatch({ type: ADD_MY_ID_PROFILE, my_id_key:key, id});
+    //         // callback({'status':true})
+    //     }else{
+    //         // callback({'status':false, 'message':'Duplicate id.'})
+    //     }
+    // })
+
+    firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(key).set({
+        id,
+        enable:false
+    }, { merge: true})
+
+    dispatch({ type: ADD_MY_ID_PROFILE, my_id_key:key, id});
+    callback({'status':true})
+}
+
+export const actionRemoveMyIDProfile = (uid, key, callback) => dispatch =>{
+    firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(id).delete()
+    dispatch({ type: REMOVE_MY_ID_PROFILE, my_id_key:key});
+    callback({'status':true})
+}
+
+export const actionSelectMyIDProfile = (uid, id, callback) => dispatch =>{
+    
+    if(id == 0){
+        dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:0});
+    }
+
+    // dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:id});
+    firebase.firestore().collection('profiles').doc(uid).collection('my_ids').get().then(snapshot => {
+        snapshot.docs.forEach(doc => {
+            if(doc.id == id){
+                firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(doc.id).set({
+                    enable:true
+                }, { merge: true})
+            }else{
+                firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(doc.id).set({
+                    enable:false
+                }, { merge: true})
+            }
+        });
+    })
+    callback({'status':true})
+}
+
 
 let unsubscribe = null;
 
 export function watchTaskEvent(uid, dispatch) {
     console.log('-------------- watchTaskEvent()')
     
-    /*
-    firebase.database().ref('idna/user/' + uid).once('value', (snap) => {
-        // dispatch(addTask(snap.val()));
-
-        // console.log('value')
-        console.log(snap.val())
-    });
-
-    firebase.database().ref('idna/user/' + uid).on('child_changed', (snap) => {
-        //   dispatch(addTask(snap.val()));
-
-        console.log(snap.val())
-    });
-
-    // line_id
-    firebase.database().ref('idna/user/' + uid + '/profiles/line_id').on('child_added', (snap) => {
-        //   dispatch(addTask(snap.val()));
-
-        console.log(snap.val())
-    });
-
-    firebase.database().ref('idna/user/' + uid + '/profiles/line_id').on('child_changed', (snap) => {
-        //   dispatch(addTask(snap.val()));
-
-        console.log(snap.val())
-    });
-    */
-
-
-    // firebase.firestore().collection('users').doc(uid).collection('test001').where("uid", '==', '1234').onSnapshot((querySnapshot) => {
-
-    //     querySnapshot.docChanges.forEach(function(change) {
-    //         console.log(change)
-    //     })
-    // })
-
-    // Set the specific user's online status to true
-    /*
-    firebase.firestore().collection('user').doc(uid)
-        .set({
-        online: true,
-        }, { merge: true});
-
-    console.log(firebase.database())
-    */
-
     // track profile
     unsubscribe = firebase.firestore().collection('profiles').doc(uid).onSnapshot((docSnapshot) => {
-        // console.log(docSnapshot.data());
-
         if(docSnapshot.data() === undefined){
             actionLogout(dispatch, ()=>{
                 // console.log(this)                
                 this.navigation.navigate("AuthLoading")
             })
         }
-
         dispatch({ type: UPDATE_PROFILE, data:docSnapshot.data()});
-
-    //    querySnapshot.documentChanges.forEach((change) => {
-    //     // Do something with change
-    //   });
-
-        // console.log(querySnapshot.metadata)
-
-    //    querySnapshot.forEach((doc) => {
-    //     console.log(doc)
-    //    })
-
-        // Object.keys(querySnapshot).map(function(key) {
-        //     // return <option value={key}>{tifs[key]}</option>
-        //     console.log(querySnapshot[key].doc())
-        // });
-
-        // const items = querySnapshot.docs.map(doc => ({ 
-        //     id: doc.id,
-        //     fromCache: doc.metadata.fromCache,
-        //     hasPendingWrites: doc.metadata.hasPendingWrites,
-        //     title: doc.data().title,
-        // }));
-
-        // console.log(items)
-
-        // const numChanged = querySnapshot.docChanges;
-        
-        // // let docs = querySnapshot;
-        // console.log(numChanged)
-
-        // let docs = querySnapshot.docs;
-        // let size = querySnapshot.size;
-
-        // console.log(docs.length)
-        // console.log(size)
-
-        /*
-            แสดงว่า user uid นี้โดนลบออกจากระบบแล้ว โดยมีการ login ค้างไว้
-        */
-        // if(querySnapshot.docs.length === 0) {
-        //     actionLogout(dispatch, ()=>{
-        //         // console.log(this)                
-        //         this.navigation.navigate("AuthLoading")
-        //     })
-        //     // return;
-        // }
-
-        /*
-        querySnapshot.docChanges.forEach(function(change) {
-            // if (change.type === "removed") {
-            //     console.log("Removed city: ", change.doc.data());
-            // }
-            console.log(change.type)
-
-            // console.log("#--- " , change.type);
-            if (change.type === "added") {
-                // console.log("added");
-            }else if (change.type === "modified") {
-                // console.log("modified");
-            }else if (change.type === "removed") {
-                // console.log("removed");
-
-                firebase.firestore().collection('users').doc(change.doc.data().uid).delete();
-            }
-
-            console.log(change.doc.data());
-        });
-        */
     }, (error) => {
         //...
         console.log(error)
@@ -1200,6 +948,30 @@ export function watchTaskEvent(uid, dispatch) {
             }
         })
     })
+
+    // track profile > my_ids
+    firebase.firestore().collection('profiles').doc(uid).collection('my_ids').onSnapshot((querySnapshot) => {
+        querySnapshot.docChanges.forEach(function(change) {
+
+            let doc_id   = change.doc.id
+            let doc_data = change.doc.data()
+
+            if (change.type === 'added') {  
+                console.log(change.type, doc_id, doc_data)
+
+                dispatch({ type: ADD_MY_ID_PROFILE, my_id_key:doc_id, my_id_data:doc_data});
+            }
+            if (change.type === 'modified') {
+                console.log(change.type, doc_id, doc_data)
+            
+                dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:doc_id, my_id_data:doc_data});
+            }
+
+            if (change.type === 'removed') {
+                // dispatch({ type: REMOVE_EMAIL_PROFILE, email_key:doc_id});
+            }
+        })
+    })
     
 
     // track friends
@@ -1209,83 +981,27 @@ export function watchTaskEvent(uid, dispatch) {
         querySnapshot.docChanges.forEach(function(change) {
             // console.log(change.type)
             if (change.type === 'added') {
-                // console.log('New, id : ', change.doc.id ,' data : ', change.doc.data());
-
-
-                // firebase.firestore().collection('profiles').doc(change.doc.id).get().then(doc => {
-                //     if (!doc.exists) {
-                //         console.log('No such document!');
-                //     } else {
-                //         console.log('Document data:', doc.data());
-
-                //         dispatch({ type: ADD_FRIEND, friend_id:change.doc.id, data:change.doc.data(), profile:doc.data()});
-                //     }
-                // })
-                // .catch(err => {
-                //     console.log('Error getting document', err);
-                // });
 
                 firebase.firestore().collection('profiles').doc(change.doc.id).onSnapshot((friendDocSnapshot) => {
-                    // console.log('profiles friend ',  friendDocSnapshot.data())
-                    // friendQuerySnapshot.docChanges.forEach(function(change) {
-                    //     console.log(change.type)
-                    // })
-
+                    
                     if (!friendDocSnapshot.exists) {
                         console.log('No such document!');
                     } else {
-                        // console.log('Document data:', friendDocSnapshot.data());
-
                         dispatch({ type: ADD_FRIEND, friend_id:change.doc.id, data:change.doc.data(), profile:friendDocSnapshot.data()});
                     }
                 })
             }
             if (change.type === 'modified') {
-                // console.log('Modified, id : ', change.doc.id ,' data : ', change.doc.data());
-                
                 dispatch({ type: MODIFIED_FRIEND, friend_id:change.doc.id, data:change.doc.data() });
             }
         })
-
-        // querySnapshot.docChanges().forEach(change => {
-        //     if (change.type === 'added') {
-        //       console.log('New city: ', change.doc.data());
-        //     }
-        //     if (change.type === 'modified') {
-        //       console.log('Modified city: ', change.doc.data());
-        //     }
-        //     if (change.type === 'removed') {
-        //       console.log('Removed city: ', change.doc.data());
-        //     }
-        //   });
-
-        /*
-        querySnapshot.forEach(function(doc) {
-            // console.log(doc)
-            // console.log(doc.id, " => ", doc.data());
-
-            console.log('ADD_FRIEND')
-            dispatch({ type: ADD_FRIEND, id:doc.id, data:doc.data()});
-
-            firebase.firestore().collection('profiles').doc(doc.id).onSnapshot((docSnapshot) => {
-                // console.log(docSnapshot.id) 
-                // doc.id จะมีค่าเท่ากันกับ  docSnapshot.id 
-                // console.log(docSnapshot.id, " => ", docSnapshot.data());
-
-                dispatch({ type: FRIEND_PROFILE, id:docSnapshot.id, data:docSnapshot.data()});
-            })
-        })
-        */
     })
 
     // track device access
     firebase.firestore().collection('users').doc(uid).collection('device_access').onSnapshot((querySnapshot) => {
-        // console.log(querySnapshot)
 
         let _this = this
         querySnapshot.forEach(function(doc) {
-            // console.log(doc.id, " => ", doc.data());
-
             let id = doc.id
             let data = doc.data()
 
@@ -1299,41 +1015,6 @@ export function watchTaskEvent(uid, dispatch) {
 
             dispatch({ type: DEVICE_ACCESS_ADDED, id, data});
         });
-
-        // querySnapshot.docChanges.forEach(function(change) {
-        //     console.log(change.id)
-        //     console.log(change._document._ref._documentPath._parts)
-        // })
-
-        // snapshot.ref.parent.parent.key
-        /*
-        let _this = this
-        querySnapshot.docChanges.forEach(function(change) {
-            let data = change.doc.data()
-
-            console.log(data)
-            console.log(change.type)
-
-            //     if(_v.udid === DeviceInfo.getUniqueID()){
-            console.log(DeviceInfo.getUniqueID())
-
-            // device
-            if (change.type === "added") {
-                dispatch({ type: DEVICE_ACCESS_ADDED, device:data});
-            }else if(change.type === "modified"){
-
-                dispatch({ type: DEVICE_ACCESS_MODIFIED, device:data});
-                
-                //  check ว่ามีการ force logout จากระบบหรือไม่
-                if(data.udid === DeviceInfo.getUniqueID() && data.is_login == 0){
-                    actionLogout(dispatch, ()=>{
-                        // console.log(this)                
-                        _this.navigation.navigate("AuthLoading")
-                    })
-                }
-            }
-        })
-        */
     })
 
     // track grouds
@@ -1472,11 +1153,6 @@ export function watchTaskEvent(uid, dispatch) {
                     return;
                 }
             }else{
-                // console.log('-- 3', Object.keys(snapshot.val())[0])
-                // console.log(snapshot.key); 
-                // console.log(snapshot.val()); 
-                // console.log(Object.keys(snapshot.val())[0]);
-                // console.log('is not null')
                 oldRealTimeDb.ref("user_presence/" + uid + "/"+ Object.keys(snapshot.val())[0] +"/").set({
                     'platform': Platform.OS,
                     'udid': DeviceInfo.getUniqueID(),
@@ -1496,45 +1172,5 @@ export function watchTaskEvent(uid, dispatch) {
                     });
             } 
         });     
-        
-
-//        reference.orderByChild("name").equalTo(user.getName()).addListenerForSingleValueEvent(new ValueEventListener() {
-//         @Override
-//         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-//             if(dataSnapshot.exists())
-//              // do what you want
-//         }
-
-//         @Override
-//         public void onCancelled(@NonNull DatabaseError databaseError) {
-
-//         }
-//   )};
     });
 }
-
-// Firestore unsubscribe to updates
-// export const unsubscribe = () => {
-//     unsubscribe()
-// }
-
-/*
-export const watchTaskChangedEvent = () => (dispatch) => {
-    firebase.database().ref('/items').on('child_changed', (snap) => {
-        // dispatch(addTask(snap.val()));
-
-        console.log('child_changed')
-        console.log(snap)
-    });
-}
-
-export const watchTaskRemovedEvent = () => (dispatch) => {
-    firebase.database().ref('/items').on('child_removed', (snap) => {
-        // dispatch(addTask(snap.val()));
-
-        console.log('child_removed')
-        console.log(snap)
-    });
-}
-*/

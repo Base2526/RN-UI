@@ -229,14 +229,24 @@ class MyProfilePage extends React.Component{
         }
 
         // intereste_in
+        // let intereste_in = []
+        // if(this.props.auth.users.profiles.intereste_in !== undefined){
+        //     _.each(this.props.auth.users.profiles.intereste_in,  function(v, k) { 
+        //         if(v.enable){
+        //             let f = Constant.intereste_in.find(k => k.id==v.id)
+        //             intereste_in.push(f.name)
+        //         }
+        //     })
+        // }
+
+
+        // intereste_in
         let intereste_in = []
         if(this.props.auth.users.profiles.intereste_in !== undefined){
-            _.each(this.props.auth.users.profiles.intereste_in,  function(v, k) { 
-                if(v.enable){
-                    let f = Constant.intereste_in.find(k => k.id==v.id)
-                    intereste_in.push(f.name)
-                }
-            })
+            this.props.auth.users.profiles.intereste_in.forEach(function(key, v, arr){
+                let f = Constant.intereste_in.find(k => k.id==key)
+                intereste_in.push(f.name)
+            });
         }
 
         // value={this.props.auth.users.profiles.address}

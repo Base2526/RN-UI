@@ -155,76 +155,42 @@ class EditMyProfilePage extends React.Component{
             let __check = null
             if(this.state.profiles.intereste_in !== undefined){
                 let intereste_in = this.state.profiles.intereste_in
-                let f = _.find(intereste_in,  function(v, k) { 
-                    return v.id == data.id && v.enable
+                let f = intereste_in.find(v=>{ 
+                    return v == data.id
                 })
 
-                console.log(f)
-                if(f !== undefined && f.enable){
+                if(f !== undefined){
                     __check = <Icon name="check" size={25} color="#900" />
                 }
             }
             
             return(<TouchableOpacity key={data.id} 
                         onPress={() => {
-                            /*
-                            if(this.state.profiles.intereste_in === undefined){
-                                // กรณียังไม่เคยมี
-                                let p = {...this.state.profiles, intereste_in:{[randomKey()]:{id: data.id, name: data.name, enable: true}} }
-                                this.setState({profiles:p})
-                            }else{
-                                // กรณีเคยมี
-                                let intereste_in = this.state.profiles.intereste_in
-                               
-                                let key = 0
-                                let value = null
-                                _.each(intereste_in,  function(v, k) { 
-                                    if(v.id == data.id){
-                                        key = k
-                                        value = v
-                                    }
+                           let intereste_in = this.state.profiles.intereste_in;
+                           if(intereste_in !== undefined){
+                                
+                                let _find = intereste_in.find(v=>{
+                                    return v == data.id;
                                 })
 
-                                if(key !== 0){
-                                    let newValue = {...value, enable:!value.enable}
-                                    let p = {...this.state.profiles, intereste_in:{...intereste_in, [key]:newValue} }
-                                    this.setState({profiles:p})
+                                let newValue = null
+                                if(_find === undefined){
+                                    newValue = [...intereste_in, data.id]
                                 }else{
-
-                                    let p = {...this.state.profiles, intereste_in:{...intereste_in, [randomKey()]:{id: data.id, name: data.name, enable: true}} }
-                                    this.setState({profiles:p})
+                                    newValue = intereste_in.filter(function(v) { 
+                                        return v != data.id 
+                                    })
                                 }
-                            }
-                            */
 
-                            if(this.state.profiles.intereste_in !== undefined){
-                                let intereste_in = this.state.profiles.intereste_in
-                                let f = _.find(intereste_in,  function(v, k) { 
-                                    return v.id == data.id
-                                })
-
-                                if(f !== undefined){
-
-                                    var interestein_key = _.findKey(intereste_in, function(item) {
-                                        return item.id == data.id;
-                                    });
-
-                                    this.props.actionInteresteInProfile(this.props.uid, interestein_key, data.id, !f.enable, (result) => {
-                                        console.log(result)
-                                    })
-
-                                    return
-                                }else{
-                                    this.props.actionInteresteInProfile(this.props.uid, undefined, data.id, true, (result) => {
-                                        console.log(result)
-                                    })
-                                }  
-                            }else{
-                                this.props.actionInteresteInProfile(this.props.uid, undefined, data.id, true, (result) => {
+                                this.props.actionInteresteInProfile(this.props.uid, newValue, (result) => {
                                     console.log(result)
                                 })
-                            }   
-
+                            }else{
+                                let intereste_in = [data.id]
+                                this.props.actionInteresteInProfile(this.props.uid, intereste_in, (result) => {
+                                    console.log(result)
+                                })
+                            }
                         }}>
                         <View
                             style={{
@@ -396,7 +362,6 @@ class EditMyProfilePage extends React.Component{
     }
 
     emailsList(){
-
         if(this.state.profiles.emails === undefined){
             return;
         }
@@ -751,16 +716,9 @@ class EditMyProfilePage extends React.Component{
 
         // ส่วนของ my id
         let my_id = ''
-        // let is_edit = false
-        // _.each(this.state.profiles.my_id, function(_v, _k) { 
-        //     my_id = _v.value
-        //     is_edit = _v.is_edit
-        // });
         if(this.state.profiles.my_id !== undefined){
             my_id = this.state.profiles.my_id
         }
-
-        // console.log(my_id)
 
         // gender
         let gender = 'None'
@@ -774,14 +732,11 @@ class EditMyProfilePage extends React.Component{
         // intereste_in
         let intereste_in = []
         if(this.state.profiles.intereste_in !== undefined){
-            _.each(this.state.profiles.intereste_in,  function(v, k) { 
-                if(v.enable){
-                    let f = Constant.intereste_in.find(k => k.id==v.id)
-                    intereste_in.push(f.name)
-                }
-            })
+            this.state.profiles.intereste_in.forEach(function(key, v, arr){
+                let f = Constant.intereste_in.find(k => k.id==key)
+                intereste_in.push(f.name)
+            });
         }
-
 
         let birthday = 'Not set'
         if(this.state.profiles.birthday !== undefined){
@@ -799,36 +754,23 @@ class EditMyProfilePage extends React.Component{
             <Modal 
                 style={{zIndex:10, 
                         height:this.getHeightGender(), 
-                        // borderTopLeftRadius:15, 
-                        // borderTopRightRadius:15
                     }} 
                 position={"bottom"} 
                 ref={"modalGender"}
                 // backdropPressToClose={false}
                 swipeToClose={true}
                 swipeArea={50}  
-                coverScreen={true}
-                // visible={this.state.is_open_modal_gender}
-                >
-                {/* <MyModal style={{height: this.getHeightGender()}} 
-                                isOpen={this.state.is_open_modal_gender} 
-                                position={"bottom"}
-                                onRequestClose={()=>{ this.setState({is_open_modal_gender:false}) }} > */}
-                    <ScrollView>
-                        <View
-                            style={{marginLeft:10, marginRight:10, marginBottom:20, marginTop:5, flex:1}}>
-                            {this.renderGender()}
-                        </View>
-                    </ScrollView>
-                {/* </MyModal> */}
+                coverScreen={true}>
+                <ScrollView>
+                    <View
+                        style={{marginLeft:10, marginRight:10, marginBottom:20, marginTop:5, flex:1}}>
+                        {this.renderGender()}
+                    </View>
+                </ScrollView>
             </Modal>
-            {/*  */}
-
             <Modal 
                 style={{zIndex:10, 
                         height:this.getHeightInteresteIn(), 
-                        // borderTopLeftRadius:15, 
-                        // borderTopRightRadius:15
                     }} 
                 position={"bottom"} 
                 ref={"modalInteresteIn"}
@@ -836,45 +778,12 @@ class EditMyProfilePage extends React.Component{
                 swipeToClose={true}
                 swipeArea={50}
                 coverScreen={true}>
-{/* 
-                <View 
-                    style={{height:35}}>
-                    <TouchableOpacity 
-                        style={{
-                                borderWidth: 1, 
-                                borderColor: 'red',
-                                borderRadius: 15,
-                                height:30, 
-                                width:30,
-                                justifyContent: 'center', 
-                                alignItems: 'center',
-                                position:'absolute',
-                                right:0,
-                                margin:5,
-                                zIndex:10
-                                    }}
-                        onPress={()=>{
-                            this.refs.modalInteresteIn.close()
-                        }}>
-                        <Text style={{color:'red', fontSize:16}}>X</Text>
-                    </TouchableOpacity>
-                    <View style={{flex:1, marginLeft:10, justifyContent:'center'}}>
-                        <Text style={{fontSize:18}}>Select Intereste In</Text>
+                <ScrollView>
+                    <View
+                        style={{marginLeft:10, marginRight:10, marginBottom:20, marginTop:5, flex:1}}>
+                        {this.renderInteresteIn()}
                     </View>
-                </View>
-                 */}
-                 
-                 {/* <MyModal style={{height: this.getHeightInteresteIn()}} 
-                                isOpen={this.state.is_open_modal_InteresteIn} 
-                                position={"bottom"}
-                                onRequestClose={()=>{ this.setState({is_open_modal_InteresteIn:false}) }} > */}
-                    <ScrollView>
-                        <View
-                            style={{marginLeft:10, marginRight:10, marginBottom:20, marginTop:5, flex:1}}>
-                            {this.renderInteresteIn()}
-                        </View>
-                    </ScrollView>
-                {/* </MyModal> */}
+                </ScrollView>
             </Modal>
 
             <KeyboardAwareScrollView>
@@ -1386,8 +1295,7 @@ class EditMyProfilePage extends React.Component{
 }
 
 const mapStateToProps = (state) => {
-    console.log(state)
-
+    // console.log(state)
     if(!state._persist.rehydrated){
       return {}
     }

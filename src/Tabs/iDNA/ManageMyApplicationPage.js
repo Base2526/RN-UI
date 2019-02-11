@@ -280,10 +280,10 @@ class ManageMyApplicationPage extends React.Component{
         });
     }
 
-    togglePublished = (value) => {
-        this.setState({isPublished: value})
+    togglePublished = (status) => {
+        this.setState({isPublished: status})
 
-        this.props.actionUpdateStatusMyApplication(this.props.uid, this.state.item.item_id, (result)=>{
+        this.props.actionUpdateStatusMyApplication(this.props.uid, this.state.item.item_id, status, (result)=>{
             console.log(result)
         })
     }

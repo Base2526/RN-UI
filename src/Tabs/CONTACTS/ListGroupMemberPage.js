@@ -74,23 +74,42 @@ class ListGroupMemberPage extends React.Component{
         }
     }
 
-    handleInvite = () => {
-        const { navigation } = this.props;
-        const group = navigation.getParam('group', null);
-
-        this.props.navigation.navigate("GroupMemberInvite", {'group':group})
-    }
-
     componentWillMount(){
+        console.log(this.props.groups)
+
         this.props.navigation.setParams({handleCancel: this.handleCancel })
         this.props.navigation.setParams({ handleInvite: this.handleInvite })
 
         const { navigation } = this.props;
-        const group = navigation.getParam('group', null);
+        const group_id = navigation.getParam('group_id', null);
+        
+        let group = _.find(this.props.groups,  function(v, k) { 
+            return k == group_id
+        })
+
+        this.loadData(group)
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log(nextProps);
+
+        const { navigation } = this.props;
+        const group_id = navigation.getParam('group_id', null);
+        
+        let group = _.find(nextProps.groups,  function(v, k) { 
+            return k == group_id
+        })
+
+        // this.loadData(group)
+        console.log(group)
+    }
+
+    loadData = (group) =>{
 
         let members = []
         let pending = []
-        _.each(group.group_profile.members,  function(_v, _k) { 
+        let decline = []
+        _.each(group.members,  function(_v, _k) { 
             switch(_v.status){
                 case Constant.GROUP_STATUS_MEMBER_INVITED:{
                     pending.push({
@@ -108,86 +127,33 @@ class ListGroupMemberPage extends React.Component{
                     })
                     break;
                 }
+                case Constant.GROUP_STATUS_MEMBER_DECLINE:{
+                    decline.push({
+                        name:_v.friend_name,
+                        status:_v.status,
+                        image_url:_v.friend_image_url
+                    })
+                    break;
+                }
             }
         });
 
         this.setState({
-            data: [{title: 'Members',member: members}, {title: 'Pending', member: pending}]
+            data: [ {title: 'Members',member: members}, 
+                    {title: 'Pending', member: pending},
+                    {title: 'Decline', member: decline},]
         })
+    }
+
+    handleInvite = () => {
+        const { navigation } = this.props;
+        const group = navigation.getParam('group', null);
+        this.props.navigation.navigate("GroupMemberInvite", {'group':group})
     }
 
     handleCancel = () => {
         this.props.navigation.goBack(null)
     }
-
-    FlatListItemSeparator = () => {
-        return (
-            <View
-            style={{
-                height: 1,
-                width: "100%",
-                backgroundColor: "#607D8B",
-            }}
-            />
-        );
-    }
-
-    GetFlatListItem (item) {
-        Alert.alert(item);   
-    }
-
-    render_FlatList_header = () => {
-        var header_View = (
-            <View>
-                <TouchableOpacity 
-                        onPress={()=>{
-                            this.props.navigation.navigate('MyApplicationProfilePage')
-                        }}>
-                <View style={{  backgroundColor:'white', 
-                                flexDirection:'row', 
-                                paddingTop:10, 
-                                paddingBottom:10,
-                                paddingLeft:5,
-                                paddingRight:5}}
-                    onPress={{}}>
-                    <TouchableOpacity 
-                        style={{height:60,
-                                width: 60,
-                                borderRadius: 10}}
-                                onPress={
-                                    ()=>this.props.navigation.navigate("FriendProfilePage")
-                                  }>
-                        <FastImage
-                            style={{width: 60, height: 60, borderRadius: 10}}
-                            source={{
-                            uri: 'https://unsplash.it/400/400?image=1',
-                            headers:{ Authorization: 'someAuthToken' },
-                            priority: FastImage.priority.normal,
-                            }}
-                            resizeMode={FastImage.resizeMode.contain}
-                        />
-                    </TouchableOpacity>
-                    <View style={{paddingLeft:10, justifyContent:'center'}}>
-                        <Text>Name Group : Somkid</Text>
-                    </View>
-            
-                </View>
-                </TouchableOpacity>
-                {/* {this.FlatListItemSeparator()} */}
-
-            </View>
-        );
-        return header_View ; 
-    };
-
-    render_FlatList_footer = () => {
-        var footer_View = (
-            <View style={styles.header_footer_style}>
-            <Text style={styles.textStyle}> FlatList Footer </Text>
-            </View>
-        );
-        return footer_View; 
-    };
 
     _renderRow = (rowItem, rowId, sectionId) => {
 
@@ -226,6 +192,42 @@ class ListGroupMemberPage extends React.Component{
                 ]
                 break;
             }
+
+            case Constant.GROUP_STATUS_MEMBER_DECLINE:{
+                return(<View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                            <TouchableHighlight 
+                                style={{height:60,
+                                        width: 60,
+                                        borderRadius: 10}}>
+                                <ImageWithDefault 
+                                source={{uri: rowItem.image_url}}
+                                style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
+                                />
+                            </TouchableHighlight>
+                            <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
+                                <Text style={{fontSize:18}}>{rowItem.name}</Text>
+                            </View>
+                            <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
+                                <TouchableOpacity
+                                    style={{padding:5, 
+                                            borderColor:'green', 
+                                            borderRadius:10, 
+                                            borderWidth:.5,
+                                            marginRight:5}}
+                                    onPress={()=>{}}>
+                                    <Text style={{color:'green'}}>Invite</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={{padding:5, 
+                                            borderColor:'red', 
+                                            borderRadius:10, 
+                                            borderWidth:.5}}
+                                    onPress={()=>{}}>
+                                    <Text style={{color:'red'}}>Cancel</Text>
+                                </TouchableOpacity>
+                                </View>
+                        </View>)
+            }
         }
         
         return( 
@@ -247,14 +249,6 @@ class ListGroupMemberPage extends React.Component{
                  </View>
                 </View>
             </Swipeout>)
-    }
-
-    componentWillReceiveProps(nextProps) {
-        // this.setState({
-        //     group: nextProps.selected,
-        // });
-
-        console.log("008 - componentWillReceiveProps");
     }
 
     _renderSection = (section, sectionId, state)  => {
@@ -298,10 +292,7 @@ class ListGroupMemberPage extends React.Component{
     }
       
     render() {
-        // let {renderContent, data} = this.state;
-
-        return (
-                <ExpandableList
+        return (<ExpandableList
                     style={{flex:1}}
                     ref={instance => this.ExpandableList = instance}
                     dataSource={this.state.data}
@@ -314,38 +305,9 @@ class ListGroupMemberPage extends React.Component{
                     openOptions={[0, 1]}
                     removeClippedSubviews={false}
                 />
-            // </View> 
         );
     }
 }
-
-const styles = StyleSheet.create({
-    
-    MainContainer :{
-        justifyContent: 'center',
-        flex:1,     
-    },
-        
-    FlatList_Item: {
-        padding: 10,
-        fontSize: 18,
-        height: 44,
-    },
-        
-    header_footer_style:{
-        width: '100%', 
-        height: 44, 
-        backgroundColor: '#4CAF50', 
-        alignItems: 'center', 
-        justifyContent: 'center'
-    },
-    
-    textStyle:{
-        textAlign: 'center', 
-        color: '#fff', 
-        fontSize: 21
-    }
-});
 
 const mapStateToProps = (state) => {
     console.log(state)
@@ -355,7 +317,7 @@ const mapStateToProps = (state) => {
     }
   
     return{
-      auth:state.auth
+        groups:state.auth.users.groups
     }
 }
 

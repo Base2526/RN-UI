@@ -80,6 +80,7 @@ class ManageGroupPage extends React.Component{
     }
 
     itemMembers = (group) =>{
+        console.log(group)
         let {members} = group
         return Object.keys(members).map((key, v) => {
             if(v > 3){
@@ -102,13 +103,14 @@ class ManageGroupPage extends React.Component{
                         </TouchableOpacity>)
             }
             
-            let {profile} = members[key].friend_profile
+            // let {profile} = members[key].friend_profile
+            // console.log(members[key])
 
             return(<TouchableOpacity key={friend.friend_id} style={{marginRight:5}}>
                         <FastImage
                             style={{width: 36, height: 36, borderRadius: 18}}
                             source={{
-                            uri: profile.image_url,
+                            uri: members[key].friend_image_url,
                             headers:{ Authorization: 'someAuthToken' },
                             priority: FastImage.priority.normal,
                             }}
@@ -224,9 +226,9 @@ class ManageGroupPage extends React.Component{
                             <TouchableOpacity 
                                 style={{width: 36, height: 36, borderRadius: 18, justifyContent:'center', alignItems:'center', backgroundColor:'#BCD1D5'}}
                                 onPress={()=>{
-                                    this.props.navigation.navigate('ListGroupMemberPage', {group})
+                                    this.props.navigation.navigate('ListGroupMemberPage', {group_id: group.group_id})
                                 }}>
-                                <Text style={{color:'white', fontWeight:'bold'}}>{Object.keys(group.members).length}+</Text>
+                                <Text style={{color:'white', fontWeight:'bold'}}>{group.members ?Object.keys(group.members).length:'0' }+</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

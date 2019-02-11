@@ -19,26 +19,6 @@ class ManageClasssPage extends React.Component{
         headerTransparent: true,
         headerTitleStyle:{color:'white'},
         headerTintColor: 'white',
-        // headerRight: (
-        //     <View style={{flexDirection:'row', flex:1}}>
-        //         <TouchableOpacity 
-        //             style={{paddingRight:10}}
-        //             onPress={()=>{
-        //                 Alert.alert(
-        //                     '',
-        //                     'If you leave this group, you\'ll no longer be able to see its member list or chat history Continue?',
-        //                     [
-        //                     //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-        //                       {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-        //                       {text: 'OK', onPress: () => console.log('OK Pressed')},
-        //                     ],
-        //                     { cancelable: false }
-        //                   )
-        //             }}>
-        //             <Text style={{color:'red', fontSize:16, borderWidth: 1, borderColor: 'red', borderRadius: 12, padding: 8, overflow:"hidden",}}>Settings</Text>
-        //         </TouchableOpacity> 
-        //     </View>
-        // ),
     });
 
     constructor(){

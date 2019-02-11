@@ -12,19 +12,11 @@ import { List, ListItem, SearchBar } from "react-native-elements";
 import FastImage from 'react-native-fast-image'
 import Spinner from 'react-native-loading-spinner-overlay';
 
-import Image from 'react-native-remote-svg'
-
-import Styles from '../../styles';
 import DictStyle from './dictStyle';
 
 import * as actions from '../../Actions'
-
-import {API_URL} from '../../Utils/Constant'
-
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
-
 import ImageWithDefault from '../../Utils/ImageWithDefault'
-
 import MyIcon from '../../config/icon-font.js';
 
 const Header = props => (

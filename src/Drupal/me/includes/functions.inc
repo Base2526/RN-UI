@@ -1052,13 +1052,13 @@ function generatorQRCode($account, $platform, $bundleidentifier){
 		  break;
 	  }
   
-	  $value['field_name'] = 'field_profile_multi_email'; // field collection name
-	  $value['field_email_text'][LANGUAGE_NONE][0]['value'] = $account->mail;
+	  // $value['field_name'] = 'field_profile_multi_email'; // field collection name
+	  // $value['field_email_text'][LANGUAGE_NONE][0]['value'] = $account->mail;
   
 	  // Create the field collection entry and associate it with the profile
-	  $field_entity = entity_create('field_collection_item', $value);
-	  $field_entity->setHostEntity('profile2', $profile);
-	  $field_entity->save();
+	  // $field_entity = entity_create('field_collection_item', $value);
+	  // $field_entity->setHostEntity('profile2', $profile);
+	  // $field_entity->save();
   
 	  // Save the profile2 to the user account.
 	  profile2_save($profile); 
