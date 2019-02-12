@@ -21,6 +21,8 @@ import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
 import MyIcon from '../../config/icon-font.js';
 
+import {getUid, getHeaderInset} from '../../Utils/Helpers'
+
 class ListGroupMemberPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
@@ -104,6 +106,11 @@ class ListGroupMemberPage extends React.Component{
         console.log(group)
     }
 
+    getGroupId = () =>{
+        const { navigation } = this.props;
+        return  navigation.getParam('group_id', null);
+    }
+
     loadData = (group) =>{
 
         let members = []
@@ -113,6 +120,8 @@ class ListGroupMemberPage extends React.Component{
             switch(_v.status){
                 case Constant.GROUP_STATUS_MEMBER_INVITED:{
                     pending.push({
+                        item_id:_k,
+                        friend_id:_v.friend_id,
                         name:_v.friend_name,
                         status:_v.status,
                         image_url:_v.friend_image_url
@@ -121,6 +130,8 @@ class ListGroupMemberPage extends React.Component{
                 }
                 case Constant.GROUP_STATUS_MEMBER_JOINED:{
                     members.push({
+                        item_id:_k,
+                        friend_id:_v.friend_id,
                         name:_v.friend_name,
                         status:_v.status,
                         image_url:_v.friend_image_url
@@ -129,6 +140,8 @@ class ListGroupMemberPage extends React.Component{
                 }
                 case Constant.GROUP_STATUS_MEMBER_DECLINE:{
                     decline.push({
+                        item_id:_k,
+                        friend_id:_v.friend_id,
                         name:_v.friend_name,
                         status:_v.status,
                         image_url:_v.friend_image_url
@@ -214,7 +227,23 @@ class ListGroupMemberPage extends React.Component{
                                             borderRadius:10, 
                                             borderWidth:.5,
                                             marginRight:5}}
-                                    onPress={()=>{}}>
+                                    onPress={()=>{
+
+                                        console.log(rowItem)
+
+                                        console.log(this.getGroupId())
+                                        
+                                        // (uid, friend_id, group_id, item_id, callback) 
+                                        // this.setState({loading:true})
+                                        this.props.actionMemberInviteAgainGroup(this.props.uid, rowItem.friend_id, this.getGroupId(), rowItem.item_id, (result) => {
+                                            console.log(result)
+
+                                            // setTimeout(() => {
+                                            //     this.setState({loading:false})
+                                            // }, 100);
+                                        })
+                                        
+                                    }}>
                                     <Text style={{color:'green'}}>Invite</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
@@ -222,7 +251,9 @@ class ListGroupMemberPage extends React.Component{
                                             borderColor:'red', 
                                             borderRadius:10, 
                                             borderWidth:.5}}
-                                    onPress={()=>{}}>
+                                    onPress={()=>{
+                                        alert('cancel')
+                                    }}>
                                     <Text style={{color:'red'}}>Cancel</Text>
                                 </TouchableOpacity>
                                 </View>
@@ -302,7 +333,7 @@ class ListGroupMemberPage extends React.Component{
                     headerOnPress={(i, state) => {
                     } }
                     renderSectionHeaderX={this._renderSection}
-                    openOptions={[0, 1]}
+                    openOptions={[0, 1, 2]}
                     removeClippedSubviews={false}
                 />
         );
@@ -317,6 +348,7 @@ const mapStateToProps = (state) => {
     }
   
     return{
+        uid:getUid(state),
         groups:state.auth.users.groups
     }
 }

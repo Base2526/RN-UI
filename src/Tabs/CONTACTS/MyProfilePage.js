@@ -199,13 +199,25 @@ class MyProfilePage extends React.Component{
     }
 
     render() {
-        let {name, image_url, bg_url, status_message, my_id, gender} = this.props.auth.users.profiles
+        let {name, image_url, bg_url, status_message, gender, my_ids} = this.props.auth.users.profiles
         // let{name, image_url} = this.props.auth.users.profiles;
 
         // My ID
-        if(my_id === undefined || my_id == ''){
+        // if(my_id === undefined || my_id == ''){
+        //     my_id = "Not set"
+        // } 
+
+        // let {my_ids} = this.state.profiles
+        let find_my_id = _.find(my_ids,  function(v, k) { 
+            return v.enable
+        })
+        
+        let my_id = ''
+        if(find_my_id === undefined){
             my_id = "Not set"
-        } 
+        }else{
+            my_id = find_my_id.id
+        }
 
         // console.log(my_id)
 

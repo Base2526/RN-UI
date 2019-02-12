@@ -373,3 +373,22 @@ export const update_group_picture_profile = (uid, group_id, image_uri) =>{
         return {'status': false, 'message': error}
     })
 }
+
+export const check_my_id = (uid, id) => {
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({
+            'uid':uid,
+            'id' :id,
+        }),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.CHECK_MY_ID, data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+        });
+}

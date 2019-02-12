@@ -25,6 +25,7 @@ import {USER_LOGIN_SUCCESS,
         FAVORITES_GROUP,
         MEMBER_JOIN_GROUP,
         MEMBER_DECLINE_GROUP,
+        MEMBER_INVITE_AGAIN_GROUP,
         SELECT_ADD_CLASS,
         CLASS_MEMBERS,
         FRIEND_MUTE,
@@ -75,7 +76,8 @@ import {login,
         create_my_application,
         update_picture_profile,
         update_picture_bg_profile,
-        update_group_picture_profile} from '../Utils/Services'
+        update_group_picture_profile,
+        check_my_id} from '../Utils/Services'
 
 export const actionApplicationCategory = () =>dispatch =>{
     return application_category().then(data=>{
@@ -286,17 +288,21 @@ export const actionAddFriend = (uid, friend_id) => dispatch =>{
 // create_group
 export const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
     return create_group(uid, group_name, members, uri).then(data => {
+        console.log(data)
         if((data instanceof Array)){
             return {'status':false, 'message': data}
         }else{
             if(!data.result){
                 return {'status':false, 'message': data}
             }else{
-
-
                 console.log(data)
+                let newData = { item_id: data.group.item_id, 
+                                 status: data.group.status, 
+                                 group_profile: data.group_profile,
+                                 members: data.members}
 
-                // dispatch({ type: ADD_GROUP, group_id:docSnapshot.id, data:v });
+                console.log(newData)
+                dispatch({ type: ADD_GROUP, group_id:data.item_id, group_data:newData});
 
                 return {'status':true, 'data':data}
             }
@@ -381,6 +387,23 @@ export const actionMemberDeclineGroup = (uid, group_id, member_item_id, callback
 
     dispatch({ type: MEMBER_DECLINE_GROUP, group_id, member_item_id});
     callback({'status':true})
+}
+
+/* 
+ การ invite again (กรณีที่เพือนกด decline แล้วเราจะทำการ invite อีกครั้ง)
+*/
+export const actionMemberInviteAgainGroup = (uid, friend_id, group_id, item_id, callback) => dispatch => {
+    firebase.firestore().collection('users').doc(friend_id).collection('groups').doc(group_id).set({
+        item_id: item_id,
+        status: Constant.GROUP_STATUS_MEMBER_INVITED,
+    }, { merge: true});
+
+    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(item_id).set({
+        status: Constant.GROUP_STATUS_MEMBER_INVITED,
+    }, { merge: true});
+
+    dispatch({ type: MEMBER_INVITE_AGAIN_GROUP, friend_id, group_id, item_id});
+    callback({'status':true, uid, friend_id, group_id, item_id})
 }
 
 export const actionDeleteGroup = (uid, group_id, callback) => dispatch =>{
@@ -519,7 +542,7 @@ export const actionFriendMute = (uid, friend_id, mute, callback) => dispatch=> {
     callback({'status':true})
 }
 
-// FRIEND_FAVORITE
+// friend favorite
 export const actionFriendFavirite = (uid, friend_id, favorite_status, callback) => dispatch=> {
     dispatch({ type: FRIEND_FAVORITE, friend_id, favorite_status});
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
@@ -784,59 +807,84 @@ export const actionRemoveEmailProfile = (uid, email_key, callback) => dispatch =
 }
 
 // my id
-export const actionAddMyIDProfile = (uid, id, callback) => dispatch =>{
-    let key = randomKey()
-    // firebase.firestore().collection('profiles').doc(uid).collection('my_ids').where("id", "==", id).get().then(snapshot => {
-    //     console.log(snapshot.size)
-    //     if(snapshot.size == 0){
-    //         firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(key).set({
-    //             id,
-    //             enable:false
-    //         }, { merge: true})
+export const actionAddMyIDProfile = (uid, id) => dispatch =>{
+    return check_my_id(uid, id).then(data => {
+        // console.log(data)
+        if((data instanceof Array)){
+            return {'status':false, 'message': data.message}
+        }else{
+            if(!data.result){
+                return {'status':false, 'message': data.message}
+            }else{
+                if(data.is_exist){
+                    return {'status':false, 'message': data.message}
+                }else{
+                    let key = randomKey()
+                    let data = {id, enable:false}
+                    firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(key).set(data, { merge: true})
 
-    //         dispatch({ type: ADD_MY_ID_PROFILE, my_id_key:key, id});
-    //         // callback({'status':true})
-    //     }else{
-    //         // callback({'status':false, 'message':'Duplicate id.'})
-    //     }
-    // })
+                    dispatch({ type: ADD_MY_ID_PROFILE, my_id_key:key, my_id_data:data});
+                    // callback({'status':true})
 
-    firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(key).set({
-        id,
-        enable:false
-    }, { merge: true})
-
-    dispatch({ type: ADD_MY_ID_PROFILE, my_id_key:key, id});
-    callback({'status':true})
+                    return {'status':true}
+                }
+            }
+        }
+    })
 }
 
 export const actionRemoveMyIDProfile = (uid, key, callback) => dispatch =>{
-    firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(id).delete()
+    firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(key).delete()
     dispatch({ type: REMOVE_MY_ID_PROFILE, my_id_key:key});
     callback({'status':true})
 }
 
 export const actionSelectMyIDProfile = (uid, id, callback) => dispatch =>{
-    
     if(id == 0){
-        dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:0});
-    }
-
-    // dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:id});
-    firebase.firestore().collection('profiles').doc(uid).collection('my_ids').get().then(snapshot => {
-        snapshot.docs.forEach(doc => {
-            if(doc.id == id){
-                firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(doc.id).set({
-                    enable:true
-                }, { merge: true})
-            }else{
+        firebase.firestore().collection('profiles').doc(uid).collection('my_ids').where('enable', '==', true).get().then(snapshot => {
+            snapshot.docs.forEach(doc => {
+                // console.log(doc.id)  
                 firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(doc.id).set({
                     enable:false
-                }, { merge: true})
-            }
-        });
-    })
-    callback({'status':true})
+                }, { merge: true})            
+            });
+        })
+
+        dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:0});
+        callback({'status':true})
+    }else{
+        dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:id});
+
+        firebase.firestore().collection('profiles').doc(uid).collection('my_ids').where('enable', '==', true).get().then(snapshot => {
+            snapshot.docs.forEach(doc => {
+                // console.log(doc.id)  
+                if(doc.id != id){
+                    firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(doc.id).set({
+                        enable:false
+                    }, { merge: true})    
+                }        
+            });
+        })
+        firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(id).set({
+            enable:true
+        }, { merge: true})
+
+        // firebase.firestore().collection('profiles').doc(uid).collection('my_ids').get().then(snapshot => {
+        //     snapshot.docs.forEach(doc => {
+        //         if(doc.id == id){
+        //             firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(doc.id).set({
+        //                 enable:true
+        //             }, { merge: true})
+        //         }else{
+        //             firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(doc.id).set({
+        //                 enable:false
+        //             }, { merge: true})
+        //         }
+        //     });
+        // })
+        
+        callback({'status':true})
+    }
 }
 
 
@@ -963,12 +1011,14 @@ export function watchTaskEvent(uid, dispatch) {
             }
             if (change.type === 'modified') {
                 console.log(change.type, doc_id, doc_data)
-            
-                dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:doc_id, my_id_data:doc_data});
+                if(doc_data.enable){
+                    console.log(change.type, doc_id, doc_data)
+                    dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:doc_id, my_id_data:doc_data});
+                }
             }
 
             if (change.type === 'removed') {
-                // dispatch({ type: REMOVE_EMAIL_PROFILE, email_key:doc_id});
+                dispatch({ type: REMOVE_MY_ID_PROFILE, my_id_key:doc_id});
             }
         })
     })

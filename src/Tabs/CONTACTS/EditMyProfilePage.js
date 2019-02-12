@@ -715,9 +715,19 @@ class EditMyProfilePage extends React.Component{
         }
 
         // ส่วนของ my id
+        // let my_id = ''
+        // if(this.state.profiles.my_id !== undefined){
+        //     my_id = this.state.profiles.my_id
+        // }
+        let {my_ids} = this.state.profiles
+        let find_my_id = _.find(my_ids,  function(v, k) { 
+            return v.enable
+        })
         let my_id = ''
-        if(this.state.profiles.my_id !== undefined){
-            my_id = this.state.profiles.my_id
+        if(find_my_id === undefined){
+            my_id = "Not set"
+        }else{
+            my_id = find_my_id.id
         }
 
         // gender

@@ -1110,6 +1110,8 @@ function generatorQRCodeForGroupChat($uid, $group_id){
 	$f_item = array("qrcode_url"  => file_create_url(image_style_url('medium', $a_file['uri'])));
 
 	firestore_db()->collection(FIRESTORE_GROUPS)->document($group_id)->set($f_item, ['merge' => true]);
+
+	return $f_item;
 }
 /*
    เป็นการ redirect url store

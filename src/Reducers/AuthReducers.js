@@ -16,6 +16,7 @@ import {USER_LOGIN_SUCCESS,
         FAVORITES_GROUP,
         MEMBER_JOIN_GROUP,
         MEMBER_DECLINE_GROUP,
+        MEMBER_INVITE_AGAIN_GROUP,
         ADDED_GROUP_MEMBER,
         MODIFIED_GROUP_MEMBER,
         REMOVED_GROUP_MEMBER,
@@ -67,6 +68,8 @@ const INITIAL_STATE = {users:null,
                        }
 
 import {isEquivalent2Object} from '../Utils/Helpers'
+
+import Constant from '../Utils/Constant'
 
 export default (state= INITIAL_STATE, action)=>{
     console.log(action)
@@ -716,23 +719,30 @@ export default (state= INITIAL_STATE, action)=>{
                 return state
             }
 
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    profiles : {
-                        ...state.users.profiles,
-                        // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
-                        my_ids : {
-                            ...state.users.profiles.my_ids,
-                            [action.my_id_key]:{id: action.my_id_data.id, enable:false}
+            let my_ids = state.users.profiles.my_ids
+            let my_id = _.find(my_ids,  function(v, k) { 
+                return k == action.my_id_key && _.isEqual(v, action.my_id_data)
+            })
+
+            // console.log(my_id)
+            if(my_id === undefined){
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            my_ids : {
+                                ...state.users.profiles.my_ids,
+                                [action.my_id_key]:action.my_id_data
+                            }
                         }
                     }
                 }
+                // console.log(v)
+                return v
             }
-
-            console.log(v)
-            return v
+            return state
         }
 
         case EDIT_MY_ID_PROFILE:{
@@ -749,7 +759,7 @@ export default (state= INITIAL_STATE, action)=>{
                                     [_k]:{..._v, enable:false}
                                 }
                 });
-                // console.log(newMyIDs)
+
                 let v = {
                     ...state,
                     users : {
@@ -760,49 +770,42 @@ export default (state= INITIAL_STATE, action)=>{
                         }
                     }
                 }
-                // console.log(v)
-                // console.log(state)
                 return v
             }
 
 
-            let my_id = _.find(my_ids,  function(v, k) { 
-                return k == action.my_id_key
-            })
- 
-            if(my_id !== undefined){
-                if(action.my_id_data === undefined){
-                    let newMyIDs = {...my_ids, [action.my_id_key]:{...my_id, enable:true}}
-                    let v = {
-                        ...state,
-                        users : {
-                            ...state.users,
-                            profiles : {
-                                ...state.users.profiles,
-                                my_ids : newMyIDs
-                            }
-                        }
-                    }
-                    return v
-                }
-                if(my_id.enable !== action.my_id_data.enable){
-                    let newMyIDs = {...my_ids, [action.my_id_key]:{...my_id, enable:!my_id.enable}}
-                    let v = {
-                        ...state,
-                        users : {
-                            ...state.users,
-                            profiles : {
-                                ...state.users.profiles,
-                                my_ids : newMyIDs
-                            }
-                        }
-                    }
-                    return v
+            // let my_id = _.find(my_ids,  function(v, k) { 
+            //     return k == action.my_id_key &&  v.enable
+            // })
+            // console.log(my_id)
+            // if(my_id !== undefined){
+            //     return state
+            // }
+
+            // dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:doc_id, my_id_data:doc_data});
+            // console.log(my_id)
+
+            let newMyIds = {}
+            _.each(my_ids, function(_v, _k) { 
+                if(_k === action.my_id_key){
+                    newMyIds = {...newMyIds, [_k]:{..._v, enable:true}}
                 }else{
-                    console.log('#1')
+                    newMyIds = {...newMyIds, [_k]:{..._v, enable:false}}
                 }
-            }
-            return state
+            });
+
+            let v = {...state,
+                        users : {
+                            ...state.users,
+                            profiles : {
+                                ...state.users.profiles,
+                                my_ids : newMyIds
+                            }
+                        }
+                    }
+            console.log(action.my_id_key)
+            console.log(v)
+            return v
         }
 
         case REMOVE_MY_ID_PROFILE:{
@@ -828,8 +831,8 @@ export default (state= INITIAL_STATE, action)=>{
                         }
                     }
                 }
-                console.log(v)
-                // return v
+                // console.log(v)
+                return v
             }
 
             return state
@@ -1015,16 +1018,20 @@ export default (state= INITIAL_STATE, action)=>{
 
             let groups = state.users.groups
 
-            let key = 0
-            let value = null
-            _.each(groups, function(_v, _k) { 
-                if(_k === action.group_id){
-                    key = _k
-                    value = _v
-                }
-            });
+            // let key = 0
+            // let value = null
+            // _.each(groups, function(_v, _k) { 
+            //     if(_k === action.group_id){
+            //         key = _k
+            //         value = _v
+            //     }
+            // });
 
-            if(key == 0){
+            let group = _.find(groups,  function(v, k) { 
+                return k == action.group_id
+            })
+
+            if(group === undefined){
                 let v = {
                     ...state,
                     users : {
@@ -1041,10 +1048,29 @@ export default (state= INITIAL_STATE, action)=>{
 
                 // console.log(_.isEqual(value, action.data))
                 // console.log(isEquivalent2Object(value, action.data))
-                if(!_.isEqual(value, action.data)){
+                // console.log(_.isEqualWith(group, action.data, customizer))
 
-                    // console.log(value)
-                    // console.log(action.data)
+                // function customizer(objValue, othValue) {
+                //     if(objValue.members !== undefined){
+                //         let newObjValue = {...othValue, members:objValue.members}
+                //         console.log(newObjValue)
+                //     }
+                //     console.log(objValue)
+                //     console.log(othValue)
+                //     return true;
+                // }
+
+                let newObjValue = action.data
+                if(group.members !== undefined){
+                    newObjValue = {...action.data, members:group.members}
+                    console.log(newObjValue)
+                }
+
+                if(!_.isEqual(group, newObjValue)){
+
+                    console.log('Not Equal')
+                    console.log(action.data)
+                    console.log(group)
                     
                     let v = {
                         ...state,
@@ -1052,7 +1078,7 @@ export default (state= INITIAL_STATE, action)=>{
                             ...state.users,
                             groups : {
                                 ...state.users.groups,
-                                [action.group_id]: {...value, ...action.data}
+                                [action.group_id]: {...group, ...action.data}
                             }
                         }
                     }
@@ -1060,8 +1086,9 @@ export default (state= INITIAL_STATE, action)=>{
                     // console.log(v)
                     return v
                 }else{
-                    // console.log(value)
+                    console.log('Equal')
                     // console.log(action.data)
+
                 }
             }
 
@@ -1146,34 +1173,58 @@ export default (state= INITIAL_STATE, action)=>{
 
             let groups = state.users.groups
 
-            let key = 0
-            let value = null
-            _.each(groups, function(_v, _k) { 
-                if(_k === action.group_id){
-                    key = _k
-                    value = _v
-                }
-            });
+            // let key = 0
+            // let value = null
+            // _.each(groups, function(_v, _k) { 
+            //     if(_k === action.group_id){
+            //         key = _k
+            //         value = _v
+            //     }
+            // });
+
+            let value = _.find(groups,  function(v, k) { 
+                return k == action.group_id
+            })
+
+            if(value === undefined){
+                return state
+            }
 
             if(value.is_favorites === undefined){
                 value = {...value, is_favorites:true}
-            }else{
-                value = {...value, is_favorites:!value.is_favorites}
-            }
 
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    groups : {
-                        ...state.users.groups,
-                        [action.group_id]: value
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        groups : {
+                            ...state.users.groups,
+                            [action.group_id]: value
+                        }
                     }
+                }
+                return v 
+            }else{
+
+                if(action.favorite_status != value.is_favorites){
+                    value = {...value, is_favorites:action.favorite_status}
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            groups : {
+                                ...state.users.groups,
+                                [action.group_id]: value
+                            }
+                        }
+                    }
+        
+                    // console.log(v)
+                    return v    
                 }
             }
 
-            // console.log(v)
-            return v
+            return state
         }
 
         case MEMBER_JOIN_GROUP:{
@@ -1248,6 +1299,43 @@ export default (state= INITIAL_STATE, action)=>{
             return state
         }
 
+        case MEMBER_INVITE_AGAIN_GROUP:{
+            if(state.users === null){
+                return state
+            }
+
+            // friend_id, group_id, item_id, status:Constant.GROUP_STATUS_MEMBER_INVITED
+            let groups = state.users.groups
+            let group = _.find(groups,  function(v, k) { 
+                return k == action.group_id
+            })
+
+            // console.log(group)
+            if(group !== undefined){ 
+                let member = _.find(group.members,  function(v, k) { 
+                    return k == action.item_id
+                })
+
+                let newGroup = {...group, 
+                                    members: {
+                                        ...group.members,
+                                        [action.item_id]:{...member, status:Constant.GROUP_STATUS_MEMBER_INVITED}
+                                    }
+                                }
+
+                let v = {...state,
+                            users : {
+                                ...state.users,
+                                groups : {
+                                    ...state.users.groups,
+                                    [action.group_id]: newGroup
+                                }
+                            }
+                        }
+                return v   
+            }
+            return state
+        }
 
         case ADDED_GROUP_MEMBER:{
             if(state.users === null){
@@ -1256,23 +1344,29 @@ export default (state= INITIAL_STATE, action)=>{
 
             let groups = state.users.groups
 
-            let key = 0
-            let value = null
-            _.each(groups, function(_v, _k) { 
-                if(_k === action.group_id){
-                    key = _k
-                    value = _v
-                }
-            });
+            // let key = 0
+            // let value = null
+            // _.each(groups, function(_v, _k) { 
+            //     if(_k === action.group_id){
+            //         key = _k
+            //         value = _v
+            //     }
+            // });
 
-            if(value == null){
+            let group = _.find(groups,  function(v, k) { 
+                return k == action.group_id
+            })
+
+            if(group === undefined){
+                console.log(value)
                 return state
             }
 
-            if(value.members === undefined){
-                let newValue = {...value, 
+            if(group.members === undefined){
+                console.log(group)
+                let newGroup = {...group, 
                                     members: {
-                                        ...value.members,
+                                        ...group.members,
                                         [action.item_id]:action.data
                                     }
                                 }
@@ -1282,22 +1376,23 @@ export default (state= INITIAL_STATE, action)=>{
                         ...state.users,
                         groups : {
                             ...state.users.groups,
-                            [action.group_id]: newValue
+                            [action.group_id]: newGroup
                         }
                     }
                 }
                 return v
             }else{
+                console.log(group)
 
-                let oldMember = _.find(value.members,  function(v, k) { 
+                let oldMember = _.find(group.members,  function(v, k) { 
                     return k == action.item_id
                 })
 
                 if(!_.isEqual(oldMember, action.data)){
                     console.log('Not equal')
-                    let newValue = {...value, 
+                    let newGroup = {...group, 
                                         members: {
-                                            ...value.members,
+                                            ...group.members,
                                             [action.item_id]:action.data
                                         }
                                     }
@@ -1308,11 +1403,13 @@ export default (state= INITIAL_STATE, action)=>{
                             ...state.users,
                             groups : {
                                 ...state.users.groups,
-                                [action.group_id]: newValue
+                                [action.group_id]: newGroup
                             }
                         }
                     }
                     return v
+                }else{
+                    console.log('equal')
                 }
             }
 

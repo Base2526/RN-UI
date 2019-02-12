@@ -44,6 +44,7 @@ class ManageGroupPage extends React.Component{
 
         let friends = auth.users.friends
         
+        console.log(groups)
         Object.entries(groups).forEach(([key, value]) => {
             if(group_id === key){
                 let {members} = value
@@ -132,6 +133,8 @@ class ManageGroupPage extends React.Component{
         let groups = nextProps.auth.users.groups;
         let friends = auth.users.friends
         
+        console.log(groups)
+        
         Object.entries(groups).forEach(([key, value]) => {
             if(group_id === key){
                 let {members} = value
@@ -165,6 +168,7 @@ class ManageGroupPage extends React.Component{
                 return;
             }
         });
+        
     }
 
     render() {
@@ -175,6 +179,7 @@ class ManageGroupPage extends React.Component{
         }
 
         console.log(group)
+        // return(<View style={{flex:1, backgroundColor:'#DF2D6C'}}></View>)
         return (
                 <View style={{flex:1, backgroundColor:'#DF2D6C', paddingTop:getHeaderInset()}}>
                     <Spinner

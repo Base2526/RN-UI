@@ -338,7 +338,7 @@ class GroupsPage extends React.Component{
                                         fontWeight: '600', 
                                         paddingBottom:5
                                       }}>
-                              {rowItem.group_profile.name} { rowItem.members === undefined ? '' : "(" + Object.keys(rowItem.members).length +")" }
+                              {rowItem.group_profile.name} { rowItem.group_profile.members === undefined ? '' : "(" + Object.keys(rowItem.group_profile.members).length +")" }
                           </Text>
                         </View>
                     </View>
@@ -351,22 +351,30 @@ class GroupsPage extends React.Component{
                                 borderWidth:.5,
                                 marginRight:5}}
                         onPress={()=>{
-                          let members = rowItem.members
+                          // let members = rowItem.members
+                          // let uid = this.props.uid
+                          // var member_item_id = _.findKey(members, function(item) {
+                          //   return item.friend_id == uid
+                          // })
+
+                          let members = rowItem.group_profile.members
+                          
                           let uid = this.props.uid
-                          var member_item_id = _.findKey(members, function(item) {
+                          var member = _.find(members, function(item, key) {
+                            // return key == uid
                             return item.friend_id == uid
                           })
 
-                          if(member_item_id !== undefined){
+                          if(member !== undefined){
                             this.setState({loading:true})
-                            this.props.actionMemberJoinGroup(this.props.uid, rowItem.group_id, member_item_id, (result) => {
+                            this.props.actionMemberJoinGroup(this.props.uid, rowItem.group_id, member.item_id, (result) => {
                               console.log(result)
                               setTimeout(() => {
                                 this.setState({loading:false})
                               }, 100);
                             })
                           }else{
-                            console.log(member_item_id)
+                            console.log(member)
                           }
                         }}>
                         <Text style={{color:'green'}}>Join</Text>
@@ -377,15 +385,23 @@ class GroupsPage extends React.Component{
                                 borderRadius:10, 
                                 borderWidth:.5}}
                         onPress={()=>{
-                          let members = rowItem.members
+                          let members = rowItem.group_profile.members
+                          
                           let uid = this.props.uid
-                          var member_item_id = _.findKey(members, function(item) {
+                          var member = _.find(members, function(item, key) {
+                            // return key == uid
                             return item.friend_id == uid
                           })
 
-                          if(member_item_id !== undefined){
+                          console.log(uid)
+                          console.log(members)
+                          console.log(member)
+                          if(member !== undefined){
+
+                            // console.log(rowItem.group_id, member.item_id)
+                          
                             this.setState({loading:true})
-                            this.props.actionMemberDeclineGroup(this.props.uid, rowItem.group_id, member_item_id, (result) => {
+                            this.props.actionMemberDeclineGroup(this.props.uid, rowItem.group_id, member.item_id, (result) => {
                               console.log(result)
 
                               setTimeout(() => {
@@ -393,7 +409,7 @@ class GroupsPage extends React.Component{
                               }, 100);
                             })
                           }else{
-                            console.log(member_item_id)
+                            console.log(member)
                           }
                         }}>
                         <Text style={{color:'red'}}>Decline</Text>

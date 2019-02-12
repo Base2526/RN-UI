@@ -1658,6 +1658,16 @@ function me_services_resources()
       ),
     ),
 
+    'check_my_id'=>array(
+      'create' =>array(
+        'help'=>'Services check my id is token',
+        'callback'=>'check_my_id',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+      ),
+    ),
+
     'shby_class'=>array(
       'create' =>array(
         'help'=>'Services Send Heart by Class',
@@ -6047,38 +6057,9 @@ function people_you_may_know(){
 
     $data_item_load = field_collection_item_load($value['value']);
 
-    // 
-    // field_heart_friend_status == 99 เราจะนํามาคิดด้วย
-    // if ($data->field_heart_friend_status[LANGUAGE_NONE][0]['value'] != '99') {
-    //   # code...
-    //   $uid_friends[] = $data->field_friend_uid[LANGUAGE_NONE][0]['value'];
-    // }
-
-    // field_heart_friend_status
-
-    // $data_item_load->field_friend_status[LANGUAGE_NONE][0]['tid']
-
-    /*
-    if (strcasecmp($data_item_load->field_friend_status[LANGUAGE_NONE][0]['tid'], '11') == 0) {
-      # code...
-      $tm[] = $data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'];
-      continue;
-    }else if (strcasecmp($data_item_load->field_friend_status[LANGUAGE_NONE][0]['tid'], '12') == 0) {
-      # code...
-      $tm[] = $data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'];
-      continue;
-    }
-    /*else if (strcasecmp($data_item_load->field_heart_friend_status[LANGUAGE_NONE][0]['value'], '-4') == 0) {
-      # code...
-      $tm[] = $data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'];
-      continue;
-    }
-    */
-
     $uid_friends[] = $data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'];
   }
   // เป้นการโหลดข้อมูลของ profile user ซึ่งจะได้รู้ว่า friend ของ user 
-
 
   $uids = db_select('users', 'ur')
         ->fields('ur', array('uid'))
@@ -6099,23 +6080,6 @@ function people_you_may_know(){
     $tmp['uid'] = $account->uid;
     // $tmp['name'] = $account->name;
     $tmp['mail'] = $account->mail;
-
-/*
-    // $path= file_create_url($uri)  uri
-    if(!is_null($account->picture)){
-      $tmp['url_image'] = file_create_url($account->picture->uri); 
-    }else{
-      $tmp['url_image'] = "";
-    }
-
-    */
-
-
-  
-    // $friend_user_fields = user_load($account->uid);
-    // $profile_friend = profile2_load(profile2_load_by_user($friend_user_fields, NULL)['main']->pid);
-
-    // 
 
     $profile_friend = profile2_by_uid_load($account->uid, 'main');
     $tmp['name'] = $profile_friend->field_profile_name[LANGUAGE_NONE][0]['value'];
@@ -6139,6 +6103,42 @@ function people_you_may_know(){
   return $result;
 }
 
+function check_my_id(){
+  $result = array();
+
+  if (!check_header()) {
+    $result['result'] = FALSE;
+    $result['message']= "check_header()";
+    return $result;
+  }
+
+  $param = json_decode(file_get_contents('php://input'), true);
+
+  if (empty($param['uid']) || empty($param['id'])) {
+    $result['result']   = FALSE;
+    $result['message']  = "function : check_my_id, parameter";
+    return $result;
+  }
+
+  $query    = new EntityFieldQuery();
+  $entities = $query->entityCondition('entity_type', 'field_collection_item')
+                    ->entityCondition('bundle', 'field_profile_my_id')
+                    ->fieldCondition('field_profile_my_id_value', 'value', $param['id'], '=')
+                    ->execute();
+
+  if (!empty($entities['field_collection_item'])) {
+    // $item_id = array_keys($entities['field_collection_item'])[0];
+
+    $result['result']   = TRUE;
+    $result['is_exist'] = TRUE;
+    $result['message']  = $param['id'] . " is exist.";
+    return $result;
+  }
+
+  $result['result']   = TRUE;
+  $result['is_exist'] = FALSE;
+  return $result;
+}
 
 function edit_display_name(){
   $result = array();
@@ -14218,7 +14218,7 @@ function create_chat_group(){
   // เป็นการสร้าง qrcode for group chat เราจะสั่งให้รัน background process
   background_process_start('generatorQRCodeForGroupChat', $param_uid, $node->nid);
 
-  // generatorQRCodeForGroupChat($param_uid, $node->nid);
+  $qrcode_url = generatorQRCodeForGroupChat($param_uid, $node->nid);
 
   /*
   invited: 35
@@ -14393,7 +14393,9 @@ function create_chat_group(){
                   "creator_id" => $param_uid,
                   // "members"    => $f_members,
                   // "image_url"  => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
-                  "image_url"  => file_create_url(image_style_url('medium', $image_url['uri']))
+                  "image_url"  => file_create_url(image_style_url('medium', $image_url['uri'])),
+                  // members: {1123737: {…}, 1123739: {…}, 1123741: {…}}
+                  "qrcode_url" => $qrcode_url["qrcode_url"],
                 );
 
   // FIRESTORE_GROUPS
@@ -14402,7 +14404,8 @@ function create_chat_group(){
 
 
   $result['result']       = TRUE;
-  $result['group_detail'] = $f_item;
+  $result['group_profile']= $f_item;
+  $result['members']      = $f_members;
   // $result['t']            = $t;
 
   /*

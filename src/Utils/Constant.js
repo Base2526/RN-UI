@@ -29,6 +29,8 @@ module.exports = {
     UPDATE_PICTURE_BG_PROFILE: API_URL + END_POINT + '/update_picture_bg_profile',
 
     UPDATE_GROUP_PICTURE_PROFILE: API_URL + END_POINT + '/update_group_picture_profile',
+    
+    CHECK_MY_ID: API_URL + END_POINT + '/check_my_id',
     // 'Content-Type': 'multipart/form-data'
     FETCH_HEADERS: {
         'Accept': 'application/json',
