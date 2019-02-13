@@ -17,6 +17,10 @@ import CenterSearch from './CenterSearch'
 
 import ManageMyApplicationPage from './ManageMyApplicationPage'
 
+
+import MyApplicationMyPost from './MyApplicationMyPost'
+import MyApplicationAddPost from './MyApplicationAddPost'
+
 const index = createStackNavigator({
     'Home': {
         screen: Home,
@@ -78,14 +82,105 @@ const index = createStackNavigator({
         title: '',
       }
     },
+    'MyApplicationMyPost': {
+      screen: MyApplicationMyPost,
+      navigationOptions: {
+        title: '',
+      }
+    },
+    // 'MyApplicationAddPost': {
+    //   screen: MyApplicationAddPost,
+    //   navigationOptions: {
+    //     title: '',
+    //   }
+    // }
 });
 
-index.navigationOptions = ({ navigation }) => {
-    let { routeName } = navigation.state.routes[navigation.state.index];
-    let navigationOptions = {};
+const MyApplicationAddPostNavigator = createStackNavigator(
+  {
+    'MyApplicationAddPost': {screen: MyApplicationAddPost},
+    // 'EditGroupNamePage': {screen: EditGroupNamePage}
+  },
+  {
+    // headerMode: 'none',
+  },
+);
+
+
+const MainModalNavigator = createStackNavigator(
+  {
+    'index': { screen: index },
+    'MyApplicationAddPostNavigator': { screen: MyApplicationAddPostNavigator },
+    // 'ListGroupMemberNavigator': { screen: ListGroupMemberNavigator,},
+    // // 'ListClassUserPageX': {
+    // //   screen: ListClassUserPage,
+      
+    // // },
+    // 'GroupSettingsNavigator': {screen: GroupSettingsNavigator},
+    // 'ClasssSettingsNavigator': {screen: ClasssSettingsNavigator},
+    
+    // // 'ClasssSettingsPage': {screen: ClasssSettingsPage},
+    // 'ClasssMemberAddFriend': {screen: ClasssMemberAddFriend},
+    
+    // 'MyQRcodeNavigator': {screen: MyQRcodeNavigator},
+    // 'BasicInfoNavigator': {screen: BasicInfoNavigator},
+
+    // 'ContactInfoNavigator': {screen: ContactInfoNavigator}
+  },
+  {
+    mode: 'modal',
+    headerMode: 'none',
+  },
+);
+
+
+MainModalNavigator.navigationOptions = ({ navigation }) => {
+    // let { routeName } = navigation.state.routes[navigation.state.index];
+    // let navigationOptions = {};
   
-    // set tabbar visible
-    if (routeName === 'CreateApplicationPage' || 
+    // // set tabbar visible
+    // if (routeName === 'CreateApplicationPage' || 
+    //     routeName === 'ApplicationDetailPage' ||
+    //     routeName === 'ListAllCategory' ||
+    //     routeName === 'ListAllSubcategory' ||
+    //     routeName === 'Comment' ||
+    //     routeName === 'MyProfilePage' ||
+    //     routeName === 'MyApplicationProfilePage' ||
+    //     routeName === 'CenterSearch'||
+    //     routeName === 'ManageMyApplicationPage' ||
+    //     routeName === 'MyApplicationMyPost' ||
+    //     routeName === 'MyApplicationAddPost') {
+    //   navigationOptions.tabBarVisible = false;
+    // }
+
+    let { routeName, routes } = navigation.state.routes[navigation.state.index];
+    let navigationOptions = {};
+
+    if(routes === undefined){
+      console.log(routeName)
+      if(routeName === 'CreateApplicationPage' || 
+          routeName === 'ApplicationDetailPage' ||
+        routeName === 'ListAllCategory' ||
+        routeName === 'ListAllSubcategory' ||
+        routeName === 'Comment' ||
+        routeName === 'MyProfilePage' ||
+        routeName === 'MyApplicationProfilePage' ||
+        routeName === 'CenterSearch'||
+        routeName === 'ManageMyApplicationPage' ||
+        routeName === 'MyApplicationMyPost' ||
+        routeName === 'MyApplicationAddPost') {
+        //  routeName === 'MyProfileEditBasicInfoPage' ||
+        //  routeName === 'MyProfileEditContactInfoPage'
+        
+        navigationOptions.tabBarVisible = false;
+        return navigationOptions;
+      }
+      return;
+    }
+
+    routeName = routes[navigation.state.routes[navigation.state.index].index].routeName;
+
+    if(routeName === 'CreateApplicationPage' || 
         routeName === 'ApplicationDetailPage' ||
         routeName === 'ListAllCategory' ||
         routeName === 'ListAllSubcategory' ||
@@ -93,11 +188,13 @@ index.navigationOptions = ({ navigation }) => {
         routeName === 'MyProfilePage' ||
         routeName === 'MyApplicationProfilePage' ||
         routeName === 'CenterSearch'||
-        routeName === 'ManageMyApplicationPage') {
+        routeName === 'ManageMyApplicationPage' ||
+        routeName === 'MyApplicationMyPost' ||
+        routeName === 'MyApplicationAddPost') {
       navigationOptions.tabBarVisible = false;
     }
   
     return navigationOptions;
 };
 
-export default index
+export default MainModalNavigator

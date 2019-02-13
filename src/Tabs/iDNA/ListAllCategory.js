@@ -60,7 +60,6 @@ class ListAllCategory extends Component {
       const { navigation } = this.props;
       const category_select = navigation.getParam('category_select', null);
       
-
       // กรณีสร้าง application ใหม่
       let {application_category} = this.props.auth
       if(application_category != null){

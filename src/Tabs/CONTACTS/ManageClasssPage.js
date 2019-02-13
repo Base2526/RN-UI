@@ -13,6 +13,8 @@ import Image from 'react-native-remote-svg'
 import {getHeaderInset} from '../../Utils/Helpers'
 import * as actions from '../../Actions'
 
+import MyIcon from '../../config/icon-font.js';
+
 class ManageClasssPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
@@ -194,11 +196,17 @@ class ManageClasssPage extends React.Component{
                             style={{ width: 30, height: 30}}
                             source={require('../../Images/icon-group-arrow.svg')}
                         /> */}
-                        <Image
+                        {/* <Image
                             style={{ width: 30, height: 30}}
                             source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28.26" height="27.305" viewBox="0 0 28.26 27.305">
                             <path id="Path_1995" data-name="Path 1995" d="M-836.388-3198.788l3.9,9h9.293l-7.193,6.95,3.4,9.354-9.4-5.854-9.195,5.854,2.945-9.354-6.817-6.95h9.067Z" transform="translate(850.454 3199.788)" fill="none" stroke="#bcd1d5" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                            </svg>`}} />
+                            </svg>`}} /> */}
+
+                        <MyIcon
+                            // name={group.is_favorites ? 'star' : 'star-empty' } // star
+                            name={'star'}
+                            size={30}
+                            color={'#C7D8DD'} />
                     </TouchableOpacity>
                     <View style={{paddingLeft:5}}>
                         <Text style={{fontSize:26, fontWeight:'bold', textAlignVertical: 'bottom', color:'#BCD1D5'}}>{data.name}</Text>

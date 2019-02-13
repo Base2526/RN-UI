@@ -19,9 +19,6 @@ import FastImage from 'react-native-fast-image'
 import ImageViewer from 'react-native-image-zoom-viewer';
 
 import Modalbox from 'react-native-modalbox';
-// import Slider from 'react-native-slider';
-
-import {Button} from 'react-native-elements'
 
 // import {ModalAction, ActionItem} from 'react-native-modal-action';
 
