@@ -12,11 +12,8 @@ import { List, ListItem, SearchBar } from "react-native-elements";
 import FastImage from 'react-native-fast-image'
 import Spinner from 'react-native-loading-spinner-overlay';
 
-import DictStyle from './dictStyle';
-
 import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
-import ImageWithDefault from '../../Utils/ImageWithDefault'
 import MyIcon from '../../config/icon-font.js';
 
 const Header = props => (
@@ -114,16 +111,7 @@ class AddFriendsPage extends React.Component{
   };
     
   handleRefresh = () => {
-    // this.setState(
-    //   {
-    //     page: 1,
-    //     seed: this.state.seed + 1,
-    //     refreshing: true
-    //   },
-    //   () => {
-    //     this.makeRemoteRequest();
-    //   }
-    // );
+
   };
 
   handleLoadMore = () => {
@@ -221,24 +209,30 @@ class AddFriendsPage extends React.Component{
                   style={{
                     alignItems: 'center', 
                     padding: 10,
-                    borderColor: DictStyle.colorSet.lineColor,
+                    // borderColor: DictStyle.colorSet.lineColor,
                     flexDirection: 'row',
-                    backgroundColor: 'white'
+                    backgroundColor: 'white',
+                    height: 80
                   }}>
-                  <View style={{flex:1, alignItems:'center'}}>
+                  <View style={{flex:1, alignItems:'center', }}>
                     <TouchableOpacity 
-                      style={{
-                              height: 40,
-                              width: 40,
-                              borderRadius: 10,
-                              alignItems:'center'}}
                       onPress={
                         ()=>this.props.navigation.navigate("FriendProfilePage")
                       }>
-                      <ImageWithDefault 
-                        source={{uri: item.url_image}}
-                        style={{width: 40, height: 40, borderRadius: 10, borderWidth:1, borderColor:'gray'}}
-                      />
+                      <FastImage
+                        style={{width: 60, 
+                                height: 60, 
+                                borderRadius: 10, 
+                                borderWidth:1, 
+                                borderColor:'gray'
+                              }}
+                        source={{
+                          uri: item.url_image,
+                          headers:{ Authorization: 'someAuthToken' },
+                          priority: FastImage.priority.normal,
+                        }}
+                        resizeMode={FastImage.resizeMode.normal}
+                    />
                     </TouchableOpacity>
                   </View>
                   <View style={{flex:3}}>
@@ -247,111 +241,58 @@ class AddFriendsPage extends React.Component{
                             ()=>this.props.navigation.navigate("FriendProfilePage")
                           }>
                       <Text style={{
-                                  fontSize: 18, 
-                                  color: DictStyle.colorSet.normalFontColor,
+                                  fontSize: 14, 
+                                  // color: DictStyle.colorSet.normalFontColor,
                                   paddingLeft: 5}}>
                           {item.name}
                       </Text>
                     </TouchableOpacity>
                   </View>
-                  {/* <View style={{flex:2}}> */}
-                  {/*
-                    <TouchableOpacity
-                        style={{
-                            borderRadius:10,
-                            top:3,
-                            right:0,
-                            borderWidth:1,
-                            borderColor:'gray',
-                            alignItems:'center',
-                            padding:10}}
-                          onPress={
-                            ()=>{
-                              // console.log(item.uid)
-                              // console.log(this.props.uid)
-                              // this.props.navigation.goBack()
+                  <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
+                    <View style={{borderColor:'green', borderWidth:1, borderRadius:10, padding:5}}>
+                      <TouchableOpacity
+                      onPress={()=>{
 
-                              let uid = this.props.uid
-                              let friend_id = item.uid
+                        let uid = this.props.uid
+                        let friend_id = item.uid
 
-                              this.setState({loading:true})
-                              this.props.actionAddFriend(uid, friend_id).then((result) => {
-                                console.log(result)
+                        this.setState({loading:true})
+                        this.props.actionAddFriend(uid, friend_id).then((result) => {
+                          console.log(result)
 
-                                console.log('uid : ' + uid)
-                                console.log('friend_id : ' + friend_id)
+                          console.log('uid : ' + uid)
+                          console.log('friend_id : ' + friend_id)
 
-                                this.setState({loading:false})
-                                // this.setState({loading: false})
-                                if(result.status){
-                                  // this.props.navigation.navigate("App") 
-                                  // this.setState({data:result.data.data});
+                          this.setState({loading:false})
+                          // this.setState({loading: false})
+                          if(result.status){
+                            // this.props.navigation.navigate("App") 
+                            // this.setState({data:result.data.data});
 
-                                  switch(result.data.friend_status){
-                                    case 99:{
-                                      
-                                    }
-                                    case -1:{
-
-                                    }
-                                  }
-                                }else{
-                          
-                                }
-                              })
-                            }
-                          }>
-                        <Text style={{color:'red', fontSize:14}}>Add Friend</Text>
-                    </TouchableOpacity>
-                        */}
-
-                    <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
-                      <View style={{borderColor:'green', borderWidth:1, borderRadius:10, padding:5}}>
-                        <TouchableOpacity
-                        onPress={()=>{
-
-                          let uid = this.props.uid
-                          let friend_id = item.uid
-
-                          this.setState({loading:true})
-                          this.props.actionAddFriend(uid, friend_id).then((result) => {
-                            console.log(result)
-
-                            console.log('uid : ' + uid)
-                            console.log('friend_id : ' + friend_id)
-
-                            this.setState({loading:false})
-                            // this.setState({loading: false})
-                            if(result.status){
-                              // this.props.navigation.navigate("App") 
-                              // this.setState({data:result.data.data});
-
-                              switch(result.data.friend_status){
-                                case 99:{
-                                  
-                                }
-                                case -1:{
-
-                                }
+                            switch(result.data.friend_status){
+                              case 99:{
+                                
                               }
-                            }else{
-                      
+                              case -1:{
+
+                              }
                             }
-                          })
-                        }}>
-                          <Text style={{color:'green'}}>Add friend</Text>
-                        </TouchableOpacity>
-                      </View>
-                      <View style={{borderColor:'red', borderWidth:1, borderRadius:10, padding:5, marginLeft:5}}>
-                        <TouchableOpacity
-                        onPress={()=>alert('Cancel')}>
-                          <Text style={{color:'red'}}>Cancel</Text>
-                        </TouchableOpacity>
-                      </View>
+                          }else{
+                    
+                          }
+                        })
+                      }}>
+                        <Text style={{color:'green', fontSize:14}}>Add friend</Text>
+                      </TouchableOpacity>
                     </View>
-                  {/* </View> */}
-                </View>
-          )
+                    <View style={{borderColor:'red', borderWidth:1, borderRadius:10, padding:5, marginLeft:5}}>
+                      <TouchableOpacity
+                      onPress={()=>alert('Cancel')}>
+                        <Text style={{color:'red', fontSize:14}}>Cancel</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>)
       }
     }   
   }

@@ -20,5 +20,8 @@
 .icon-star:before { content: '\e812'; } /* '' */
 .icon-volume-off:before { content: '\e813'; } /* '' */
 .icon-volume-low:before { content: '\e814'; } /* '' */
+.icon-call:before { content: '\e815'; } /* '' */
+.icon-friend-chat:before { content: '\e816'; } /* '' */
+.icon-all-app:before { content: '\e817'; } /* '' */
 .icon-menu:before { content: '\f0c9'; } /* '' */
 .icon-dot-circled:before { content: '\f192'; } /* '' */

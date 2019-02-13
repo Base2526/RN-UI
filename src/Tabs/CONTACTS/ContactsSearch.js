@@ -280,7 +280,7 @@ class ContactsSearch extends React.Component{
                                   paddingRight:10,
                                   marginLeft:10,
                                   // backgroundColor:this.state.data.length -1 == 10?'gray':'red',
-                                  backgroundColor:'red',
+                                  backgroundColor:'#CE3B6E',
                                   justifyContent:'center'}}
                           onPress={()=>{
                               this.handleSearch()

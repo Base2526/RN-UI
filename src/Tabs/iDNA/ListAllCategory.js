@@ -154,7 +154,7 @@ class ListAllCategory extends Component {
                   }}>
                   <TouchableHighlight>
                       <FastImage
-                          style={{width: 35, height: 35, borderRadius: 17}}
+                          style={{width: 35, height: 35, borderRadius: 5, borderColor:'gray', borderWidth:.5}}
                           source={{
                           uri: item.field_image,
                           headers:{ Authorization: 'someAuthToken' },

@@ -6,6 +6,7 @@ import {View,
 
 import { connect } from 'react-redux';
 import Spinner from 'react-native-loading-spinner-overlay';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import * as actions from '../../Actions'
 import {getUid} from '../../Utils/Helpers'
@@ -42,7 +43,6 @@ class EditAddressPage extends React.Component{
 
     constructor(props) {
       super(props);
-
       this.state = {
           text:'',
           loading:false
@@ -51,8 +51,6 @@ class EditAddressPage extends React.Component{
   
     componentDidMount() {
         this.props.navigation.setParams({handleSave: this.handleSave })
-
-
         this.setState({text:this.props.profiles.address === undefined ?'':this.props.profiles.address})
     }
 
@@ -85,7 +83,7 @@ class EditAddressPage extends React.Component{
     }
       
     render() {
-        return (<View style={{margin:10}}>
+        return (<KeyboardAwareScrollView><View style={{margin:10}}>
                     <Spinner
                         visible={this.state.loading}
                         textContent={'Wait...'}
@@ -111,7 +109,8 @@ class EditAddressPage extends React.Component{
                             placeholder= {this.state.text}
                         />
                     </View>
-                </View>)
+                </View>
+                </KeyboardAwareScrollView>)
     }
 }
 

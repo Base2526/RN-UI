@@ -48,6 +48,18 @@ import {USER_LOGIN_SUCCESS,
         ADD_PHONE_PROFILE,
         EDIT_PHONE_PROFILE,
         REMOVE_PHONE_PROFILE,
+
+        ADD_PHONE_FRIEND,
+        EDIT_PHONE_FRIEND,
+        REMOVE_PHONE_FRIEND,
+
+        ADD_WEBSITE_FRIEND,
+        EDIT_WEBSITE_FRIEND,
+        REMOVE_WEBSITE_FRIEND,
+
+        ADD_EMAIL_FRIEND,
+        EDIT_EMAIL_FRIEND,
+        REMOVE_EMAIL_FRIEND,
     
         ADDRESS_PROFILE,
 
@@ -908,23 +920,23 @@ export function watchTaskEvent(uid, dispatch) {
     })
 
     // track profile > intereste_in
-    firebase.firestore().collection('profiles').doc(uid).collection('intereste_in').onSnapshot((querySnapshot) => {
-        querySnapshot.docChanges.forEach(function(change) {
+    // firebase.firestore().collection('profiles').doc(uid).collection('intereste_in').onSnapshot((querySnapshot) => {
+    //     querySnapshot.docChanges.forEach(function(change) {
 
-            let doc_id   = change.doc.id
-            let doc_data = change.doc.data()
-            if (change.type === 'added') {  
-                dispatch({ type: INTERESTE_IN_PROFILE, interestein_key:doc_id, interestein_id:doc_data.id, interestein_status:doc_data.enable});
-            }
-            if (change.type === 'modified') {
-                dispatch({ type: INTERESTE_IN_PROFILE, interestein_key:doc_id, interestein_id:doc_data.id, interestein_status:doc_data.enable});
-            }
+    //         let doc_id   = change.doc.id
+    //         let doc_data = change.doc.data()
+    //         if (change.type === 'added') {  
+    //             // dispatch({ type: INTERESTE_IN_PROFILE, interestein_key:doc_id, interestein_id:doc_data.id, interestein_status:doc_data.enable});
+    //         }
+    //         if (change.type === 'modified') {
+    //             // dispatch({ type: INTERESTE_IN_PROFILE, interestein_key:doc_id, interestein_id:doc_data.id, interestein_status:doc_data.enable});
+    //         }
 
-            if (change.type === 'removed') {
+    //         if (change.type === 'removed') {
                 
-            }
-        })
-    })
+    //         }
+    //     })
+    // })
 
     // track profile > phones
     firebase.firestore().collection('profiles').doc(uid).collection('phones').onSnapshot((querySnapshot) => {
@@ -1023,7 +1035,6 @@ export function watchTaskEvent(uid, dispatch) {
         })
     })
     
-
     // track friends
     firebase.firestore().collection('users').doc(uid).collection('friends').onSnapshot((querySnapshot) => {
         // console.log(querySnapshot)
@@ -1039,6 +1050,117 @@ export function watchTaskEvent(uid, dispatch) {
                     } else {
                         dispatch({ type: ADD_FRIEND, friend_id:change.doc.id, data:change.doc.data(), profile:friendDocSnapshot.data()});
                     }
+                })
+
+                // track friends > intereste_in
+                // firebase.firestore().collection('profiles').doc(change.doc.id).collection('intereste_in').onSnapshot((intereste_inSnapshot) => {
+                //     intereste_inSnapshot.docChanges.forEach(function(intereste_inChange) {
+                //         console.log(intereste_inChange.type)
+
+                //         console.log(change.doc.id, intereste_inChange.doc.id, intereste_inChange.doc.data())
+                //         if (intereste_inChange.type === 'added') {
+                //             // friend_id:change.doc.id, data:change.doc.data()
+                //         }
+
+                //         if (intereste_inChange.type === 'modified') {
+
+                //         }
+
+                //         if (intereste_inChange.type === 'removed') {
+
+                //         }
+                //     })
+                // })
+
+                // track friends > phones
+                firebase.firestore().collection('profiles').doc(change.doc.id).collection('phones').onSnapshot((phonesSnapshot) => {
+                    phonesSnapshot.docChanges.forEach(function(phonesChange) {
+                        console.log(phonesChange.type)
+
+                        console.log(change.doc.id, phonesChange.doc.id, phonesChange.doc.data())
+                        if (phonesChange.type === 'added') {
+                            // friend_id:change.doc.id, data:change.doc.data()
+
+                            dispatch({ type: ADD_PHONE_FRIEND, friend_id:change.doc.id, phone_key:phonesChange.doc.id, phone_data:phonesChange.doc.data()})
+                        }
+
+                        if (phonesChange.type === 'modified') {
+
+                        }
+
+                        if (phonesChange.type === 'removed') {
+
+                        }
+                    })
+                })
+
+
+                /* 
+                ADD_WEBSITE_FRIEND
+                */
+                // track friends > websites
+                firebase.firestore().collection('profiles').doc(change.doc.id).collection('websites').onSnapshot((websitesSnapshot) => {
+                    websitesSnapshot.docChanges.forEach(function(websitesChange) {
+                        console.log(websitesChange.type)
+
+                        console.log(change.doc.id, websitesChange.doc.id, websitesChange.doc.data())
+                        if (websitesChange.type === 'added') {
+                            // friend_id:change.doc.id, data:change.doc.data()
+
+
+                            dispatch({ type: ADD_WEBSITE_FRIEND, friend_id:change.doc.id, website_key:websitesChange.doc.id, website_data:websitesChange.doc.data()})
+                        }
+
+                        if (websitesChange.type === 'modified') {
+
+                        }
+
+                        if (websitesChange.type === 'removed') {
+
+                        }
+                    })
+                })
+
+                // track friends > emails
+                firebase.firestore().collection('profiles').doc(change.doc.id).collection('emails').onSnapshot((emailsSnapshot) => {
+                    emailsSnapshot.docChanges.forEach(function(emailsChange) {
+                        console.log(emailsChange.type)
+
+                        console.log(change.doc.id, emailsChange.doc.id, emailsChange.doc.data())
+                        if (emailsChange.type === 'added') {
+                            // friend_id:change.doc.id, data:change.doc.data()
+
+                            dispatch({ type: ADD_EMAIL_FRIEND, friend_id:change.doc.id, email_key:emailsChange.doc.id, email_data:emailsChange.doc.data()})
+                        }
+
+                        if (emailsChange.type === 'modified') {
+
+                        }
+
+                        if (emailsChange.type === 'removed') {
+
+                        }
+                    })
+                })
+
+                // track friends > my_ids
+                firebase.firestore().collection('profiles').doc(change.doc.id).collection('my_ids').onSnapshot((my_idsSnapshot) => {
+                    my_idsSnapshot.docChanges.forEach(function(my_idsChange) {
+                        console.log(my_idsChange.type)
+
+                        console.log(change.doc.id, my_idsChange.doc.id, my_idsChange.doc.data())
+                        if (my_idsChange.type === 'added') {
+                            // friend_id:change.doc.id, data:change.doc.data()
+                        }
+
+                        if (my_idsChange.type === 'modified') {
+
+                        }
+
+                        if (my_idsChange.type === 'removed') {
+
+                        }
+                    })
                 })
             }
             if (change.type === 'modified') {

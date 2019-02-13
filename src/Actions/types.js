@@ -63,6 +63,18 @@ export const ADD_PHONE_PROFILE              = 'add_phone_profile'
 export const EDIT_PHONE_PROFILE             = 'edit_phone_profile'
 export const REMOVE_PHONE_PROFILE           = 'remove_phone_profile'
 
+export const ADD_WEBSITE_FRIEND             = 'add_websites_friend'
+export const EDIT_WEBSITE_FRIEND            = 'edit_websites_friend'
+export const REMOVE_WEBSITE_FRIEND          = 'remove_websites_friend'
+
+export const ADD_PHONE_FRIEND               = 'add_phone_friend'
+export const EDIT_PHONE_FRIEND              = 'edit_phone_friend'
+export const REMOVE_PHONE_FRIEND            = 'remove_phone_friend'
+
+export const ADD_EMAIL_FRIEND               = 'add_email_friend'
+export const EDIT_EMAIL_FRIEND              = 'edit_email_friend'
+export const REMOVE_EMAIL_FRIEND            = 'remove_email_friend'
+
 export const ADDRESS_PROFILE                = 'address_profile'
 
 export const ADD_WEBSITE_PROFILE            = 'add_website_profile'

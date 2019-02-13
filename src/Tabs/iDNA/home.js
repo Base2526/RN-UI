@@ -43,8 +43,8 @@ export default class home extends Component {
             break
             case 1:{
                 __headerRight = <TouchableOpacity
-                        style={{height: 20,
-                                width: 30,
+                        style={{height: 25,
+                                width: 25,
                                 alignItems:'center', 
                                 marginRight:10}}
                     onPress={() => {
@@ -66,13 +66,13 @@ export default class home extends Component {
             // title: "iDNA",
             headerTintColor: 'white',
             headerStyle: {
-            backgroundColor: 'rgba(186, 53, 100, 1.0)',
-            // ios navigationoptions underline hide
-            borderBottomWidth: 0,
+                backgroundColor: 'rgba(186, 53, 100, 1.0)',
+                // ios navigationoptions underline hide
+                borderBottomWidth: 0,
 
-            // android navigationoptions underline hide
-            elevation: 0,
-            shadowOpacity: 0
+                // android navigationoptions underline hide
+                elevation: 0,
+                shadowOpacity: 0
             },
             headerLeft: (
                 <TouchableOpacity

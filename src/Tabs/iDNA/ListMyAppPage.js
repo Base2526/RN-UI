@@ -10,7 +10,9 @@ import ExpandableList from 'react-native-expandable-section-flatlist'
 import FastImage from 'react-native-fast-image'
 import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
-import Image from 'react-native-remote-svg'
+// import Image from 'react-native-remote-svg'
+
+import MyIcon from '../../config/icon-font.js';
 
 import Spinner from 'react-native-loading-spinner-overlay';
 
@@ -285,9 +287,7 @@ class ListMyAppPage extends React.Component{
             //     rowID: rowId,
             //   })
             // }}
-            close={(this.state.sectionID === sectionId && this.state.rowID === rowId)}
-            
-            >
+            close={(this.state.sectionID === sectionId && this.state.rowID === rowId)}>
         <TouchableOpacity 
           key={ rowId } 
           onPress={()=>{
@@ -335,21 +335,10 @@ class ListMyAppPage extends React.Component{
 
     _renderSection = (section, sectionId, state)  => {
 
-      let ic_collapse;
-      if(state){
-        ic_collapse =  <Image
-                          style={{ width: 15, height: 15}}
-                          source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24.105" height="12.233" viewBox="0 0 24.105 12.233">
-                          <path id="Path_2031" data-name="Path 2031" d="M-1634.662,58.446h3.792l8.08,8.08,8.08-8.08h4.153l-12.233,12.233Z" transform="translate(1634.662 -58.446)" fill="#3c3f3f"/>
-                        </svg>`}} />
-
-      }else{
-        ic_collapse =  <Image
-                          style={{ width: 15, height: 15}}
-                          source={{uri:`data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24.105" height="12.233" viewBox="0 0 24.105 12.233">
-                          <path id="Path_2031" data-name="Path 2031" d="M-1634.662,70.679h3.792l8.08-8.08,8.08,8.08h4.153l-12.233-12.233Z" transform="translate(1634.662 -58.446)" fill="#3c3f3f"/>
-                        </svg>`}} />
-      }
+      let ic_collapse = <MyIcon
+                        name={state ? 'collapse-up' : 'collapse-down'}
+                        size={8}
+                        color={'#C7D8DD'} />
 
       let member_size = this.loadData()[sectionId].member.length
       if(member_size == 0){

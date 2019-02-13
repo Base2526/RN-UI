@@ -285,9 +285,9 @@ class EditMyProfilePage extends React.Component{
     }
 
     phonesList(){
-        // this.state.profiles.phones
-        // console.log(this.state.profiles)
-        // console.log(this.state.profiles.phones)
+        if(this.state.profiles.phones === undefined){
+            return;
+        }
 
         return Object.entries(this.state.profiles.phones).map(([key, value]) => {
             return(<Cell

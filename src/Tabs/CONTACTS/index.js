@@ -230,6 +230,16 @@ const ListGroupMemberNavigator = createStackNavigator(
     // headerMode: 'none',
   },);
 
+const ClasssSettingsNavigator = createStackNavigator(
+  {
+    'ClasssSettingsPage': {screen: ClasssSettingsPage},
+    // 'EditGroupNamePage': {screen: EditGroupNamePage}
+  },
+  {
+    // headerMode: 'none',
+  },
+);
+
 const GroupSettingsNavigator = createStackNavigator(
   {
     'GroupSettingsPage': {screen: GroupSettingsPage},
@@ -262,8 +272,9 @@ const MainModalNavigator = createStackNavigator(
       
     // },
     'GroupSettingsNavigator': {screen: GroupSettingsNavigator},
+    'ClasssSettingsNavigator': {screen: ClasssSettingsNavigator},
     
-    'ClasssSettingsPage': {screen: ClasssSettingsPage},
+    // 'ClasssSettingsPage': {screen: ClasssSettingsPage},
     'ClasssMemberAddFriend': {screen: ClasssMemberAddFriend},
     
     'MyQRcodeNavigator': {screen: MyQRcodeNavigator},
@@ -333,7 +344,8 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
       routeName === 'GroupSettingsPage' ||
       routeName === 'EditGroupNamePage' ||
       routeName === 'GroupMemberInvite' ||
-      routeName === 'ChangeFriendsName'
+      routeName === 'ChangeFriendsName' ||
+      routeName === 'ClasssSettingsPage'
       ) {
     navigationOptions.tabBarVisible = false;
   }

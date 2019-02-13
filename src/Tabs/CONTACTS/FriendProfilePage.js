@@ -24,6 +24,8 @@ import Spinner from 'react-native-loading-spinner-overlay';
 
 var _ = require('lodash');
 
+import Moment from 'moment'
+
 import {getStatusBarHeight} from '../../Utils/Helpers'
 import ImageWithDefault from '../../Utils/ImageWithDefault'
 import * as actions from '../../Actions'
@@ -388,6 +390,98 @@ class FriendProfilePage extends React.Component{
         }
     }
 
+    phonesList(){
+
+        if(this.state.friend.profile.phones === undefined){
+            return;
+        }
+
+        // console.log(this.props.friend.profile.phones)
+        return Object.entries(this.state.friend.profile.phones).map(([key, value]) => {
+            return(<Cell
+                key={key}
+                cellStyle="Subtitle"
+                titleTextColor="#007AFF"
+                hideSeparator={false} 
+                cellContentView={
+                <View style={{flexDirection:'row'}}>
+                    <View style={{flex:1, flexDirection:'row'}}>
+                        <Text style={{fontSize: 22,  }}>
+                            {value.phone_number} 
+                        </Text>
+                        <TouchableOpacity
+                            style={{alignSelf:'flex-end'}}
+                            onPress={()=>{
+                                alert('Verify')
+                            }}>
+                            <Text style={{fontSize: 16, color:'blue', marginLeft:10, textAlignVertical:'bottom'}}>
+                                {value.is_verify ? '': ''}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            }
+        />)
+        })
+    }
+
+    websitesList(){
+        
+        if(this.state.friend.profile.websites === undefined){
+            return;
+        }
+
+        return Object.entries(this.state.friend.profile.websites).map(([key, value]) => {
+            return(<Cell
+                    key={key}
+                    cellStyle="Subtitle"
+                    titleTextColor="#007AFF"
+                    hideSeparator={false} 
+                    accessory="DisclosureIndicator"
+                    cellContentView={
+                    <View style={{flex:1}}>
+                        <View style={{flex:1}}>
+                            <Text style={{flex:1, fontSize:16, marginTop:10, marginBottom:10, color:'blue'}}>
+                                {value.url}
+                            </Text>
+                        </View>
+                    </View>
+                    }
+                    onPress={()=>{
+                        Linking.openURL(value.url)
+                    }}
+                />)
+        })
+    }
+    emailsList(){
+        if(this.state.friend.profile.emails === undefined){
+            return;
+        }
+
+        return Object.entries(this.state.friend.profile.emails).map(([key, value]) => {
+            return(<Cell
+                    key={key}
+                    cellStyle="Subtitle"
+                    titleTextColor="#007AFF"
+                    hideSeparator={false} 
+                    accessory="DisclosureIndicator"
+                    cellContentView={
+                    <View style={{flex:1,}}>
+                        <View style={{flex:1,}}>
+                            <Text style={{flex:1, fontSize: 16, marginTop:10 }}>
+                                {value.email}
+                            </Text>
+                        </View>
+                    </View>
+                    }
+                    onPress={()=>{
+                        Linking.openURL('mailto:' + value.email)
+                    }}
+                    />)
+        })
+    }
+
+
     render() {
         let {friend} = this.state
 
@@ -396,6 +490,65 @@ class FriendProfilePage extends React.Component{
         }
 
         console.log(friend)
+
+        let {profile} = friend
+
+        // let {my_ids} = this.state.profiles
+        let find_my_id = _.find(profile.my_ids,  function(v, k) { 
+            return v.enable
+        })
+        
+        let my_id = ''
+        if(find_my_id === undefined){
+            my_id = "Not set"
+        }else{
+            my_id = find_my_id.id
+        }
+
+        let status_message = ''
+        if(profile.status_message !== undefined){
+            status_message = profile.status_message
+        }
+
+        // Gender
+        let text_gender = 'Not set'
+        if(profile.gender !== undefined){  
+            console.log(profile.gender)      
+            let __ = Constant.gender.filter(function(item){
+                return item.id == profile.gender;
+            })
+            
+            if(__.length > 0){
+                text_gender = __[0].name
+            }
+        }
+
+        let birthday = ''
+        if(profile.birthday !== undefined){
+            birthday = profile.birthday
+        }
+
+        // intereste_in
+        let intereste_in = []
+        if(profile.intereste_in !== undefined){
+        profile.intereste_in.forEach(function(key, v, arr){
+                let f = Constant.intereste_in.find(k => k.id==key)
+                intereste_in.push(f.name)
+            });
+        }
+ 
+        // value={this.props.auth.users.profiles.address}
+        let address = 'Not set'
+        if(profile.address !== undefined){
+            address = profile.address
+        }
+ 
+
+        //  {Object.keys(profile.phones).length == 0 ? <Text style={{flex:1, fontSize:18}}>Not set</Text> :<View />}
+        let txt_phones = <Text style={{flex:1, fontSize:18}}>Not set</Text>
+        if(profile.phones !== undefined){
+            txt_phones = <View />
+        }
 
         return (
             <View style={{flex:1}}>
@@ -465,39 +618,44 @@ class FriendProfilePage extends React.Component{
                                 cellContentView={
                                     <View style={{flex:1, flexDirection:'row', justifyContent:'center'}}>
                                         <TouchableOpacity
-                                            style={{height:60,
-                                                    width:60,
-                                                    borderRadius: 30,
-                                                    margin:5,
-                                                    // backgroundColor:'blue'
-                                                    }}   
+                                            style={{padding:5}}
+                                            onPress={()=>{
+                                                alert('All Application')
+                                            }}     
+                                            >
+
+                                            <MyIcon
+                                                name={'all-app'}
+                                                size={60}
+                                                color={'#CE3B6E'}/>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={{padding:5}}
                                             onPress={()=>{
                                                 alert('Video call')
                                             }}     
                                             >
-                                            <ImageWithDefault 
+                                            {/* <ImageWithDefault 
                                                 // source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
                                                 source={require('../../Images/icon-profile-friend-phone.png')}
                                                 style={{width: 60, height: 60, borderRadius: 30, }}
-                                            />      
+                                            />       */}
+
+                                            <MyIcon
+                                            name={'call'}
+                                            size={60}
+                                            color={'#CE3B6E'}/>
                                         </TouchableOpacity>
                                         <TouchableOpacity
-                                            style={{height:60,
-                                                    width:60,
-                                                    borderRadius: 30,
-                                                    margin:5,
-                                                    // backgroundColor:'blue'
-                                                    }}  
-                                                    
+                                            style={{padding:5}}
                                             onPress={()=>{
                                                 this.props.navigation.navigate("ChatPage")
                                             }}
                                             >
-                                            <ImageWithDefault  // 
-                                                // source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
-                                                source={require('../../Images/icon-profile-friend-chat.png')}
-                                                style={{width: 60, height: 60, borderRadius: 30, }}
-                                            />      
+                                            <MyIcon
+                                            name={'friend-chat'}
+                                            size={60}
+                                            color={'#CE3B6E'}/> 
                                         </TouchableOpacity>
                                         {/* <TouchableOpacity
                                             style={{height:60,
@@ -571,7 +729,6 @@ class FriendProfilePage extends React.Component{
                                     this.props.navigation.navigate('ChangeFriendsName', {"friend": friend})
                                 }}
                             />
-
                             <Cell
                                 cellStyle="Basic"
                                 contentContainerStyle={{ padding:10 }} 
@@ -583,7 +740,7 @@ class FriendProfilePage extends React.Component{
                                                 Status message
                                             </Text>
                                             <Text style={{ fontSize:18 }}>
-                                                The most valuable lessons in life cannot be taught, they must be experienced.
+                                                {status_message}
                                             </Text>
                                         </View>
                                         
@@ -637,7 +794,7 @@ class FriendProfilePage extends React.Component{
                                                 My ID
                                             </Text>
                                             <Text style={{ fontSize:18 }}>
-                                                XUASDFOPMNBSSS
+                                                {my_id}
                                             </Text>
                                         </View>
                                     </View>
@@ -655,7 +812,7 @@ class FriendProfilePage extends React.Component{
                                                 Gender
                                             </Text>
                                             <Text style={{ fontSize:18 }}>
-                                                Male
+                                                {text_gender}
                                             </Text>
                                         </View>
                                     </View>
@@ -673,7 +830,8 @@ class FriendProfilePage extends React.Component{
                                                 Birthday
                                             </Text>
                                             <Text style={{ fontSize:18 }}>
-                                                January 4, 1983
+                                                {birthday != ''? Moment(new Date(birthday)).format('MMMM DD, YYYY'):'Not set'}
+                                                {/*  */}
                                             </Text>
                                         </View>
                                     </View>
@@ -691,7 +849,7 @@ class FriendProfilePage extends React.Component{
                                                 Interested In
                                             </Text>
                                             <Text style={{ fontSize:18 }}>
-                                                Women
+                                                {intereste_in.length == 0 ? "Not set": intereste_in.join(", ")}
                                             </Text>
                                         </View>
                                     </View>
@@ -734,35 +892,14 @@ class FriendProfilePage extends React.Component{
                                     <View style={{flex:1, marginBottom:10}}>
                                         <View >
                                             <Text style={{ }}>
-                                            Mobile
+                                            Mobile phones
                                             </Text>
-                                            <Text style={{ fontSize:18 }}>
-                                                0988264820
-                                            </Text>
+                                           {txt_phones}
                                         </View>
                                     </View>
                                 }
                             />
-                            <Cell
-                                cellStyle="Basic"
-                                // title="MY INFO"
-                                contentContainerStyle={{ }} 
-                                hideSeparator={true}
-                                // contentContainerStyle={{ paddingVertical: 10 }} 
-                                cellContentView={
-                                    <View style={{flex:1, marginBottom:10}}>
-                                        <View >
-                                            <Text style={{ }}>
-                                            Home
-                                            </Text>
-                                            <Text style={{ fontSize:18}}>
-                                                0988264820
-                                            </Text>
-                                        </View>
-                                    </View>
-                                }
-                            />
-
+                            {this.phonesList()}
                             <Cell
                                 cellStyle="Basic"
                                 // title="MY INFO"
@@ -776,7 +913,7 @@ class FriendProfilePage extends React.Component{
                                             Address
                                             </Text>
                                             <Text style={{ fontSize:18}}>
-                                            ซอยสุขสวัสดิ์ 26 บางปะกอก
+                                            {address}
                                             </Text>
                                         </View>
                                     </View>
@@ -795,13 +932,12 @@ class FriendProfilePage extends React.Component{
                                             <Text style={{ }}>
                                             Website
                                             </Text>
-                                            <Text style={{ fontSize:18}}>
-                                            www.klovers.org
-                                            </Text>
+                                            {profile.websites === undefined ? <Text style={{flex:1, fontSize:18}}>Not set</Text> :<View />}
                                         </View>
                                     </View>
                                 }
                             />
+                            {this.websitesList()}
 
                             <Cell
                                 cellStyle="Basic"
@@ -813,14 +949,13 @@ class FriendProfilePage extends React.Component{
                                             <Text style={{ }}>
                                                 Email
                                             </Text>
-                                            <Text style={{ fontSize:18 }}>
-                                                android.somkid@gmail.com
-                                            </Text>
+                                            {profile.emails === undefined ? <Text style={{flex:1, fontSize:18}}>Not set</Text> :<View />}
                                         </View>
                                         
                                     </View>
                                 }
                             />
+                            {this.emailsList()}
                         </Section>
                     </TableView>
                     </View>

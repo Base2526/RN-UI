@@ -26,44 +26,35 @@ var _ = require('lodash');
 const { RNTwitterSignIn } = NativeModules
 const FBSDK = require('react-native-fbsdk');
 const { LoginManager } = FBSDK;
-
-// import firebase from 'react-native-firebase';
-
 import Styles from '../../styles';
 import Constant from '../../Utils/Constant'
-// import {loadAsyncStorage, removeAsyncStorageByKey} from '../../Utils/Helpers'
-// import * as actions from '../../Actions';
 import { actionLogout, updateIsLogin } from '../../Actions';
-
-// import {watchTaskEvent, watchTaskAddedEvent} from '../Actions'
-
-// import {group_deleteAll, groupDetail_deleteAll} from '../../Utils/DB'
-
-// Example component for section:headerComponent
-const CustomSectionHeader = () => (
-  <View>
-    <Text>Custom header!</Text>
-  </View>
-);
+import MyIcon from '../../config/icon-font.js';
 
 class homeY extends React.Component {
 
   static navigationOptions = ({ navigation }) => ({
     title: "Settings",
+    headerTintColor: '#C7D8DD',
+    headerStyle: {
+      backgroundColor: 'rgba(186, 53, 100, 1.0)',
+      // ios navigationoptions underline hide
+      borderBottomWidth: 0,
+
+      // android navigationoptions underline hide
+      elevation: 0,
+      shadowOpacity: 0
+    },
     headerLeft: (
         <TouchableOpacity
-            style={Styles.headerButton}
-            onPress={() => navigation.openDrawer()}>
-            <Icon name="bars" size={25} />
-        </TouchableOpacity>
+          onPress={() => navigation.openDrawer()}>
+          <MyIcon
+              name={'menu'}
+              size={30}
+              color={'#C7D8DD'}
+              />
+      </TouchableOpacity>
     ),
-    // headerRight: (
-    //     <TouchableOpacity
-    //         style={Styles.headerButton}
-    //         onPress={() => alert("address-book click")}>
-    //         <Icon name="address-book" size={20} />
-    //     </TouchableOpacity>
-    //   ),
   }) 
 
   componentDidMount() {

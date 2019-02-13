@@ -46,16 +46,16 @@ class ManageMyApplicationPage extends React.Component{
             elevation: 0,
             shadowOpacity: 0
         },
-        headerRight: (
-            <TouchableOpacity
-                style={{marginRight:10}}
-                onPress={() => {
-                    const { params = {} } = navigation.state
-                    params.handleSaveApplication()
-                }}>
-                <Text style={{fontSize:18, fontWeight:'600', color:'white'}}>Save</Text>
-            </TouchableOpacity>
-          ),
+        // headerRight: (
+        //     <TouchableOpacity
+        //         style={{marginRight:10}}
+        //         onPress={() => {
+        //             const { params = {} } = navigation.state
+        //             params.handleSaveApplication()
+        //         }}>
+        //         <Text style={{fontSize:18, fontWeight:'600', color:'white'}}>Save</Text>
+        //     </TouchableOpacity>
+        //   ),
     })
 
     constructor(props) {
