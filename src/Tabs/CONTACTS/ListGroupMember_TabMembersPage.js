@@ -11,7 +11,7 @@ import {FlatList,
 import ExpandableList from 'react-native-expandable-section-flatlist'
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
-import ScrollableTabView, {ScrollableTabBar, DefaultTabBar} from 'react-native-scrollable-tab-view';
+
 import Swipeout from 'react-native-swipeout'
 
 var _ = require('lodash');
@@ -23,101 +23,89 @@ import MyIcon from '../../config/icon-font.js';
 
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
-import ListGroupMember_TabMembersPage from './ListGroupMember_TabMembersPage'
-import ListGroupMember_TabAdminPage from './ListGroupMember_TabAdminPage'
-class ListGroupMemberPage extends React.Component{
+class ListGroupMember_TabMembersPage extends React.Component{
 
-    static navigationOptions = ({ navigation }) => ({
-        title: "List members",
-        headerTintColor: '#C7D8DD',
-        headerStyle: {
-            backgroundColor: 'rgba(186, 53, 100, 1.0)',
+    // static navigationOptions = ({ navigation }) => ({
+    //     title: "List members",
+    //     headerTintColor: '#C7D8DD',
+    //     headerStyle: {
+    //         backgroundColor: 'rgba(186, 53, 100, 1.0)',
   
-            // ios navigationoptions underline hide
-            borderBottomWidth: 0,
+    //         // ios navigationoptions underline hide
+    //         borderBottomWidth: 0,
   
-            // android navigationoptions underline hide
-            elevation: 0,
-            shadowOpacity: 0
-          },
-        headerLeft: (
-            <View style={{paddingLeft:10}}>
-                <TouchableOpacity 
-                    onPress={()=>{
-                        // GroupMemberInvite
-                        const { params = {} } = navigation.state
-                        params.handleInvite()
-                    }}>
-                    <Text style={{color:'#C7D8DD', fontSize:18, fontWeight:'bold'}}>Invite</Text>
-                </TouchableOpacity> 
-            </View>
-        ),
-        headerRight: (
-            <View style={{marginRight:10}}>
-                <TouchableOpacity
-                    style={{padding:5}}
-                    // disabled={isModify ? false: true}
-                    onPress={() => {
-                        const { params = {} } = navigation.state
-                        params.handleCancel()
-                    }}>
-                    <MyIcon
-                        name={'cancel'}
-                        size={25}
-                        color={'#C7D8DD'} />
-                </TouchableOpacity>
-            </View>
-        ),
-    });
+    //         // android navigationoptions underline hide
+    //         elevation: 0,
+    //         shadowOpacity: 0
+    //       },
+    //     headerLeft: (
+    //         <View style={{paddingLeft:10}}>
+    //             <TouchableOpacity 
+    //                 onPress={()=>{
+    //                     // GroupMemberInvite
+    //                     const { params = {} } = navigation.state
+    //                     params.handleInvite()
+    //                 }}>
+    //                 <Text style={{color:'#C7D8DD', fontSize:18, fontWeight:'bold'}}>Invite</Text>
+    //             </TouchableOpacity> 
+    //         </View>
+    //     ),
+    //     headerRight: (
+    //         <View style={{marginRight:10}}>
+    //             <TouchableOpacity
+    //                 style={{padding:5}}
+    //                 // disabled={isModify ? false: true}
+    //                 onPress={() => {
+    //                     const { params = {} } = navigation.state
+    //                     params.handleCancel()
+    //                 }}>
+    //                 <MyIcon
+    //                     name={'cancel'}
+    //                     size={25}
+    //                     color={'#C7D8DD'} />
+    //             </TouchableOpacity>
+    //         </View>
+    //     ),
+    // });
 
     constructor(){
         super();
         this.state = { 
             renderContent: false,
             data:[],
-            group_id:0,
+            group_id :0
         }
     }
 
     componentWillMount(){
-        console.log(this.props.groups)
+        let {group_id} = this.props.params
 
-        this.props.navigation.setParams({handleCancel: this.handleCancel })
-        this.props.navigation.setParams({ handleInvite: this.handleInvite })
-
-        const { navigation } = this.props;
-        const group_id = navigation.getParam('group_id', null);
-
-        this.setState({group_id})
-        
         let group = _.find(this.props.groups,  function(v, k) { 
             return k == group_id
         })
-
         this.loadData(group)
     }
 
     componentWillReceiveProps(nextProps) {
         console.log(nextProps);
 
-        const { navigation } = this.props;
-        const group_id = navigation.getParam('group_id', null);
+        let {group_id} = this.props.params
         
         let group = _.find(nextProps.groups,  function(v, k) { 
             return k == group_id
         })
 
-        // this.loadData(group)
-        console.log(group)
+        this.loadData(group)
     }
 
     getGroupId = () =>{
+        return 0
         const { navigation } = this.props;
         return  navigation.getParam('group_id', null);
     }
 
     loadData = (group) =>{
-
+        console.log(group);
         let members = []
         let pending = []
         let decline = []
@@ -156,11 +144,11 @@ class ListGroupMemberPage extends React.Component{
             }
         });
 
-        // this.setState({
-        //     data: [ {title: 'Members',member: members}, 
-        //             {title: 'Pending', member: pending},
-        //             {title: 'Decline', member: decline},]
-        // })
+        this.setState({
+            data: [ {title: 'Members',member: members}, 
+                    {title: 'Pending', member: pending},
+                    {title: 'Decline', member: decline},]
+        })
     }
 
     handleInvite = () => {
@@ -175,7 +163,7 @@ class ListGroupMemberPage extends React.Component{
 
     _renderRow = (rowItem, rowId, sectionId) => {
 
-        console.log(rowItem)
+        // console.log(rowItem)
 
         let swipeoutRight = []
 
@@ -292,7 +280,6 @@ class ListGroupMemberPage extends React.Component{
 
         let m_length = data[sectionId].member.length
         if(m_length == 0){
-            console.log('000001')
             return ;
         }
 
@@ -326,57 +313,27 @@ class ListGroupMemberPage extends React.Component{
             </View>
         )
     }
-
-    handleChangeTab({i, ref, from, }) {
-        // this.children[i].onEnter();
-        // this.children[from].onLeave();
-
-        console.log("handleChangeTab : i =" + i)
-
-        // this.setState({
-        //     positionSelect:i
-        // })
-    }
       
     render() {
-        // return (<ExpandableList
-        //             style={{flex:1}}
-        //             ref={instance => this.ExpandableList = instance}
-        //             dataSource={this.state.data}
-        //             headerKey="title"
-        //             memberKey="member"
-        //             renderRow={this._renderRow}
-        //             headerOnPress={(i, state) => {
-        //             } }
-        //             renderSectionHeaderX={this._renderSection}
-        //             openOptions={[0, 1, 2]}
-        //             removeClippedSubviews={false}
-        //         />
-        // );
-
-        let {group_id} = this.state
-
-        if(group_id == 0){
-            return (<View />)
-        }
-
-        return(<ScrollableTabView
-                // style={{height:500}}
-                initialPage={0}
-                renderTabBar={() => <DefaultTabBar />}
-                locked={true}
-                tabBarPosition='top'
-                //  contentProps={...props}
-                tabBarTextStyle={{fontSize:15}}
-                onChangeTab={this.handleChangeTab.bind(this)}>
-                <ListGroupMember_TabMembersPage tabLabel='Members' index={0} amount={4} params={this.state}/>
-                <ListGroupMember_TabAdminPage tabLabel='Admins' index={1} amount={5} params={this.state} />
-            </ScrollableTabView>)
+        return (<ExpandableList
+                    style={{flex:1}}
+                    ref={instance => this.ExpandableList = instance}
+                    dataSource={this.state.data}
+                    headerKey="title"
+                    memberKey="member"
+                    renderRow={this._renderRow}
+                    headerOnPress={(i, state) => {
+                    } }
+                    renderSectionHeaderX={this._renderSection}
+                    openOptions={[0, 1, 2]}
+                    removeClippedSubviews={false}
+                />
+        );
     }
 }
 
 const mapStateToProps = (state) => {
-    console.log(state)
+    // console.log(state)
 
     if(!state._persist.rehydrated){
       return {}
@@ -388,4 +345,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps, actions)(ListGroupMemberPage);
+export default connect(mapStateToProps, actions)(ListGroupMember_TabMembersPage);

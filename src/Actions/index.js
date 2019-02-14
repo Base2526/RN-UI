@@ -17,6 +17,7 @@ import {USER_LOGIN_SUCCESS,
         FRIEND_PROFILE,
         UPDATE_STATUS_FRIEND,
         ADD_GROUP,
+        MODIFIED_GROUP,
         DELETE_GROUP,
         UPDATE_GROUP_PICTURE_PROFILE,
         ADDED_GROUP_MEMBER,
@@ -26,6 +27,7 @@ import {USER_LOGIN_SUCCESS,
         MEMBER_JOIN_GROUP,
         MEMBER_DECLINE_GROUP,
         MEMBER_INVITE_AGAIN_GROUP,
+        MEMBER_LEAVE_GROUP,
         SELECT_ADD_CLASS,
         CLASS_MEMBERS,
         FRIEND_MUTE,
@@ -305,16 +307,17 @@ export const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
             return {'status':false, 'message': data}
         }else{
             if(!data.result){
-                return {'status':false, 'message': data}
+                return {'status':false, 'message': data.message}
             }else{
-                console.log(data)
+                // console.log(data)
                 let newData = { item_id: data.group.item_id, 
                                  status: data.group.status, 
                                  group_profile: data.group_profile,
                                  members: data.members}
 
                 console.log(newData)
-                dispatch({ type: ADD_GROUP, group_id:data.item_id, group_data:newData});
+                console.log(data.item_id)
+                dispatch({ type: ADD_GROUP, group_id:data.item_id, data:newData});
 
                 return {'status':true, 'data':data}
             }
@@ -355,7 +358,7 @@ export const actionFavoritesGroup = (uid, group_id, favorite_status, callback) =
     
     dispatch({ type: FAVORITES_GROUP, group_id, favorite_status});
 
-    console.log(uid, group_id, favorite_status)
+    // console.log(uid, group_id, favorite_status)
     // dispatch({ type: INTERESTE_IN_PROFILE, interestein_key, interestein_id, interestein_status});
     firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).set({
         is_favorites: favorite_status,
@@ -381,6 +384,19 @@ export const actionMemberJoinGroup = (uid, group_id, member_item_id, callback) =
     }, { merge: true});
 
     dispatch({ type: MEMBER_JOIN_GROUP, group_id, member_item_id})
+    callback({'status':true})
+}
+
+// Leave Group
+export const actionMemberLeaveGroup = (uid, group_id, member_item_id, callback) => dispatch => {
+    
+    // console.log(uid, group_id, member_item_id)
+    firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).delete()
+    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_item_id).set({
+        status: Constant.GROUP_STATUS_MEMBER_LEAVE,
+    }, { merge: true});
+
+    dispatch({ type: MEMBER_LEAVE_GROUP, group_id});
     callback({'status':true})
 }
 
@@ -1192,67 +1208,104 @@ export function watchTaskEvent(uid, dispatch) {
     // track grouds
     firebase.firestore().collection('users').doc(uid).collection('groups').onSnapshot((querySnapshot) => {
 
-        let _this = this
-        querySnapshot.forEach(function(doc) {
-            // console.log(doc.id, " => ", doc.data());
+        // let _this = this
+        // querySnapshot.forEach(function(doc) {
+        //     // console.log(doc.id, " => ", doc.data());
 
-            // let id = doc.id
-            // let data = doc.data()
+        //     // let id = doc.id
+        //     // let data = doc.data()
 
-            firebase.firestore().collection('groups').doc(doc.id).onSnapshot((docSnapshot) => {
-                // console.log(docSnapshot.id) 
-                // doc.id จะมีค่าเท่ากันกับ  docSnapshot.id 
+        //     firebase.firestore().collection('groups').doc(doc.id).onSnapshot((docSnapshot) => {
+        //         // console.log(docSnapshot.id) 
+        //         // doc.id จะมีค่าเท่ากันกับ  docSnapshot.id 
 
-                if(docSnapshot.data() !== undefined){
-                    // console.log(doc.id, " => ", doc.data());
+        //         if(docSnapshot.data() !== undefined){
+        //             // console.log(doc.id, " => ", doc.data());
 
-                    let v = {...doc.data(), group_profile:docSnapshot.data()}
-                    console.log(v)
-                    dispatch({ type: ADD_GROUP, group_id:docSnapshot.id, data:v });
-                }else{
+        //             let v = {...doc.data(), group_profile:docSnapshot.data()}
+        //             console.log(v)
+        //             dispatch({ type: ADD_GROUP, group_id:docSnapshot.id, data:v });
+        //         }else{
 
-                    /** จะมีบั๊ก ไม่รู้ว่าตอนไหนจะมีการ insert object ลงไปเราต้องลบออก ค่อยมาไล่เช็ดทีหลัง */
-                    dispatch({ type: DELETE_GROUP, group_id:docSnapshot.id});
-                }
-            })
+        //             /** จะมีบั๊ก ไม่รู้ว่าตอนไหนจะมีการ insert object ลงไปเราต้องลบออก ค่อยมาไล่เช็ดทีหลัง */
+        //             dispatch({ type: DELETE_GROUP, group_id:docSnapshot.id});
+        //         }
+        //     })
 
-            firebase.firestore().collection('groups').doc(doc.id).collection('members').onSnapshot((querySnapshot) => {
-                querySnapshot.docChanges.forEach(function(change) {
-                    console.log(doc.id, change.doc.id)
+        //     firebase.firestore().collection('groups').doc(doc.id).collection('members').onSnapshot((querySnapshot) => {
+        //         querySnapshot.docChanges.forEach(function(change) {
+        //             console.log(doc.id, change.doc.id)
                     
-                    if (change.type === 'added') {
-                        console.log('added: ', doc.id, change.doc.id, change.doc.data());
+        //             if (change.type === 'added') {
+        //                 console.log('added: ', doc.id, change.doc.id, change.doc.data());
 
-                        let group_id = doc.id
-                        let item_id = change.doc.id
-                        let data = change.doc.data()
-                        // ADDED_GROUP_MEMBER
+        //                 let group_id = doc.id
+        //                 let item_id = change.doc.id
+        //                 let data = change.doc.data()
+        //                 // ADDED_GROUP_MEMBER
 
-                        dispatch({ type: ADDED_GROUP_MEMBER, group_id, item_id, data});
-                    }
-                    if (change.type === 'modified') {
-                        console.log('modified: ', doc.id, change.doc.id, change.doc.data());
+        //                 dispatch({ type: ADDED_GROUP_MEMBER, group_id, item_id, data});
+        //             }
+        //             if (change.type === 'modified') {
+        //                 console.log('modified: ', doc.id, change.doc.id, change.doc.data());
 
-                        let group_id = doc.id
-                        let item_id = change.doc.id
-                        let data = change.doc.data()
-                        // MODIFIED_GROUP_MEMBER
+        //                 let group_id = doc.id
+        //                 let item_id = change.doc.id
+        //                 let data = change.doc.data()
+        //                 // MODIFIED_GROUP_MEMBER
 
-                        dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, item_id, data});
-                    }
-                    if (change.type === 'removed') {
-                        console.log('removed: ', doc.id, change.doc.id, change.doc.data());
+        //                 dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, item_id, data});
+        //             }
+        //             if (change.type === 'removed') {
+        //                 console.log('removed: ', doc.id, change.doc.id, change.doc.data());
 
-                        let group_id = doc.id
-                        let item_id = change.doc.id
-                        let data = change.doc.data()
-                        // REMOVED_GROUP_MEMBER
+        //                 let group_id = doc.id
+        //                 let item_id = change.doc.id
+        //                 let data = change.doc.data()
+        //                 // REMOVED_GROUP_MEMBER
 
-                        dispatch({ type: REMOVED_GROUP_MEMBER, group_id, item_id});
-                    }
-                })
-            })
-        })
+        //                 dispatch({ type: REMOVED_GROUP_MEMBER, group_id, item_id});
+        //             }
+        //         })
+        //     })
+        // })
+
+        querySnapshot.docChanges.forEach(function(change) {
+            console.log(change.type, change.doc.id, change.doc.data());
+
+            switch(change.type){
+                case 'added':{
+                    // dispatch({type: ADDED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
+                    
+                    firebase.firestore().collection('groups').doc(change.doc.id).onSnapshot((docSnapshot) => {
+                        // console.log(docSnapshot.id) 
+                        // doc.id จะมีค่าเท่ากันกับ  docSnapshot.id 
+        
+                        if(docSnapshot.data() !== undefined){
+                            // console.log(doc.id, " => ", doc.data());
+        
+                            let newData = {...change.doc.data(), group_profile:docSnapshot.data()}
+                            console.log(newData)
+                            dispatch({ type: ADD_GROUP, group_id:docSnapshot.id, data:newData });
+                        }
+                    })
+                    
+                    break;
+                }
+                case 'modified':{
+                    // dispatch({type: MODIFIED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
+                    
+                    // MODIFIED_GROUP
+                    dispatch({ type: MODIFIED_GROUP, group_id:change.doc.id, data:change.doc.data() });
+                    break;
+                }
+                case 'removed':{
+                    // dispatch({type: REMOVED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
+                    dispatch({ type: DELETE_GROUP, group_id:change.doc.id});
+                    break;
+                }
+            }
+        });
     })
     
     // track classs

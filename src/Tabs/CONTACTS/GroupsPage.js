@@ -2,8 +2,6 @@ import React from 'react'
 import {View, 
         Alert, 
         Text, 
-        FlatList, 
-        ActivityIndicator, 
         TouchableOpacity} from 'react-native'
 import ExpandableList from 'react-native-expandable-section-flatlist'
 import { connect } from 'react-redux';
@@ -32,6 +30,10 @@ class GroupsPage extends React.Component{
 
         sectionID: null,
         rowID: null,
+
+        favorites:[],
+        invited:[],
+        groups:[]
       };
     }
 
@@ -40,125 +42,58 @@ class GroupsPage extends React.Component{
       setTimeout(() => {this.setState({renderContent: true})}, 0);
 
       this.setState({
-        // data: this.loadData(),
         error: null,
         loading: false,
         refreshing: false
-      });      
+      });   
+      
+      this.loadData(this.props.groups)
     }
 
-    loadData=()=>{
-      // let group_member = []
-      // for (var key in this.props.groups) {
-      //   let group =  this.props.groups[key]
-
-      //   console.log(group.status)
-      //   group_member.push({...group, group_id:key});
-      // }
-      
-      // console.log(group_member)
-      // return group_member
-
-      /*
-      GROUP_STATUS_MEMBER_INVITED: '35',
-      GROUP_STATUS_MEMBER_JOINED: '36',
-      GROUP_STATUS_MEMBER_CANCELED: '38', 
-      GROUP_STATUS_MEMBER_DECLINE: '37',
-      GROUP_STATUS_MEMBER_LEAVE: '39',
-        */
-
-      console.log(this.props)
-
+    loadData=(groups)=>{
+      // console.log(groups)
       let group_invited = []
       let group_joined = []
       let group_favorites = []
-      for (var key in this.props.groups) {
-        let group =  this.props.groups[key]
-        console.log(group)
+      for (var key in groups) {
+        let group = groups[key]
         switch(group.status){ // GROUP_STATUS_MEMBER_INVITED
           case Constant.GROUP_STATUS_MEMBER_INVITED:{
             group_invited.push({...group, group_id:key})
             break;
           }
-
           case Constant.GROUP_STATUS_MEMBER_JOINED:{
-            
+            group_joined.push({...group, group_id:key})
 
             if(group.is_favorites !== undefined && group.is_favorites){
               group_favorites.push({...group, group_id:key})
-            }else{
-              group_joined.push({...group, group_id:key})
             }
             break;
           }
         }
       }
 
-      let groups = {
-        title: 'Groups',
-        member:group_joined
-      }
-
-      let invited = {
-        title: 'Groups invitations',
-        member:group_invited
-      }
-
-      let favorites = {
-        title:'Favorites',
-        member:group_favorites
-      }
-
-      console.log(group_joined)
-      console.log(group_invited)
-      console.log(group_favorites)
-
-      return [favorites, invited, groups];    
+      this.setState({
+        favorites: {
+          title: 'Groups',
+          member:group_joined
+        },
+        invited: {
+          title: 'Groups invitations',
+          member:group_invited
+        },
+        groups: {
+          title:'Favorites',
+          member:group_favorites
+        },
+        refreshing: true,
+      })
     }
 
-    componentWillReceiveProps(nextProps) {      
-      let group_member = []
-      for (var key in nextProps.groups) {    
-        let group = nextProps.groups[key]
-
-        group_member.push({...group, group_id:key});
-      }
-
-      // this.setState({
-      //   data: group_member,
-      // });
+    componentWillReceiveProps(nextProps) {    
+      this.loadData(nextProps.groups)
     }
     
-    renderSeparator = () => {
-      return (
-        <View
-          style={{
-            position:'absolute',
-            bottom: 0,
-            height: 1,
-            width: "100%",
-            backgroundColor: "#CED0CE",
-          }}
-        />
-      );
-    };
-
-    renderFooter = () => {
-      if (!this.state.loading) return null;
-  
-      return (
-        <View
-          style={{
-            paddingVertical: 20,
-            borderTopWidth: 1,
-            borderColor: "#CED0CE"
-          }}
-        >
-          <ActivityIndicator animating size="large" />
-        </View>
-      );
-    };
-
     renderItem = ({item, index}) => { 
       // console.log(index)
       let swipeoutRight = [{component:<View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
@@ -177,12 +112,12 @@ class GroupsPage extends React.Component{
                                     {text: 'OK', onPress: () => {
                                       console.log(item) // group_id
 
-                                      this.setState({loading:true})
-                                      this.props.actionDeleteGroup(this.props.uid, item.group_id, (result) => {
-                                        console.log(result)
+                                      // this.setState({loading:true})
+                                      // this.props.actionDeleteGroup(this.props.uid, item.group_id, (result) => {
+                                      //   console.log(result)
 
-                                        this.setState({loading:false})
-                                      })
+                                      //   this.setState({loading:false})
+                                      // })
                                     }},
                                   ],
                                   { cancelable: false }
@@ -261,10 +196,32 @@ class GroupsPage extends React.Component{
     }
 
     _renderSection = (section, sectionId, state)  => {
-      // console.log(this.loadData()[sectionId].member)
-      let member_size = this.loadData()[sectionId].member.length
-      if(member_size == 0){
-        return ;
+      let member_size = 0
+      switch(sectionId){
+        case 0:{
+          let {favorites} = this.state
+          member_size = favorites.member.length
+          if(member_size == 0){
+            return;
+          }
+          break;
+        }
+        case 1:{
+          let {invited} = this.state
+          member_size = invited.member.length
+          if(member_size == 0){
+            return;
+          }
+          break;
+        }
+        case 2:{
+          let {groups} = this.state
+          member_size = groups.member.length
+          if(member_size == 0){
+            return;
+          }
+          break;
+        }
       }
 
       let ic_collapse = <MyIcon
@@ -298,7 +255,7 @@ class GroupsPage extends React.Component{
     }
 
     _renderRow = (rowItem, rowId, sectionId) => {
-      console.log(rowItem)
+      // console.log(rowItem)
       switch(sectionId){
         // favorites
         case 0:{
@@ -351,27 +308,20 @@ class GroupsPage extends React.Component{
                                 borderWidth:.5,
                                 marginRight:5}}
                         onPress={()=>{
-                          // let members = rowItem.members
-                          // let uid = this.props.uid
-                          // var member_item_id = _.findKey(members, function(item) {
-                          //   return item.friend_id == uid
-                          // })
-
-                          let members = rowItem.group_profile.members
-                          
+                          let members = rowItem.members
                           let uid = this.props.uid
                           var member = _.find(members, function(item, key) {
-                            // return key == uid
                             return item.friend_id == uid
                           })
-
+                          // console.log(members)
                           if(member !== undefined){
+                            // console.log(member)
                             this.setState({loading:true})
-                            this.props.actionMemberJoinGroup(this.props.uid, rowItem.group_id, member.item_id, (result) => {
+                            this.props.actionMemberJoinGroup(this.props.uid, rowItem.group_id, rowItem.item_id, (result) => {
                               console.log(result)
                               setTimeout(() => {
                                 this.setState({loading:false})
-                              }, 100);
+                              }, 200);
                             })
                           }else{
                             console.log(member)
@@ -385,28 +335,19 @@ class GroupsPage extends React.Component{
                                 borderRadius:10, 
                                 borderWidth:.5}}
                         onPress={()=>{
-                          let members = rowItem.group_profile.members
+                          let members = rowItem.members
                           
                           let uid = this.props.uid
                           var member = _.find(members, function(item, key) {
-                            // return key == uid
                             return item.friend_id == uid
                           })
 
-                          console.log(uid)
-                          console.log(members)
-                          console.log(member)
                           if(member !== undefined){
-
-                            // console.log(rowItem.group_id, member.item_id)
-                          
                             this.setState({loading:true})
-                            this.props.actionMemberDeclineGroup(this.props.uid, rowItem.group_id, member.item_id, (result) => {
-                              console.log(result)
-
+                            this.props.actionMemberDeclineGroup(this.props.uid, rowItem.group_id, rowItem.item_id, (result) => {
                               setTimeout(() => {
                                 this.setState({loading:false})
-                              }, 100);
+                              }, 200);
                             })
                           }else{
                             console.log(member)
@@ -439,10 +380,10 @@ class GroupsPage extends React.Component{
 
                                     }, style: 'cancel'},
                                     {text: 'OK', onPress: () => {
-                                      console.log(item) // group_id
+                                      console.log(rowItem) // group_id
 
                                       this.setState({loading:true})
-                                      this.props.actionDeleteGroup(this.props.uid, item.group_id, (result) => {
+                                      this.props.actionDeleteGroup(this.props.uid, rowItem.group_id, (result) => {
                                         console.log(result)
 
                                         this.setState({loading:false})
@@ -464,7 +405,27 @@ class GroupsPage extends React.Component{
                                 [
                                 //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
                                   {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-                                  {text: 'OK', onPress: () => console.log('OK Pressed')},
+                                  {text: 'OK', onPress: () => {
+                                    
+                                    let members = rowItem.members
+                                    let uid = this.props.uid
+                                    var member = _.find(members, function(item, key) {
+                                      return item.friend_id == uid
+                                    })
+                                    // console.log(members)
+                                    if(member !== undefined){
+                                      // console.log(rowItem)
+                                      this.setState({loading:true})
+                                      this.props.actionMemberLeaveGroup(this.props.uid, rowItem.group_id, rowItem.item_id, (result) => {
+                                        console.log(result)
+                                        setTimeout(() => {
+                                          this.setState({loading:false})
+                                        }, 200);
+                                      })
+                                    }else{
+                                      console.log(member)
+                                    }
+                                  }},
                                 ],
                                 { cancelable: false }
                               )
@@ -526,10 +487,13 @@ class GroupsPage extends React.Component{
     }
   
     render() {
-      let {renderContent} = this.state;
-
-      if(!this.props.hasOwnProperty('groups')){
+      if(!this.state.refreshing){
         return <View style={{flex: 1}}></View>
+      }
+
+      let {favorites, invited, groups} = this.state
+      if(favorites.member.length == 0 && invited.member.length == 0 && groups.member.length == 0){
+        return <View style={{flex: 1}}><Text>Empty Group</Text></View>
       }
 
       return (
@@ -541,10 +505,9 @@ class GroupsPage extends React.Component{
           overlayColor={'rgba(0,0,0,0.5)'}
         />
         {
-          renderContent && 
           <ExpandableList
               ref={instance => this.ExpandableList = instance}
-              dataSource={this.loadData()}
+              dataSource={[favorites, invited, groups]}
               headerKey="title"
               memberKey="member"
               renderRow={this._renderRow}
@@ -562,9 +525,8 @@ class GroupsPage extends React.Component{
     }
 }
 
-
 const mapStateToProps = (state) => {
-  console.log(state)
+  // console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
   //_persist.rehydrated parameter is initially set to false

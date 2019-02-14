@@ -9,7 +9,8 @@ import { View,
         TouchableHighlight, 
         TextInput,
         SectionList,
-        Dimensions} from 'react-native';
+        Dimensions,
+        Alert} from 'react-native';
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
 import ImagePicker from 'react-native-image-picker';
@@ -174,6 +175,9 @@ class AddGroupsPage extends React.Component{
             this.props.navigation.goBack()
           }else{
 
+            setTimeout(() => {
+              Alert.alert(result.message);
+            }, 100);
           }
         })
       }

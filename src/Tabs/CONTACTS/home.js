@@ -102,7 +102,7 @@ const ImageHeader = (props, navigation) => {
         }
     }
 
-    console.log(props.navigation.state.routes[0].params, bg_url)
+    // console.log(props.navigation.state.routes[0].params, bg_url)
     /**
      source={require('../Images/boxpink.png')}
      */
@@ -149,7 +149,7 @@ class ContactsHome extends Component {
         if(navigation.state.params !== undefined){
             // console.log(navigation.state.params)
             const { bg_url } =navigation.state.params;
-            console.log(bg_url)
+            // console.log(bg_url)
         }
 
         // if(!this.props.hasOwnProperty('auth') 
@@ -279,7 +279,7 @@ class ContactsHome extends Component {
         // this.children[i].onEnter();
         // this.children[from].onLeave();
 
-        console.log("handleChangeTab : i =" + i)
+        // console.log("handleChangeTab : i =" + i)
 
         this.setState({
             positionSelect:i

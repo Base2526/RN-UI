@@ -14162,13 +14162,16 @@ function create_chat_group(){
     $result['result'] = FALSE;
     $result['message']  = "function : create_chat_group, parameter";
     // $result['param'] = $param;
-    $result['_REQUEST'] = $_REQUEST;
-    $result['_FILES'] = $_FILES;
-    $result['param_members'] = $param_members= (array)json_decode($_REQUEST['members']);
+    // $result['_REQUEST'] = $_REQUEST;
+    // $result['_FILES'] = $_FILES;
+    // $result['param_members'] = $param_members= (array)json_decode($_REQUEST['members']);
     return $result;
   }
 
-  global $firebase;
+  $time_start = microtime(true);
+  $batch = firestore_db()->batch();
+
+  // global $firebase;
 
   $param_uid    = $_REQUEST['uid'];
   $param_name   = $_REQUEST['name'];
@@ -14208,7 +14211,6 @@ function create_chat_group(){
   $node->field_object_id[LANGUAGE_NONE][0]['value']     = $chat_id;
   // $node->field_profile_my_qrcode[LANGUAGE_NONE][0]      = generatorQRCodeForGroupChat($uid, $group_id);
 
-
   $node->language = LANGUAGE_NONE;
   $node->status   = 1;
   $node->comment  = 0; 
@@ -14217,8 +14219,7 @@ function create_chat_group(){
 
   // เป็นการสร้าง qrcode for group chat เราจะสั่งให้รัน background process
   background_process_start('generatorQRCodeForGroupChat', $param_uid, $node->nid);
-
-  $qrcode_url = generatorQRCodeForGroupChat($param_uid, $node->nid);
+  // $qrcode_url = generatorQRCodeForGroupChat($param_uid, $node->nid);
 
   /*
   invited: 35
@@ -14229,6 +14230,7 @@ function create_chat_group(){
   $user_name    = $user_profile->field_profile_display_name[LANGUAGE_NONE][0]['value'];
 
   $f_members = array();
+  $group_admins = array();
 
   $m_profile = getNameImageURLFriend($param_uid);
   
@@ -14248,8 +14250,28 @@ function create_chat_group(){
   $m_profile['status'] = '36';
   $f_members[$member_field_entity->item_id] = $m_profile;
 
-  firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('members')->document($member_field_entity->item_id)->set($m_profile, ['merge' => true]);
+  // $nycRef = $db->collection('cities')->document('NYC');
 
+  // $nycRef =firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('members')->document($member_field_entity->item_id)->set($m_profile, ['merge' => true]);
+
+  $nycRef =firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('members')->document($member_field_entity->item_id);
+  $batch->set($nycRef, $m_profile, ['merge' => true]);
+  
+
+  // Add group admins
+  $group_admin = array();
+  $group_admin['field_name'] = 'field_group_admins';
+  $group_admin['field_group_admins_uid'][LANGUAGE_NONE][0]['value']  = $param_uid;
+
+  $group_admin_entity = entity_create('field_collection_item', $group_admin);
+  $group_admin_entity->setHostEntity('node', $node);
+  $group_admin_entity->save();
+
+  $admin = array('uid'=>$param_uid);
+  $group_admins[$group_admin_entity->item_id] = $admin;
+
+  $nycRef =firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('admins')->document($group_admin_entity->item_id);
+  $batch->set($nycRef, $admin, ['merge' => true]);
 
   /*
 
@@ -14328,7 +14350,10 @@ function create_chat_group(){
     $m_profile['status'] = '35';
     $f_members[$member_field_entity->item_id] = $m_profile;
     
-    firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('members')->document($member_field_entity->item_id)->set($m_profile, ['merge' => true]);
+    // firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('members')->document($member_field_entity->item_id)->set($m_profile, ['merge' => true]);
+    $nycRef =firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('members')->document($member_field_entity->item_id);
+    $batch->set($nycRef, $m_profile, ['merge' => true]);
+
 
     // โหลดเพือนขึ้นมาเพือบันทึก field_chat_group
     $members_friend_profile = profile2_by_uid_load($members_friend_id, 'main');
@@ -14380,7 +14405,7 @@ function create_chat_group(){
                       'friend_id'  =>$param_uid,
                       'friend_name'=>$user_name);
 
-        send_push_notification($item_load_device_access->field_key_token_notification[LANGUAGE_NONE][0]['value'], '', $message, $sval, $badge);
+        // send_push_notification($item_load_device_access->field_key_token_notification[LANGUAGE_NONE][0]['value'], '', $message, $sval, $badge);
       }
     }
     // ส่ง notification บอกเพือนว่ามี การเชิญเข้ากลุ่ม
@@ -14395,13 +14420,16 @@ function create_chat_group(){
                   // "image_url"  => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
                   "image_url"  => file_create_url(image_style_url('medium', $image_url['uri'])),
                   // members: {1123737: {…}, 1123739: {…}, 1123741: {…}}
-                  "qrcode_url" => $qrcode_url["qrcode_url"],
+                  // "qrcode_url" => $qrcode_url["qrcode_url"],
                 );
 
   // FIRESTORE_GROUPS
   // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_CHAT_GROUPS . '/' . $node->nid, $f_item);
-  firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->set($f_item, ['merge' => true]);
+  
+  // firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->set($f_item, ['merge' => true]);
 
+  $nycRef =firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid);
+  $batch->set($nycRef, $f_item, ['merge' => true]);
 
   $result['result']       = TRUE;
   $result['group_profile']= $f_item;
@@ -14417,12 +14445,19 @@ function create_chat_group(){
 
       // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $t_key . '/' . PATH_GROUPS . '/' . $tt_key . '/' , $tt_value);
 
-      firestore_db()->collection(FIRESTORE_USERS)->document($t_key)->collection(FIRESTORE_GROUPS)->document($tt_key)->set($tt_value);
+      // firestore_db()->collection(FIRESTORE_USERS)->document($t_key)->collection(FIRESTORE_GROUPS)->document($tt_key)->set($tt_value);
+      $nycRef =firestore_db()->collection(FIRESTORE_USERS)->document($t_key)->collection(FIRESTORE_GROUPS)->document($tt_key);
+      $batch->set($nycRef, $tt_value, ['merge' => true]);
     }
   }
 
+  # Commit the batch
+  $batch->commit();
 
-  // $result['tt']            = $tt;
+  $time_end       = microtime(true);
+  $execution_time = number_format(($time_end - $time_start), 2);
+
+  $result['execution_time']  = $execution_time;
   return  $result;
 }
 
