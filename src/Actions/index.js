@@ -23,6 +23,11 @@ import {USER_LOGIN_SUCCESS,
         ADDED_GROUP_MEMBER,
         MODIFIED_GROUP_MEMBER,
         REMOVED_GROUP_MEMBER,
+
+        ADDED_GROUP_ADMIN,
+        MODIFIED_GROUP_ADMIN, // modified
+        REMOVED_GROUP_ADMIN,
+
         FAVORITES_GROUP,
         MEMBER_JOIN_GROUP,
         MEMBER_DECLINE_GROUP,
@@ -313,7 +318,8 @@ export const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
                 let newData = { item_id: data.group.item_id, 
                                  status: data.group.status, 
                                  group_profile: data.group_profile,
-                                 members: data.members}
+                                 members: data.members,
+                                 group_admins: data.group_admins}
 
                 console.log(newData)
                 console.log(data.item_id)
@@ -1277,6 +1283,7 @@ export function watchTaskEvent(uid, dispatch) {
                 case 'added':{
                     // dispatch({type: ADDED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
                     
+                    // track group profile
                     firebase.firestore().collection('groups').doc(change.doc.id).onSnapshot((docSnapshot) => {
                         // console.log(docSnapshot.id) 
                         // doc.id จะมีค่าเท่ากันกับ  docSnapshot.id 
@@ -1288,6 +1295,88 @@ export function watchTaskEvent(uid, dispatch) {
                             console.log(newData)
                             dispatch({ type: ADD_GROUP, group_id:docSnapshot.id, data:newData });
                         }
+                    })
+
+                    // track group > members
+                    firebase.firestore().collection('groups').doc(change.doc.id).collection('members').onSnapshot((querySnapshot) => {
+                        querySnapshot.docChanges.forEach(function(members_change) {
+                            console.log(change.doc.id, members_change.type, members_change.doc.id)
+                            
+                            if (members_change.type === 'added') {
+                                console.log('added: ', change.doc.id, members_change.doc.id, members_change.doc.data());
+
+                                let group_id = change.doc.id
+                                let item_id = members_change.doc.id
+                                let data = members_change.doc.data()
+                                // ADDED_GROUP_MEMBER
+
+                                dispatch({ type: ADDED_GROUP_MEMBER, group_id, item_id, data});
+                            }
+                            if (members_change.type === 'modified') {
+                                console.log('modified: ', change.doc.id, members_change.doc.id, members_change.doc.data());
+
+                                let group_id = change.doc.id
+                                let item_id = change.doc.id
+                                let data = change.doc.data()
+                                // MODIFIED_GROUP_MEMBER
+
+                                dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, item_id, data});
+                            }
+                            if (members_change.type === 'removed') {
+                                console.log('removed: ', change.doc.id, members_change.doc.id, members_change.doc.data());
+
+                                let group_id = change.doc.id
+                                let item_id = members_change.doc.id
+                                let data = members_change.doc.data()
+                                // REMOVED_GROUP_MEMBER
+
+                                dispatch({ type: REMOVED_GROUP_MEMBER, group_id, item_id});
+                            }
+                        })
+                    })
+
+                    // track group > admins
+                    /*
+                    ADDED_GROUP_ADMIN,
+                    MODIFIED_GROUP_ADMIN, // modified
+                    REMOVED_GROUP_ADMIN,
+                    */
+                    firebase.firestore().collection('groups').doc(change.doc.id).collection('admins').onSnapshot((querySnapshot) => {
+                        querySnapshot.docChanges.forEach(function(admins_change) {
+
+                            console.log(change.doc.id, admins_change.type, admins_change.doc.id, admins_change.doc.data())
+                            
+                            if (admins_change.type === 'added') {
+                                console.log('added: ', change.doc.id, admins_change.doc.id, admins_change.doc.data());
+
+                                // let group_id = doc.id
+                                // let item_id = change.doc.id
+                                // let data = change.doc.data()
+                                // // ADDED_GROUP_MEMBER
+
+                                dispatch({ type: ADDED_GROUP_ADMIN, group_id:change.doc.id, admin_item_id:admins_change.doc.id, admin_data: admins_change.doc.data()});
+                            }
+                            if (admins_change.type === 'modified') {
+                                console.log('modified: ', change.doc.id, admins_change.doc.id, admins_change.doc.data());
+
+                                // let group_id = doc.id
+                                // let item_id = change.doc.id
+                                // let data = change.doc.data()
+                                // // MODIFIED_GROUP_MEMBER
+
+                                // dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, item_id, data});
+                            }
+                            if (admins_change.type === 'removed') {
+                                console.log('removed: ', change.doc.id, admins_change.doc.id, admins_change.doc.data());
+
+                                // let group_id = doc.id
+                                // let item_id = change.doc.id
+                                // let data = change.doc.data()
+                                // // REMOVED_GROUP_MEMBER
+
+                                // dispatch({ type: REMOVED_GROUP_MEMBER, group_id, item_id});
+                            }
+                        })
                     })
                     
                     break;

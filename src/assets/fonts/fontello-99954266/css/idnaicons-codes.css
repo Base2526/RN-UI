@@ -23,5 +23,7 @@
 .icon-call:before { content: '\e815'; } /* '' */
 .icon-friend-chat:before { content: '\e816'; } /* '' */
 .icon-all-app:before { content: '\e817'; } /* '' */
+.icon-dot-horizontal:before { content: '\e818'; } /* '' */
+.icon-dot-vertical:before { content: '\e819'; } /* '' */
 .icon-menu:before { content: '\f0c9'; } /* '' */
 .icon-dot-circled:before { content: '\f192'; } /* '' */

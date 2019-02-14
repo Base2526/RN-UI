@@ -22,6 +22,9 @@ import {USER_LOGIN_SUCCESS,
         ADDED_GROUP_MEMBER,
         MODIFIED_GROUP_MEMBER,
         REMOVED_GROUP_MEMBER,
+        ADDED_GROUP_ADMIN,
+        MODIFIED_GROUP_ADMIN, 
+        REMOVED_GROUP_ADMIN,
         SELECT_ADD_CLASS,
         CLASS_MEMBERS,
         FRIEND_MUTE,
@@ -1275,22 +1278,27 @@ export default (state= INITIAL_STATE, action)=>{
                 }
                 return v
             }else{
-                let newObjValue = action.data
-                if(group.members !== undefined){
-                    newObjValue = {...action.data, members:group.members}
-                }
+                // let newObjValue = action.data
+                // if(group.members !== undefined){
+                //     newObjValue = {...action.data, members:group.members}
+                // }
 
-                if(!_.isEqual(group, newObjValue)){
+                let newGroup = {...group, ...action.data}
+                console.log(newGroup)
+                console.log(group)
+
+                if(!_.isEqual(group, newGroup)){
                     let v = {
                         ...state,
                         users : {
                             ...state.users,
                             groups : {
                                 ...state.users.groups,
-                                [action.group_id]: {...group, ...action.data}
+                                [action.group_id]: newGroup
                             }
                         }
                     }
+                    console.log(v)
                     return v
                 }
             }
@@ -1776,6 +1784,75 @@ export default (state= INITIAL_STATE, action)=>{
                     }
                 }
                 return v
+            }
+
+            return state
+        }
+
+        case ADDED_GROUP_ADMIN:{
+            if(state.users === null){
+                return state
+            }
+
+            let groups = state.users.groups
+            let group = _.find(groups,  function(v, k) { 
+                return k == action.group_id
+            })
+
+            if(group === undefined){
+                // console.log(value)
+                return state
+            }
+
+            // dispatch({ type: ADDED_GROUP_ADMIN, group_id:change.doc.id, admin_item_id:admins_change.doc.id, admin_data: admins_change.doc.data()});
+
+            if(group.group_admins === undefined){
+                // console.log(group)
+                let newGroup = {...group, 
+                                    group_admins: {
+                                        ...group.group_admins,
+                                        [action.admin_item_id]:action.admin_data
+                                    }
+                                }
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        groups : {
+                            ...state.users.groups,
+                            [action.group_id]: newGroup
+                        }
+                    }
+                }
+                return v
+            }else{
+                let group_admin = _.find(group.group_admins,  function(v, k) { 
+                    return k == action.admin_item_id
+                })
+
+                if(!_.isEqual(group_admin, action.admin_data)){
+                    console.log('Not equal')
+                    let newGroup = {...group, 
+                                        group_admins: {
+                                            ...group.group_admins,
+                                            [action.admin_item_id]:action.admin_data
+                                        }
+                                    }
+
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            groups : {
+                                ...state.users.groups,
+                                [action.group_id]: newGroup
+                            }
+                        }
+                    }
+                    return v
+                }else{
+                    console.log('equal')
+                }
             }
 
             return state

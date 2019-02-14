@@ -5,7 +5,6 @@ import {FlatList,
         Text, 
         Alert, 
         TouchableOpacity,
-        TouchableHighlight,
         Image} from 'react-native'
 
 import ExpandableList from 'react-native-expandable-section-flatlist'
@@ -25,55 +24,14 @@ import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
 class ListGroupMember_TabMembersPage extends React.Component{
 
-    // static navigationOptions = ({ navigation }) => ({
-    //     title: "List members",
-    //     headerTintColor: '#C7D8DD',
-    //     headerStyle: {
-    //         backgroundColor: 'rgba(186, 53, 100, 1.0)',
-  
-    //         // ios navigationoptions underline hide
-    //         borderBottomWidth: 0,
-  
-    //         // android navigationoptions underline hide
-    //         elevation: 0,
-    //         shadowOpacity: 0
-    //       },
-    //     headerLeft: (
-    //         <View style={{paddingLeft:10}}>
-    //             <TouchableOpacity 
-    //                 onPress={()=>{
-    //                     // GroupMemberInvite
-    //                     const { params = {} } = navigation.state
-    //                     params.handleInvite()
-    //                 }}>
-    //                 <Text style={{color:'#C7D8DD', fontSize:18, fontWeight:'bold'}}>Invite</Text>
-    //             </TouchableOpacity> 
-    //         </View>
-    //     ),
-    //     headerRight: (
-    //         <View style={{marginRight:10}}>
-    //             <TouchableOpacity
-    //                 style={{padding:5}}
-    //                 // disabled={isModify ? false: true}
-    //                 onPress={() => {
-    //                     const { params = {} } = navigation.state
-    //                     params.handleCancel()
-    //                 }}>
-    //                 <MyIcon
-    //                     name={'cancel'}
-    //                     size={25}
-    //                     color={'#C7D8DD'} />
-    //             </TouchableOpacity>
-    //         </View>
-    //     ),
-    // });
-
     constructor(){
         super();
         this.state = { 
             renderContent: false,
             data:[],
-            group_id :0
+            group_id :0,
+            group:{}, 
+            group_profile:{}
         }
     }
 
@@ -117,7 +75,8 @@ class ListGroupMember_TabMembersPage extends React.Component{
                         friend_id:_v.friend_id,
                         name:_v.friend_name,
                         status:_v.status,
-                        image_url:_v.friend_image_url
+                        image_url:_v.friend_image_url,
+                        invitor:_v.invitor === undefined? 0:_v.invitor
                     })
                     break;
                 }
@@ -127,7 +86,8 @@ class ListGroupMember_TabMembersPage extends React.Component{
                         friend_id:_v.friend_id,
                         name:_v.friend_name,
                         status:_v.status,
-                        image_url:_v.friend_image_url
+                        image_url:_v.friend_image_url,
+                        invitor:_v.invitor === undefined? 0:_v.invitor
                     })
                     break;
                 }
@@ -147,7 +107,9 @@ class ListGroupMember_TabMembersPage extends React.Component{
         this.setState({
             data: [ {title: 'Members',member: members}, 
                     {title: 'Pending', member: pending},
-                    {title: 'Decline', member: decline},]
+                    {title: 'Decline', member: decline},],
+            group_profile: group.group_profile,
+            group
         })
     }
 
@@ -161,9 +123,34 @@ class ListGroupMember_TabMembersPage extends React.Component{
         this.props.navigation.goBack(null)
     }
 
+    checkInvitor = (rowItem) =>{
+
+        // rowItem.friend_id === this.state.group_profile.creator_id?<Text style={{fontSize:12, color:'gray'}}>Group Creator</Text>:<View />
+    
+        if(rowItem.friend_id === this.state.group_profile.creator_id){
+            return(<Text style={{fontSize:12, color:'gray'}}>Group Creator</Text>)
+        }else {
+            if(rowItem.invitor != 0){
+
+                if(rowItem.invitor === this.props.uid){
+                    return(<Text style={{fontSize:12, color:'gray'}}>Added by You</Text>)
+                }
+
+                let member = _.find(this.state.group.members, (mv, mk)=>{
+                    return rowItem.invitor == mv.friend_id
+                })
+
+                return(<Text style={{fontSize:12, color:'gray'}}>Added by {member.friend_name}</Text>)
+
+                // console.log()
+            }
+        }
+        return(<View />)
+    }
+
     _renderRow = (rowItem, rowId, sectionId) => {
 
-        // console.log(rowItem)
+        console.log(rowItem)
 
         let swipeoutRight = []
 
@@ -181,6 +168,54 @@ class ListGroupMember_TabMembersPage extends React.Component{
                         }
                     }
                 ]
+
+                return( 
+                    <Swipeout 
+                        style={{backgroundColor:'white'}} 
+                        right={swipeoutRight}>
+                        <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                            <TouchableOpacity>
+                              {/* <ImageWithDefault 
+                                source={{uri: rowItem.image_url}}
+                                style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
+                              /> */}
+                                <FastImage
+                                    style={{width: 60,  
+                                            height: 60,
+                                            borderRadius: 10, 
+                                            borderColor:'gray', 
+                                            // backgroundColor: '#FF83AF',
+                                            borderWidth:1
+                                            }}
+                                    source={{
+                                        uri: rowItem.image_url,
+                                        headers:{ Authorization: 'someAuthToken' },
+                                        priority: FastImage.priority.normal,
+                                    }}
+                                    resizeMode={FastImage.resizeMode.normal}
+                                />
+                            </TouchableOpacity>
+                            <View >
+                                <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
+                                    <Text style={{fontSize:18}}>{rowItem.name}{this.props.uid === rowItem.friend_id ? '(You)': ''}</Text>
+                                    {/* {rowItem.friend_id === this.state.group_profile.creator_id?<Text style={{fontSize:12, color:'gray'}}>Group Creator</Text>:<View />} */}
+                                
+                                    {this.checkInvitor(rowItem)}
+                                    {/* rowItem */}
+                                </View>
+                            </View>
+                            {/* <View style={{position:'absolute', right:0, marginRight:10}}>
+                                <TouchableOpacity
+                                    onPress={()=>{
+                                        alert('menu')
+                                    }}>
+                                    <MyIcon name={'dot-vertical'}
+                                            size={14}
+                                            color={'#C7D8DD'} />
+                                </TouchableOpacity>
+                            </View> */}
+                        </View>
+                    </Swipeout>)
                 break;
             }
             case Constant.GROUP_STATUS_MEMBER_JOINED:{
@@ -188,7 +223,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                     {
                         // component: <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}><Text style={{color:'white'}}>Delete</Text></View>,
                         component:  <View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'red'}}>
-                                        <Text style={{fontWeight:'bold', color:'white', fontSize:14}}>DELETE</Text>
+                                        <Text style={{fontWeight:'bold', color:'white', fontSize:14}}>LEAVE</Text>
                                     </View>,
                         backgroundColor: 'red',
                         onPress: () => { 
@@ -196,12 +231,60 @@ class ListGroupMember_TabMembersPage extends React.Component{
                         }
                     }
                 ]
+
+                return( 
+                    <Swipeout 
+                        style={{backgroundColor:'white'}} 
+                        right={swipeoutRight}>
+                        <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                            <TouchableOpacity>
+                              {/* <ImageWithDefault 
+                                source={{uri: rowItem.image_url}}
+                                style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
+                              /> */}
+                                <FastImage
+                                    style={{width: 60,  
+                                            height: 60,
+                                            borderRadius: 10, 
+                                            borderColor:'gray', 
+                                            // backgroundColor: '#FF83AF',
+                                            borderWidth:1
+                                            }}
+                                    source={{
+                                        uri: rowItem.image_url,
+                                        headers:{ Authorization: 'someAuthToken' },
+                                        priority: FastImage.priority.normal,
+                                    }}
+                                    resizeMode={FastImage.resizeMode.normal}
+                                />
+                            </TouchableOpacity>
+                            <View >
+                                <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
+                                    <Text style={{fontSize:18}}>{rowItem.name}{this.props.uid === rowItem.friend_id ? '(You)': ''}</Text>
+                                    {/* {rowItem.friend_id === this.state.group_profile.creator_id?<Text style={{fontSize:12, color:'gray'}}>Group Creator</Text>:<View />} */}
+                                
+                                    {this.checkInvitor(rowItem)}
+                                    {/* rowItem */}
+                                </View>
+                            </View>
+                            <View style={{position:'absolute', right:0, marginRight:10}}>
+                                <TouchableOpacity
+                                    onPress={()=>{
+                                        alert('menu')
+                                    }}>
+                                    <MyIcon name={'dot-vertical'}
+                                            size={14}
+                                            color={'#C7D8DD'} />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Swipeout>)
                 break;
             }
 
             case Constant.GROUP_STATUS_MEMBER_DECLINE:{
                 return(<View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
-                            <TouchableHighlight 
+                            <TouchableOpacity
                                 style={{height:60,
                                         width: 60,
                                         borderRadius: 10}}>
@@ -209,7 +292,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                 source={{uri: rowItem.image_url}}
                                 style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
                                 />
-                            </TouchableHighlight>
+                            </TouchableOpacity>
                             <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
                                 <Text style={{fontSize:18}}>{rowItem.name}</Text>
                             </View>
@@ -253,26 +336,8 @@ class ListGroupMember_TabMembersPage extends React.Component{
                         </View>)
             }
         }
-        
-        return( 
-            <Swipeout 
-                style={{backgroundColor:'white'}} 
-                right={swipeoutRight}>
-                <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
-                  <TouchableHighlight 
-                      style={{height:60,
-                              width: 60,
-                              borderRadius: 10}}>
-                      <ImageWithDefault 
-                        source={{uri: rowItem.image_url}}
-                        style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
-                      />
-                  </TouchableHighlight>
-                  <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                    <Text style={{fontSize:18}}>{rowItem.name}</Text>
-                 </View>
-                </View>
-            </Swipeout>)
+
+        return (<View />)
     }
 
     _renderSection = (section, sectionId, state)  => {

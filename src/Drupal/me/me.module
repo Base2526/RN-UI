@@ -14241,12 +14241,13 @@ function create_chat_group(){
   $member_v['field_members_group_friend_name'][LANGUAGE_NONE][0]['value']= $m_profile['friend_name'];
   $member_v['field_path_uri'][LANGUAGE_NONE][0]['value']                 = $m_profile['friend_image_url'];
   $member_v['field_mg_status'][LANGUAGE_NONE][0]['tid']                  = '36';
+  $member_v['field_members_group_invitor'][LANGUAGE_NONE][0]['value']    =  $param_uid;
 
   $member_field_entity = entity_create('field_collection_item', $member_v);
   $member_field_entity->setHostEntity('node', $node);
   $member_field_entity->save();
 
-
+  $m_profile['invitor'] = $param_uid;
   $m_profile['status'] = '36';
   $f_members[$member_field_entity->item_id] = $m_profile;
 
@@ -14267,10 +14268,15 @@ function create_chat_group(){
   $group_admin_entity->setHostEntity('node', $node);
   $group_admin_entity->save();
 
-  $admin = array('uid'=>$param_uid);
-  $group_admins[$group_admin_entity->item_id] = $admin;
+  $key_admin = generateRandomString(LENGTH_CHAT_ID);
+  $item_id_admin = $group_admin_entity->item_id;
 
-  $nycRef =firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('admins')->document($group_admin_entity->item_id);
+  $admin = array('uid'    =>$param_uid,
+                 'item_id'=>$item_id_admin);
+                 
+  $group_admins[$key_admin] = $admin;
+
+  $nycRef =firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('admins')->document($key_admin);
   $batch->set($nycRef, $admin, ['merge' => true]);
 
   /*
@@ -14342,11 +14348,13 @@ function create_chat_group(){
     $member_v['field_members_group_friend_name'][LANGUAGE_NONE][0]['value']= $m_profile['friend_name'];
     $member_v['field_path_uri'][LANGUAGE_NONE][0]['value']                 = $m_profile['friend_image_url'];
     $member_v['field_mg_status'][LANGUAGE_NONE][0]['tid']                  = '35';
+    $member_v['field_members_group_invitor'][LANGUAGE_NONE][0]['value']    =  $param_uid;
 
     $member_field_entity = entity_create('field_collection_item', $member_v);
     $member_field_entity->setHostEntity('node', $node);
     $member_field_entity->save();
 
+    $m_profile['invitor'] = $param_uid;
     $m_profile['status'] = '35';
     $f_members[$member_field_entity->item_id] = $m_profile;
     
@@ -14434,6 +14442,7 @@ function create_chat_group(){
   $result['result']       = TRUE;
   $result['group_profile']= $f_item;
   $result['members']      = $f_members;
+  $result['group_admins'] = $group_admins;
   // $result['t']            = $t;
 
   /*

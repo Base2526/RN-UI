@@ -75,16 +75,16 @@ class GroupsPage extends React.Component{
 
       this.setState({
         favorites: {
-          title: 'Groups',
-          member:group_joined
+          title: 'Favorites',
+          member:group_favorites
         },
         invited: {
           title: 'Groups invitations',
           member:group_invited
         },
         groups: {
-          title:'Favorites',
-          member:group_favorites
+          title:'Groups',
+          member: group_joined
         },
         refreshing: true,
       })
@@ -496,6 +496,7 @@ class GroupsPage extends React.Component{
         return <View style={{flex: 1}}><Text>Empty Group</Text></View>
       }
 
+      let data = [favorites, invited, groups]
       return (
         <View style={{flex:1}}>
         <Spinner
@@ -507,7 +508,7 @@ class GroupsPage extends React.Component{
         {
           <ExpandableList
               ref={instance => this.ExpandableList = instance}
-              dataSource={[favorites, invited, groups]}
+              dataSource={data}
               headerKey="title"
               memberKey="member"
               renderRow={this._renderRow}

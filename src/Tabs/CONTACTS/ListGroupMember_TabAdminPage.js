@@ -5,7 +5,6 @@ import {FlatList,
         Text, 
         Alert, 
         TouchableOpacity,
-        TouchableHighlight,
         Image} from 'react-native'
 
 import ExpandableList from 'react-native-expandable-section-flatlist'
@@ -72,7 +71,9 @@ class ListGroupMember_TabAdminPage extends React.Component{
         super();
         this.state = { 
             renderContent: false,
-            data:[]
+            data:[],
+            group_id: 0,
+            members: []
         }
     }
 
@@ -90,20 +91,22 @@ class ListGroupMember_TabAdminPage extends React.Component{
         // })
 
         // this.loadData(group)
+
+        let {group_id} = this.props.params
+        let group = _.find(this.props.groups,  function(v, k) { 
+            return k == group_id
+        })
+        this.loadData(group)
     }
 
     componentWillReceiveProps(nextProps) {
         console.log(nextProps);
+        let {group_id} = this.props.params
+        let group = _.find(nextProps.groups,  function(v, k) { 
+            return k == group_id
+        })
 
-        // const { navigation } = this.props;
-        // const group_id = navigation.getParam('group_id', null);
-        
-        // let group = _.find(nextProps.groups,  function(v, k) { 
-        //     return k == group_id
-        // })
-
-        // // this.loadData(group)
-        // console.log(group)
+        this.loadData(group)
     }
 
     getGroupId = () =>{
@@ -115,49 +118,20 @@ class ListGroupMember_TabAdminPage extends React.Component{
 
     loadData = (group) =>{
 
-        let members = []
-        let pending = []
-        let decline = []
-        _.each(group.members,  function(_v, _k) { 
-            switch(_v.status){
-                case Constant.GROUP_STATUS_MEMBER_INVITED:{
-                    pending.push({
-                        item_id:_k,
-                        friend_id:_v.friend_id,
-                        name:_v.friend_name,
-                        status:_v.status,
-                        image_url:_v.friend_image_url
-                    })
-                    break;
-                }
-                case Constant.GROUP_STATUS_MEMBER_JOINED:{
-                    members.push({
-                        item_id:_k,
-                        friend_id:_v.friend_id,
-                        name:_v.friend_name,
-                        status:_v.status,
-                        image_url:_v.friend_image_url
-                    })
-                    break;
-                }
-                case Constant.GROUP_STATUS_MEMBER_DECLINE:{
-                    decline.push({
-                        item_id:_k,
-                        friend_id:_v.friend_id,
-                        name:_v.friend_name,
-                        status:_v.status,
-                        image_url:_v.friend_image_url
-                    })
-                    break;
-                }
+        console.log(group)
+
+        // members, group_admins
+
+        var members = _.map(group.group_admins, function(v, k) {
+            let member = _.find(group.members, (mv, mk)=>{
+                return v.uid == mv.friend_id
+            })
+            if(member !== undefined){
+                return member;
             }
         });
 
-        this.setState({
-            data: [ {title: 'Members',member: members}, 
-                    {title: 'Pending', member: pending},
-                    {title: 'Decline', member: decline},]
-        })
+        this.setState({members})
     }
 
     handleInvite = () => {
@@ -210,7 +184,7 @@ class ListGroupMember_TabAdminPage extends React.Component{
 
             case Constant.GROUP_STATUS_MEMBER_DECLINE:{
                 return(<View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
-                            <TouchableHighlight 
+                            <TouchableOpacity
                                 style={{height:60,
                                         width: 60,
                                         borderRadius: 10}}>
@@ -218,7 +192,7 @@ class ListGroupMember_TabAdminPage extends React.Component{
                                 source={{uri: rowItem.image_url}}
                                 style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
                                 />
-                            </TouchableHighlight>
+                            </TouchableOpacity>
                             <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
                                 <Text style={{fontSize:18}}>{rowItem.name}</Text>
                             </View>
@@ -268,7 +242,7 @@ class ListGroupMember_TabAdminPage extends React.Component{
                 style={{backgroundColor:'white'}} 
                 right={swipeoutRight}>
                 <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
-                  <TouchableHighlight 
+                  <TouchableOpacity 
                       style={{height:60,
                               width: 60,
                               borderRadius: 10}}>
@@ -276,7 +250,7 @@ class ListGroupMember_TabAdminPage extends React.Component{
                         source={{uri: rowItem.image_url}}
                         style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
                       />
-                  </TouchableHighlight>
+                  </TouchableOpacity>
                   <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
                     <Text style={{fontSize:18}}>{rowItem.name}</Text>
                  </View>
@@ -323,22 +297,62 @@ class ListGroupMember_TabAdminPage extends React.Component{
             </View>
         )
     }
+
+    renderItem = ({item, index}) => { 
+        console.log(item)
+        return(<View style={{height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                    <TouchableOpacity>
+                        <FastImage
+                            style={{width: 60,  
+                                    height: 60,
+                                    borderRadius: 10, 
+                                    borderColor:'gray', 
+                                    // backgroundColor: '#FF83AF',
+                                    borderWidth:1
+                                    }}
+                            source={{
+                                uri: item.friend_image_url,
+                                headers:{ Authorization: 'someAuthToken' },
+                                priority: FastImage.priority.normal,
+                            }}
+                            resizeMode={FastImage.resizeMode.normal}
+                        />
+                    </TouchableOpacity>
+                    <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
+                        <Text style={{fontSize:18}}>{item.friend_name}</Text>
+                    </View>
+                </View>)
+    }
       
     render() {
-        return (<ExpandableList
-                    style={{flex:1}}
-                    ref={instance => this.ExpandableList = instance}
-                    dataSource={this.state.data}
-                    headerKey="title"
-                    memberKey="member"
-                    renderRow={this._renderRow}
-                    headerOnPress={(i, state) => {
-                    } }
-                    renderSectionHeaderX={this._renderSection}
-                    openOptions={[0, 1, 2]}
-                    removeClippedSubviews={false}
-                />
-        );
+        // return (<ExpandableList
+        //             style={{flex:1}}
+        //             ref={instance => this.ExpandableList = instance}
+        //             dataSource={this.state.data}
+        //             headerKey="title"
+        //             memberKey="member"
+        //             renderRow={this._renderRow}
+        //             headerOnPress={(i, state) => {
+        //             } }
+        //             renderSectionHeaderX={this._renderSection}
+        //             openOptions={[0, 1, 2]}
+        //             removeClippedSubviews={false}
+        //         />
+        // );
+
+        let {members} = this.state
+
+        return(<View style={{flex:1}} ><FlatList
+            
+            // key = {this.state.orientation}
+            /*  เราต้องมีการคำนวณ item ให้เต็มแต่ละแถว  */
+            data = {members}
+            // numColumns={this.state.numColumns}
+            renderItem={this.renderItem}
+            // keyExtractor={this.keyExtractor}
+            extraData={this.state}
+            // contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
+          /></View>)
     }
 }
 
