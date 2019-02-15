@@ -43,8 +43,18 @@ export const ADDED_GROUP_ADMIN     = "added_group_admin"
 export const MODIFIED_GROUP_ADMIN  = "modified_group_admin" // modified
 export const REMOVED_GROUP_ADMIN   = "removed_group_admin"
 
-export const SELECT_ADD_CLASS       = "select_add_class"
-export const CLASS_MEMBERS          = "class_members"
+//  เป็นการ cancel การ invite โดยผู้เชิญ(admin)
+export const CANCELED_GROUP_MEMBER  = "canceled_group_member"
+
+export const ADDED_CLASS            = "added_class"
+export const MODIFIED_CLASS         = "modified_class"
+export const REMOVED_CLASS          = "emoved_class"
+
+export const FAVORITES_CLASS        = "favorites_classs"
+
+export const ADDED_CLASS_MEMBER     = "added_class_member"
+export const MODIFIED_CLASS_MEMBER  = "modified_class_member"
+export const REMOVED_CLASS_MEMBER   = "removed_class_member"
 
 export const FRIEND_MUTE            = "friend_mute"
 export const FRIEND_HIDE            = "friend_hide"

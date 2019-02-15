@@ -108,7 +108,7 @@ class DrawerMenu extends React.Component{
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log(nextProps.auth)
+        // console.log(nextProps.auth)
 
         let {my_applications} = nextProps.auth.users
         this.onLoadDataMyApplication(my_applications)

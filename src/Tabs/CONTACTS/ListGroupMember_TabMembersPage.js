@@ -12,6 +12,13 @@ import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
 
 import Swipeout from 'react-native-swipeout'
+import {
+    MenuProvider,
+    Menu,
+    MenuTrigger,
+    MenuOptions,
+    MenuOption,
+  } from 'react-native-popup-menu';
 
 var _ = require('lodash');
 import ImageWithDefault from '../../Utils/ImageWithDefault'
@@ -57,9 +64,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
     }
 
     getGroupId = () =>{
-        return 0
-        const { navigation } = this.props;
-        return  navigation.getParam('group_id', null);
+        return this.props.params.group_id
     }
 
     loadData = (group) =>{
@@ -164,7 +169,14 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                     </View>,
                         backgroundColor: 'red',
                         onPress: () => { 
-                            alert('Cancel')
+                            console.log(rowItem)
+                            this.props.actionCanceledGroupMember(this.props.uid, this.getGroupId(), rowItem.friend_id, rowItem.item_id, (result) => {
+                                console.log(result)
+
+                                // setTimeout(() => {
+                                //     this.setState({loading:false})
+                                // }, 100);
+                            })
                         }
                     }
                 ]
@@ -272,9 +284,10 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                     onPress={()=>{
                                         alert('menu')
                                     }}>
+                                    
                                     <MyIcon name={'dot-vertical'}
-                                            size={14}
-                                            color={'#C7D8DD'} />
+                                        size={14}
+                                        color={'#C7D8DD'} />        
                                 </TouchableOpacity>
                             </View>
                         </View>

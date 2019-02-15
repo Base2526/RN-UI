@@ -28,13 +28,22 @@ import {USER_LOGIN_SUCCESS,
         MODIFIED_GROUP_ADMIN, // modified
         REMOVED_GROUP_ADMIN,
 
+        //  เป็นการ cancel การ invite โดยผู้เชิญ(admin)
+        CANCELED_GROUP_MEMBER,
+
         FAVORITES_GROUP,
         MEMBER_JOIN_GROUP,
         MEMBER_DECLINE_GROUP,
         MEMBER_INVITE_AGAIN_GROUP,
         MEMBER_LEAVE_GROUP,
-        SELECT_ADD_CLASS,
-        CLASS_MEMBERS,
+        ADDED_CLASS,
+        MODIFIED_CLASS,
+        REMOVED_CLASS,
+        // CLASS_MEMBERS,
+        ADDED_CLASS_MEMBER,
+        MODIFIED_CLASS_MEMBER,
+        REMOVED_CLASS_MEMBER,
+        FAVORITES_CLASS,
         FRIEND_MUTE,
         FRIEND_HIDE,
         FRIEND_BLOCK,
@@ -331,6 +340,21 @@ export const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
     })
 }
 
+/*
+//  เป็นการ cancel การ invite โดยผู้เชิญ(admin)
+CANCELED_GROUP_MEMBER  = "canceled_group_member"
+*/
+export const actionCanceledGroupMember = (uid, group_id, friend_id, member_item_id, callback) => dispatch =>{
+    firebase.firestore().collection('users').doc(friend_id).collection('groups').doc(group_id).delete()
+    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_item_id).set({
+        status: Constant.GROUP_STATUS_MEMBER_CANCELED,
+        canceler:uid // เก้บ uid ของคนที่ทำการ cancel friend_id 
+    }, { merge: true});
+
+    dispatch({ type: CANCELED_GROUP_MEMBER, group_id, friend_id, member_item_id});
+    callback({'status':true})
+}
+
 export const actionUpdateGroupPictureProfile = (uid, group_id, image_uri) => dispatch =>{
 
     return update_group_picture_profile(uid, group_id, image_uri).then(data => {
@@ -446,18 +470,37 @@ export const actionDeleteGroup = (uid, group_id, callback) => dispatch =>{
     callback({'status':true})
 }
 
-export const actionCreateClass = (uid, class_name, uri) => dispatch =>{
-    return create_class(uid, class_name, uri).then(data => {
+export const actionCreateClass = (uid, class_name, members, uri) => dispatch =>{
+    return create_class(uid, class_name, members, uri).then(data => {
+        console.log(data)
         if((data instanceof Array)){
             return {'status':false, 'message': data}
         }else{
             if(!data.result){
                 return {'status':false, 'message': data}
             }else{
+                dispatch({type: ADDED_CLASS, class_id:data.item_id ,class_data:data.data})
                 return {'status':true, 'data':data}
             }
         }
     })
+}
+
+// favorites class
+export const actionFavoritesClass = (uid, class_id, favorite_status, callback) => dispatch => {
+    
+    dispatch({ type: FAVORITES_CLASS, class_id, favorite_status});
+    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).set({
+        is_favorites: favorite_status,
+    }, { merge: true});
+    callback({'status':true})
+}
+
+// delete class
+export const actionDeleteClass = (uid, class_id, callback) => dispatch =>{
+    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).delete()
+    dispatch({ type: REMOVED_CLASS, class_id});
+    callback({'status':true})
 }
 
 export const actionUpdateStatusFriend = (uid, friend_id, status, callback) => dispatch=>{
@@ -1300,7 +1343,7 @@ export function watchTaskEvent(uid, dispatch) {
                     // track group > members
                     firebase.firestore().collection('groups').doc(change.doc.id).collection('members').onSnapshot((querySnapshot) => {
                         querySnapshot.docChanges.forEach(function(members_change) {
-                            console.log(change.doc.id, members_change.type, members_change.doc.id)
+                            console.log(change.doc.id, members_change.type, members_change.doc.id, members_change.doc.data())
                             
                             if (members_change.type === 'added') {
                                 console.log('added: ', change.doc.id, members_change.doc.id, members_change.doc.data());
@@ -1320,7 +1363,7 @@ export function watchTaskEvent(uid, dispatch) {
                                 let data = change.doc.data()
                                 // MODIFIED_GROUP_MEMBER
 
-                                dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, item_id, data});
+                                // dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, item_id, data});
                             }
                             if (members_change.type === 'removed') {
                                 console.log('removed: ', change.doc.id, members_change.doc.id, members_change.doc.data());
@@ -1398,25 +1441,75 @@ export function watchTaskEvent(uid, dispatch) {
     })
     
     // track classs
-    firebase.firestore().collection('users').doc(uid).collection('classs').onSnapshot((qSnapshot) => {
+    firebase.firestore().collection('users').doc(uid).collection('classs').onSnapshot((classsSnapshot) => {
+        classsSnapshot.docChanges.forEach(function(classsChange) {
+            console.log("Classs", classsChange.type, classsChange.doc.id, classsChange.doc.data());
 
-        let _this = this
-        qSnapshot.forEach(function(doc) {
-            // console.log("SELECT_ADD_CLASS ", doc.id, " => ", doc.data());
+            switch(classsChange.type){
+                case 'added':{
+                    // ADDED_CLASS class_id, class_data
+                    dispatch({type: ADDED_CLASS, class_id:classsChange.doc.id ,class_data:classsChange.doc.data() })
 
-            dispatch({type: SELECT_ADD_CLASS, class_id:doc.id, class_data:doc.data()})
-
-            firebase.firestore().collection('users').doc(uid).collection('classs').doc(doc.id).collection('members').onSnapshot((querySnapshot) => {
-            
-                // console.log(doc.id)
-                querySnapshot.forEach(function(pdoc) {
-                    // console.log("CLASS_MEMBERS ", doc.id, " => ", doc.data());
-
-                    // SELECT_CLASS_MEMBERS
-                    dispatch({type: CLASS_MEMBERS, parent_id:doc.id,class_members_id:pdoc.id, class_members_data:pdoc.data()})
-                })
-            })
+                    firebase.firestore().collection('users').doc(uid).collection('classs').doc(classsChange.doc.id).collection('members').onSnapshot((classsMembersSnapshot) => {
+                        classsMembersSnapshot.docChanges.forEach(function(classsMembersChange) {
+                            console.log("Classs", classsChange.doc.data(), classsMembersChange.type, classsMembersChange.doc.id, classsMembersChange.doc.data());
+                            // console.log("CLASS_MEMBERS ", doc.id, " => ", doc.data());
+                            // SELECT_CLASS_MEMBERS
+                            // dispatch({type: CLASS_MEMBERS, parent_id:doc.id,class_members_id:pdoc.id, class_members_data:pdoc.data()})
+                        
+                            switch(classsMembersChange.type){
+                                case 'added':{
+                                    // ADDED_CLASS_MEMBER
+                                    dispatch({type: ADDED_CLASS_MEMBER, class_id:classsChange.doc.id, class_member_id:classsMembersChange.doc.id, class_member_data:classsMembersChange.doc.data() })
+                                    break;
+                                }
+                                case 'modified':{
+                                    // MODIFIED_CLASS_MEMBER
+                                    dispatch({type: MODIFIED_CLASS_MEMBER, class_id:classsChange.doc.id, class_member_id:classsMembersChange.doc.id, class_member_data:classsMembersChange.doc.data() })
+                                    break;
+                                }
+                                case 'removed':{
+                                    // REMOVED_CLASS_MEMBER
+                                    dispatch({type: REMOVED_CLASS_MEMBER, class_id:classsChange.doc.id, class_member_id:classsMembersChange.doc.id})
+                                    break;
+                                }
+                            }
+                        })
+                    })
+                    break;
+                }
+                case 'modified':{
+                    // MODIFIED_CLASS
+                    // console.log("Classs", classsChange.type, classsChange.doc.id, classsChange.doc.data());
+                    dispatch({type: MODIFIED_CLASS, class_id:classsChange.doc.id ,class_data:classsChange.doc.data() })
+                   
+                    break;
+                }
+                case 'removed':{
+                    // REMOVED_CLASS
+                    dispatch({type: REMOVED_CLASS, class_id:classsChange.doc.id})
+                    break;
+                }
+            }
         })
+
+        // let _this = this
+        // qSnapshot.forEach(function(doc) {
+        //     // console.log("SELECT_ADD_CLASS ", doc.id, " => ", doc.data());
+
+        //     dispatch({type: SELECT_ADD_CLASS, class_id:doc.id, class_data:doc.data()})
+
+        //     firebase.firestore().collection('users').doc(uid).collection('classs').doc(doc.id).collection('members').onSnapshot((querySnapshot) => {
+            
+        //         // console.log(doc.id)
+        //         querySnapshot.forEach(function(pdoc) {
+        //             // console.log("CLASS_MEMBERS ", doc.id, " => ", doc.data());
+
+        //             // SELECT_CLASS_MEMBERS
+        //             dispatch({type: CLASS_MEMBERS, parent_id:doc.id,class_members_id:pdoc.id, class_members_data:pdoc.data()})
+        //         })
+        //     })
+        // })
     })
 
     // trach my application

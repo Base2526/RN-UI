@@ -222,7 +222,7 @@ export const create_group = (uid, group_name, members, uri) =>{
       })
 }
 
-export const create_class = (uid, class_name, uri) =>{
+export const create_class = (uid, class_name, members, uri) =>{
     var data = new FormData();
     data.append('idna', {
         uri: uri, // your file path string
@@ -230,8 +230,9 @@ export const create_class = (uid, class_name, uri) =>{
         type: 'image/png'
     })
     data.append("uid", uid)
-    data.append("fction", 'add')
+    // data.append("fction", 'add')
     data.append("name", class_name)
+    data.append('members', JSON.stringify(members))
 
     return fetch(Constant.CREATE_CLASS, {
         headers: Constant.FETCH_HEADERS,
@@ -242,7 +243,7 @@ export const create_class = (uid, class_name, uri) =>{
     }).then((responseJson) => {
         return responseJson;
     }).catch((error) => {
-    return {'status': false, 'message': error}
+        return {'status': false, 'message': error}
     })
 }
 

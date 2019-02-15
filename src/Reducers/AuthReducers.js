@@ -16,6 +16,7 @@ import {USER_LOGIN_SUCCESS,
         UPDATE_GROUP_PICTURE_PROFILE,
         FAVORITES_GROUP,
         MEMBER_JOIN_GROUP,
+        CANCELED_GROUP_MEMBER,
         MEMBER_DECLINE_GROUP,
         MEMBER_INVITE_AGAIN_GROUP,
         MEMBER_LEAVE_GROUP,
@@ -25,8 +26,14 @@ import {USER_LOGIN_SUCCESS,
         ADDED_GROUP_ADMIN,
         MODIFIED_GROUP_ADMIN, 
         REMOVED_GROUP_ADMIN,
-        SELECT_ADD_CLASS,
-        CLASS_MEMBERS,
+        ADDED_CLASS,
+        MODIFIED_CLASS,
+        REMOVED_CLASS,
+        // CLASS_MEMBERS,
+        ADDED_CLASS_MEMBER,
+        MODIFIED_CLASS_MEMBER,
+        REMOVED_CLASS_MEMBER,
+        FAVORITES_CLASS,
         FRIEND_MUTE,
         FRIEND_HIDE,
         FRIEND_BLOCK,
@@ -1521,6 +1528,50 @@ export default (state= INITIAL_STATE, action)=>{
             return state
         }
 
+        case CANCELED_GROUP_MEMBER:{
+
+            if(state.users === null){
+                return state
+            }
+
+            let groups = state.users.groups
+            let group = _.find(groups,  function(v, k) { 
+                return k == action.group_id
+            })
+
+            let members = group.members
+            if(members !== undefined){
+                console.log(action, group)
+
+                let member_item_id = action.member_item_id
+
+                let member = _.find(members,  function(v, k) { 
+                    return k == member_item_id
+                })
+
+                if(member !== undefined){      
+                    let newMembers = _.omit(members, member_item_id)
+                    let newGroup = {...group, members: newMembers}
+
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            groups : {
+                                ...state.users.groups,
+                                [action.group_id]: newGroup
+                            }
+                        }
+                    }
+
+                    console.log(newGroup)
+                    return v 
+                }
+            }
+
+            return state
+        }
+
         case MEMBER_LEAVE_GROUP:{
             if(state.users === null){
                 return state
@@ -1692,16 +1743,20 @@ export default (state= INITIAL_STATE, action)=>{
             
             let groups = state.users.groups
 
-            let key = 0
-            let value = null
-            _.each(groups, function(_v, _k) { 
-                if(_k === action.group_id){
-                    key = _k
-                    value = _v
-                }
-            });
+            // let key = 0
+            // let value = null
+            // _.each(groups, function(_v, _k) { 
+            //     if(_k === action.group_id){
+            //         key = _k
+            //         value = _v
+            //     }
+            // });
+            // let groups = state.users.groups
+            let group = _.find(groups,  function(v, k) { 
+                return k == action.group_id
+            })
 
-            if(value == null){
+            if(group === undefined){
                 return state
             }
             
@@ -1858,32 +1913,355 @@ export default (state= INITIAL_STATE, action)=>{
             return state
         }
 
-        case SELECT_ADD_CLASS:{
+        case ADDED_CLASS:{
             if(state.users === null){
                 return state
             }
 
             let classs = state.users.classs
+            let _class = _.find(classs,  function(v, k) { 
+                return k == action.class_id
+            })
+
+            if(_class === undefined){
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        classs : {
+                            ...state.users.classs,
+                            [action.class_id]: action.class_data
+                        }
+                    }
+                }
+                console.log("Classs", 'Not equal', action, _class, v)
+                return v
+            }
 
             // console.log(classs)
             // console.log(action.class_id)
             // console.log(action.class_data)
 
+            // dispatch({type: ADDED_CLASS, class_id:classsChange.doc.id ,class_data:classsChange.doc.data() })
+
+            /* 
+            การที่เราร่วมกันก่อน compare เพราะว่า data เก่าจะมี field members หรือ field อืนด้วย
+            */
+            let newClassData = action.class_data
+            if(_class.members !== undefined){
+                newClassData = {...action.class_data, members:_class.members}
+            }
+
+            // let newClassData = {..._class, ...action.class_data}
+            // console.log("Classs", _class)
+            // console.log("Classs", action.class_data)
+            // console.log("Classs", newClassData)
+
+            if(!_.isEqual(_class, newClassData)){
+                // console.log()
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        classs : {
+                            ...state.users.classs,
+                            [action.class_id]: newClassData
+                        }
+                    }
+                }
+                console.log("Classs", 'Not equal', action, _class, v)
+                return v
+            }
+            console.log("Classs", 'Equal', action, _class)
+
+            return state
+        }
+
+        case MODIFIED_CLASS:{
+            if(state.users === null){
+                return state
+            }
+
+            let classs = state.users.classs
+            let _class = _.find(classs,  function(v, k) { 
+                return k == action.class_id
+            })
+
+            if(_class === undefined){
+                return state
+            }
+
+            let newClassData = {..._class, ...action.class_data}
+
+            // console.log("Classs", action)
+            // console.log("Classs", _class)
+            // console.log("Classs", action.class_data)
+            // console.log("Classs", newClassData)
+
+            if(_class.members === undefined){
+                if(!_.isEqual(_class, action.class_data)){
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            classs : {
+                                ...state.users.classs,
+                                [action.class_id]: action.class_data
+                            }
+                        }
+                    }
+                    console.log("Classs", v)
+                }
+            }else{
+                let newClass = {...action.class_data, members:_class.members}
+                console.log("Classs", newClass)
+
+                if(!_.isEqual(_class, newClass)){
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            classs : {
+                                ...state.users.classs,
+                                [action.class_id]: newClass
+                            }
+                        }
+                    }
+                    console.log("Classs", v)
+
+                    return v
+                }
+            }
+
+            return state
+        }
+
+        case REMOVED_CLASS:{
+            if(state.users === null){
+                return state
+            }
+            
+            let classs = state.users.classs
+            let _class = _.find(classs,  function(v, k) { 
+                return k == action.class_id
+            })
+
+            if(_class === undefined){
+                return state
+            }
+
+            let newClasss = _.omit(classs, action.class_id)
             let v = {
                 ...state,
                 users : {
                     ...state.users,
-                    classs : {
-                        ...state.users.classs,
-                        [action.class_id]: action.class_data
+                    classs : newClasss
+                }
+            }
+            console.log("Classs", v)
+            return v
+        }
+
+        case ADDED_CLASS_MEMBER:{
+            if(state.users === null){
+                return state
+            }
+
+            let classs = state.users.classs
+            let _class = _.find(classs,  function(v, k) { 
+                return k == action.class_id
+            })
+
+            if(_class === undefined){
+                return state
+            }
+
+            console.log("Classs", _class)
+            //  dispatch({type: ADDED_CLASS_MEMBER, class_id:classsChange.doc.id, class_member_id:classsMembersChange.doc.id, class_member_data:classsMembersChange.doc.data() })
+            if(_class.members === undefined){
+
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        classs : {
+                            ...state.users.classs,
+                            [action.class_id]: {..._class, members:{[action.class_member_id]: action.class_member_data}}
+                        }
+                    }
+                }    
+                // console.log("Classs", v)
+                return v
+            }else{
+
+                let members = _class.members
+                let member = _.find(members,  function(v, k) { 
+                    return k == action.class_member_id
+                })
+
+                if(member === undefined){
+                    members = {...members, ...{[action.class_member_id]: action.class_member_data}}
+                
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            classs : {
+                                ...state.users.classs,
+                                [action.class_id]: {..._class, members}
+                            }
+                        }
+                    }       
+                    console.log("Classs", v)
+                    return v
+                }else{
+                    if(!_.isEqual(member, action.class_member_data)){
+                        members = {...members, ...{[action.class_member_id]: action.class_member_data}}
+                        let v = {
+                            ...state,
+                            users : {
+                                ...state.users,
+                                classs : {
+                                    ...state.users.classs,
+                                    [action.class_id]: {..._class, members}
+                                }
+                            }
+                        }       
+                        console.log("Classs", v)
                     }
                 }
             }
-
-            // console.log(v)
-            return v;
+            return state
         }
 
+        /* 
+        MODIFIED_CLASS_MEMBER,
+        REMOVED_CLASS_MEMBER,
+        */
+        case MODIFIED_CLASS_MEMBER:{
+
+            if(state.users === null){
+                return state
+            }
+
+            let classs = state.users.classs
+            let _class = _.find(classs,  function(v, k) { 
+                return k == action.class_id
+            })
+
+            if(_class.members !== undefined){
+                let members = _class.members
+                let member = _.find(members,  function(v, k) { 
+                    return k == action.class_member_id && _.isEqual(v, action.class_member_data)
+                })
+
+                console.log("Classs", member, action)
+                if(member === undefined){
+                    members = {...members, ...{[action.class_member_id]: action.class_member_data}}
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            classs : {
+                                ...state.users.classs,
+                                [action.class_id]: {..._class, members}
+                            }
+                        }
+                    }  
+                    console.log("Classs", v)
+                    return v
+                }
+            }
+
+            return state
+        }
+
+        case REMOVED_CLASS_MEMBER:{
+
+            if(state.users === null){
+                return state
+            }
+
+            let classs = state.users.classs
+            let _class = _.find(classs,  function(v, k) { 
+                return k == action.class_id
+            })
+
+            if(_class.members !== undefined){
+                let members = _class.members
+                let member = _.find(members,  function(v, k) { 
+                    return k == action.class_member_id 
+                })
+
+                let newMembers = _.omit(members, action.class_member_id)
+
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        classs : {
+                            ...state.users.classs,
+                            [action.class_id]: {..._class, newMembers}
+                        }
+                    }
+                }  
+                console.log("Classs", v)
+            }
+
+            return state
+        }
+
+        case FAVORITES_CLASS :{
+            if(state.users === null){
+                return state
+            }
+            let classs = state.users.classs
+
+            let _class = _.find(classs,  function(v, k) { 
+                return k == action.class_id
+            })
+
+            if(_class === undefined){
+                console.log('FAVORITES_CLASS : undefined', action.class_id)
+                return state
+            }
+
+            if(_class.is_favorites === undefined){
+                _class = {..._class, is_favorites:true}
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        classs : {
+                            ...state.users.classs,
+                            [action.class_id]: _class
+                        }
+                    }
+                }
+                console.log('FAVORITES_CLASS', v)
+                return v 
+            }else{
+                if(action.favorite_status != _class.is_favorites){
+                    _class = {..._class, is_favorites:action.favorite_status}
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            classs : {
+                                ...state.users.classs,
+                                [action.class_id]: _class
+                            }
+                        }
+                    }
+                    console.log('FAVORITES_CLASS', v)
+                    return v    
+                }
+            }
+
+            return state
+        }
+
+        /*
         case CLASS_MEMBERS:{
             if(state.users === null){
                 return state
@@ -1967,6 +2345,7 @@ export default (state= INITIAL_STATE, action)=>{
             }
             return state;
         }
+        */
         
         case FRIEND_MUTE:{
             if(state.users === null){

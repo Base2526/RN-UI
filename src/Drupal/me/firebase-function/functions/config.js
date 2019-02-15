@@ -18,9 +18,10 @@ let constants = {
     PROFILE_WEBSITES: '/profile_websites',
     PROFILE_PHONES: '/profile_phones',
     PROFILE_MYIDS: '/profile_myids',
-    UPDATE_FOR_FRIEND_EDITUPDATE:'/user_for_friend_editupdate',
+    UPDATE_FOR_FRIEND_EDITUPDATE: '/user_for_friend_editupdate',
 
-    DELETE_CHAT_GROUP:'/delete_chat_group',
+    DELETE_CHAT_GROUP: '/delete_chat_group',
+    DELETE_CLASSS: '/delete_classs',
 };
 
 module.exports = Object.freeze(constants); 

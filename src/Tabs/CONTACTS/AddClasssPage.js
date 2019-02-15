@@ -56,12 +56,11 @@ const formatData = (data, numColumns) => {
 const calculatorWidthHeightItem=(margin, itemRow)=>{
   let {width, height} = Dimensions.get('window')
 
-  console.log(width, (itemRow) )
+  // console.log(width, (itemRow) )
   return (width - (margin* (itemRow*2))) / itemRow
 }
 
 class AddClasssPage extends React.Component{
-
     constructor(props){
         super(props)
         this.state = {
@@ -134,47 +133,44 @@ class AddClasssPage extends React.Component{
 
     loadData=()=>{
       let friend_member = []
-
-      // console.log(this.props.auth.users.friends)
-      for (var key in this.props.auth.users.friends) {
-    
-        let friend =  this.props.auth.users.friends[key]
-        // let friend_profile = friend_profiles[key]
-
-        console.log(friend)
-
+      let friends = this.props.friends
+      for (var key in friends) {
+        let friend = friends[key]
         switch(friend.status){
-          case Constant.FRIEND_STATUS_FRIEND:{
-            // console.log('1, --' + key)
-            
+          case Constant.FRIEND_STATUS_FRIEND:{            
             friend_member.push({...friend, ...{'friend_id':key}});
             break
           }
 
           case Constant.FRIEND_STATUS_FRIEND_CANCEL:{
-            // console.log('2, --' + key)
             break
           }
 
           case Constant.FRIEND_STATUS_FRIEND_REQUEST:{
-            // console.log('3, --' + key)
             break
           }
 
           case Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND:{
-            // console.log('4, --' + key)
             break
           }
         }
       }
-
-      // console.log(friend_member)
       return friend_member
     }
 
     handleCreateClass = () => {
       let className = this.state.className.trim()
       let uri = this.state.avatarSource.uri; 
+
+      let seleteds = []
+      let list = this.state.sections[0].data[0].list
+      list.map((value) => {
+        if(value.friend_id !== undefined){
+          seleteds.push(value.friend_id)
+        }
+      })
+
+      console.log(seleteds)
 
       if(className === "" && uri === ""){
         alert("Class name and Image is empty.")
@@ -183,36 +179,19 @@ class AddClasssPage extends React.Component{
       }else if(uri === ""){
         alert("Image is empty.")
       }else{
-        this.setState({loading:true})
         console.log('className : ' + className + ", uri : " + uri)
 
-        // actionCreateClass = (uid, class_name, uri) 
-
-        this.props.actionCreateClass(this.props.uid, className, this.state.avatarSource.uri).then((result) => {
+        this.setState({loading:true})
+        this.props.actionCreateClass(this.props.uid, className, seleteds, this.state.avatarSource.uri).then((result) => {
           console.log(result)
 
           this.setState({loading:false})
           if(result.status){
-            // this.props.navigation.navigate("App") 
-
-            // let {item_id, group, group_detail} = result.data
-
             this.props.navigation.goBack()
-
-            // let item_id = result
-            // console.log(item_id)
-            // console.log(group)
-            // console.log(group_detail)
-
-            // group_update({'group_id':item_id,'value':group}, v=>{
-            //   console.log(v)
-            // })
-
-            // groupDetail_update({'group_id':item_id, 'value':group_detail}, v=>{
-            //   console.log(v)
-            // })
           }else{
-
+            setTimeout(() => {
+              Alert.alert(result.message);
+            }, 100);
           }
         })
       }
@@ -611,8 +590,9 @@ const mapStateToProps = (state) => {
   }
 
   return{
-    auth:state.auth,
-    uid:getUid(state)
+    auth: state.auth,
+    friends: state.auth.users.friends,
+    uid: getUid(state)
   }
 }
 

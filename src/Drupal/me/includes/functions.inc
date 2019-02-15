@@ -87,7 +87,7 @@ function me_mail($key, &$message, $params) {
 /*
   สร้าง Class ของแต่ละ Account
 */
-function create_class(){
+function create_class2(){
 	$result = array();
   
 	if (!check_header()) {
@@ -138,59 +138,59 @@ function create_class(){
   
 		  $image_url = array();
 		  if(!empty($_FILES["idna"])){
-			// http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
-			$binary =  file_get_contents($_FILES["idna"]["tmp_name"]);//base64_decode($image);
-  
-			//Create the directory if it does not already exist, otherwise check the permissions
-			$directory = 'public://';
-			file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
-  
-			$currentDate = date("Ymd");
-			$file_name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
-			
-			//Saves a file to the specified destination and creates a database entry.
-			$image_url = (array)klovers_file_save_data($uid, $binary, $directory. '/' . $file_name, FILE_EXISTS_RENAME);
-  
-			// save รูป profile
-			// $profile->field_profile_image[LANGUAGE_NONE][0] = (array)$file;
-  
-			// #1 field_name_group
-			$values['field_class_name'][LANGUAGE_NONE][0]['value'] = $name;
-  
-			// #2 field_class_image_profile
-			$values['field_class_image_profile'][LANGUAGE_NONE][0] = $image_url;
-  
-			$values['field_is_default'][LANGUAGE_NONE][0]['value'] = "0";
-			
+				// http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
+				$binary =  file_get_contents($_FILES["idna"]["tmp_name"]);//base64_decode($image);
 		
-			// Create the field collection entry and associate it with the profile
-			$field_entity = entity_create('field_collection_item', $values);
-			$field_entity->setHostEntity('profile2', $profile);
-			$field_entity->save();
-		   
-			// เป็น node id ของ group
-			$item_id = $field_entity->item_id;
-  
-			// $url = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
-			$value = array(      
-				"name"     => $name,
-				"is_defualt"=>"0",
-				// "image_url"=> substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
-				"image_url"=> file_create_url(image_style_url('medium', $image_url['uri']))
-			);
-  
-			$firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $uid . '/' . PATH_CLASSS . '/' . $item_id . '/' , $value);
-  
-			$result['result'] = TRUE;
-			$result['item_id']= $item_id;
-			$result['value']  = $value;
-			$result['fction'] = $fction;
-  
-			return  $result;
+				//Create the directory if it does not already exist, otherwise check the permissions
+				$directory = 'public://';
+				file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+		
+				$currentDate = date("Ymd");
+				$file_name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
+				
+				//Saves a file to the specified destination and creates a database entry.
+				$image_url = (array)klovers_file_save_data($uid, $binary, $directory. '/' . $file_name, FILE_EXISTS_RENAME);
+		
+				// save รูป profile
+				// $profile->field_profile_image[LANGUAGE_NONE][0] = (array)$file;
+		
+				// #1 field_name_group
+				$values['field_class_name'][LANGUAGE_NONE][0]['value'] = $name;
+		
+				// #2 field_class_image_profile
+				$values['field_class_image_profile'][LANGUAGE_NONE][0] = $image_url;
+		
+				$values['field_is_default'][LANGUAGE_NONE][0]['value'] = "0";
+				
+			
+				// Create the field collection entry and associate it with the profile
+				$field_entity = entity_create('field_collection_item', $values);
+				$field_entity->setHostEntity('profile2', $profile);
+				$field_entity->save();
+				
+				// เป็น node id ของ group
+				$item_id = $field_entity->item_id;
+		
+				// $url = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
+				$value = array(      
+					"name"     => $name,
+					"is_defualt"=>"0",
+					// "image_url"=> substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
+					"image_url"=> file_create_url(image_style_url('medium', $image_url['uri']))
+				);
+		
+				$firebase->set(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $uid . '/' . PATH_CLASSS . '/' . $item_id . '/' , $value);
+		
+				$result['result'] = TRUE;
+				$result['item_id']= $item_id;
+				$result['value']  = $value;
+				$result['fction'] = $fction;
+		
+				return  $result;
   
 		  }else{
-			$result['result'] = FALSE;
-			return  $result;
+				$result['result'] = FALSE;
+				return  $result;
 		  }
 		}
 		break;
@@ -268,6 +268,116 @@ function create_class(){
 		# code...
 		break;
 	}  
+}
+
+// new version react-native
+function create_class(){
+	$result = array();
+  
+	if (!check_header()) {
+	  $result['result'] = FALSE;
+	  $result['message']= "check_header()";
+	  return $result;
+	}
+  
+	if (empty($_REQUEST['uid']) || empty($_REQUEST['name']) ) {
+	  $result['result'] = FALSE;
+	  $result['message']  = "function : create_class, parameter";
+	  $result['_REQUEST'] = $_REQUEST;
+	  return $result;
+	}
+
+	$param_uid    = $_REQUEST['uid'];
+  $param_name   = $_REQUEST['name'];
+  $param_members= (array)json_decode($_REQUEST['members']);
+
+  if (count($param_members) == 0) {
+    $result['result']   = FALSE;
+    $result['message']  = "Members empty.";
+    return $result;
+	}
+	
+	if(empty($_FILES["idna"])){
+		$result['result']   = FALSE;
+    $result['message']  = "Picture Class empty.";
+    return $result;
+	}
+
+	$time_start = microtime(true);
+	$batch = firestore_db()->batch();
+	
+	$profile = profile2_by_uid_load($param_uid, 'main');
+
+	$classValues = array();
+	$classValues['field_name'] = 'field_field_my_class'; 
+
+	$binary =  file_get_contents($_FILES["idna"]["tmp_name"]);//base64_decode($image);
+	//Create the directory if it does not already exist, otherwise check the permissions
+	$directory = 'public://';
+	file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+	$currentDate = date("Ymd");
+	$file_name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
+	//Saves a file to the specified destination and creates a database entry.
+	$image_url =(array)klovers_file_save_data($param_uid, $binary, $directory. '/' . $file_name, FILE_EXISTS_RENAME);
+
+
+	// #1 field_name_group
+	$classValues['field_class_name'][LANGUAGE_NONE][0]['value'] = $param_name;
+	// #2 field_class_image_profile
+	$classValues['field_class_image_profile'][LANGUAGE_NONE][0] = $image_url;
+	$classValues['field_is_default'][LANGUAGE_NONE][0]['value'] = "0";
+	
+	// Create the field collection entry and associate it with the profile
+	$class_entity = entity_create('field_collection_item', $classValues);
+	$class_entity->setHostEntity('profile2', $profile);
+	$class_entity->save();
+
+	$my_class_item_load = field_collection_item_load($class_entity->item_id);
+
+	$value_class = array('image_url'	=> file_create_url(image_style_url('medium', $image_url['uri'])), 
+											 'name'     	=> $param_name,
+											 'is_default' => FALSE);
+
+	$nycRef =firestore_db()->collection(FIRESTORE_USERS)->document($param_uid)->collection(FIRESTORE_CLASSS)->document($class_entity->item_id);
+	$batch->set($nycRef, $value_class, ['merge' => true]);
+
+	foreach ($param_members as $members_friend_id){
+
+		$key_class_member = generateRandomString(LENGTH_CHAT_ID);
+
+		$classMemberValue = array();
+		$classMemberValue['field_name'] = 'field_my_class_members'; // field collection name
+
+		$classMemberValue['field_friend_uid'][LANGUAGE_NONE][0]['value']      = $members_friend_id;
+		$classMemberValue['field_object_id'][LANGUAGE_NONE][0]['value']       = $key_class_member;
+		
+		$class_member_entity = entity_create('field_collection_item', $classMemberValue);
+		$class_member_entity->setHostEntity('field_my_class_members', $my_class_item_load);
+		$class_member_entity->save();
+	
+		$value_class_member = array('friend_id'=> $members_friend_id, 
+																'item_id'=>$class_member_entity->item_id,
+																'status'=>TRUE);
+
+
+		$value_class['members'][$key_class_member] = $value_class_member;
+
+		// update firestore
+		$nycRef =firestore_db()->collection(FIRESTORE_USERS)->document($param_uid)->collection(FIRESTORE_CLASSS)->document($class_entity->item_id)->collection('members')->document($key_class_member);
+    $batch->set($nycRef, $value_class_member, ['merge' => true]);
+	}
+
+	# Commit the batch
+	$batch->commit();
+
+	$time_end       = microtime(true);
+	$execution_time = number_format(($time_end - $time_start), 2);
+	
+	$result['result'] = TRUE;
+	$result['item_id']= $class_entity->item_id;
+	$result['data']   = $value_class;
+	$result['execution_time']  = $execution_time;
+  return $result;
 }
   
 /*
@@ -718,7 +828,20 @@ function delete_classs(){
 	  $result['message']= "check_header()";
 	  return $result;
 	}
+	
+	$param = $_REQUEST['context']['params'];
+	if (empty($param['userId']) || empty($param['classId'])) {
+	  $result['result'] 	= FALSE;
+		$result['message'] 	= "function delete_classs : parameter";
+	  return $result;
+	}
   
+	$userId      = $param['userId'];
+	$classId     = $param['classId'];
+  $deletedValue = $_REQUEST['deletedValue'];
+	
+	// .document('users/{userId}/classs/{classId}')
+	/*
 	$param = json_decode(file_get_contents('php://input'), true);
 	if (empty($param['uid']) || empty($param['item_id'])) {
 	  $result['result'] = FALSE;
@@ -739,11 +862,9 @@ function delete_classs(){
 			$profile_wrapper->field_profile_friend_classs->set('');
 			$profile_wrapper->save();
 		
-		
 			$firebase->delete(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $uid . '/friends/' . $profile_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] .'/classs');
 	  }
 	}
-  
   
 	// ลบ group ออกตาม group id
 	$item_load = field_collection_item_load($item_id);
@@ -752,8 +873,17 @@ function delete_classs(){
 	  $wrapper = entity_metadata_wrapper('field_collection_item', $item_load);    
 	  entity_delete_multiple('field_collection_item', array($wrapper->getIdentifier()));
 	}
-  
+	*/
+
+	entity_delete_multiple('field_collection_item', array($classId));
+
+	firestore_delete_collection(firestore_db()->collection(FIRESTORE_USERS)->document($userId)->collection(FIRESTORE_CLASSS)->document($classId)->collection('members'), 100);
+
 	$result['result'] = TRUE;
+
+	// $result['userId'] = $userId;
+	// $result['classId'] = $classId;
+  // $result['deletedValue'] = $deletedValue;
 	return  $result;
 }
   
@@ -1222,7 +1352,7 @@ function setDefualtClasss($profile){
 			$value_classs = array(      
 				"nid"      => $nid,
 				"name"     => $node->title,
-				"is_default" => "1",
+				"is_default" => TRUE,
 				// "image_url"=> substr(file_create_url(image_style_url('medium', $image_arr['uri'])), strlen($GLOBALS['base_url']))
 		
 				"image_url"=> file_create_url(image_style_url('medium', $image_arr['uri']))

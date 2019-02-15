@@ -9,9 +9,11 @@ import {View,
 import FastImage from 'react-native-fast-image'
 import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
+import Spinner from 'react-native-loading-spinner-overlay';
 var _ = require('lodash');
 
 import * as actions from '../../Actions'
+import {getUid} from '../../Utils/Helpers'
 
 class ClasssPage extends React.Component{
     constructor(props) {
@@ -39,11 +41,11 @@ class ClasssPage extends React.Component{
         let classs =  this.props.classs[key]
         data.push({...{class_id:key}, ...classs});
       }
-
       this.setState({data,});
     }
 
     componentWillReceiveProps(nextProps) {
+      console.log(nextProps)
       let data = []
       for (var key in nextProps.classs) {
         let classs =  nextProps.classs[key]
@@ -51,51 +53,7 @@ class ClasssPage extends React.Component{
       }
       this.setState({data,});
     }
-  
-    makeRemoteRequest = () => {
-      const { page, seed } = this.state;
-      const url = `https://randomuser.me/api/?seed=${seed}&page=${page}&results=20`;
-      this.setState({ loading: true });
-  
-      fetch(url)
-        .then(res => res.json())
-        .then(res => {
-          this.setState({
-            data: page === 1 ? res.results : [...this.state.data, ...res.results],
-            error: res.error || null,
-            loading: false,
-            refreshing: false
-          });
-        })
-        .catch(error => {
-          this.setState({ error, loading: false });
-        });
-    };
-  
-    handleRefresh = () => {
-      this.setState(
-        {
-          page: 1,
-          seed: this.state.seed + 1,
-          refreshing: true
-        },
-        () => {
-          this.makeRemoteRequest();
-        }
-      );
-    };
-  
-    handleLoadMore = () => {
-      this.setState(
-        {
-          page: this.state.page + 1
-        },
-        () => {
-          this.makeRemoteRequest();
-        }
-      );
-    };
-  
+
     renderSeparator = () => {
       return (
         <View
@@ -138,35 +96,58 @@ class ClasssPage extends React.Component{
       return count
     }
 
-    renderItem = ({ item, index }) => {
+    isDefault = (item) =>{
+      // {item.is_default ? '(default '+ item.is_favorites +')': ''}
 
-      var swipeoutBtns = [
-        {
-          // text: 'Delete',
-          component:<View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
-                      <Text style={{fontWeight:'bold', color:'white', fontSize:16}}>DELETE</Text>
-                    </View>,
-          backgroundColor: 'red',
-          onPress: () => {
-            Alert.alert(
-              'Delete Classs',
-              'Are you sure you want to delete?',
-              [
-                // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-                {text: 'Cancel', 
-                onPress: () => {console.log("cancel")}, 
-                style: 'cancel'},
-                {text: 'OK', 
-                onPress: () => {
-                      
-                    }, 
-                },
-              ],
-              { cancelable: false })
-
-          }
+      if(item.is_default){
+        if(item.is_favorites){
+          return(' (default, favorite)')
+        }else{
+          return(' (default)')
         }
-      ]
+      }else{
+        if(item.is_favorites){
+          return(' (favorite)')
+        }else{
+          return('')
+        }
+      }
+    }
+
+    renderItem = ({ item, index }) => {
+      var swipeoutBtns = []
+      if(!item.is_default){
+        swipeoutBtns =  [{  component:<View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
+                                        <Text style={{fontWeight:'bold', color:'white', fontSize:16}}>DELETE</Text>
+                                      </View>,
+                            backgroundColor: 'red',
+                            onPress: () => {
+                              Alert.alert(
+                                'Delete Classs',
+                                'Are you sure you want to delete?',
+                                [
+                                  // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                                  {text: 'Cancel', 
+                                  onPress: () => {console.log("cancel")}, 
+                                  style: 'cancel'},
+                                  {text: 'OK', 
+                                    onPress: () => {
+                                      console.log(item)
+                                      if(item.class_id !== undefined){
+                                        this.setState({loading:true})
+                                        this.props.actionDeleteClass(this.props.uid, item.class_id, (result) => {
+                                            console.log(result)
+                                            this.setState({loading:false})
+                                        })
+                                      }
+                                    }, 
+                                  },
+                                ],
+                                { cancelable: false })
+                            }
+                          }
+                        ]
+      }
       
       return (<Swipeout 
                 style={{backgroundColor:'white'}} 
@@ -180,18 +161,14 @@ class ClasssPage extends React.Component{
                 }}
                 close={!(this.state.rowID === index)}>
           <TouchableOpacity key={ item.name } onPress={() => {
-            this.props.params.navigation.navigate("ManageClasssPage", {'data': item})
+            this.props.params.navigation.navigate("ManageClasssPage", {'data': item, 'class_id':item.class_id})
           }}>
             <View
               style={{
                 alignItems: 'center', 
-                // margin: 5, 
                 padding: 10,
-                // borderWidth: 0.5, 
-                // borderColor: DictStyle.colorSet.lineColor,
                 flexDirection: 'row'
-              }}
-            >
+              }}>
                 <TouchableOpacity 
                     style={{height:80,
                             width: 80,
@@ -202,7 +179,7 @@ class ClasssPage extends React.Component{
                             alignItems:'center'
                             }}
                     onPress={()=>{
-                      this.props.params.navigation.navigate("ManageClasssPage", {'data': item})
+                      this.props.params.navigation.navigate("ManageClasssPage", {'data': item, 'class_id':item.class_id})
                     }}>
                   <FastImage
                     style={{width: 64, 
@@ -213,17 +190,21 @@ class ClasssPage extends React.Component{
                       headers:{ Authorization: 'someAuthToken' },
                       priority: FastImage.priority.normal,
                     }}
-                    resizeMode={FastImage.resizeMode.cover}
-                  />
+                    resizeMode={FastImage.resizeMode.cover}/>
                 </TouchableOpacity>
                 <View style={{paddingLeft: 10}}>
-                <Text style={{fontSize: 18, 
-                                fontWeight: '600', 
-                                // color: DictStyle.colorSet.normalFontColor,
-                                paddingBottom:5
-                              }}>
-                      {item.name}
-                  </Text>
+                  <View style={{flexDirection:'row', justifyContent:'center', alignItems:'center'}}>
+                    <Text style={{fontSize: 18, 
+                                    fontWeight: '600', 
+                                    // color: DictStyle.colorSet.normalFontColor,
+                                    paddingBottom:5
+                                  }}>
+                          {item.name} 
+                      </Text>
+                      <Text style={{fontSize:12, color:'gray', fontStyle:'italic'}}>
+                        {this.isDefault(item)}
+                      </Text>
+                  </View>
                   <Text>
                     {this.countMembers(item)} Users
                   </Text>
@@ -241,8 +222,15 @@ class ClasssPage extends React.Component{
         return <View style={{flex: 1}}></View>
       }
 
+      console.log(this.state.data)
       return (
         <View style={{flex:1}}>
+        <Spinner
+          visible={this.state.loading}
+          textContent={'Wait...'}
+          textStyle={{color: '#FFF'}}
+          overlayColor={'rgba(0,0,0,0.5)'}
+        />
         {
             renderContent && 
           <FlatList
@@ -270,7 +258,7 @@ const mapStateToProps = (state) => {
   }
   // groups
   return{
-    // auth:state.auth
+    uid:getUid(state),
     classs:state.auth.users.classs
   }
 }
