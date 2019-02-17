@@ -115,12 +115,12 @@ const index = createStackNavigator({
         // title: 'Manage Group',
       }
     },
-    'ListClassMemberPage': {
-      screen: ListClassMemberPage,
-      navigationOptions: {
-        // title: 'List Class User',
-      }
-    },
+    // 'ListClassMemberPage': {
+    //   screen: ListClassMemberPage,
+    //   navigationOptions: {
+    //     // title: 'List Class User',
+    //   }
+    // },
     'QRCodeReaderPage': {
       screen: QRCodeReaderPage,
       navigationOptions: {
@@ -228,12 +228,23 @@ const ListGroupMemberNavigator = createStackNavigator(
   },
   {
     // headerMode: 'none',
-  },);
+},);
 
 const ClasssSettingsNavigator = createStackNavigator(
   {
     'ClasssSettingsPage': {screen: ClasssSettingsPage},
-    // 'EditGroupNamePage': {screen: EditGroupNamePage}
+    // 'ListClassMemberPage': {screen: ListClassMemberPage}
+  },
+  {
+    // headerMode: 'none',
+  },
+);
+
+const ListClassMemberNavigator = createStackNavigator(
+  {
+    // 'ClasssSettingsPage': {screen: ClasssSettingsPage},
+    'ListClassMemberPage': {screen: ListClassMemberPage},
+    'ClasssMemberAddFriend': {screen: ClasssMemberAddFriend},
   },
   {
     // headerMode: 'none',
@@ -273,9 +284,10 @@ const MainModalNavigator = createStackNavigator(
     // },
     'GroupSettingsNavigator': {screen: GroupSettingsNavigator},
     'ClasssSettingsNavigator': {screen: ClasssSettingsNavigator},
+    'ListClassMemberNavigator': {screen: ListClassMemberNavigator},
     
     // 'ClasssSettingsPage': {screen: ClasssSettingsPage},
-    'ClasssMemberAddFriend': {screen: ClasssMemberAddFriend},
+    // 'ClasssMemberAddFriend': {screen: ClasssMemberAddFriend},
     
     'MyQRcodeNavigator': {screen: MyQRcodeNavigator},
     'BasicInfoNavigator': {screen: BasicInfoNavigator},

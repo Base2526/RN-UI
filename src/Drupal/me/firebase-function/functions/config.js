@@ -22,6 +22,7 @@ let constants = {
 
     DELETE_CHAT_GROUP: '/delete_chat_group',
     DELETE_CLASSS: '/delete_classs',
+    CLASS_MEMBER: '/class_member',
 };
 
 module.exports = Object.freeze(constants); 

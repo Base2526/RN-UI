@@ -95,6 +95,45 @@ exports.deleteClasss = functions.firestore
         return true;
 });
 
+// .document('users/{userId}/classs/{classId}/members/{memberId}')
+exports.updateClasssMember = functions.firestore
+    .document('users/{userId}/classs/{classId}/members/{memberId}')
+    .onUpdate((change, context) => {
+        const newValue = change.after.data();
+        let mode = 'modified';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.CLASS_MEMBER, form: {context, mode, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
+
+exports.deleteClasssMember = functions.firestore
+    .document('users/{userId}/classs/{classId}/members/{memberId}')
+    .onDelete((snap, context) => {
+        // Get an object representing the document prior to deletion
+        // e.g. {'name': 'Marie', 'age': 66}
+        const deletedValue = snap.data();
+        let mode = 'removed';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.CLASS_MEMBER, form: {context, mode}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+
+        return true;
+});
+
 // 
 exports.updateMyApplications = functions.firestore
     .document('users/{userId}/my_applications/{my_applicationsId}')

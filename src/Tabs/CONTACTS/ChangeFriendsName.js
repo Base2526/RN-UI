@@ -3,7 +3,8 @@ import React from 'react'
 import {View, 
         Text, 
         TouchableOpacity,
-        TextInput} from 'react-native';
+        TextInput,
+        Alert} from 'react-native';
 import { connect } from 'react-redux';
 import Spinner from 'react-native-loading-spinner-overlay';
 
@@ -40,7 +41,6 @@ class ChangeFriendsName extends React.Component{
         }
     }
 
-
     constructor(props){
         super(props)
         this.state ={
@@ -56,10 +56,10 @@ class ChangeFriendsName extends React.Component{
         const { navigation } = this.props;
         const friend = navigation.getParam('friend', null);
 
-        if(friend.hasOwnProperty('change_friend_name')){
-            this.setState({friend, text:friend.change_friend_name})
+        if(friend.change_friend_name === undefined){
+            this.setState({friend, text:friend.profile.name}) 
         }else{
-            this.setState({friend, text:friend.profile.name})
+            this.setState({friend, text:friend.change_friend_name})
         }
     }
 
@@ -67,22 +67,32 @@ class ChangeFriendsName extends React.Component{
         if(this.state.text.length == 0){
             alert('Name is empty?')
         }else{
+            if(this.state.friend.change_friend_name === undefined){
+                if(this.state.text === this.state.friend.profile.name){
+                    this.props.navigation.goBack()
+                    return;
+                }
+            }else{
+                if(this.state.text === this.state.friend.change_friend_name){
+                    this.props.navigation.goBack()
+                    return;
+                }
+            }
 
+            this.setState({loading:true})
+            this.props.actionChangeFriendsName(this.props.uid, this.state.friend.friend_id, this.state.text, (result)=>{
+                console.log(result)
+                this.setState({loading:false})
+                if(result.status){
+                    this.props.navigation.goBack()
+                }else{
+                    setTimeout(() => {
+                        Alert.alert(result.message);
+                    }, 100);
+                }
+            })
         }
     }
-
-    // onSave = () => {
-    //     // this.setState({name:this.state.text})
-
-    //     // this.props.navigation.goBack()
-
-    //     // console.log(this.state.friend)
-
-    //     this.props.actionChangeFriendsName(this.props.uid, this.state.friend.friend_id, this.state.text, (result)=>{
-    //         // console.log(result)
-    //         this.props.navigation.goBack()
-    //     })
-    // }
 
     render(){
         return( <View style={{flex:1, margin:10}}>
@@ -108,7 +118,6 @@ class ChangeFriendsName extends React.Component{
 }
 
 const mapStateToProps = (state) => {
-    console.log(state)
     return({
         uid:getUid(state)
     })

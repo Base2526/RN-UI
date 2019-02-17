@@ -4,67 +4,89 @@ import {FlatList,
         View, 
         Text, 
         Alert, 
-        Platform, 
-        TouchableOpacity,
-        TouchableHighlight} from 'react-native'
-
-import Icon from 'react-native-vector-icons/FontAwesome5';
+        TouchableOpacity,} from 'react-native'
+import Spinner from 'react-native-loading-spinner-overlay';
+import FastImage from 'react-native-fast-image'
 import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
-
 var _ = require('lodash');
 
-import ImageWithDefault from '../../Utils/ImageWithDefault'
 import * as actions from '../../Actions'
+import {getUid} from '../../Utils/Helpers'
+import MyIcon from '../../config/icon-font.js';
 
 class ListClassMemberPage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
-        title: "Members",
-        headerRight: (
+        title: "Class members",
+        headerTintColor: '#C7D8DD',
+        headerStyle: {
+            backgroundColor: 'rgba(186, 53, 100, 1.0)',
+  
+            // ios navigationoptions underline hide
+            borderBottomWidth: 0,
+  
+            // android navigationoptions underline hide
+            elevation: 0,
+            shadowOpacity: 0
+        },
+        headerLeft: (
             <View style={{flexDirection:'row', flex:1}}>
                 <TouchableOpacity 
-                    style={{paddingRight:10}}
+                    style={{paddingLeft:10}}
                     onPress={()=>{
                         // GroupMemberInvite
                         const { params = {} } = navigation.state
                         params.handleAddFriend()
-
                     }}>
-                    <Text style={{color:'black', fontSize:16}}>Add friend</Text>
+                    <MyIcon
+                        name={'user-plus'}
+                        size={25}
+                        color={'#C7D8DD'} />
                 </TouchableOpacity> 
+            </View>
+        ),
+        headerRight: (
+            <View style={{flexDirection:'row', flex:1}}>
+                <TouchableOpacity
+                    style={{padding:5}}
+                    // disabled={isModify ? false: true}
+                    onPress={() => {
+                        const { params = {} } = navigation.state
+                        params.handleCancel()
+                    }}>
+                    <MyIcon
+                        name={'cancel'}
+                        size={25}
+                        color={'#C7D8DD'} />
+                </TouchableOpacity>
             </View>
         ),
     });
 
     constructor(){
         super();
-    
         this.state = { 
             renderContent: false,
-            class_id :0,
+            class_id: 0,
+            loading: false,
             data: []
         }
     }
 
-    getArrFriends = () =>{
-        let friends = this.props.auth.users.friends
-        return Object.keys(friends).map((key, index) => {
-            // const myItem = friends[key]
-            // return friends[key]
-            return {...{friend_id:key}, ...friends[key]};
-        })
-    }
-
-    handleAddFriend = () => {
-        this.props.navigation.navigate("ClasssMemberAddFriend",{'class_id':this.state.class_id})
-
-        // console.log(this.state.data)
-    }
-
     componentDidMount() {
+        this.props.navigation.setParams({handleCancel: this.handleCancel })
         this.props.navigation.setParams({handleAddFriend: this.handleAddFriend })
+        
         setTimeout(() => {this.setState({renderContent: true})}, 0);
 
+        const { navigation } = this.props;
+        const class_id = navigation.getParam('class_id', null);
+
+        this.setState({class_id},()=>{
+            this.loadData(this.props)
+        })
+
+        /*
         const { navigation } = this.props;
         const data = navigation.getParam('data', null);
 
@@ -86,13 +108,13 @@ class ListClassMemberPage extends React.Component{
                 } 
             })
         }
-
         this.setState({data:newData})
+        */
     }
 
     componentWillReceiveProps(nextProps) {
-        // console.log(nextProps)
-
+        this.loadData(nextProps)
+        /*
         let classs = nextProps.auth.users.classs
         let arr_classs = Object.keys(classs).map((key, index) => {
             return {...{class_id:key}, ...classs[key]};
@@ -121,6 +143,44 @@ class ListClassMemberPage extends React.Component{
         }
 
         this.setState({data:newData})
+        */
+    }
+
+    loadData = (props) =>{
+        let {class_id} = this.state
+        let {friends, classs} = props
+
+        console.log(friends, classs, class_id)
+        let cla = _.find(classs,  function(v, k) { 
+            return k == class_id; 
+        })
+
+        if(cla === undefined || cla.members === undefined){
+            this.props.navigation.goBack(null)
+        }
+
+        let newData = []
+        _.each(cla.members, (v, k)=>{
+            if(v.status){
+                // return {...{friend_id:key}, ...friends[key]};
+                friend =_.find(friends, (vv, kk)=>{
+                            return v.friend_id == kk
+                        })
+                
+                newData.push( {...{friend_id:v.friend_id}, ...{member_item_id:k}, ...friend} )
+            }
+        })
+
+        console.log(newData)
+        this.setState({data:newData})
+    }
+
+    handleCancel = () => {
+        this.props.navigation.goBack(null)
+    }
+
+    handleAddFriend = () => {
+        this.props.navigation.navigate("ClasssMemberAddFriend", {'class_id':this.state.class_id})
     }
 
     FlatListItemSeparator = () => {
@@ -128,83 +188,33 @@ class ListClassMemberPage extends React.Component{
           <View
             style={{
               height: 1,
-              width: "86%",
+              width: "100%",
               backgroundColor: "#CED0CE",
-              marginLeft: "14%"
+            //   marginLeft: "14%"
             }}
           />
         );
-    };
-
-    GetFlatListItem (item) {
-        Alert.alert(item);   
     }
 
-    render_FlatList_header = () => {
-        var header_View = (
-            <View>
-                <TouchableOpacity 
-                        onPress={()=>{
-                            this.props.navigation.navigate('MyApplicationProfilePage')
-                        }}>
-                <View style={{  backgroundColor:'white', 
-                                flexDirection:'row', 
-                                paddingTop:10, 
-                                paddingBottom:10,
-                                paddingLeft:5,
-                                paddingRight:5}}
-                    onPress={{}}>
-                    <TouchableOpacity 
-                        style={{height:60,
-                                width: 60,
-                                borderRadius: 10}}
-                                onPress={
-                                    ()=>this.props.navigation.navigate("FriendProfilePage")
-                                  }>
-                        {/* <FastImage
-                            style={{width: 60, height: 60, borderRadius: 10}}
-                            source={{
-                            uri: 'https://unsplash.it/400/400?image=1',
-                            headers:{ Authorization: 'someAuthToken' },
-                            priority: FastImage.priority.normal,
-                            }}
-                            resizeMode={FastImage.resizeMode.contain}
-                        /> */}
-                        <ImageWithDefault 
-                            source={{uri: 'https://unsplash.it/400/400?image=1'}}
-                            style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
-                        />
-                    </TouchableOpacity>
-                    <View style={{paddingLeft:10, justifyContent:'center'}}>
-                        <Text>Name Group : Somkid</Text>
-                    </View>
-            
-                </View>
-                </TouchableOpacity>
-                {this.FlatListItemSeparator()}
-
-            </View>
-        );
-        return header_View ; 
-    };
-
-    render_FlatList_footer = () => {
-        var footer_View = (
-            <View style={styles.header_footer_style}>
-            <Text style={styles.textStyle}> FlatList Footer </Text>
-            </View>
-        );
-        return footer_View; 
-    };
-
-    renderListItem = ({ item }) => {
-        // console.log(item)
+    renderItem = ({item, index}) => { 
         let swipeoutRight = [
             {
-                component: <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}><Text style={{color:'white'}}>Delete</Text></View>,
+                component: <View style={{flex: 1, 
+                                        justifyContent:'center', 
+                                        alignItems:'center'}}>
+                                        <Text style={{color:'white', fontSize:18, fontWeight:'bold'}}>Delete</Text>
+                            </View>,
                 backgroundColor: 'red',
                 onPress: () => { 
-                    alert('Delete')
+                    console.log(item)
+
+                    this.setState({loading:true})
+
+                    // console.log(this.props.uid, this.state.class_id, item.member_item_id)
+                    this.props.actionDeleteClassMember(this.props.uid, this.state.class_id, item.member_item_id, (result) => {
+                        console.log(result)
+                        this.setState({loading:false})
+                    })
                 }
             }
         ]
@@ -220,22 +230,15 @@ class ListClassMemberPage extends React.Component{
                               borderRadius: 10}}   
                               onPress={
                                 ()=>this.props.navigation.navigate("FriendProfilePage")
-                              } 
-                      >
-                      {/* <FastImage
-                          style={{width: 60, height: 60, borderRadius: 10}}
-                          source={{
-                            uri: 'https://unsplash.it/400/400?image=1',
-                            headers:{ Authorization: 'someAuthToken' },
-                            priority: FastImage.priority.normal,
-                          }}
-                          resizeMode={FastImage.resizeMode.contain}
-                      /> */}
-
-                        <ImageWithDefault 
-                            source={{uri: item.profile.image_url}}
+                              }>
+                        <FastImage
                             style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
-                        />
+                            source={{
+                                uri: item.profile.image_url,
+                                headers:{ Authorization: 'someAuthToken' },
+                                priority: FastImage.priority.normal,
+                            }}
+                            resizeMode={FastImage.resizeMode.cover}/>
                   </TouchableOpacity>
                   <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
                     <Text style={{fontSize:18}}>{item.profile.name}</Text>
@@ -245,15 +248,20 @@ class ListClassMemberPage extends React.Component{
     }
 
     render() {
-
         let {renderContent, data} = this.state;
         return (
-            <View style={styles.MainContainer}>
+            <View style={{ flex:1}}>
+            <Spinner
+                visible={this.state.loading}
+                textContent={'Wait...'}
+                textStyle={{color: '#FFF'}}
+                overlayColor={'rgba(0,0,0,0.5)'}
+                />
             { renderContent &&
             <FlatList
                 data={ data }
                 ItemSeparatorComponent = {this.FlatListItemSeparator}
-                renderItem={this.renderListItem}
+                renderItem={this.renderItem}
                 // ListHeaderComponent={this.render_FlatList_header}
                 // ListFooterComponent={this.render_FlatList_footer}
                 />
@@ -263,42 +271,18 @@ class ListClassMemberPage extends React.Component{
     }
 }
 
-const styles = StyleSheet.create({
-    MainContainer :{
-        justifyContent: 'center',
-        flex:1,
-    },
-        
-    FlatList_Item: {
-        padding: 10,
-        fontSize: 18,
-        height: 44,
-    },
-        
-    header_footer_style:{
-        width: '100%', 
-        height: 44, 
-        backgroundColor: '#4CAF50', 
-        alignItems: 'center', 
-        justifyContent: 'center'
-    },
-    
-    textStyle:{
-        textAlign: 'center', 
-        color: '#fff', 
-        fontSize: 21
-    }
-});
-
 const mapStateToProps = (state) => {
-    console.log(state)
+    // console.log(state)
 
     if(!state._persist.rehydrated){
       return {}
     }
   
     return{
-      auth:state.auth
+        auth:state.auth,
+        uid:getUid(state),
+        friends:state.auth.users.friends,
+        classs:state.auth.users.classs,
     }
 }
 

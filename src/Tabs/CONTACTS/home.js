@@ -6,7 +6,7 @@ import { View,
         StyleSheet,
         FlatList, 
         Dimensions, 
-        Image } from 'react-native';
+        NetInfo } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Styles from '../../styles';
 import ScrollableTabView, {ScrollableTabBar, DefaultTabBar} from 'react-native-scrollable-tab-view';
@@ -20,6 +20,8 @@ import * as actions from '../../Actions'
 import {getHeaderInset} from '../../Utils/Helpers'
 
 import MyIcon from '../../config/icon-font.js';
+
+import OfflineNotice from '../../Utils/OfflineNotice'
 
 const _header = props => (
     <View style={{flex:1, alignItems:'flex-end', flexDirection:'row'}}>
@@ -207,6 +209,7 @@ class ContactsHome extends Component {
         super(props)
 
         this.state= {
+            isConnected: true,
             positionSelect:0,
             renderContent: false,
             isOpenMenu:false,
@@ -215,11 +218,16 @@ class ContactsHome extends Component {
         }
     }
 
-    componentDidMount () {
+    componentDidMount() {
+        NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
         setTimeout(() => {this.setState({renderContent: true})}, 0);
         this.props.navigation.setParams({ handleHeaderRight: this.handleHeaderRight })
         this.props.navigation.setParams({ handleHeaderRightContactsSearch: this.handleHeaderRightContactsSearch })
         this.props.navigation.setParams({ handleHeaderRightContactsMenu: this.handleHeaderRightContactsMenu })
+    }
+
+    componentWillUnmount() {
+        NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -233,6 +241,10 @@ class ContactsHome extends Component {
             // console.log('----- 09')
             this.props.navigation.setParams({ bg_url: nextProps.auth.users.profiles.bg_url });
         }
+    }
+
+    handleConnectivityChange =(isConnected) => {
+        this.setState({ isConnected });
     }
 
     onLayout(e) {
@@ -403,10 +415,12 @@ class ContactsHome extends Component {
 
         return (
             <View style={[style.container, {backgroundColor:'white'}]} onLayout={this.onLayout.bind(this)} >
-                
                 {menuView}
-
-                { renderContent &&
+                {/* {!this.state.isConnected ?<OfflineNotice />:<View />} */}
+                
+                {/* { renderContent && */}
+                {/* <View> */}
+                
                 <ScrollableTabView
                     // style={{height:500}}
                     initialPage={0}
@@ -420,7 +434,9 @@ class ContactsHome extends Component {
                     <GroupsPage tabLabel='Groups' index={1} amount={5} params={this.props} handleScroll={this.handleScroll}/>
                     <ClasssPage tabLabel='Classs' index={2} amount={6} params={this.props} handleScroll={this.handleScroll}/>
                 </ScrollableTabView>
-                }
+                {/*  */}
+                {/* </View> */}
+                {/* } */}
             </View>
         );
     }

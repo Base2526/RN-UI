@@ -886,6 +886,109 @@ function delete_classs(){
   // $result['deletedValue'] = $deletedValue;
 	return  $result;
 }
+
+function class_member(){
+	$result = array();
+	if (!check_header()) {
+	  $result['result'] = FALSE;
+	  $result['message']= "check_header()";
+	  return $result;
+	}
+
+	$mode  = $_REQUEST['mode'];
+	if(empty($mode)){
+		$result['result'] = FALSE;
+	  return $result;
+	}
+
+	// added
+	if(strcasecmp($mode, 'added') == 0){
+		$param_uid  = $_REQUEST['uid'];
+		$class_id  = $_REQUEST['class_id'];
+		$param_members= (array)json_decode($_REQUEST['members']);
+
+		if (count($param_members) == 0) {
+			$result['result']   = FALSE;
+			return $result;
+		}
+
+		$time_start = microtime(true);
+		$batch = firestore_db()->batch();
+
+		$members = array();
+
+		$class_item_load = field_collection_item_load($class_id);
+		foreach ($param_members as $members_friend_id){
+
+			$key_class_member = generateRandomString(LENGTH_CHAT_ID);
+
+			$classMemberValue = array();
+			$classMemberValue['field_name'] = 'field_my_class_members'; // field collection name
+	
+			$classMemberValue['field_friend_uid'][LANGUAGE_NONE][0]['value']      = $members_friend_id;
+			$classMemberValue['field_object_id'][LANGUAGE_NONE][0]['value']       = $key_class_member;
+			
+			$class_member_entity = entity_create('field_collection_item', $classMemberValue);
+			$class_member_entity->setHostEntity('field_my_class_members', $class_item_load);
+			$class_member_entity->save();
+
+			$value_class_member = array('friend_id'=> $members_friend_id, 
+																	'item_id'=>$class_member_entity->item_id,
+																	'status'=>TRUE);
+
+			$members[$key_class_member] = $value_class_member;
+
+			// update firestore
+			$nycRef =firestore_db()->collection(FIRESTORE_USERS)->document($param_uid)->collection(FIRESTORE_CLASSS)->document($class_id)->collection('members')->document($key_class_member);
+			$batch->set($nycRef, $value_class_member, ['merge' => true]);
+		}
+
+		# Commit the batch
+		$batch->commit();
+
+		$time_end       = microtime(true);
+		$execution_time = number_format(($time_end - $time_start), 2);
+
+		$result['result'] 		= TRUE;
+		$result['members']   	= $members;
+		$result['execution_time']  = $execution_time;
+		return $result;
+	}
+
+	$param = $_REQUEST['context']['params'];
+	if (empty($param['userId']) || empty($param['classId']) || empty($param['memberId'])) {
+	  $result['result'] 	= FALSE;
+		$result['message'] 	= "function classs_member : parameter";
+	  return $result;
+	}
+	
+	// users/{userId}/classs/{classId}/members/{memberId}
+	
+
+	$userId      	= $param['userId'];
+	$classId     	= $param['classId'];
+	$memberId     = $param['memberId'];
+	$deletedValue = $_REQUEST['deletedValue'];
+
+	
+
+	if(strcasecmp($mode, 'modified') == 0){
+		$query  = new EntityFieldQuery();
+		$entities = $query->entityCondition('entity_type', 'field_collection_item')
+											->entityCondition('bundle', 'field_my_class_members')
+											->fieldCondition('field_object_id', 'value', $memberId, '=')
+											->execute();
+
+		if (!empty($entities['field_collection_item'])) {
+			// กรณีนี้อาจไม่เกิดขึ้นเลยก็ได้
+			$item_id = array_keys($entities['field_collection_item'])[0];
+			entity_delete_multiple('field_collection_item', array($item_id));
+		}
+	}
+	
+	$result['result'] = TRUE;
+	return  $result;
+}
   
 function update_picture_chat_group(){ 
 	$result = array();

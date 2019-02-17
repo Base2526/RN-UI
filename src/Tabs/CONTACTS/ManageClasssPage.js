@@ -140,7 +140,8 @@ class ManageClasssPage extends React.Component{
             return(<View style={{flex:1, backgroundColor:'#DF2D6C'}}></View>)
         }
         
-        console.log(data)
+        // console.log(data)
+        // console.log(this.state.class_id)
         return (
             <View style={{flex:1, backgroundColor:'#DF2D6C', paddingTop:getHeaderInset()}}>
             <Spinner
@@ -201,7 +202,10 @@ class ManageClasssPage extends React.Component{
                 <View style={{padding:5, flexDirection:'row'}}>
                     {this.itemMembers(data)}
                     <TouchableOpacity 
-                        style={{width: 36, height: 36, borderRadius: 18, justifyContent:'center', alignItems:'center', backgroundColor:'#BCD1D5'}}>
+                        style={{width: 36, height: 36, borderRadius: 18, justifyContent:'center', alignItems:'center', backgroundColor:'#BCD1D5'}}
+                        onPress={()=>{
+                            this.props.navigation.navigate("ListClassMemberPage", {'class_id': this.state.class_id})
+                        }}>
                         <Text style={{color:'white', fontWeight:'bold'}}>{Object.keys(data.members).length}+</Text>
                     </TouchableOpacity>
                 </View>

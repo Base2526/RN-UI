@@ -247,6 +247,29 @@ export const create_class = (uid, class_name, members, uri) =>{
     })
 }
 
+/*
+    กรณีที่เพิ่มเพือนใน class เพิ่ม
+*/
+export const class_add_member = (uid, class_id, members) =>{
+    var data = new FormData();
+    data.append("mode", 'added')
+    data.append("uid", uid)
+    data.append("class_id", class_id)
+    data.append('members', JSON.stringify(members))
+
+    return fetch(Constant.CLASS_MEMBER, {
+        headers: Constant.FETCH_HEADERS,
+        method: 'POST',
+        body: data
+    }).then((response) => {
+        return response.json()
+    }).then((responseJson) => {
+        return responseJson;
+    }).catch((error) => {
+        return {'status': false, 'message': error}
+    })
+}
+
 export const search_google = (textSearch) => {
     return fetch('https://www.googleapis.com/customsearch/v1?key=AIzaSyDAVMdipuafrh2sfZbwDL7smEsk0HJrgHs&cx=011532986475707227508:bsrvzot-rza&q=' + textSearch)
     .then((response) => response.json())
@@ -326,7 +349,6 @@ export const update_picture_profile  = (uid, image_uri) =>{
     })
 }
 
-// 
 export const update_picture_bg_profile  = (uid, image_uri) =>{
     var data = new FormData();
     data.append('idna', {

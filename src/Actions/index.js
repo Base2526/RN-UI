@@ -16,6 +16,7 @@ import {USER_LOGIN_SUCCESS,
         MODIFIED_FRIEND,
         FRIEND_PROFILE,
         UPDATE_STATUS_FRIEND,
+        CHANGE_FRIEND_NAME,
         ADD_GROUP,
         MODIFIED_GROUP,
         DELETE_GROUP,
@@ -105,7 +106,8 @@ import {login,
         update_picture_profile,
         update_picture_bg_profile,
         update_group_picture_profile,
-        check_my_id} from '../Utils/Services'
+        check_my_id,
+        class_add_member} from '../Utils/Services'
 
 export const actionApplicationCategory = () =>dispatch =>{
     return application_category().then(data=>{
@@ -503,6 +505,36 @@ export const actionDeleteClass = (uid, class_id, callback) => dispatch =>{
     callback({'status':true})
 }
 
+// Classs add member 
+export const actionClassAddMember = (uid, class_id, members) => dispatch =>{
+    return class_add_member(uid, class_id, members).then(data => {
+        console.log(data)
+        if((data instanceof Array)){
+            return {'status':false, 'message': data}
+        }else{
+            if(!data.result){
+                return {'status':false, 'message': data}
+            }else{
+                _.each(data.members, (v, k)=>{
+                    console.log(class_id, v, k)
+                    dispatch({type: ADDED_CLASS_MEMBER, class_id, class_member_id:k, class_member_data:v })
+                })
+                return {'status':true, 'data':data}
+            }
+        }
+    })
+   
+    // callback({'status':true, uid, class_id, members})
+}
+
+// REMOVED_CLASS_MEMBER
+export const actionDeleteClassMember = (uid, class_id, class_member_id, callback) => dispatch =>{
+    // users/{userId}/classs/{classId}/members/{key}
+    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(class_member_id).delete()
+    dispatch({type: REMOVED_CLASS_MEMBER, class_id, class_member_id})
+    callback({'status':true, uid, class_id, class_member_id})
+}
+
 export const actionUpdateStatusFriend = (uid, friend_id, status, callback) => dispatch=>{
     // console.log('-------------- actionAcceptFriend()')
     // update status เพือ่นของเรา
@@ -552,11 +584,17 @@ export const actionSelectClass = (class_id, uid, friend_id, callback) => dispatc
 
 // Change friend's name
 export const actionChangeFriendsName = (uid, friend_id, name, callback) => dispatch=> {
+    dispatch({ type: CHANGE_FRIEND_NAME, friend_id, change_friend_name:name});
+
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         change_friend_name: name,
-    }, { merge: true});
-
-    callback({'status':true, uid, friend_id, name})
+    }, { merge: true}).then(result => {
+        
+        callback({'status':true})
+    })
+    .catch(error => {
+        callback({'status':false, 'message': error})
+    })    
 }
 
 // friend hide

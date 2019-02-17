@@ -1,14 +1,6 @@
-// export const EMAIL_CHANGED = 'email_changed'
-// export const PASSWORD_CHANGED = 'password_changed'
 export const USER_LOGIN_SUCCESS = 'user_login_success'
 export const USER_LOGIN_FAIL    = 'user_login_fail'
 export const USER_LOGOUT        = 'user_logout'
-
-// export const LOGIN_USER = 'login_user'
-
-// export const GET_USER_LOGIN = "get_user_login"
-
-// export const LOADING = 'loading'
 
 export const PROFILES = 'profiles'
 
@@ -21,6 +13,8 @@ export const ADD_FRIEND             = "add_friend"
 export const MODIFIED_FRIEND        = "modified_friend"
 export const FRIEND_PROFILE         = "friend_profile"
 export const UPDATE_STATUS_FRIEND   = "update_status_friend" 
+export const CHANGE_FRIEND_NAME     = "change_friend_name"
+
 export const ADD_GROUP              = "add_group" 
 export const MODIFIED_GROUP         = "modified_group" 
 export const DELETE_GROUP           = "delete_group"
@@ -33,7 +27,6 @@ export const MEMBER_LEAVE_GROUP     = "member_leave_group"
 export const MEMBER_INVITE_AGAIN_GROUP = "member_invite_again_group"
 
 // actionMemberLeaveGroup
-
 export const ADDED_GROUP_MEMBER     = "added_group_member"
 export const MODIFIED_GROUP_MEMBER  = "modified_group_member" // modified
 export const REMOVED_GROUP_MEMBER   = "removed_group_member"
@@ -48,7 +41,7 @@ export const CANCELED_GROUP_MEMBER  = "canceled_group_member"
 
 export const ADDED_CLASS            = "added_class"
 export const MODIFIED_CLASS         = "modified_class"
-export const REMOVED_CLASS          = "emoved_class"
+export const REMOVED_CLASS          = "removed_class"
 
 export const FAVORITES_CLASS        = "favorites_classs"
 

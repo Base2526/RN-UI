@@ -21,6 +21,7 @@ module.exports = {
 
     CREATE_GROUP: API_URL + END_POINT + '/create_chat_group',
     CREATE_CLASS: API_URL + END_POINT + '/create_class',
+    CLASS_MEMBER: API_URL + END_POINT + '/class_member',
     
     CREATE_MY_APPLICATION: API_URL + END_POINT + '/create_my_application',
     APPLICATION_CATEGORY: API_URL + END_POINT + '/application_category',

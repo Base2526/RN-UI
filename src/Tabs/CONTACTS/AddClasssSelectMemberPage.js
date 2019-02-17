@@ -145,9 +145,6 @@ class AddClasssSelectMemberPage extends React.Component{
                             color={seleted ? '#E9E9E9' : '#DF2D6C'} />
                     </TouchableOpacity>
                     <TouchableOpacity 
-                        style={{height: 60,
-                                width: 60,
-                                borderRadius: 30}}
                         onPress={()=>{
                             this.onSeleted(index)
                         }}>

@@ -106,6 +106,9 @@ class AddGroupsSelectMemberPage extends React.Component{
             this.state.data[index].seleted = !this.state.data[index].seleted
         }
 
+
+        // console.log(newData)
+
         this.setState({
             data:newData
         })

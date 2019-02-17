@@ -10,6 +10,7 @@ import {USER_LOGIN_SUCCESS,
         MODIFIED_FRIEND,
         FRIEND_PROFILE,
         UPDATE_STATUS_FRIEND,
+        CHANGE_FRIEND_NAME,
         ADD_GROUP,
         MODIFIED_GROUP,
         DELETE_GROUP,
@@ -1260,9 +1261,57 @@ export default (state= INITIAL_STATE, action)=>{
             
             return state
         }
+        
+        case CHANGE_FRIEND_NAME:{
+            if(state.users === null){
+                return state
+            }
+
+            let friends = state.users.friends
+            let friend = _.find(friends,  function(v, k) { 
+                return k == action.friend_id
+            })
+
+            if(friend === undefined){
+                return state
+            }
+
+            if(friend.change_friend_name === undefined){
+                friend = {...friend, change_friend_name:action.change_friend_name}
+
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        friends : {
+                            ...state.users.friends,
+                            [action.friend_id]: friend
+                        }
+                    }
+                }
+                return v
+            }else{
+                if(friend.change_friend_name !== action.change_friend_name){
+                    friend = {...friend, change_friend_name:action.change_friend_name}
+
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            friends : {
+                                ...state.users.friends,
+                                [action.friend_id]: friend
+                            }
+                        }
+                    }
+                    return v
+                }
+            }
+
+            return state
+        }
 
         case ADD_GROUP:{
-
             if(state.users === null){
                 return state
             }
@@ -2187,25 +2236,32 @@ export default (state= INITIAL_STATE, action)=>{
                 return k == action.class_id
             })
 
+            if(_class === undefined){
+                return state
+            }
+
             if(_class.members !== undefined){
                 let members = _class.members
                 let member = _.find(members,  function(v, k) { 
                     return k == action.class_member_id 
                 })
 
-                let newMembers = _.omit(members, action.class_member_id)
+                if(member !== undefined){
+                    let newMembers = _.omit(members, action.class_member_id)
 
-                let v = {
-                    ...state,
-                    users : {
-                        ...state.users,
-                        classs : {
-                            ...state.users.classs,
-                            [action.class_id]: {..._class, newMembers}
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            classs : {
+                                ...state.users.classs,
+                                [action.class_id]: {..._class, members:newMembers}
+                            }
                         }
-                    }
-                }  
-                console.log("Classs", v)
+                    }  
+                    console.log("Classs", v)
+                    return v
+                }
             }
 
             return state
