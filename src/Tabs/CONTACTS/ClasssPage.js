@@ -36,19 +36,19 @@ class ClasssPage extends React.Component{
 
       setTimeout(() => {this.setState({renderContent: true})}, 0);
 
-      let data = []
-      for (var key in this.props.classs) {
-        let classs =  this.props.classs[key]
-        data.push({...{class_id:key}, ...classs});
-      }
-      this.setState({data,});
+      this.loadData(this.props)
     }
 
     componentWillReceiveProps(nextProps) {
       console.log(nextProps)
+      
+      this.loadData(nextProps)
+    }
+
+    loadData = (props) =>{
       let data = []
-      for (var key in nextProps.classs) {
-        let classs =  nextProps.classs[key]
+      for (var key in props.classs) {
+        let classs =  props.classs[key]
         data.push({...{class_id:key}, ...classs});
       }
       this.setState({data,});

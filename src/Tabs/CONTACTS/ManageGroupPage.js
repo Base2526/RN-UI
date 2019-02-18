@@ -30,6 +30,7 @@ class ManageGroupPage extends React.Component{
         this.state = { 
             loading:false,
             renderContent: false,
+            group_id:0,
             group:{}
         }
     }
@@ -40,6 +41,11 @@ class ManageGroupPage extends React.Component{
         const { navigation, auth } = this.props;
         const group_id = navigation.getParam('group_id', null);
 
+        this.setState({group_id},()=>{
+            this.loadData(this.props)
+        })
+
+        /*
         let groups = this.props.auth.users.groups;
 
         let friends = auth.users.friends
@@ -78,6 +84,110 @@ class ManageGroupPage extends React.Component{
                 return;
             }
         });
+        */
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log(nextProps)
+
+        /*
+        const { navigation, auth } = this.props;
+        const group_id = navigation.getParam('group_id', null);
+
+        // console.log(group_id)
+
+        let groups = nextProps.auth.users.groups;
+        let friends = auth.users.friends
+        
+        console.log(groups)
+        
+        Object.entries(groups).forEach(([key, value]) => {
+            if(group_id === key){
+                let {members} = value
+
+                let newMembers = {...members}
+                Object.entries(members).forEach(([mkey, mvalue]) => {
+
+                    var friend_profile = _.filter(friends, function(v, k) {
+                        return k == mvalue.friend_id;
+                    });
+
+                    if(friend_profile.length == 0){
+                        newMembers = {...newMembers, [mkey]:mvalue}
+                    }else{
+                        let mm = {...mvalue, ...{friend_profile:friend_profile[0]} }
+                        newMembers = {...newMembers, [mkey]:mm}
+                    }
+
+                    let group = {...{group_id:key, ...value}, 
+                                    group_profile:{
+                                        ...value.group_profile,
+                                        members:newMembers
+                                    },
+                                    members:newMembers
+                                }
+
+                    this.setState({
+                        group
+                    })
+                })
+                return;
+            }
+        });
+        */
+    }
+
+    loadData = (props) =>{
+        let {groups, friends} = props
+
+        let {group_id} = this.state
+
+        console.log(groups)
+        console.log(friends)
+
+        let group  = _.find(groups, (v, k)=>{
+            return group_id == k
+        })
+        // console.log(group)
+
+        if(group === undefined){
+            this.props.navigation.goBack(null)
+        }
+        console.log(group)
+
+        // let data = _.map(group.members, (v, k)=>{
+        //                 var friend_profile = _.find(friends, function(vv, kk) {
+        //                     return kk == v.friend_id;
+        //                 });
+
+        //                 console.log(friend_profile)
+        //                 // if(friend_profile !== undefined){
+        //                 //     return friend_profile
+        //                 // }
+
+        //                 return 88
+        //            })
+
+        let count = Object.keys(group.members).length;
+
+        if(count >= 5){
+            count = 5
+        }
+
+        let keys = Object.keys(group.members);
+        for (let i = 0; i < count; i++) {
+            // console.log(group.members[keys[i]])
+
+            let {friend_id}= group.members[keys[i]]
+
+            var friend_profile = _.find(friends, function(v, k) {
+                // console.log(k, friend_id)
+                return k == friend_id;
+            });
+            console.log(friend_profile)
+        }
+
+        console.log(count)
     }
 
     itemMembers = (group) =>{
@@ -122,54 +232,7 @@ class ManageGroupPage extends React.Component{
         )
     }
 
-    componentWillReceiveProps(nextProps) {
-        console.log(nextProps)
-
-        const { navigation, auth } = this.props;
-        const group_id = navigation.getParam('group_id', null);
-
-        // console.log(group_id)
-
-        let groups = nextProps.auth.users.groups;
-        let friends = auth.users.friends
-        
-        console.log(groups)
-        
-        Object.entries(groups).forEach(([key, value]) => {
-            if(group_id === key){
-                let {members} = value
-
-                let newMembers = {...members}
-                Object.entries(members).forEach(([mkey, mvalue]) => {
-
-                    var friend_profile = _.filter(friends, function(v, k) {
-                        return k == mvalue.friend_id;
-                    });
-
-                    if(friend_profile.length == 0){
-                        newMembers = {...newMembers, [mkey]:mvalue}
-                    }else{
-                        let mm = {...mvalue, ...{friend_profile:friend_profile[0]} }
-                        newMembers = {...newMembers, [mkey]:mm}
-                    }
-
-                    let group = {...{group_id:key, ...value}, 
-                                    group_profile:{
-                                        ...value.group_profile,
-                                        members:newMembers
-                                    },
-                                    members:newMembers
-                                }
-
-                    this.setState({
-                        group
-                    })
-                })
-                return;
-            }
-        });
-        
-    }
+    
 
     render() {
         let {group} = this.state
@@ -285,7 +348,9 @@ const mapStateToProps = (state) => {
   
     return{
         uid:getUid(state),
-        auth:state.auth
+        auth:state.auth,
+        groups:state.auth.users.groups,
+        friends:state.auth.users.friends,
     }
 }
 

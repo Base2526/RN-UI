@@ -26,7 +26,7 @@ class GroupsPage extends React.Component{
         page: 1,
         seed: 1,
         error: null,
-        refreshing: false,
+        // refreshing: false,
 
         sectionID: null,
         rowID: null,
@@ -39,19 +39,23 @@ class GroupsPage extends React.Component{
 
     // invited you to group
     componentDidMount() {
-      setTimeout(() => {this.setState({renderContent: true})}, 0);
-
+      // setTimeout(() => {this.setState({renderContent: true})}, 0);
       this.setState({
         error: null,
         loading: false,
-        refreshing: false
       });   
       
-      this.loadData(this.props.groups)
+      this.loadData(this.props)
     }
 
-    loadData=(groups)=>{
+    componentWillReceiveProps(nextProps) {    
+      this.loadData(nextProps)
+    }
+
+    loadData=(props)=>{
       // console.log(groups)
+      let {groups} = props
+
       let group_invited = []
       let group_joined = []
       let group_favorites = []
@@ -86,13 +90,11 @@ class GroupsPage extends React.Component{
           title:'Groups',
           member: group_joined
         },
-        refreshing: true,
+        renderContent: true,
       })
     }
 
-    componentWillReceiveProps(nextProps) {    
-      this.loadData(nextProps.groups)
-    }
+   
     
     renderItem = ({item, index}) => { 
       // console.log(index)
@@ -487,11 +489,12 @@ class GroupsPage extends React.Component{
     }
   
     render() {
-      if(!this.state.refreshing){
+      let {favorites, invited, groups, renderContent} = this.state
+
+      if(!renderContent){
         return <View style={{flex: 1}}></View>
       }
 
-      let {favorites, invited, groups} = this.state
       if(favorites.member.length == 0 && invited.member.length == 0 && groups.member.length == 0){
         return <View style={{flex: 1}}><Text>Empty Group</Text></View>
       }

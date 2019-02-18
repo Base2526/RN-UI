@@ -396,10 +396,14 @@ class home extends Component {
         let {renderContent, isOpenMenu} = this.state;
 
         let {isConnected} = this.props
-
+        // console.log(isConnected)
         let menuView
         if (isOpenMenu) {
             menuView = this.renderViewMenu()
+        }
+
+        if(!renderContent){
+            return(<View style={{flex:1}}></View>)
         }
 
         // console.log(this.state.isConnected)
