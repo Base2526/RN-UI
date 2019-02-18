@@ -1,15 +1,14 @@
 import React from 'react'
-import {FlatList, 
-        StyleSheet, 
+import {FlatList,  
         View, 
         Text, 
-        Alert, 
         TouchableOpacity,} from 'react-native'
 import Spinner from 'react-native-loading-spinner-overlay';
 import FastImage from 'react-native-fast-image'
 import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 var _ = require('lodash');
+import ActionButton from 'react-native-action-button';
 
 import * as actions from '../../Actions'
 import {getUid} from '../../Utils/Helpers'
@@ -29,38 +28,22 @@ class ListClassMemberPage extends React.Component{
             elevation: 0,
             shadowOpacity: 0
         },
-        headerLeft: (
-            <View style={{flexDirection:'row', flex:1}}>
-                <TouchableOpacity 
-                    style={{paddingLeft:10}}
-                    onPress={()=>{
-                        // GroupMemberInvite
-                        const { params = {} } = navigation.state
-                        params.handleAddFriend()
-                    }}>
-                    <MyIcon
-                        name={'user-plus'}
-                        size={25}
-                        color={'#C7D8DD'} />
-                </TouchableOpacity> 
-            </View>
-        ),
-        headerRight: (
-            <View style={{flexDirection:'row', flex:1}}>
-                <TouchableOpacity
-                    style={{padding:5}}
-                    // disabled={isModify ? false: true}
-                    onPress={() => {
-                        const { params = {} } = navigation.state
-                        params.handleCancel()
-                    }}>
-                    <MyIcon
-                        name={'cancel'}
-                        size={25}
-                        color={'#C7D8DD'} />
-                </TouchableOpacity>
-            </View>
-        ),
+        // headerRight: (
+        //     <View style={{flexDirection:'row', flex:1}}>
+        //         <TouchableOpacity
+        //             style={{padding:5}}
+        //             // disabled={isModify ? false: true}
+        //             onPress={() => {
+        //                 const { params = {} } = navigation.state
+        //                 params.handleSetting()
+        //             }}>
+        //             <MyIcon
+        //                 name={'settings'}
+        //                 size={25}
+        //                 color={'#C7D8DD'} />
+        //         </TouchableOpacity>
+        //     </View>
+        // ),
     });
 
     constructor(){
@@ -74,7 +57,7 @@ class ListClassMemberPage extends React.Component{
     }
 
     componentDidMount() {
-        this.props.navigation.setParams({handleCancel: this.handleCancel })
+        this.props.navigation.setParams({handleSetting: this.handleSetting })
         this.props.navigation.setParams({handleAddFriend: this.handleAddFriend })
         
         setTimeout(() => {this.setState({renderContent: true})}, 0);
@@ -175,8 +158,10 @@ class ListClassMemberPage extends React.Component{
         this.setState({data:newData})
     }
 
-    handleCancel = () => {
-        this.props.navigation.goBack(null)
+    handleSetting = () => {
+        // this.props.navigation.goBack(null)
+
+        this.props.navigation.navigate('ClasssSettingsPage')
     }
 
     handleAddFriend = () => {
@@ -223,27 +208,24 @@ class ListClassMemberPage extends React.Component{
             <Swipeout 
                 style={{backgroundColor:'white'}} 
                 right={swipeoutRight}>
+                <TouchableOpacity   
+                onPress={()=>{  
+                            this.props.navigation.navigate("FriendProfilePage",{'friend_id': item.friend_id})
+                            }}>
                 <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
-                    <TouchableOpacity 
-                      style={{height:60,
-                              width: 60,
-                              borderRadius: 10}}   
-                              onPress={
-                                ()=>this.props.navigation.navigate("FriendProfilePage")
-                              }>
-                        <FastImage
-                            style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
-                            source={{
-                                uri: item.profile.image_url,
-                                headers:{ Authorization: 'someAuthToken' },
-                                priority: FastImage.priority.normal,
-                            }}
-                            resizeMode={FastImage.resizeMode.cover}/>
-                  </TouchableOpacity>
-                  <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                    <Text style={{fontSize:18}}>{item.profile.name}</Text>
-                 </View>
+                    <FastImage
+                        style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
+                        source={{
+                            uri: item.profile.image_url,
+                            headers:{ Authorization: 'someAuthToken' },
+                            priority: FastImage.priority.normal,
+                        }}
+                        resizeMode={FastImage.resizeMode.cover}/>
+                    <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
+                        <Text style={{fontSize:18}}>{item.profile.name}</Text>
+                    </View>
                 </View>
+                </TouchableOpacity>
             </Swipeout>)
     }
 
@@ -255,17 +237,49 @@ class ListClassMemberPage extends React.Component{
                 visible={this.state.loading}
                 textContent={'Wait...'}
                 textStyle={{color: '#FFF'}}
-                overlayColor={'rgba(0,0,0,0.5)'}
-                />
+                overlayColor={'rgba(0,0,0,0.5)'}/>
             { renderContent &&
             <FlatList
-                data={ data }
+                data={data}
                 ItemSeparatorComponent = {this.FlatListItemSeparator}
                 renderItem={this.renderItem}
-                // ListHeaderComponent={this.render_FlatList_header}
-                // ListFooterComponent={this.render_FlatList_footer}
+                extraData={data}
                 />
             }
+                <ActionButton buttonColor="rgba(231,76,60,1)"
+                    renderIcon={() => {
+                        return(<MyIcon
+                            name={'plus'}
+                            size={25}
+                            color={'#C7D8DD'} />)
+                        }}>
+                    <ActionButton.Item 
+                        buttonColor='#3498db' 
+                        title="Settings" 
+                        onPress={() => {
+                            this.props.navigation.navigate('ClasssSettingsPage', {'class_id':this.state.class_id})
+                        }}>
+                        <Text>
+                            <MyIcon
+                                name={'settings'}
+                                size={25}
+                                color={'#C7D8DD'} />
+                        </Text>
+                    </ActionButton.Item>
+                    <ActionButton.Item 
+                        buttonColor='#9b59b6' 
+                        title="Add Friend" 
+                        onPress={()=>{
+                            this.props.navigation.navigate("ClasssMemberAddFriend", {'class_id':this.state.class_id})
+                        }}>
+                        <Text>
+                            <MyIcon
+                                name={'user-plus'}
+                                size={25}
+                                color={'#C7D8DD'} />
+                        </Text>
+                    </ActionButton.Item>
+                </ActionButton>
             </View>
         );
     }
@@ -273,13 +287,11 @@ class ListClassMemberPage extends React.Component{
 
 const mapStateToProps = (state) => {
     // console.log(state)
-
     if(!state._persist.rehydrated){
       return {}
     }
   
     return{
-        auth:state.auth,
         uid:getUid(state),
         friends:state.auth.users.friends,
         classs:state.auth.users.classs,

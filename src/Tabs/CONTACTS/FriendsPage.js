@@ -72,25 +72,30 @@ class FriendsPage extends React.Component{
             case Constant.FRIEND_STATUS_FRIEND:{
 
               // hide, block
+              let isAdd = false
               if(friend.hide === undefined && friend.block === undefined){
-                friend_member.push({...friend, friend_id:key});
+                isAdd = true
               }else if(friend.hide !== undefined && friend.block !== undefined){
                 if(!friend.hide && !friend.block){
-                  friend_member.push({...friend, friend_id:key});
+                  isAdd = true
                 }
               }else if(friend.hide !== undefined){
                 if(!friend.hide){
-                  friend_member.push({...friend, friend_id:key});
+                  isAdd = true
                 }
               }else if(friend.block !== undefined){
                 if(!friend.block){
-                  friend_member.push({...friend, friend_id:key});
+                  isAdd = true
                 }
               } 
               
-              if(friend.is_favorite !== undefined){
-                if(friend.is_favorite){
-                  favorite_member.push({...friend, friend_id:key});
+              if(isAdd){
+                friend_member.push({...friend, friend_id:key});
+
+                if(friend.is_favorite !== undefined){
+                  if(friend.is_favorite){
+                      favorite_member.push({...friend, friend_id:key});
+                  }
                 }
               }
               break

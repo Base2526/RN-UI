@@ -1,7 +1,7 @@
 import { Animated } from "react-native";
 
 import { createStackNavigator, createTabNavigator } from 'react-navigation'
-import Home from './home';
+import home from './home';
 import Details from './details';
 import AddFriendsPage from './AddFriendsPage';
 import AddGroupsPage from './AddGroupsPage';
@@ -52,10 +52,11 @@ import EditMyIDPage from './EditMyIDPage'
 import EditAddressPage from './EditAddressPage'
 
 import EditGroupNamePage from './EditGroupNamePage'
+import EditClassNamePage from './EditClassNamePage'
 
 const index = createStackNavigator({
     'Home': {
-        screen: Home,
+        screen: home,
         navigationOptions: {
           title: 'Contacts',
         },
@@ -102,7 +103,6 @@ const index = createStackNavigator({
         // title: 'My Profile',
       }
     },
-    
     'FriendProfilePage': {
       screen: FriendProfilePage,
       navigationOptions: {
@@ -115,12 +115,12 @@ const index = createStackNavigator({
         // title: 'Manage Group',
       }
     },
-    // 'ListClassMemberPage': {
-    //   screen: ListClassMemberPage,
-    //   navigationOptions: {
-    //     // title: 'List Class User',
-    //   }
-    // },
+    'ListClassMemberPage': {
+      screen: ListClassMemberPage,
+      navigationOptions: {
+        // title: 'List Class User',
+      }
+    },
     'QRCodeReaderPage': {
       screen: QRCodeReaderPage,
       navigationOptions: {
@@ -160,6 +160,9 @@ const index = createStackNavigator({
     'ChangeFriendsName': {
       screen: ChangeFriendsName
     },
+    // 'ClasssMemberAddFriend': {
+    //   screen: ClasssMemberAddFriend
+    // },
 },{
 //   initialRouteName: 'Base',
 // headerMode: "screen",
@@ -233,7 +236,7 @@ const ListGroupMemberNavigator = createStackNavigator(
 const ClasssSettingsNavigator = createStackNavigator(
   {
     'ClasssSettingsPage': {screen: ClasssSettingsPage},
-    // 'ListClassMemberPage': {screen: ListClassMemberPage}
+    'EditClassNamePage': {screen: EditClassNamePage}
   },
   {
     // headerMode: 'none',
@@ -243,7 +246,7 @@ const ClasssSettingsNavigator = createStackNavigator(
 const ListClassMemberNavigator = createStackNavigator(
   {
     // 'ClasssSettingsPage': {screen: ClasssSettingsPage},
-    'ListClassMemberPage': {screen: ListClassMemberPage},
+    // 'ListClassMemberPage': {screen: ListClassMemberPage},
     'ClasssMemberAddFriend': {screen: ClasssMemberAddFriend},
   },
   {
@@ -357,7 +360,9 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
       routeName === 'EditGroupNamePage' ||
       routeName === 'GroupMemberInvite' ||
       routeName === 'ChangeFriendsName' ||
-      routeName === 'ClasssSettingsPage'
+      routeName === 'ClasssSettingsPage' ||
+      routeName === 'ClasssMemberAddFriend' ||
+      routeName === 'EditClassNamePage'
       ) {
     navigationOptions.tabBarVisible = false;
   }

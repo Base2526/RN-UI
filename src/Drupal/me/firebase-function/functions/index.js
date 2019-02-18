@@ -46,33 +46,20 @@ exports.updateClasss = functions.firestore
     .document('users/{userId}/classs/{classId}')
     .onUpdate((change, context) => {
 
-    console.log(context);
-
     const newValue = change.after.data();
-
-    // const timestamp = functions.firestore.FieldValue.serverTimestamp();
-
-    // console.log(admin.database.ServerValue.TIMESTAMP);
-
-    // Using Cloud Firestore
-    // console.log(admin.firestore.FieldValue.serverTimestamp());
-
-    // Using Realtime Database
-    // admin.database.ServerValue.TIMESTAMP
-
-    // กรณี 
-    // request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PATH_API_TEST, form: {value:newValue}, headers: config.headers}, function(err,httpResponse,body){ 
-    //     /* ... */
-    //     // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
-    //     var objectValue = JSON.parse(body);
-    //     console.log(objectValue);
-    //     if (!objectValue.result) {
-    //         // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
-    //     }
-    // });
+   
+    let mode = 'modified';
+    request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.CLASSS, form: {mode, context, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+        /* ... */
+        // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+        var objectValue = JSON.parse(body);
+        console.log(objectValue);
+        if (!objectValue.result) {
+            // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+        }
+    });
 
     return true;
-    
 });
 
 exports.deleteClasss = functions.firestore
@@ -82,7 +69,8 @@ exports.deleteClasss = functions.firestore
         // e.g. {'name': 'Marie', 'age': 66}
         const deletedValue = snap.data();
 
-        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.DELETE_CLASSS, form: {deletedValue, context}, headers: config.headers}, function(err,httpResponse,body){ 
+        let mode = 'removed';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.CLASSS, form: {mode, context, deletedValue}, headers: config.headers}, function(err,httpResponse,body){ 
             /* ... */
             // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
             var objectValue = JSON.parse(body);
@@ -94,6 +82,40 @@ exports.deleteClasss = functions.firestore
 
         return true;
 });
+
+/*
+.onCreate((snap, context) => {
+        const newValue = snap.data();
+        let mode = 'added';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PROFILE_PHONES, form: {context, mode, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+*/
+
+exports.createClasssMember = functions.firestore
+    .document('users/{userId}/classs/{classId}/members/{memberId}')
+    .onCreate((snap, context) => {
+        const newValue = snap.data();
+        let mode = 'added';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.CLASS_MEMBER, form: {context, mode, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
 
 // .document('users/{userId}/classs/{classId}/members/{memberId}')
 exports.updateClasssMember = functions.firestore
@@ -125,7 +147,7 @@ exports.deleteClasssMember = functions.firestore
             /* ... */
             // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
             var objectValue = JSON.parse(body);
-            console.log(objectValue);
+            // console.log(objectValue);
             if (!objectValue.result) {
                 // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
             }

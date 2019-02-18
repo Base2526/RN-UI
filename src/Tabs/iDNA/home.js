@@ -1,20 +1,21 @@
 import React, { Component } from 'react';
 import { View, Text, Button, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import Styles from '../../styles';
-
 import ScrollableTabView, {ScrollableTabBar, DefaultTabBar} from 'react-native-scrollable-tab-view';
 
+import { connect } from 'react-redux';
+
+
+import Styles from '../../styles';
 import ListMyAppPage from './ListMyAppPage'
 import ListCenterPage from './ListCenterPage'
 import ListFollowingPage from './ListFollowingPage'
 
-import Image from 'react-native-remote-svg'
-
+import * as actions from '../../Actions'
 import MyIcon from '../../config/icon-font.js';
+import OfflineNotice from '../../Utils/OfflineNotice'
 
-export default class home extends Component {
-
+class home extends Component {
     static navigationOptions = ({navigation}) => {
         const {params = {}, positionSelect} = navigation.state;
 
@@ -107,7 +108,8 @@ export default class home extends Component {
         super(props)
 
         this.state= {
-            positionSelect:0,
+            // isConnected: true,
+            positionSelect: 0,
             renderContent: false,
         }
     }
@@ -140,7 +142,7 @@ export default class home extends Component {
         // this.children[i].onEnter();
         // this.children[from].onLeave();
 
-        console.log("handleChangeTab : i =" + i)
+        // console.log("handleChangeTab : i =" + i)
 
         this.setState({
             positionSelect:i
@@ -150,12 +152,13 @@ export default class home extends Component {
     }
       
     render() {
-        let {
-            renderContent
-          } = this.state;
+        let {renderContent} = this.state;
+        let {isConnected} = this.props
 
+        // console.log(isConnected)
         return (
-            <View style={[style.container, {backgroundColor:'white'}]}>
+            <View style={{backgroundColor:'white', flex:1}}>
+                {!isConnected ?<OfflineNotice />:<View />}
                 { renderContent &&
                 <ScrollableTabView
                     // style={{height:500}}
@@ -175,8 +178,15 @@ export default class home extends Component {
     }
 }
 
-let style = StyleSheet.create({
-    container: {
-        flex: 1
-    },
-});
+const mapStateToProps = (state) => {
+    console.log(state)
+    if(!state._persist.rehydrated){
+        return {}
+    }
+    console.log(state.offline)
+    return{
+        isConnected:state.offline.online
+    }
+}
+
+export default connect(mapStateToProps, actions)(home);

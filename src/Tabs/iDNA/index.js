@@ -1,5 +1,5 @@
 import { createStackNavigator } from 'react-navigation'
-import Home from './home';
+import home from './home';
 import CreateApplicationPage from './CreateApplicationPage';
 
 import ApplicationDetailPage from './ApplicationDetailPage'
@@ -23,7 +23,7 @@ import MyApplicationAddPost from './MyApplicationAddPost'
 
 const index = createStackNavigator({
     'Home': {
-        screen: Home,
+        screen: home,
         navigationOptions: {
           // title: 'iDNA',
         },

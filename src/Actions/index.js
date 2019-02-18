@@ -45,6 +45,7 @@ import {USER_LOGIN_SUCCESS,
         MODIFIED_CLASS_MEMBER,
         REMOVED_CLASS_MEMBER,
         FAVORITES_CLASS,
+        UPDATE_CLASS_PICTURE_PROFILE,
         FRIEND_MUTE,
         FRIEND_HIDE,
         FRIEND_BLOCK,
@@ -106,8 +107,8 @@ import {login,
         update_picture_profile,
         update_picture_bg_profile,
         update_group_picture_profile,
-        check_my_id,
-        class_add_member} from '../Utils/Services'
+        update_class_picture_profile,
+        check_my_id,} from '../Utils/Services'
 
 export const actionApplicationCategory = () =>dispatch =>{
     return application_category().then(data=>{
@@ -506,8 +507,48 @@ export const actionDeleteClass = (uid, class_id, callback) => dispatch =>{
 }
 
 // Classs add member 
-export const actionClassAddMember = (uid, class_id, members) => dispatch =>{
-    return class_add_member(uid, class_id, members).then(data => {
+export const actionClassAddMember = (uid, class_id, members, callback) => dispatch =>{
+    members.map(function(friend_id, k) {
+        firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').where('friend_id', '==', friend_id).get().then(snapshot => {
+            let value = {friend_id, status: true}
+            if(snapshot.size == 0){
+                let key = randomKey()
+                
+                firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(key).set(value, { merge: true})
+            
+                dispatch({type: MODIFIED_CLASS_MEMBER, class_id, class_member_id:key, class_member_data:value })
+                // callback({'status':true})
+
+                if(k == members.length - 1){
+                    callback({'status':true})
+                }
+            }else{
+                snapshot.docs.forEach(doc => {
+                    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(doc.id).set({status: true}, { merge: true})
+                    
+                    dispatch({type: MODIFIED_CLASS_MEMBER, class_id, class_member_id:doc.id, class_member_data:value })
+                    
+                    if(k == members.length - 1){
+                        callback({'status':true})
+                    }
+                })
+            }
+        })
+    })
+    
+}
+
+// REMOVED_CLASS_MEMBER
+export const actionDeleteClassMember = (uid, class_id, class_member_id, callback) => dispatch =>{
+    // users/{userId}/classs/{classId}/members/{key}
+    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(class_member_id).set({status: false}, { merge: true})
+    dispatch({type: REMOVED_CLASS_MEMBER, class_id, class_member_id})
+    callback({'status':true, uid, class_id, class_member_id})
+}
+
+export const actionUpdateClassPictureProfile = (uid, class_id, image_uri) => dispatch =>{
+
+    return update_class_picture_profile(uid, class_id, image_uri).then(data => {
         console.log(data)
         if((data instanceof Array)){
             return {'status':false, 'message': data}
@@ -515,25 +556,24 @@ export const actionClassAddMember = (uid, class_id, members) => dispatch =>{
             if(!data.result){
                 return {'status':false, 'message': data}
             }else{
-                _.each(data.members, (v, k)=>{
-                    console.log(class_id, v, k)
-                    dispatch({type: ADDED_CLASS_MEMBER, class_id, class_member_id:k, class_member_data:v })
-                })
-                return {'status':true, 'data':data}
+                // dispatch({ type: UPDATE_GROUP_PICTURE_PROFILE, group_id, image_url:data.image_url});
+                
+                dispatch({ type: UPDATE_CLASS_PICTURE_PROFILE, class_id, image_url:data.image_url});
+                return {'status':true, data}
             }
         }
     })
-   
-    // callback({'status':true, uid, class_id, members})
 }
 
-// REMOVED_CLASS_MEMBER
-export const actionDeleteClassMember = (uid, class_id, class_member_id, callback) => dispatch =>{
-    // users/{userId}/classs/{classId}/members/{key}
-    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(class_member_id).delete()
-    dispatch({type: REMOVED_CLASS_MEMBER, class_id, class_member_id})
-    callback({'status':true, uid, class_id, class_member_id})
+export const actionEditClassNameProfile = (uid, class_id, name, callback) => dispatch =>{
+    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).set({
+        name,
+    }, { merge: true});
+
+    // dispatch({ type: EDIT_DISPLAY_NAME_PROFILE, name});
+    callback({'status':true})
 }
+
 
 export const actionUpdateStatusFriend = (uid, friend_id, status, callback) => dispatch=>{
     // console.log('-------------- actionAcceptFriend()')

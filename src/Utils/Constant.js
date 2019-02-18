@@ -31,6 +31,8 @@ module.exports = {
 
     UPDATE_GROUP_PICTURE_PROFILE: API_URL + END_POINT + '/update_group_picture_profile',
     
+    UPDATE_CLASS_PICTURE_PROFILE: API_URL + END_POINT + '/update_class_picture_profile',
+
     CHECK_MY_ID: API_URL + END_POINT + '/check_my_id',
     // 'Content-Type': 'multipart/form-data'
     FETCH_HEADERS: {

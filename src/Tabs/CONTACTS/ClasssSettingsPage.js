@@ -13,17 +13,16 @@ import {View,
 import { connect } from 'react-redux';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
+var _ = require('lodash');
 import FastImage from 'react-native-fast-image'
 import Spinner from 'react-native-loading-spinner-overlay';
 import ImagePicker from 'react-native-image-picker';
 
-import {getStatusBarHeight} from '../../Utils/Helpers'
-
 import * as actions from '../../Actions'
-
 import Constant from '../../Utils/Constant'
 import MyIcon from '../../config/icon-font.js';
+
+import {getUid} from '../../Utils/Helpers'
 
 class ClasssSettingsPage extends React.Component{
 
@@ -58,26 +57,53 @@ class ClasssSettingsPage extends React.Component{
         ),
     });
 
-
     constructor(props) {
         super(props)
 
         this.state ={
-            image_url:''
+            loading: false,
+            cla: {},
+            name: '',
+            image_url: '',
+            class_id: 0,
         }
     }
 
     componentDidMount(){
         this.props.navigation.setParams({handleCancel: this.handleCancel })
+    
+        const { navigation } = this.props;
+        const class_id = navigation.getParam('class_id', null);
+
+        // console.log(class_id)
+        this.setState({class_id},()=>{
+            this.loadData(this.props)
+        })
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.loadData(nextProps)
     }
 
     handleCancel = () => {
         this.props.navigation.goBack(null)
     }
 
-    groupProfilePicture = () => {
+    loadData = (props) =>{
+        // console.log(props)
+        let {class_id} = this.state
+        let {classs} = props
+
+        let cla = _.find(classs,  function(v, k) { 
+            return k == class_id; 
+        })
+
+        this.setState({cla, image_url:cla.image_url, name:cla.name})
+    }
+
+    profilePicture = () => {
         let options =  {
-            title: 'Select group profile picture',
+            title: 'Select class profile picture',
             noData: true,
             storageOptions: {
               skipBackup: true,
@@ -98,28 +124,28 @@ class ClasssSettingsPage extends React.Component{
             } else if (response.customButton) {
                 console.log('User tapped custom button: ', response.customButton);
             } else {
-                // this.setState({loading:true})
-                // this.props.actionUpdateGroupPictureProfile(this.props.uid, this.state.group_id, response.uri).then((result) => {
-                //     console.log(result)
-
-                //     this.setState({loading:false})
-
-                //     // setTimeout(() => {
-                //     //     Alert.alert('Oops!');
-                //     //   }, 100);
-                // })
-
-                this.setState({image_url: response.uri})
+                this.setState({loading:true})
+                this.props.actionUpdateClassPictureProfile(this.props.uid, this.state.class_id, response.uri).then((result) => {
+                    console.log(result)
+                    setTimeout(() => {
+                        this.setState({loading:false})
+                    }, 200);
+                })
             }
         });
     }
 
     render(){
 
-        console.log(this.state.image_url)
         return(
         <KeyboardAwareScrollView>
         <View style={{flex:1}}>
+            <Spinner
+                visible={this.state.loading}
+                textContent={'Wait...'}
+                textStyle={{color: '#FFF'}}
+                overlayColor={'rgba(0,0,0,0.5)'}
+            />
             
             <View style={{flex: 1,}}>
           
@@ -153,7 +179,7 @@ class ClasssSettingsPage extends React.Component{
                             marginBottom:10}}>
                             <TouchableOpacity
                                 onPress={()=>{
-                                    this.groupProfilePicture()
+                                    this.profilePicture()
                                 }}>
                                 
                                 <FastImage
@@ -167,7 +193,7 @@ class ClasssSettingsPage extends React.Component{
                             </TouchableOpacity>
                             <TouchableOpacity style={{position:'absolute', right:0, bottom:0, padding:5, margin:5}}
                                             onPress={()=>{
-                                                this.groupProfilePicture()
+                                                this.profilePicture()
                                             }}>
                                 <MyIcon
                                     name={'camera'}
@@ -196,12 +222,19 @@ class ClasssSettingsPage extends React.Component{
                         }
                     />
                     <Cell
+                        accessory="DisclosureIndicator"
                         cellContentView={
                             <TextInput
-                            style={{ fontSize: 22, flex: 1 }}
-                            placeholder="input class name"
+                                style={{ fontSize: 22, flex: 1 }}
+                                placeholder="input class name"
+                                value={this.state.name}
+                                editable={false}
+                                pointerEvents="none"
                             />
                         }
+                        onPress={()=>{
+                            this.props.navigation.navigate("EditClassNamePage", {'class_id': this.state.class_id})
+                        }}
                         />
                 </Section>
             </TableView>
@@ -212,14 +245,15 @@ class ClasssSettingsPage extends React.Component{
 }
 
 const mapStateToProps = (state) => {
-    console.log(state)
-
+    // console.log(state)
     if(!state._persist.rehydrated){
       return {}
     }
   
     return{
-      auth:state.auth
+        uid:getUid(state),
+        auth:state.auth,
+        classs:state.auth.users.classs,
     }
 }
 

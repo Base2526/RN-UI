@@ -35,6 +35,7 @@ import {USER_LOGIN_SUCCESS,
         MODIFIED_CLASS_MEMBER,
         REMOVED_CLASS_MEMBER,
         FAVORITES_CLASS,
+        UPDATE_CLASS_PICTURE_PROFILE,
         FRIEND_MUTE,
         FRIEND_HIDE,
         FRIEND_BLOCK,
@@ -2125,7 +2126,7 @@ export default (state= INITIAL_STATE, action)=>{
                 return state
             }
 
-            console.log("Classs", _class)
+            // console.log("Classs", _class)
             //  dispatch({type: ADDED_CLASS_MEMBER, class_id:classsChange.doc.id, class_member_id:classsMembersChange.doc.id, class_member_data:classsMembersChange.doc.data() })
             if(_class.members === undefined){
 
@@ -2148,35 +2149,38 @@ export default (state= INITIAL_STATE, action)=>{
                     return k == action.class_member_id
                 })
 
+                // console.log(member, action)
                 if(member === undefined){
-                    members = {...members, ...{[action.class_member_id]: action.class_member_data}}
-                
+                    let newMembers = {...members, [action.class_member_id ]:action.class_member_data}
+
                     let v = {
                         ...state,
                         users : {
                             ...state.users,
                             classs : {
                                 ...state.users.classs,
-                                [action.class_id]: {..._class, members}
+                                [action.class_id]: {..._class, members:newMembers}
                             }
                         }
                     }       
-                    console.log("Classs", v)
+                    // console.log("Classs", v)
                     return v
                 }else{
                     if(!_.isEqual(member, action.class_member_data)){
-                        members = {...members, ...{[action.class_member_id]: action.class_member_data}}
+                        let newMembers = {...members, [action.class_member_id ]:action.class_member_data}
+
                         let v = {
                             ...state,
                             users : {
                                 ...state.users,
                                 classs : {
                                     ...state.users.classs,
-                                    [action.class_id]: {..._class, members}
+                                    [action.class_id]: {..._class, members:newMembers}
                                 }
                             }
                         }       
-                        console.log("Classs", v)
+                        // console.log("Classs", v)
+                        return v
                     }
                 }
             }
@@ -2184,8 +2188,7 @@ export default (state= INITIAL_STATE, action)=>{
         }
 
         /* 
-        MODIFIED_CLASS_MEMBER,
-        REMOVED_CLASS_MEMBER,
+            - คิดเฉพาะ status == false เพือ update status = true เท่านั้น
         */
         case MODIFIED_CLASS_MEMBER:{
 
@@ -2201,24 +2204,42 @@ export default (state= INITIAL_STATE, action)=>{
             if(_class.members !== undefined){
                 let members = _class.members
                 let member = _.find(members,  function(v, k) { 
-                    return k == action.class_member_id && _.isEqual(v, action.class_member_data)
+                    return k == action.class_member_id
                 })
 
                 console.log("Classs", member, action)
                 if(member === undefined){
-                    members = {...members, ...{[action.class_member_id]: action.class_member_data}}
+                    // members = {...members, ...{[action.class_member_id]: {...member, status:true}}}
+                    let newMembers = {...members, [action.class_member_id ]:action.class_member_data}
                     let v = {
                         ...state,
                         users : {
                             ...state.users,
                             classs : {
                                 ...state.users.classs,
-                                [action.class_id]: {..._class, members}
+                                [action.class_id]: {..._class, members:newMembers}
                             }
                         }
                     }  
                     console.log("Classs", v)
                     return v
+                }else{
+                    if(!_.isEqual(member, action.class_member_data)){
+                        let newMembers = {...members, [action.class_member_id ]:action.class_member_data}
+
+                        let v = {
+                            ...state,
+                            users : {
+                                ...state.users,
+                                classs : {
+                                    ...state.users.classs,
+                                    [action.class_id]: {..._class, members:newMembers}
+                                }
+                            }
+                        }       
+                        console.log("Classs", v)
+                        return v
+                    }
                 }
             }
 
@@ -2243,11 +2264,13 @@ export default (state= INITIAL_STATE, action)=>{
             if(_class.members !== undefined){
                 let members = _class.members
                 let member = _.find(members,  function(v, k) { 
-                    return k == action.class_member_id 
+                    return k == action.class_member_id && !v.status
                 })
 
                 if(member !== undefined){
-                    let newMembers = _.omit(members, action.class_member_id)
+                    let newMembers = {...members, [action.class_member_id ]:{...member, status:false}}
+                    // console.log(newMembers)
+                    // let newMembers = _.omit(members, action.class_member_id)
 
                     let v = {
                         ...state,
@@ -2317,6 +2340,64 @@ export default (state= INITIAL_STATE, action)=>{
             return state
         }
 
+
+        case UPDATE_CLASS_PICTURE_PROFILE:{
+
+            if(state.users === null){
+                return state
+            }
+
+            let classs = state.users.classs
+
+            let _class = _.find(classs,  function(v, k) { 
+                return k == action.class_id
+            })
+
+            if(_class === undefined){
+                return state
+            }
+
+            // image_url
+
+            if( !_.isEqual(action.image_url != _class.image_url) ){
+                _class = {..._class, image_url:action.image_url}
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        classs : {
+                            ...state.users.classs,
+                            [action.class_id]: _class
+                        }
+                    }
+                }
+                console.log('CLASS update image_url : ', v)
+                return v    
+            }
+
+            // let newValue = {...value, 
+            //                     group_profile: {
+            //                         ...value.group_profile,
+            //                         image_url:action.image_url
+            //                     }
+            //                 }
+
+            // let v = {
+            //     ...state,
+            //     users : {
+            //         ...state.users,
+            //         groups : {
+            //             ...state.users.groups,
+            //             [action.group_id]: newValue
+            //         }
+            //     }
+            // }
+
+            // console.log(v)
+            // return v
+
+            return state
+        }
         /*
         case CLASS_MEMBERS:{
             if(state.users === null){

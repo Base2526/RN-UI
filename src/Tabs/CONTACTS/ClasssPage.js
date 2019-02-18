@@ -100,17 +100,19 @@ class ClasssPage extends React.Component{
       // {item.is_default ? '(default '+ item.is_favorites +')': ''}
 
       if(item.is_default){
-        if(item.is_favorites){
-          return(' (default, favorite)')
-        }else{
+        // if(item.is_favorites){
+        //   return(' (default, favorite)')
+        // }else{
           return(' (default)')
-        }
+        // }
       }else{
-        if(item.is_favorites){
-          return(' (favorite)')
-        }else{
-          return('')
-        }
+        // if(item.is_favorites){
+        //   return(' (favorite)')
+        // }else{
+        //   return('')
+        // }
+
+        return('')
       }
     }
 
@@ -161,7 +163,9 @@ class ClasssPage extends React.Component{
                 }}
                 close={!(this.state.rowID === index)}>
           <TouchableOpacity key={ item.name } onPress={() => {
-            this.props.params.navigation.navigate("ManageClasssPage", {'data': item, 'class_id':item.class_id})
+            // this.props.params.navigation.navigate("ManageClasssPage", {'data': item, 'class_id':item.class_id})
+
+            this.props.params.navigation.navigate("ListClassMemberPage", {'class_id': item.class_id})
           }}>
             <View
               style={{

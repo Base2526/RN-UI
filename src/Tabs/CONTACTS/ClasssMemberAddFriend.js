@@ -2,7 +2,8 @@ import React from 'react'
 import {View, 
         Text, 
         FlatList,  
-        TouchableOpacity,} from 'react-native'
+        TouchableOpacity,
+        Alert,} from 'react-native'
 import { connect } from 'react-redux';
 import FastImage from 'react-native-fast-image'
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -26,16 +27,32 @@ class ClasssMemberAddFriend extends React.Component{
             elevation: 0,
             shadowOpacity: 0
         },
-        headerRight: (
+        headerLeft: (
             <View style={{flexDirection:'row', flex:1}}>
                 <TouchableOpacity
-                    style={{padding:5}}
+                    style={{paddingLeft:10}}
                     // disabled={isModify ? false: true}
                     onPress={() => {
                         const { params = {} } = navigation.state
                         params.handleAdd()
                     }}>
                     <Text style={{color:'#C7D8DD',fontSize:18, fontWeight:'bold'}}>Add</Text>
+                </TouchableOpacity>
+            </View>
+        ),
+        headerRight: (
+            <View style={{marginRight:10}}>
+                <TouchableOpacity
+                    style={{padding:5}}
+                    // disabled={isModify ? false: true}
+                    onPress={() => {
+                        const { params = {} } = navigation.state
+                        params.handleCancel()
+                    }}>
+                    <MyIcon
+                        name={'cancel'}
+                        size={25}
+                        color={'#C7D8DD'} />
                 </TouchableOpacity>
             </View>
         ),
@@ -47,23 +64,14 @@ class ClasssMemberAddFriend extends React.Component{
             loading: false,
             data: [],
             class_id: 0,
-            buttonState: 'normal'
         }
     }
 
-    getArrFriends = () =>{
-        let friends = this.props.auth.users.friends
-        return Object.keys(friends).map((key, index) => {
-            // const myItem = friends[key]
-            // return friends[key]
-            return {...{friend_id:key}, ...friends[key]};
-        })
-    }
-
     componentDidMount(){
-        this.props.navigation.setParams({ handleAdd: this.handleAdd })
+        this.props.navigation.setParams({handleCancel: this.handleCancel })
+        this.props.navigation.setParams({handleAdd: this.handleAdd })
 
-        const { navigation, auth } = this.props;
+        const { navigation} = this.props;
         const class_id = navigation.getParam('class_id', null);
 
         this.setState({class_id},()=>{
@@ -103,6 +111,14 @@ class ClasssMemberAddFriend extends React.Component{
         */
     }
 
+    componentWillReceiveProps(nextProps) {
+        this.loadData(nextProps)
+    }
+
+    handleCancel = () => {
+        this.props.navigation.goBack(null)
+    }
+
     loadData = (props) =>{
         console.log(props)
 
@@ -118,27 +134,10 @@ class ClasssMemberAddFriend extends React.Component{
             this.props.navigation.goBack(null)
         }
 
-        /*
-        let newData = []
-        _.each(cla.members, (v, k)=>{
-            if(v.status){
-                // return {...{friend_id:key}, ...friends[key]};
-                friend =_.find(friends, (vv, kk)=>{
-                            return v.friend_id == kk
-                        })
-                
-                newData.push( {...{friend_id:v.friend_id}, ...{member_item_id:k}, ...friend} )
-            }
-        })
-
-        console.log(newData)
-        this.setState({data:newData})
-        */
-
         let newData = []
         _.each(friends, (v, k)=>{
             let f = _.find(cla.members, (vv, kk)=>{
-                return k == vv.friend_id
+                return k == vv.friend_id && vv.status
             })
 
             console.log(f)
@@ -152,27 +151,14 @@ class ClasssMemberAddFriend extends React.Component{
     }
 
     handleAdd = () =>{
-        // alert('handleAddMember')
-
         let newData = this.state.data.filter(function(item){
             return item.seleted == true;
         })
 
-        // console.log(newData)
         newData.sort(function(a, b) {
             var dateA = new Date(a.create), dateB = new Date(b.create);
             return dateA - dateB;
         });
-
-        /* 
-        let seleteds = []
-      let list = this.state.sections[0].data[0].list
-      list.map((value) => {
-        if(value.friend_id !== undefined){
-          seleteds.push(value.friend_id)
-        }
-      })
-        */
 
         let members = []
         newData.map((value) => {
@@ -181,28 +167,24 @@ class ClasssMemberAddFriend extends React.Component{
             }
         })
 
-        // console.log(this.props.uid)
-        // console.log(this.state.class_id)
-        // console.log(members)
-        // const { navigation } = this.props;
-        // navigation.goBack();
-        // navigation.state.params.onSeleted(newData);
-
-        
-        // (uid, class_id, members)
-        // this.setState({loading:true})
-        // this.props.actionClassAddMember(this.props.uid, this.state.class_id, members).then((result) => {
-        //     console.log(result)
-
-        //     this.setState({loading:false})
-        //     if(result.status){
-        //         this.props.navigation.goBack()
-        //     }else{
-        //         setTimeout(() => {
-        //         Alert.alert(result.message);
-        //         }, 100);
-        //     }
-        // })
+        if(members.length == 0){
+            Alert.alert("Empty friend.");
+        }else{
+            this.setState({loading:true})
+            this.props.actionClassAddMember(this.props.uid, this.state.class_id, members, (result) => {
+                console.log(result)
+                if(result.status){
+                    // setTimeout(() => {
+                        this.setState({loading:false})
+                        this.props.navigation.goBack(null)
+                    // }, 200);
+                }else{
+                    setTimeout(() => {
+                        Alert.alert(result.message);
+                    }, 100);
+                }
+            })
+        }
     }
 
     onSeleted = (index) =>{
@@ -276,16 +258,6 @@ class ClasssMemberAddFriend extends React.Component{
         );
     };
 
-    componentWillReceiveProps(nextProps) {
-        console.log(nextProps)
-        // let data = []
-        // for (var key in nextProps.classs) {
-        //   let classs =  nextProps.classs[key]
-        //   data.push({...{class_id:key}, ...classs});
-        // }
-        // this.setState({data,});
-    }
-
     render(){
         return(<View style={{flex:1}}>
                     <Spinner
@@ -304,13 +276,11 @@ class ClasssMemberAddFriend extends React.Component{
 
 const mapStateToProps = (state) => {
     // console.log(state)
-
     if(!state._persist.rehydrated){
       return {}
     }
   
     return{
-        auth:state.auth,
         uid:getUid(state),
         friends:state.auth.users.friends,
         classs:state.auth.users.classs,

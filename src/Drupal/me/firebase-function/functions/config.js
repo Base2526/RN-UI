@@ -21,7 +21,7 @@ let constants = {
     UPDATE_FOR_FRIEND_EDITUPDATE: '/user_for_friend_editupdate',
 
     DELETE_CHAT_GROUP: '/delete_chat_group',
-    DELETE_CLASSS: '/delete_classs',
+    CLASSS: '/classs',
     CLASS_MEMBER: '/class_member',
 };
 

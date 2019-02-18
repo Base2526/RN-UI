@@ -6,7 +6,8 @@ import {View,
         TextInput, 
         FlatList,
         SectionList,
-        Dimensions} from 'react-native'
+        Dimensions,
+        Alert} from 'react-native'
 import FastImage from 'react-native-fast-image'
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -187,7 +188,9 @@ class AddClasssPage extends React.Component{
 
           this.setState({loading:false})
           if(result.status){
-            this.props.navigation.goBack()
+            setTimeout(() => {
+              this.props.navigation.goBack()
+            }, 200);
           }else{
             setTimeout(() => {
               Alert.alert(result.message);
@@ -490,90 +493,21 @@ class AddClasssPage extends React.Component{
       let {sections} = this.state;
       return(
           <View style={{flex:1}} onLayout={this.onLayout.bind(this)}>
-          {this.renderHeader()}
-
-          {/*
-          <FlatList
-            style={{flex:1}}
-            data={this.state.data}
-            renderItem={this.renderItem.bind(this)}
-            keyExtractor = { (item, index) => index.toString() }
-            ItemSeparatorComponent={this.renderSeparator}
-            ListFooterComponent={this.renderFooter}
-            renderSectionHeader={this.renderSectionHeader}
-            onEndReachedThreshold={50}
-            extraData={this.state}
-            ListHeaderComponent={() => (!this.state.data.length ? 
-              <Text style={{textAlign:'left', fontSize:22}}>No Friend.</Text>
-              : null)}
+          <Spinner
+            visible={this.state.loading}
+            textContent={'Wait...'}
+            textStyle={{color: '#FFF'}}
+            overlayColor={'rgba(0,0,0,0.5)'}
           />
-            */}
-
-
+          {this.renderHeader()}
           <SectionList
             sections={sections}
             renderSectionHeader={this.renderSectionHeader}
             renderItem={this.renderSection}
             // style={{justifyContent:'space-between'}}
             extraData={this.state}
-          />
-
-          {/*                    
-            <TouchableOpacity 
-                      style={{height:80,
-                              width: 80,
-                              borderRadius: 10,
-                              margin:10}}
-                        onPress={()=>
-                        {
-                          
-                          ImagePicker.showImagePicker(options, (response) => {
-                            console.log('Response = ', response);
-
-                            if (response.didCancel) {
-                              console.log('User cancelled image picker');
-                            } else if (response.error) {
-                              console.log('ImagePicker Error: ', response.error);
-                            } else if (response.customButton) {
-                              console.log('User tapped custom button: ', response.customButton);
-                            } else {
-                              const source = { uri: response.uri };
-
-                              // You can also display the image using data:
-                              // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-
-                              this.setState({
-                                avatarSource: source,
-                              });
-
-                              console.log(this.state.avatarSource.uri)
-                            }
-                          });
-                        }}>
-                      <FastImage
-                          style={{width: 80, height: 80, borderRadius: 10}}
-                          source={{
-                          uri: this.state.avatarSource.uri === "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.avatarSource.uri,
-                          headers:{ Authorization: 'someAuthToken' },
-                          priority: FastImage.priority.normal,
-                          }}
-                          resizeMode={FastImage.resizeMode.contain}
-                      />
-            </TouchableOpacity>
-            <TextInput style = {{margin: 15,
-                                height: 40,
-                                width:180,
-                                borderColor: 'gray',
-                                borderWidth: 1}}
-                underlineColorAndroid = "transparent"
-                placeholder = "Class name"
-                placeholderTextColor = "gray"
-                autoCapitalize = "none"
-                ref= {(el) => { this.className = el; }}
-                onChangeText = {this.handleClass}
-                value={this.state.className}/>
-            */}
-          </View>
+          /> 
+        </View>
         )
     }
 }

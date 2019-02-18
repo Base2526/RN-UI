@@ -5,10 +5,8 @@ import { View,
         TouchableOpacity, 
         StyleSheet,
         FlatList, 
-        Dimensions, 
-        NetInfo } from 'react-native';
+        Dimensions} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import Styles from '../../styles';
 import ScrollableTabView, {ScrollableTabBar, DefaultTabBar} from 'react-native-scrollable-tab-view';
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
@@ -18,9 +16,7 @@ import ClasssPage from './ClasssPage'
 
 import * as actions from '../../Actions'
 import {getHeaderInset} from '../../Utils/Helpers'
-
 import MyIcon from '../../config/icon-font.js';
-
 import OfflineNotice from '../../Utils/OfflineNotice'
 
 const _header = props => (
@@ -142,7 +138,7 @@ const formatData = (data, numColumns) => {
     return data;
 };
 
-class ContactsHome extends Component {
+class home extends Component {
 
     static navigationOptions = ({ navigation }) => {
         // const { bg_url } = navigation.params
@@ -162,7 +158,7 @@ class ContactsHome extends Component {
             header: (props) => <ImageHeader {...props} {...navigation}/>,
             headerLeft: (
                 <TouchableOpacity
-                    style={Styles.headerButton}
+                    // style={Styles.headerButton}
                     onPress={() => navigation.openDrawer()}>
                     <Icon name="bars" size={25} />
                 </TouchableOpacity>
@@ -209,7 +205,7 @@ class ContactsHome extends Component {
         super(props)
 
         this.state= {
-            isConnected: true,
+            // isConnected: true,
             positionSelect:0,
             renderContent: false,
             isOpenMenu:false,
@@ -219,15 +215,10 @@ class ContactsHome extends Component {
     }
 
     componentDidMount() {
-        NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
         setTimeout(() => {this.setState({renderContent: true})}, 0);
         this.props.navigation.setParams({ handleHeaderRight: this.handleHeaderRight })
         this.props.navigation.setParams({ handleHeaderRightContactsSearch: this.handleHeaderRightContactsSearch })
         this.props.navigation.setParams({ handleHeaderRightContactsMenu: this.handleHeaderRightContactsMenu })
-    }
-
-    componentWillUnmount() {
-        NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -241,10 +232,6 @@ class ContactsHome extends Component {
             // console.log('----- 09')
             this.props.navigation.setParams({ bg_url: nextProps.auth.users.profiles.bg_url });
         }
-    }
-
-    handleConnectivityChange =(isConnected) => {
-        this.setState({ isConnected });
     }
 
     onLayout(e) {
@@ -408,15 +395,19 @@ class ContactsHome extends Component {
     render() {
         let {renderContent, isOpenMenu} = this.state;
 
+        let {isConnected} = this.props
+
         let menuView
         if (isOpenMenu) {
             menuView = this.renderViewMenu()
         }
 
+        // console.log(this.state.isConnected)
+
         return (
-            <View style={[style.container, {backgroundColor:'white'}]} onLayout={this.onLayout.bind(this)} >
+            <View style={{backgroundColor:'white', flex:1}} onLayout={this.onLayout.bind(this)} >
                 {menuView}
-                {/* {!this.state.isConnected ?<OfflineNotice />:<View />} */}
+                {!isConnected ?<OfflineNotice />:<View />}
                 
                 {/* { renderContent && */}
                 {/* <View> */}
@@ -442,21 +433,16 @@ class ContactsHome extends Component {
     }
 }
 
-let style = StyleSheet.create({
-    container: {
-        flex: 1
-    },
-});
-
 const mapStateToProps = (state) => {
-    // console.log(state)
+    console.log(state)
     if(!state._persist.rehydrated){
         return {}
     }
     
     return{
-    auth:state.auth
+        auth:state.auth,
+        isConnected:state.offline.online
     }
 }
 
-export default connect(mapStateToProps, actions)(ContactsHome);
+export default connect(mapStateToProps, actions)(home);

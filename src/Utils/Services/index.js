@@ -250,25 +250,25 @@ export const create_class = (uid, class_name, members, uri) =>{
 /*
     กรณีที่เพิ่มเพือนใน class เพิ่ม
 */
-export const class_add_member = (uid, class_id, members) =>{
-    var data = new FormData();
-    data.append("mode", 'added')
-    data.append("uid", uid)
-    data.append("class_id", class_id)
-    data.append('members', JSON.stringify(members))
+// export const class_add_member = (uid, class_id, members) =>{
+//     var data = new FormData();
+//     data.append("mode", 'added')
+//     data.append("uid", uid)
+//     data.append("class_id", class_id)
+//     data.append('members', JSON.stringify(members))
 
-    return fetch(Constant.CLASS_MEMBER, {
-        headers: Constant.FETCH_HEADERS,
-        method: 'POST',
-        body: data
-    }).then((response) => {
-        return response.json()
-    }).then((responseJson) => {
-        return responseJson;
-    }).catch((error) => {
-        return {'status': false, 'message': error}
-    })
-}
+//     return fetch(Constant.CLASS_MEMBER, {
+//         headers: Constant.FETCH_HEADERS,
+//         method: 'POST',
+//         body: data
+//     }).then((response) => {
+//         return response.json()
+//     }).then((responseJson) => {
+//         return responseJson;
+//     }).catch((error) => {
+//         return {'status': false, 'message': error}
+//     })
+// }
 
 export const search_google = (textSearch) => {
     return fetch('https://www.googleapis.com/customsearch/v1?key=AIzaSyDAVMdipuafrh2sfZbwDL7smEsk0HJrgHs&cx=011532986475707227508:bsrvzot-rza&q=' + textSearch)
@@ -414,4 +414,27 @@ export const check_my_id = (uid, id) => {
         }).catch((error) => {
             console.error(error);
         });
+}
+
+export const update_class_picture_profile = (uid, class_id, image_uri) =>{
+    var data = new FormData();
+    data.append('idna', {
+        uri: image_uri, 
+        name: 'imageName.png',
+        type: 'image/png'
+    })
+    data.append("uid", uid)
+    data.append("class_id", class_id)
+
+    return fetch(Constant.UPDATE_CLASS_PICTURE_PROFILE, {
+        headers: Constant.FETCH_HEADERS,
+        method: 'POST',
+        body: data
+    }).then((response) => {
+        return response.json()
+    }).then((responseJson) => {
+        return responseJson;
+    }).catch((error) => {
+        return {'status': false, 'message': error}
+    })
 }

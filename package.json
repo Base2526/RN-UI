@@ -7,12 +7,14 @@
     "test": "jest"
   },
   "dependencies": {
+    "@redux-offline/redux-offline": "^2.5.1",
     "blacklist": "^1.1.4",
     "firebase-admin": "^6.5.0",
     "firebase-functions": "^2.1.0",
     "lodash": "^4.17.11",
     "react": "16.6.1",
     "react-native": "0.57.7",
+    "react-native-action-button": "^2.8.5",
     "react-native-camera": "^1.4.3",
     "react-native-camera-roll-picker": "file:src/Library/react-native-camera-roll-picker",
     "react-native-comments": "^1.1.1",

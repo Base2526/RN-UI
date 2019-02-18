@@ -48,6 +48,7 @@ export const FAVORITES_CLASS        = "favorites_classs"
 export const ADDED_CLASS_MEMBER     = "added_class_member"
 export const MODIFIED_CLASS_MEMBER  = "modified_class_member"
 export const REMOVED_CLASS_MEMBER   = "removed_class_member"
+export const UPDATE_CLASS_PICTURE_PROFILE   = "update_class_picture_profile"
 
 export const FRIEND_MUTE            = "friend_mute"
 export const FRIEND_HIDE            = "friend_hide"

@@ -350,7 +350,8 @@ function create_class(){
 
 		$classMemberValue['field_friend_uid'][LANGUAGE_NONE][0]['value']      = $members_friend_id;
 		$classMemberValue['field_object_id'][LANGUAGE_NONE][0]['value']       = $key_class_member;
-		
+		$classMemberValue['field_enable'][LANGUAGE_NONE][0]['value']       		= 1;
+
 		$class_member_entity = entity_create('field_collection_item', $classMemberValue);
 		$class_member_entity->setHostEntity('field_my_class_members', $my_class_item_load);
 		$class_member_entity->save();
@@ -820,7 +821,7 @@ function delete_member_group_chat(){
 	return  $result;
 }
   
-function delete_classs(){
+function classs(){
 	$result = array();
   
 	if (!check_header()) {
@@ -828,17 +829,52 @@ function delete_classs(){
 	  $result['message']= "check_header()";
 	  return $result;
 	}
+
+	$mode  = $_REQUEST['mode'];
+	if(empty($mode)){
+		$result['result'] = FALSE;
+	  return $result;
+	}
 	
 	$param = $_REQUEST['context']['params'];
 	if (empty($param['userId']) || empty($param['classId'])) {
 	  $result['result'] 	= FALSE;
-		$result['message'] 	= "function delete_classs : parameter";
+		$result['message'] 	= "function classs : parameter";
 	  return $result;
 	}
-  
 	$userId      = $param['userId'];
 	$classId     = $param['classId'];
-  $deletedValue = $_REQUEST['deletedValue'];
+	
+	if(strcasecmp($mode, 'modified') == 0){
+		$newValue 		= $_REQUEST['newValue'];
+
+		// watchdog(TAG, 'classs update newValue : %v', array('%v'=>$newValue), WATCHDOG_INFO);
+
+		if (array_key_exists('name', $newValue)) {
+			$name = $newValue['name'];
+			$item_load = field_collection_item_load($classId);
+			if ($item_load) {
+				$wrapper = entity_metadata_wrapper('field_collection_item', $item_load);
+		
+				// watchdog(TAG, 'classs update : %v - %n', array('%v'=>$wrapper->field_class_name->value(), '%n'=>$name), WATCHDOG_INFO);
+
+				if(strcmp($wrapper->field_class_name->value(), $name) !== 0){
+					$wrapper->field_class_name->set($name);
+					$wrapper->save();
+				}
+			}
+		}
+	}
+
+	if(strcasecmp($mode, 'removed') == 0){
+		$deletedValue = $_REQUEST['deletedValue'];
+
+		entity_delete_multiple('field_collection_item', array($classId));
+
+		// ลบ collection ทั้งหมด
+		firestore_delete_collection(firestore_db()->collection(FIRESTORE_USERS)->document($userId)->collection(FIRESTORE_CLASSS)->document($classId)->collection('members'), 100);
+	}
+	
 	
 	// .document('users/{userId}/classs/{classId}')
 	/*
@@ -875,10 +911,7 @@ function delete_classs(){
 	}
 	*/
 
-	entity_delete_multiple('field_collection_item', array($classId));
-
-	firestore_delete_collection(firestore_db()->collection(FIRESTORE_USERS)->document($userId)->collection(FIRESTORE_CLASSS)->document($classId)->collection('members'), 100);
-
+	
 	$result['result'] = TRUE;
 
 	// $result['userId'] = $userId;
@@ -901,60 +934,6 @@ function class_member(){
 	  return $result;
 	}
 
-	// added
-	if(strcasecmp($mode, 'added') == 0){
-		$param_uid  = $_REQUEST['uid'];
-		$class_id  = $_REQUEST['class_id'];
-		$param_members= (array)json_decode($_REQUEST['members']);
-
-		if (count($param_members) == 0) {
-			$result['result']   = FALSE;
-			return $result;
-		}
-
-		$time_start = microtime(true);
-		$batch = firestore_db()->batch();
-
-		$members = array();
-
-		$class_item_load = field_collection_item_load($class_id);
-		foreach ($param_members as $members_friend_id){
-
-			$key_class_member = generateRandomString(LENGTH_CHAT_ID);
-
-			$classMemberValue = array();
-			$classMemberValue['field_name'] = 'field_my_class_members'; // field collection name
-	
-			$classMemberValue['field_friend_uid'][LANGUAGE_NONE][0]['value']      = $members_friend_id;
-			$classMemberValue['field_object_id'][LANGUAGE_NONE][0]['value']       = $key_class_member;
-			
-			$class_member_entity = entity_create('field_collection_item', $classMemberValue);
-			$class_member_entity->setHostEntity('field_my_class_members', $class_item_load);
-			$class_member_entity->save();
-
-			$value_class_member = array('friend_id'=> $members_friend_id, 
-																	'item_id'=>$class_member_entity->item_id,
-																	'status'=>TRUE);
-
-			$members[$key_class_member] = $value_class_member;
-
-			// update firestore
-			$nycRef =firestore_db()->collection(FIRESTORE_USERS)->document($param_uid)->collection(FIRESTORE_CLASSS)->document($class_id)->collection('members')->document($key_class_member);
-			$batch->set($nycRef, $value_class_member, ['merge' => true]);
-		}
-
-		# Commit the batch
-		$batch->commit();
-
-		$time_end       = microtime(true);
-		$execution_time = number_format(($time_end - $time_start), 2);
-
-		$result['result'] 		= TRUE;
-		$result['members']   	= $members;
-		$result['execution_time']  = $execution_time;
-		return $result;
-	}
-
 	$param = $_REQUEST['context']['params'];
 	if (empty($param['userId']) || empty($param['classId']) || empty($param['memberId'])) {
 	  $result['result'] 	= FALSE;
@@ -962,15 +941,39 @@ function class_member(){
 	  return $result;
 	}
 	
-	// users/{userId}/classs/{classId}/members/{memberId}
-	
-
 	$userId      	= $param['userId'];
 	$classId     	= $param['classId'];
 	$memberId     = $param['memberId'];
-	$deletedValue = $_REQUEST['deletedValue'];
 
-	
+	$newValue 		= $_REQUEST['newValue'];
+
+	if(strcasecmp($mode, 'added') == 0){
+		$friend_id = $newValue['friend_id'];
+
+		/*
+			เราต้อง check ก่อนเพราะครั้งที่เราสร้าง class 
+			ระบบยอมให้ที่การเพิ่ม/หลัง friend ตอนสร้าง ดังนั้นเราต้องเช็ดก่อน
+		*/
+		$query  = new EntityFieldQuery();
+		$entities = $query->entityCondition('entity_type', 'field_collection_item')
+											->entityCondition('bundle', 'field_my_class_members')
+											->fieldCondition('field_friend_uid', 'value', $friend_id, '=')
+											->fieldCondition('field_object_id', 'value', $memberId, '=')
+											->execute();
+
+		if (empty($entities['field_collection_item'])) {
+			$classMemberValue = array();
+			$classMemberValue['field_name'] = 'field_my_class_members'; // field collection name
+
+			$classMemberValue['field_friend_uid'][LANGUAGE_NONE][0]['value']      = $friend_id;
+			$classMemberValue['field_object_id'][LANGUAGE_NONE][0]['value']       = $memberId;
+			$classMemberValue['field_enable'][LANGUAGE_NONE][0]['value']       		= 1;
+				
+			$class_member_entity = entity_create('field_collection_item', $classMemberValue);
+			$class_member_entity->setHostEntity('field_my_class_members', field_collection_item_load($classId));
+			$class_member_entity->save();
+		}
+	}
 
 	if(strcasecmp($mode, 'modified') == 0){
 		$query  = new EntityFieldQuery();
@@ -979,14 +982,40 @@ function class_member(){
 											->fieldCondition('field_object_id', 'value', $memberId, '=')
 											->execute();
 
+		$friend_id = $newValue['friend_id'];
+		$status    = $newValue['status'];
+
+		// $newValue = $param['newValue'];
 		if (!empty($entities['field_collection_item'])) {
 			// กรณีนี้อาจไม่เกิดขึ้นเลยก็ได้
 			$item_id = array_keys($entities['field_collection_item'])[0];
-			entity_delete_multiple('field_collection_item', array($item_id));
+			// entity_delete_multiple('field_collection_item', array($item_id));
+		
+			$item_load = field_collection_item_load($item_id);
+
+			$wrapper = entity_metadata_wrapper('field_collection_item', $item_load);
+			$wrapper->field_enable->set($status === 'true'? 1: 0);
+			$wrapper->save();
+		}else{
+		
+			$classMemberValue = array();
+			$classMemberValue['field_name'] = 'field_my_class_members'; // field collection name
+
+			$classMemberValue['field_friend_uid'][LANGUAGE_NONE][0]['value']      = $friend_id;
+			$classMemberValue['field_object_id'][LANGUAGE_NONE][0]['value']       = $memberId;
+			$classMemberValue['field_enable'][LANGUAGE_NONE][0]['value']       		= $status === 'true'? 1: 0;
+			
+			$class_member_entity = entity_create('field_collection_item', $classMemberValue);
+			$class_member_entity->setHostEntity('field_my_class_members', field_collection_item_load($classId));
+			$class_member_entity->save();
 		}
 	}
 	
 	$result['result'] = TRUE;
+	// $result['userId'] = $userId;
+	// $result['classId'] = $classId;
+	// $result['memberId'] = $memberId;
+	// $result['newValue'] = $newValue;
 	return  $result;
 }
   
