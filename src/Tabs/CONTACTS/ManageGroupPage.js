@@ -3,8 +3,10 @@ import {StyleSheet,
         View, 
         Text, 
         TouchableOpacity,
+        Alert,
         } from 'react-native'
-
+        
+import firebase from 'react-native-firebase';
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
 import { ifIphoneX } from 'react-native-iphone-x-helper';
@@ -13,9 +15,11 @@ import Spinner from 'react-native-loading-spinner-overlay';
 
 import {getHeaderInset} from '../../Utils/Helpers'
 import * as actions from '../../Actions'
-import {getUid} from '../../Utils/Helpers'
+import {getUid, checkInternetConnectionDialog} from '../../Utils/Helpers'
 
 import MyIcon from '../../config/icon-font.js';
+
+import Constant from '../../Utils/Constant'
 
 class ManageGroupPage extends React.Component{
 
@@ -38,170 +42,98 @@ class ManageGroupPage extends React.Component{
     componentDidMount() {
         setTimeout(() => {this.setState({renderContent: true})}, 0);
 
-        const { navigation, auth } = this.props;
+        const { navigation } = this.props;
         const group_id = navigation.getParam('group_id', null);
 
         this.setState({group_id},()=>{
             this.loadData(this.props)
         })
-
-        /*
-        let groups = this.props.auth.users.groups;
-
-        let friends = auth.users.friends
-        
-        console.log(groups)
-        Object.entries(groups).forEach(([key, value]) => {
-            if(group_id === key){
-                let {members} = value
-
-                let newMembers = {...members}
-                Object.entries(members).forEach(([mkey, mvalue]) => {
-
-                    var friend_profile = _.filter(friends, function(v, k) {
-                        return k == mvalue.friend_id;
-                    });
-
-                    if(friend_profile.length == 0){
-                        newMembers = {...newMembers, [mkey]:mvalue}
-                    }else{
-                        let mm = {...mvalue, ...{friend_profile:friend_profile[0]} }
-                        newMembers = {...newMembers, [mkey]:mm}
-                    }
-
-                    let group = {...{group_id:key, ...value}, 
-                                    group_profile:{
-                                        ...value.group_profile,
-                                        members:newMembers
-                                    },
-                                    members:newMembers
-                                }
-
-                    this.setState({
-                        group
-                    })
-                })
-                return;
-            }
-        });
-        */
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log(nextProps)
-
-        /*
-        const { navigation, auth } = this.props;
-        const group_id = navigation.getParam('group_id', null);
-
-        // console.log(group_id)
-
-        let groups = nextProps.auth.users.groups;
-        let friends = auth.users.friends
-        
-        console.log(groups)
-        
-        Object.entries(groups).forEach(([key, value]) => {
-            if(group_id === key){
-                let {members} = value
-
-                let newMembers = {...members}
-                Object.entries(members).forEach(([mkey, mvalue]) => {
-
-                    var friend_profile = _.filter(friends, function(v, k) {
-                        return k == mvalue.friend_id;
-                    });
-
-                    if(friend_profile.length == 0){
-                        newMembers = {...newMembers, [mkey]:mvalue}
-                    }else{
-                        let mm = {...mvalue, ...{friend_profile:friend_profile[0]} }
-                        newMembers = {...newMembers, [mkey]:mm}
-                    }
-
-                    let group = {...{group_id:key, ...value}, 
-                                    group_profile:{
-                                        ...value.group_profile,
-                                        members:newMembers
-                                    },
-                                    members:newMembers
-                                }
-
-                    this.setState({
-                        group
-                    })
-                })
-                return;
-            }
-        });
-        */
+        // console.log(nextProps)
+        this.loadData(nextProps)
     }
 
     loadData = (props) =>{
-        let {groups, friends} = props
-
+        let {groups, friends, uid} = props
         let {group_id} = this.state
-
-        console.log(groups)
-        console.log(friends)
 
         let group  = _.find(groups, (v, k)=>{
             return group_id == k
         })
-        // console.log(group)
 
         if(group === undefined){
             this.props.navigation.goBack(null)
         }
+
         console.log(group)
 
-        // let data = _.map(group.members, (v, k)=>{
-        //                 var friend_profile = _.find(friends, function(vv, kk) {
-        //                     return kk == v.friend_id;
-        //                 });
+        let members = {}
+        _.each(group.members, (v, k)=>{
+            if(v.status === Constant.GROUP_STATUS_MEMBER_JOINED){
+                members = {...members, [k]:v}
+            }
+        })
 
-        //                 console.log(friend_profile)
-        //                 // if(friend_profile !== undefined){
-        //                 //     return friend_profile
-        //                 // }
-
-        //                 return 88
-        //            })
-
-        let count = Object.keys(group.members).length;
-
+        let count = Object.keys(members).length;
         if(count >= 5){
             count = 5
         }
 
-        let keys = Object.keys(group.members);
+        let keys = Object.keys(members);
         for (let i = 0; i < count; i++) {
-            // console.log(group.members[keys[i]])
-
-            let {friend_id}= group.members[keys[i]]
-
+            let {friend_id}= members[keys[i]]
             var friend_profile = _.find(friends, function(v, k) {
                 // console.log(k, friend_id)
                 return k == friend_id;
             });
-            console.log(friend_profile)
+            // console.log(friend_profile)
+
+            if(friend_profile === undefined && uid !== friend_id){
+                if(uid === friend_id){
+
+                }else{
+                    console.log(this.props.uid, friend_id)
+                    // กรณีไม่ใช่ friend เราจะดึงจาก firestore โดยตรงแล้ว insert เข้าไเก้บใน friend
+                    let pfriendRef = firebase.firestore().collection('profiles').doc(friend_id);
+                    let getDoc = pfriendRef.get()
+                    .then(doc => {
+                        if (!doc.exists) {
+                            console.log('No such document!');
+                        } else {
+                            console.log('Document data:', doc.data());
+                        }
+                    })
+                    .catch(err => {
+                        console.log('Error getting document', err);
+                    });
+                }
+            }else{
+                members = {...members, [keys[i]]:{...members[keys[i]], friend:friend_profile}}
+            }
         }
 
-        console.log(count)
+        let newGroup = {...group, members}
+        this.setState({group: newGroup})
     }
 
     itemMembers = (group) =>{
-        console.log(group)
+        // console.log(group)
         let {members} = group
         return Object.keys(members).map((key, v) => {
             if(v > 3){
                 return;
             }
 
-            let friend = members[key]
-            if(friend.friend_id === this.props.uid){
-                let {profiles} = this.props.auth.users
-                return(<TouchableOpacity key={friend.friend_id} style={{marginRight:5}}>
+            let {friend, friend_id} = members[key]
+            if(friend_id === this.props.uid){
+                let {profiles} = this.props
+                return(<TouchableOpacity key={friend_id} 
+                            style={{marginRight:5}}
+                            onPress={()=>{
+                                this.props.navigation.navigate("MyProfilePage")
+                            }}>
                             <FastImage
                                 style={{width: 36, height: 36, borderRadius: 18}}
                                 source={{
@@ -214,16 +146,19 @@ class ManageGroupPage extends React.Component{
                         </TouchableOpacity>)
             }
             
-            // let {profile} = members[key].friend_profile
-            // console.log(members[key])
-
-            return(<TouchableOpacity key={friend.friend_id} style={{marginRight:5}}>
+            // let {friend} = members[key]
+            // console
+            return(<TouchableOpacity key={friend_id} 
+                        style={{marginRight:5}}
+                        onPress={()=>{
+                            this.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
+                        }}>
                         <FastImage
                             style={{width: 36, height: 36, borderRadius: 18}}
                             source={{
-                            uri: members[key].friend_image_url,
-                            headers:{ Authorization: 'someAuthToken' },
-                            priority: FastImage.priority.normal,
+                                uri: friend.profile.image_url,
+                                headers:{ Authorization: 'someAuthToken' },
+                                priority: FastImage.priority.normal,
                             }}
                             resizeMode={FastImage.resizeMode.cover}
                         />
@@ -232,16 +167,16 @@ class ManageGroupPage extends React.Component{
         )
     }
 
-    
-
     render() {
-        let {group} = this.state
+        let {group_id, group} = this.state
 
         if (Object.keys(group).length == 0) {
             return(<View style={{flex:1, backgroundColor:'#DF2D6C'}}></View>)
         }
 
-        console.log(group)
+        let {isConnected} = this.props
+
+        // console.log(group)
         // return(<View style={{flex:1, backgroundColor:'#DF2D6C'}}></View>)
         return (
                 <View style={{flex:1, backgroundColor:'#DF2D6C', paddingTop:getHeaderInset()}}>
@@ -268,17 +203,20 @@ class ManageGroupPage extends React.Component{
                             <TouchableOpacity
                                 style={{justifyContent:'center', alignItems:'center'}}
                                 onPress={()=>{
-                                    let is_favorites = false;
-                                    if(group.is_favorites !== undefined){
-                                        is_favorites = group.is_favorites
+
+                                    if(!isConnected){
+                                        checkInternetConnectionDialog()
+                                    }else{
+                                        let is_favorites = true;
+                                        if(group.is_favorites !== undefined){
+                                            is_favorites = !group.is_favorites
+                                        }
+                                        this.setState({loading:true})
+                                        this.props.actionFavoritesGroup(this.props.uid, group_id, is_favorites, (result) => {
+                                            // console.log(result)
+                                            this.setState({loading:false})
+                                        })
                                     }
-
-                                    this.setState({loading:true})
-                                    this.props.actionFavoritesGroup(this.props.uid, group.group_id, !is_favorites, (result) => {
-                                        console.log(result)
-
-                                        this.setState({loading:false})
-                                    })
                                 }}>
                                 <MyIcon
                                     name={group.is_favorites ? 'star' : 'star-empty' } // star
@@ -294,7 +232,7 @@ class ManageGroupPage extends React.Component{
                             <TouchableOpacity 
                                 style={{width: 36, height: 36, borderRadius: 18, justifyContent:'center', alignItems:'center', backgroundColor:'#BCD1D5'}}
                                 onPress={()=>{
-                                    this.props.navigation.navigate('ListGroupMemberPage', {group_id: group.group_id})
+                                    this.props.navigation.navigate('ListGroupMemberPage', {group_id})
                                 }}>
                                 <Text style={{color:'white', fontWeight:'bold'}}>{group.members ?Object.keys(group.members).length:'0' }+</Text>
                             </TouchableOpacity>
@@ -348,9 +286,10 @@ const mapStateToProps = (state) => {
   
     return{
         uid:getUid(state),
-        auth:state.auth,
+        profiles:state.auth.users.profiles,
         groups:state.auth.users.groups,
         friends:state.auth.users.friends,
+        isConnected:state.offline.online,
     }
 }
 

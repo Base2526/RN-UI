@@ -1,9 +1,6 @@
-import {AsyncStorage} from 'react-native'
-
+import {AsyncStorage, Alert} from 'react-native'
 import { Dimensions, DeviceInfo, Platform, StatusBar } from 'react-native';
 import { Header } from 'react-navigation';
-
-import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import { isIphoneX } from 'react-native-iphone-x-helper';
 
@@ -303,5 +300,16 @@ export function randomKey() {
       text += possible.charAt(Math.floor(Math.random() * possible.length));
   
     return text;
+}
+
+export function checkInternetConnectionDialog(){
+    Alert.alert(
+        '',
+        'Please check internet connection and retry.',
+        [
+          {text: 'OK', onPress: () => console.log('close, please check internet connection and retry.')},
+        ],
+        {cancelable: false},
+      );
 }
 

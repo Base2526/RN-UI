@@ -21,6 +21,8 @@ import {
   } from 'react-native-popup-menu';
 
 var _ = require('lodash');
+import ActionButton from 'react-native-action-button';
+
 import ImageWithDefault from '../../Utils/ImageWithDefault'
 import * as actions from '../../Actions'
 
@@ -43,32 +45,100 @@ class ListGroupMember_TabMembersPage extends React.Component{
     }
 
     componentWillMount(){
+        // console.log(this.props)
         let {group_id} = this.props.params
 
-        let group = _.find(this.props.groups,  function(v, k) { 
-            return k == group_id
+        this.setState({group_id}, ()=>{
+            this.loadData(this.props)
         })
-        this.loadData(group)
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log(nextProps);
+        // console.log(nextProps);
+        this.loadData(nextProps)
+    }
 
-        let {group_id} = this.props.params
-        
-        let group = _.find(nextProps.groups,  function(v, k) { 
+    loadData = (props) =>{
+        let {group_id}  = this.state
+        let {groups, friends, uid}    = props
+
+        let group = _.find(groups,  function(v, k) { 
             return k == group_id
         })
 
-        this.loadData(group)
-    }
+        if(group === undefined){
+            this.props.navigation.goBack(null)
+        }
 
-    getGroupId = () =>{
-        return this.props.params.group_id
-    }
+        let members  = []
+        let pendings = []
+        let declines = []
 
-    loadData = (group) =>{
-        console.log(group);
+        console.log(group)
+        let group_members = group.members
+        _.each(group_members, (v, k)=>{
+            console.log(v, k)
+            var friend_profile = _.find(friends, function(fv, fk) {
+                return fk == v.friend_id;
+            });
+
+            switch(v.status){
+                case Constant.GROUP_STATUS_MEMBER_INVITED:{
+                    // console.log(friend_profile)
+                    if(friend_profile === undefined ){
+                        if(uid === v.friend_id){
+                            pendings.push({...v, member_key:k})
+                        }else{
+                            // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
+
+                        }
+                    }else{
+                        pendings.push({...v, member_key:k, friend:friend_profile})
+                    }
+                    break;
+                }
+                case Constant.GROUP_STATUS_MEMBER_JOINED:{
+                    if(friend_profile === undefined ){
+                        if(uid === v.friend_id){
+                            members.push({...v, member_key:k})
+                        }else{
+                            // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
+
+                        }
+                    }else{
+                        members.push({...v, member_key:k, friend:friend_profile})
+                    }
+                    break;
+                }
+                case Constant.GROUP_STATUS_MEMBER_DECLINE:{
+                    if(friend_profile === undefined ){
+                        if(uid === v.friend_id){
+                            declines.push({...v, member_key:k})
+                        }else{
+                            // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
+
+                        }
+                    }else{
+                        declines.push({...v, member_key:k, friend:friend_profile})
+                    }
+                    break;
+                }
+            }
+        })
+
+        console.log(members)
+        console.log(pendings)
+        console.log(declines)
+
+        this.setState({
+            data: [ {title: 'Members',member: members}, 
+                    {title: 'Pending', member: pendings},
+                    {title: 'Decline', member: declines},],
+            group_profile: group.group_profile,
+            group
+        })
+
+        /*
         let members = []
         let pending = []
         let decline = []
@@ -116,6 +186,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
             group_profile: group.group_profile,
             group
         })
+        */
     }
 
     handleInvite = () => {
@@ -146,8 +217,6 @@ class ListGroupMember_TabMembersPage extends React.Component{
                 })
 
                 return(<Text style={{fontSize:12, color:'gray'}}>Added by {member.friend_name}</Text>)
-
-                // console.log()
             }
         }
         return(<View />)
@@ -157,92 +226,60 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
         console.log(rowItem)
 
+        let {group_id} = this.state
+        let {uid} = this.props
+
         let swipeoutRight = []
-
         switch(rowItem.status){
-            case Constant.GROUP_STATUS_MEMBER_INVITED:{
-                swipeoutRight = [
-                    {
-                        // component: <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}><Text style={{color:'white'}}>Cancel</Text></View>,
-                        component:  <View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'red'}}>
-                                        <Text style={{fontWeight:'bold', color:'white', fontSize:14}}>CANCEL</Text>
-                                    </View>,
-                        backgroundColor: 'red',
-                        onPress: () => { 
-                            console.log(rowItem)
-                            this.props.actionCanceledGroupMember(this.props.uid, this.getGroupId(), rowItem.friend_id, rowItem.item_id, (result) => {
-                                console.log(result)
-
-                                // setTimeout(() => {
-                                //     this.setState({loading:false})
-                                // }, 100);
-                            })
-                        }
-                    }
-                ]
-
-                return( 
-                    <Swipeout 
-                        style={{backgroundColor:'white'}} 
-                        right={swipeoutRight}>
-                        <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
-                            <TouchableOpacity>
-                              {/* <ImageWithDefault 
-                                source={{uri: rowItem.image_url}}
-                                style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
-                              /> */}
-                                <FastImage
-                                    style={{width: 60,  
-                                            height: 60,
-                                            borderRadius: 10, 
-                                            borderColor:'gray', 
-                                            // backgroundColor: '#FF83AF',
-                                            borderWidth:1
-                                            }}
-                                    source={{
-                                        uri: rowItem.image_url,
-                                        headers:{ Authorization: 'someAuthToken' },
-                                        priority: FastImage.priority.normal,
-                                    }}
-                                    resizeMode={FastImage.resizeMode.normal}
-                                />
-                            </TouchableOpacity>
-                            <View >
-                                <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                                    <Text style={{fontSize:18}}>{rowItem.name}{this.props.uid === rowItem.friend_id ? '(You)': ''}</Text>
-                                    {/* {rowItem.friend_id === this.state.group_profile.creator_id?<Text style={{fontSize:12, color:'gray'}}>Group Creator</Text>:<View />} */}
-                                
-                                    {this.checkInvitor(rowItem)}
-                                    {/* rowItem */}
-                                </View>
-                            </View>
-                            {/* <View style={{position:'absolute', right:0, marginRight:10}}>
-                                <TouchableOpacity
-                                    onPress={()=>{
-                                        alert('menu')
-                                    }}>
-                                    <MyIcon name={'dot-vertical'}
-                                            size={14}
-                                            color={'#C7D8DD'} />
-                                </TouchableOpacity>
-                            </View> */}
-                        </View>
-                    </Swipeout>)
-                break;
-            }
             case Constant.GROUP_STATUS_MEMBER_JOINED:{
                 swipeoutRight = [
                     {
-                        // component: <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}><Text style={{color:'white'}}>Delete</Text></View>,
                         component:  <View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'red'}}>
                                         <Text style={{fontWeight:'bold', color:'white', fontSize:14}}>LEAVE</Text>
                                     </View>,
                         backgroundColor: 'red',
                         onPress: () => { 
-                            alert('Delete')
+                            alert('LEAVE')
                         }
                     }
                 ]
+
+                if(rowItem.friend_id === uid){
+                    let {profiles} = this.props
+                    return( 
+                        <Swipeout 
+                            style={{backgroundColor:'white'}} 
+                            right={swipeoutRight}>
+                            <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                                <TouchableOpacity>
+                                    <FastImage
+                                        style={{width: 60,  
+                                                height: 60,
+                                                borderRadius: 10, 
+                                                borderColor:'gray', 
+                                                // backgroundColor: '#FF83AF',
+                                                borderWidth:1
+                                                }}
+                                        source={{
+                                            uri: profiles.image_url,
+                                            headers:{ Authorization: 'someAuthToken' },
+                                            priority: FastImage.priority.normal,
+                                        }}
+                                        resizeMode={FastImage.resizeMode.normal}
+                                    />
+                                </TouchableOpacity>
+                                <View >
+                                    <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
+                                        <View style={{flexDirection:'row', alignItems:'baseline'}}>
+                                            <Text style={{fontSize:18}}>{profiles.name}</Text>
+                                            <Text style={{fontSize:12, fontStyle:'italic', color:'gray'}}>(You)</Text>
+                                        </View>
+                                        {this.checkInvitor(rowItem)}
+                                    </View>
+                                </View>
+                            </View>
+                        </Swipeout>)
+                }
 
                 return( 
                     <Swipeout 
@@ -250,10 +287,6 @@ class ListGroupMember_TabMembersPage extends React.Component{
                         right={swipeoutRight}>
                         <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                             <TouchableOpacity>
-                              {/* <ImageWithDefault 
-                                source={{uri: rowItem.image_url}}
-                                style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
-                              /> */}
                                 <FastImage
                                     style={{width: 60,  
                                             height: 60,
@@ -263,7 +296,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                             borderWidth:1
                                             }}
                                     source={{
-                                        uri: rowItem.image_url,
+                                        uri: rowItem.friend.profile.image_url,
                                         headers:{ Authorization: 'someAuthToken' },
                                         priority: FastImage.priority.normal,
                                     }}
@@ -272,11 +305,8 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             </TouchableOpacity>
                             <View >
                                 <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                                    <Text style={{fontSize:18}}>{rowItem.name}{this.props.uid === rowItem.friend_id ? '(You)': ''}</Text>
-                                    {/* {rowItem.friend_id === this.state.group_profile.creator_id?<Text style={{fontSize:12, color:'gray'}}>Group Creator</Text>:<View />} */}
-                                
+                                <Text style={{fontSize:18}}>{rowItem.friend.change_friend_name !== undefined ?rowItem.friend.change_friend_name: rowItem.friend.profile.name}</Text>
                                     {this.checkInvitor(rowItem)}
-                                    {/* rowItem */}
                                 </View>
                             </View>
                             <View style={{position:'absolute', right:0, marginRight:10}}>
@@ -292,22 +322,150 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             </View>
                         </View>
                     </Swipeout>)
-                break;
+            }
+
+            case Constant.GROUP_STATUS_MEMBER_INVITED:{
+                swipeoutRight = [
+                    {
+                        component:  <View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'red'}}>
+                                        <Text style={{fontWeight:'bold', color:'white', fontSize:14}}>CANCEL</Text>
+                                    </View>,
+                        backgroundColor: 'red',
+                        onPress: () => { 
+                            // console.log(rowItem)
+                            // console.log(uid, group_id, rowItem.friend_id, rowItem.member_key)
+
+                            this.setState({loading:true})
+                            this.props.actionCanceledGroupMember(uid, group_id, rowItem.friend_id, rowItem.member_key, (result) => {
+                                this.setState({loading:false})
+
+                                console.log(result)
+                            })
+                        }
+                    }
+                ]
+
+                if(rowItem.friend_id === uid){
+                    let {profiles} = this.props
+                    return( 
+                        <Swipeout 
+                            style={{backgroundColor:'white'}} 
+                            right={swipeoutRight}>
+                            <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                                <TouchableOpacity>
+                                    <FastImage
+                                        style={{width: 60,  
+                                                height: 60,
+                                                borderRadius: 10, 
+                                                borderColor:'gray', 
+                                                // backgroundColor: '#FF83AF',
+                                                borderWidth:1
+                                                }}
+                                        source={{
+                                            uri: profiles.image_url,
+                                            headers:{ Authorization: 'someAuthToken' },
+                                            priority: FastImage.priority.normal,
+                                        }}
+                                        resizeMode={FastImage.resizeMode.normal}
+                                    />
+                                </TouchableOpacity>
+                                <View >
+                                    <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
+                                        <Text style={{fontSize:18}}>{profiles.name}(You)</Text>
+                                        {this.checkInvitor(rowItem)}
+                                    </View>
+                                </View>
+                            </View>
+                        </Swipeout>)
+                }
+
+                return( 
+                    <Swipeout 
+                        style={{backgroundColor:'white'}} 
+                        right={swipeoutRight}>
+                        <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                            <TouchableOpacity>
+                                <FastImage
+                                    style={{width: 60,  
+                                            height: 60,
+                                            borderRadius: 10, 
+                                            borderColor:'gray', 
+                                            // backgroundColor: '#FF83AF',
+                                            borderWidth:1
+                                            }}
+                                    source={{
+                                        uri: rowItem.friend.profile.image_url,
+                                        headers:{ Authorization: 'someAuthToken' },
+                                        priority: FastImage.priority.normal,
+                                    }}
+                                    resizeMode={FastImage.resizeMode.normal}
+                                />
+                            </TouchableOpacity>
+                            <View >
+                                <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
+                                    <Text style={{fontSize:18}}>{rowItem.friend.change_friend_name !== undefined ?rowItem.friend.change_friend_name: rowItem.friend.profile.name}</Text>
+                                    {this.checkInvitor(rowItem)}
+                                </View>
+                            </View>
+                        </View>
+                    </Swipeout>)
             }
 
             case Constant.GROUP_STATUS_MEMBER_DECLINE:{
+                if(rowItem.friend_id === uid){
+                    let {profiles} = this.props
+                    return( 
+                        <Swipeout 
+                            style={{backgroundColor:'white'}} 
+                            right={swipeoutRight}>
+                            <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                                <TouchableOpacity>
+                                    <FastImage
+                                        style={{width: 60,  
+                                                height: 60,
+                                                borderRadius: 10, 
+                                                borderColor:'gray', 
+                                                // backgroundColor: '#FF83AF',
+                                                borderWidth:1
+                                                }}
+                                        source={{
+                                            uri: profiles.image_url,
+                                            headers:{ Authorization: 'someAuthToken' },
+                                            priority: FastImage.priority.normal,
+                                        }}
+                                        resizeMode={FastImage.resizeMode.normal}
+                                    />
+                                </TouchableOpacity>
+                                <View >
+                                    <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
+                                        <Text style={{fontSize:18}}>{profiles.name}(You)</Text>
+                                        {this.checkInvitor(rowItem)}
+                                    </View>
+                                </View>
+                            </View>
+                        </Swipeout>)
+                }
+
                 return(<View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
-                            <TouchableOpacity
-                                style={{height:60,
-                                        width: 60,
-                                        borderRadius: 10}}>
-                                <ImageWithDefault 
-                                source={{uri: rowItem.image_url}}
-                                style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
+                            <TouchableOpacity>
+                                <FastImage
+                                    style={{width: 60,  
+                                            height: 60,
+                                            borderRadius: 10, 
+                                            borderColor:'gray', 
+                                            // backgroundColor: '#FF83AF',
+                                            borderWidth:1
+                                            }}
+                                    source={{
+                                        uri: rowItem.friend.profile.image_url,
+                                        headers:{ Authorization: 'someAuthToken' },
+                                        priority: FastImage.priority.normal,
+                                    }}
+                                    resizeMode={FastImage.resizeMode.normal}
                                 />
                             </TouchableOpacity>
                             <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                                <Text style={{fontSize:18}}>{rowItem.name}</Text>
+                            <Text style={{fontSize:18}}>{rowItem.friend.change_friend_name !== undefined ?rowItem.friend.change_friend_name: rowItem.friend.profile.name}</Text>
                             </View>
                             <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
                                 <TouchableOpacity
@@ -317,21 +475,13 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                             borderWidth:.5,
                                             marginRight:5}}
                                     onPress={()=>{
-
                                         console.log(rowItem)
-
-                                        console.log(this.getGroupId())
-                                        
-                                        // (uid, friend_id, group_id, item_id, callback) 
-                                        // this.setState({loading:true})
-                                        this.props.actionMemberInviteAgainGroup(this.props.uid, rowItem.friend_id, this.getGroupId(), rowItem.item_id, (result) => {
+                                        this.setState({loading:true})
+                                        this.props.actionMemberInviteAgainGroup(this.props.uid, rowItem.friend_id, this.state.group_id, rowItem.item_id, (result) => {
                                             console.log(result)
 
-                                            // setTimeout(() => {
-                                            //     this.setState({loading:false})
-                                            // }, 100);
+                                            this.setState({loading:false})
                                         })
-                                        
                                     }}>
                                     <Text style={{color:'green'}}>Invite</Text>
                                 </TouchableOpacity>
@@ -373,13 +523,10 @@ class ListGroupMember_TabMembersPage extends React.Component{
                         justifyContent: 'space-between', 
                         alignItems: 'center', 
                         borderBottomWidth: 0.5,
-                        // borderBottomColor: DictStyle.colorSet.lineColor 
                         }}>
             <View style={{ flexDirection: 'row', 
                         alignItems: 'center'}}>
-                <Text style={{ 
-                                // fontSize: DictStyle.fontSet.mSize, 
-                                color: 'gray',
+                <Text style={{  color: 'gray',
                                 paddingLeft: 10,
                                 fontWeight:'700' }}>
                 {section + "(" + m_length +")"}
@@ -393,7 +540,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
     }
       
     render() {
-        return (<ExpandableList
+        return (<View style={{flex:1}}><ExpandableList
                     style={{flex:1}}
                     ref={instance => this.ExpandableList = instance}
                     dataSource={this.state.data}
@@ -406,6 +553,20 @@ class ListGroupMember_TabMembersPage extends React.Component{
                     openOptions={[0, 1, 2]}
                     removeClippedSubviews={false}
                 />
+                {/* user-plus */}
+                    <ActionButton 
+                        buttonColor="rgba(231,76,60,1)"
+                        renderIcon={() => {
+                            return(<MyIcon
+                                name={'user-plus'}
+                                size={25}
+                                color={'#C7D8DD'} />)
+                            }}
+                        onPress={()=>{
+                            this.props.props.navigation.navigate("GroupMemberInvite", {'group_id':this.state.group_id})
+                        }}>
+                    </ActionButton>
+                </View>
         );
     }
 }
@@ -419,7 +580,9 @@ const mapStateToProps = (state) => {
   
     return{
         uid:getUid(state),
-        groups:state.auth.users.groups
+        profiles:state.auth.users.profiles,
+        friends:state.auth.users.friends,
+        groups:state.auth.users.groups,
     }
 }
 

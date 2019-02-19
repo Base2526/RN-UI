@@ -172,9 +172,8 @@ class AddGroupsPage extends React.Component{
 
           this.setState({loading:false})
           if(result.status){
-            this.props.navigation.goBack()
+            this.props.navigation.goBack(null)
           }else{
-
             setTimeout(() => {
               Alert.alert(result.message);
             }, 100);

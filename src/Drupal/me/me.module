@@ -14254,13 +14254,13 @@ function create_chat_group(){
 
   if (!check_header()) {
     $result['result'] = FALSE;
-    $result['message']= "check_header()";
+    // $result['message']= "check_header()";
     return $result;
   }
 
   if (empty($_REQUEST['uid']) || empty($_REQUEST['name'])) {
     $result['result'] = FALSE;
-    $result['message']  = "function : create_chat_group, parameter";
+    // $result['message']  = "function : create_chat_group, parameter";
     // $result['param'] = $param;
     // $result['_REQUEST'] = $_REQUEST;
     // $result['_FILES'] = $_FILES;
@@ -14332,30 +14332,36 @@ function create_chat_group(){
   $f_members = array();
   $group_admins = array();
 
-  $m_profile = getNameImageURLFriend($param_uid);
+  // $m_profile = getNameImageURLFriend($param_uid);
   
+  $objectId = generateRandomString(LENGTH_CHAT_ID);
+
   // เราต้อง insert คนที่สร้าง group ลงไปก่อนด้วย
   $member_v = array();
   $member_v['field_name'] = 'field_members_group';
   $member_v['field_members_group_friend_id'][LANGUAGE_NONE][0]['value']  = $param_uid;
-  $member_v['field_members_group_friend_name'][LANGUAGE_NONE][0]['value']= $m_profile['friend_name'];
-  $member_v['field_path_uri'][LANGUAGE_NONE][0]['value']                 = $m_profile['friend_image_url'];
+  // $member_v['field_members_group_friend_name'][LANGUAGE_NONE][0]['value']= $m_profile['friend_name'];
+  // $member_v['field_path_uri'][LANGUAGE_NONE][0]['value']                 = $m_profile['friend_image_url'];
   $member_v['field_mg_status'][LANGUAGE_NONE][0]['tid']                  = '36';
   $member_v['field_members_group_invitor'][LANGUAGE_NONE][0]['value']    =  $param_uid;
+  $member_v['field_object_id'][LANGUAGE_NONE][0]['value']                =  $objectId;
 
   $member_field_entity = entity_create('field_collection_item', $member_v);
   $member_field_entity->setHostEntity('node', $node);
   $member_field_entity->save();
 
-  $m_profile['invitor'] = $param_uid;
-  $m_profile['status'] = '36';
-  $f_members[$member_field_entity->item_id] = $m_profile;
+  $m_profile = array();
+  $m_profile['friend_id'] = $param_uid;
+  $m_profile['invitor']   = $param_uid;
+  $m_profile['status']    = '36';
+  $m_profile['item_id']   = $member_field_entity->item_id;
+  $f_members[$objectId]   = $m_profile;
 
   // $nycRef = $db->collection('cities')->document('NYC');
 
   // $nycRef =firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('members')->document($member_field_entity->item_id)->set($m_profile, ['merge' => true]);
 
-  $nycRef =firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('members')->document($member_field_entity->item_id);
+  $nycRef =firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('members')->document($objectId);
   $batch->set($nycRef, $m_profile, ['merge' => true]);
   
 
@@ -14440,26 +14446,33 @@ function create_chat_group(){
     //   $f_status = '35';
     // }
 
-    $m_profile = getNameImageURLFriend($members_friend_id);
+    // $m_profile = getNameImageURLFriend($members_friend_id);
+
+    $objectId = generateRandomString(LENGTH_CHAT_ID);
 
     $member_v = array();
     $member_v['field_name'] = 'field_members_group';
     $member_v['field_members_group_friend_id'][LANGUAGE_NONE][0]['value']  = $members_friend_id;
-    $member_v['field_members_group_friend_name'][LANGUAGE_NONE][0]['value']= $m_profile['friend_name'];
-    $member_v['field_path_uri'][LANGUAGE_NONE][0]['value']                 = $m_profile['friend_image_url'];
+    // $member_v['field_members_group_friend_name'][LANGUAGE_NONE][0]['value']= $m_profile['friend_name'];
+    // $member_v['field_path_uri'][LANGUAGE_NONE][0]['value']                 = $m_profile['friend_image_url'];
     $member_v['field_mg_status'][LANGUAGE_NONE][0]['tid']                  = '35';
     $member_v['field_members_group_invitor'][LANGUAGE_NONE][0]['value']    =  $param_uid;
+    $member_v['field_object_id'][LANGUAGE_NONE][0]['value']                =  $objectId;
 
     $member_field_entity = entity_create('field_collection_item', $member_v);
     $member_field_entity->setHostEntity('node', $node);
     $member_field_entity->save();
 
+    $m_profile = array();
+    $m_profile['friend_id'] = $members_friend_id;
     $m_profile['invitor'] = $param_uid;
     $m_profile['status'] = '35';
-    $f_members[$member_field_entity->item_id] = $m_profile;
+    $m_profile['item_id'] = $member_field_entity->item_id;
+
+    $f_members[$objectId] = $m_profile;
     
     // firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('members')->document($member_field_entity->item_id)->set($m_profile, ['merge' => true]);
-    $nycRef =firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('members')->document($member_field_entity->item_id);
+    $nycRef =firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('members')->document($objectId);
     $batch->set($nycRef, $m_profile, ['merge' => true]);
 
 
@@ -14514,6 +14527,8 @@ function create_chat_group(){
                       'friend_name'=>$user_name);
 
         // send_push_notification($item_load_device_access->field_key_token_notification[LANGUAGE_NONE][0]['value'], '', $message, $sval, $badge);
+      
+        background_process_start('send_push_notification', $item_load_device_access->field_key_token_notification[LANGUAGE_NONE][0]['value'], '', $message, $sval, $badge);
       }
     }
     // ส่ง notification บอกเพือนว่ามี การเชิญเข้ากลุ่ม

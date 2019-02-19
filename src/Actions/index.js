@@ -347,14 +347,14 @@ export const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
 //  เป็นการ cancel การ invite โดยผู้เชิญ(admin)
 CANCELED_GROUP_MEMBER  = "canceled_group_member"
 */
-export const actionCanceledGroupMember = (uid, group_id, friend_id, member_item_id, callback) => dispatch =>{
+export const actionCanceledGroupMember = (uid, group_id, friend_id, member_key, callback) => dispatch =>{
     firebase.firestore().collection('users').doc(friend_id).collection('groups').doc(group_id).delete()
-    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_item_id).set({
+    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_key).set({
         status: Constant.GROUP_STATUS_MEMBER_CANCELED,
         canceler:uid // เก้บ uid ของคนที่ทำการ cancel friend_id 
     }, { merge: true});
 
-    dispatch({ type: CANCELED_GROUP_MEMBER, group_id, friend_id, member_item_id});
+    dispatch({ type: CANCELED_GROUP_MEMBER, group_id, friend_id, member_key});
     callback({'status':true})
 }
 
@@ -473,6 +473,63 @@ export const actionDeleteGroup = (uid, group_id, callback) => dispatch =>{
     callback({'status':true})
 }
 
+// Invite Member to group
+export const actionGroupInviteMember = (uid, group_id, members, callback) => dispatch =>{
+    members.map(function(friend_id, k) {
+
+        firebase.firestore().collection('groups').doc(group_id).collection('members').where('friend_id', '==', friend_id).get().then(snapshot => {
+            // console.log(snapshot)
+            if(snapshot.size == 0){
+                let key = randomKey()
+
+                let batch = firebase.firestore().batch();
+
+                let groupsRef = firebase.firestore().collection('groups').doc(group_id).collection('members').doc(key);
+                let groupsValue = { friend_id, 
+                                    status: Constant.GROUP_STATUS_MEMBER_INVITED}
+                batch.set(groupsRef, groupsValue, { merge: true});
+
+                let usersRef = firebase.firestore().collection('users').doc(friend_id).collection('groups').doc(group_id);
+                batch.set(usersRef, {status: Constant.GROUP_STATUS_MEMBER_INVITED}, { merge: true});
+
+                batch.commit().then(function () {
+                    if(k == members.length-1){
+                        callback({'status':true})
+                    }
+                }).catch(function(err) {
+                    console.error("Transaction failure: " + err);
+                    if(k == members.length-1){
+                        callback({'status':false, 'message':err})
+                    }
+                });
+
+            }else{
+                snapshot.docs.forEach(doc => {
+                    // console.log(doc.data())
+                    let batch = firebase.firestore().batch();
+
+                    let groupsRef = firebase.firestore().collection('groups').doc(group_id).collection('members').doc(doc.id);
+                    batch.set(groupsRef, {status: Constant.GROUP_STATUS_MEMBER_INVITED}, { merge: true});
+
+                    let usersRef = firebase.firestore().collection('users').doc(friend_id).collection('groups').doc(group_id);
+                    batch.set(usersRef, {status: Constant.GROUP_STATUS_MEMBER_INVITED}, { merge: true});
+
+                    batch.commit().then(function () {
+                        if(k == members.length-1){
+                            callback({'status':true})
+                        }
+                    }).catch(function(err) {
+                        console.error("Transaction failure: " + err);
+                        if(k == members.length-1){
+                            callback({'status':false, 'message':err})
+                        }
+                    });
+                })
+            }
+        })
+    })
+}
+
 export const actionCreateClass = (uid, class_name, members, uri) => dispatch =>{
     return create_class(uid, class_name, members, uri).then(data => {
         console.log(data)
@@ -535,7 +592,6 @@ export const actionClassAddMember = (uid, class_id, members, callback) => dispat
             }
         })
     })
-    
 }
 
 // REMOVED_CLASS_MEMBER

@@ -94,8 +94,12 @@ class GroupsPage extends React.Component{
       })
     }
 
-   
-    
+    countMembers = (members) =>{
+      return (_.filter(members, (v, k)=>{
+                return v.status === Constant.GROUP_STATUS_MEMBER_JOINED
+              })).length
+    }
+
     renderItem = ({item, index}) => { 
       // console.log(index)
       let swipeoutRight = [{component:<View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
@@ -189,7 +193,7 @@ class GroupsPage extends React.Component{
                                 fontWeight: '600', 
                                 paddingBottom:5
                               }}>
-                      {item.group_profile.name} ({ Object.keys(item.members).length})
+                      {item.group_profile.name} ({ Object.keys(item.members).length })
                   </Text>
                 </View>
             </View>
@@ -479,7 +483,7 @@ class GroupsPage extends React.Component{
                                 fontWeight: '600', 
                                 paddingBottom:5
                               }}>
-                      {rowItem.group_profile.name} { rowItem.members === undefined ? '' : "(" + Object.keys(rowItem.members).length +")" }
+                      {rowItem.group_profile.name} { rowItem.members === undefined ? '' : "(" + this.countMembers(rowItem.members) /*Object.keys(rowItem.members).length*/ +")" }
                   </Text>
                 </View>
             </View>

@@ -1589,20 +1589,21 @@ export default (state= INITIAL_STATE, action)=>{
                 return k == action.group_id
             })
 
+            if(group === undefined){
+                return state
+            }
+
             let members = group.members
             if(members !== undefined){
-                console.log(action, group)
-
-                let member_item_id = action.member_item_id
-
+                // console.log(action, group)
+                let member_key = action.member_key
                 let member = _.find(members,  function(v, k) { 
-                    return k == member_item_id
+                    return k == member_key
                 })
 
-                if(member !== undefined){      
-                    let newMembers = _.omit(members, member_item_id)
+                if(member !== undefined){
+                    let newMembers = {...members, [member_key]:{...member, status: Constant.GROUP_STATUS_MEMBER_CANCELED}}
                     let newGroup = {...group, members: newMembers}
-
                     let v = {
                         ...state,
                         users : {
@@ -1614,9 +1615,28 @@ export default (state= INITIAL_STATE, action)=>{
                         }
                     }
 
-                    console.log(newGroup)
-                    return v 
+                    // console.log(v)
+
+                    return v
                 }
+                // if(member !== undefined){      
+                //     let newMembers = _.omit(members, member_key)
+                //     let newGroup = {...group, members: newMembers}
+
+                //     let v = {
+                //         ...state,
+                //         users : {
+                //             ...state.users,
+                //             groups : {
+                //                 ...state.users.groups,
+                //                 [action.group_id]: newGroup
+                //             }
+                //         }
+                //     }
+
+                //     console.log(newGroup)
+                //     // return v 
+                // }
             }
 
             return state
