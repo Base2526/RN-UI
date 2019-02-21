@@ -102,7 +102,21 @@ class ManageGroupPage extends React.Component{
                         if (!doc.exists) {
                             console.log('No such document!');
                         } else {
-                            console.log('Document data:', doc.data());
+
+                            let {members} = this.state.group
+
+                            // var member = _.find(members, function(v, k) {
+                            //     // console.log(k, friend_id)
+                            //     return k == keys[i];
+                            // });
+
+                            members = {...members, [keys[i]]: {...members[keys[i]], friend:{profile:doc.data()} }}
+
+                            let newGroup = {...this.state.group, members}
+                            this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                                console.log(result)
+                            })
+                            this.setState({group: newGroup})
                         }
                     })
                     .catch(err => {
@@ -115,6 +129,10 @@ class ManageGroupPage extends React.Component{
         }
 
         let newGroup = {...group, members}
+
+        console.log(friends)
+        console.log(newGroup)
+
         this.setState({group: newGroup})
     }
 
@@ -146,8 +164,28 @@ class ManageGroupPage extends React.Component{
                         </TouchableOpacity>)
             }
             
+            console.log(friend_id, friend)
             // let {friend} = members[key]
             // console
+
+            if(friend === undefined){
+                return(<TouchableOpacity key={friend_id} 
+                    style={{marginRight:5}}
+                    onPress={()=>{
+                        this.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
+                    }}>
+                    <FastImage
+                        style={{width: 36, height: 36, borderRadius: 18}}
+                        source={{
+                            uri: Constant.DEFAULT_AVATARSOURCE_URI,
+                            headers:{ Authorization: 'someAuthToken' },
+                            priority: FastImage.priority.normal,
+                        }}
+                        resizeMode={FastImage.resizeMode.cover}
+                    />
+                </TouchableOpacity>)
+            }
+
             return(<TouchableOpacity key={friend_id} 
                         style={{marginRight:5}}
                         onPress={()=>{
@@ -262,7 +300,7 @@ class ManageGroupPage extends React.Component{
                         </TouchableOpacity>
                         <TouchableOpacity style={{marginLeft:30 ,alignItems:'center'}}
                             onPress={()=>{
-                                this.props.navigation.navigate('GroupSettingsPage', {group})
+                                this.props.navigation.navigate('GroupSettingsPage', {group_id})
                             }}>
                             <MyIcon
                                 name={'settings'}

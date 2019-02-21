@@ -1,72 +1,20 @@
 import React from 'react'
 import {FlatList, 
-        StyleSheet, 
         View, 
         Text, 
-        Alert, 
-        TouchableOpacity,
-        Image} from 'react-native'
+        TouchableOpacity,} from 'react-native'
 
-import ExpandableList from 'react-native-expandable-section-flatlist'
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
-
 import Swipeout from 'react-native-swipeout'
+import firebase from 'react-native-firebase';
 
 var _ = require('lodash');
-import ImageWithDefault from '../../Utils/ImageWithDefault'
 import * as actions from '../../Actions'
-
-import Constant from '../../Utils/Constant'
+import {getUid} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
-import {getUid, getHeaderInset} from '../../Utils/Helpers'
-
 class ListGroupMember_TabAdminPage extends React.Component{
-
-    // static navigationOptions = ({ navigation }) => ({
-    //     title: "List members",
-    //     headerTintColor: '#C7D8DD',
-    //     headerStyle: {
-    //         backgroundColor: 'rgba(186, 53, 100, 1.0)',
-  
-    //         // ios navigationoptions underline hide
-    //         borderBottomWidth: 0,
-  
-    //         // android navigationoptions underline hide
-    //         elevation: 0,
-    //         shadowOpacity: 0
-    //       },
-    //     headerLeft: (
-    //         <View style={{paddingLeft:10}}>
-    //             <TouchableOpacity 
-    //                 onPress={()=>{
-    //                     // GroupMemberInvite
-    //                     const { params = {} } = navigation.state
-    //                     params.handleInvite()
-    //                 }}>
-    //                 <Text style={{color:'#C7D8DD', fontSize:18, fontWeight:'bold'}}>Invite</Text>
-    //             </TouchableOpacity> 
-    //         </View>
-    //     ),
-    //     headerRight: (
-    //         <View style={{marginRight:10}}>
-    //             <TouchableOpacity
-    //                 style={{padding:5}}
-    //                 // disabled={isModify ? false: true}
-    //                 onPress={() => {
-    //                     const { params = {} } = navigation.state
-    //                     params.handleCancel()
-    //                 }}>
-    //                 <MyIcon
-    //                     name={'cancel'}
-    //                     size={25}
-    //                     color={'#C7D8DD'} />
-    //             </TouchableOpacity>
-    //         </View>
-    //     ),
-    // });
-
     constructor(){
         super();
         this.state = { 
@@ -78,228 +26,131 @@ class ListGroupMember_TabAdminPage extends React.Component{
     }
 
     componentWillMount(){
-        console.log(this.props)
-
-        // this.props.navigation.setParams({handleCancel: this.handleCancel })
-        // this.props.navigation.setParams({ handleInvite: this.handleInvite })
-
-        // const { navigation } = this.props;
-        // const group_id = navigation.getParam('group_id', null);
-        
-        // let group = _.find(this.props.groups,  function(v, k) { 
-        //     return k == group_id
-        // })
-
-        // this.loadData(group)
-
         let {group_id} = this.props.params
-        let group = _.find(this.props.groups,  function(v, k) { 
-            return k == group_id
+        this.setState({group_id}, ()=>{
+            this.loadData(this.props)
         })
-        this.loadData(group)
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log(nextProps);
-        let {group_id} = this.props.params
-        let group = _.find(nextProps.groups,  function(v, k) { 
+        this.loadData(nextProps)
+    }
+
+    loadData = (props) =>{
+        let {group_id}  = this.state
+        let {uid, groups, friends}    = props
+
+        let group = _.find(groups,  function(v, k) { 
             return k == group_id
         })
 
-        this.loadData(group)
-    }
+        if(group === undefined){
+            this.handleCancel()
+        }
 
-    getGroupId = () =>{
-
-        return 0
-        const { navigation } = this.props;
-        return  navigation.getParam('group_id', null);
-    }
-
-    loadData = (group) =>{
-
-        console.log(group)
-
-        // members, group_admins
-
-        var members = _.map(group.group_admins, function(v, k) {
-            let member = _.find(group.members, (mv, mk)=>{
-                return v.uid == mv.friend_id
+        let members = []
+        _.each(group.group_admins, (v, k)=>{
+            let friend = _.find(friends, (fv, fk)=>{
+                return v.uid == fk
             })
-            if(member !== undefined){
-                return member;
+
+            // console.log(friend)
+            if(friend === undefined){
+                if(v.uid == uid){
+                    members.push({...v, group_admin_key:k})
+                }else{
+                    // get from firestore
+                    firebase.firestore().collection('profiles').doc(v.friend_id).get()
+                    .then(doc => {
+                        if (!doc.exists) {
+                            console.log('No such document!');
+                        } else {
+                            console.log(doc.data())
+
+                            // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                            //     console.log(result)
+                            // })
+                        }
+                    })
+                    .catch(err => {
+                        console.log('Error getting document', err);
+                    });
+                }
+            }else{
+                members.push({...v, group_admin_key:k, friend})
             }
-        });
+        })
+
+        console.log(members)
 
         this.setState({members})
-    }
-
-    handleInvite = () => {
-        const { navigation } = this.props;
-        const group = navigation.getParam('group', null);
-        this.props.navigation.navigate("GroupMemberInvite", {'group':group})
     }
 
     handleCancel = () => {
         this.props.navigation.goBack(null)
     }
 
-    _renderRow = (rowItem, rowId, sectionId) => {
-
-        console.log(rowItem)
-
-        let swipeoutRight = []
-
-        switch(rowItem.status){
-            case Constant.GROUP_STATUS_MEMBER_INVITED:{
-                swipeoutRight = [
-                    {
-                        // component: <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}><Text style={{color:'white'}}>Cancel</Text></View>,
-                        component:  <View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'red'}}>
-                                        <Text style={{fontWeight:'bold', color:'white', fontSize:14}}>CANCEL</Text>
-                                    </View>,
-                        backgroundColor: 'red',
-                        onPress: () => { 
-                            alert('Cancel')
-                        }
-                    }
-                ]
-                break;
-            }
-            case Constant.GROUP_STATUS_MEMBER_JOINED:{
-                swipeoutRight = [
-                    {
-                        // component: <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}><Text style={{color:'white'}}>Delete</Text></View>,
-                        component:  <View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'red'}}>
-                                        <Text style={{fontWeight:'bold', color:'white', fontSize:14}}>DELETE</Text>
-                                    </View>,
-                        backgroundColor: 'red',
-                        onPress: () => { 
-                            alert('Delete')
-                        }
-                    }
-                ]
-                break;
-            }
-
-            case Constant.GROUP_STATUS_MEMBER_DECLINE:{
-                return(<View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
-                            <TouchableOpacity
-                                style={{height:60,
-                                        width: 60,
-                                        borderRadius: 10}}>
-                                <ImageWithDefault 
-                                source={{uri: rowItem.image_url}}
-                                style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
-                                />
-                            </TouchableOpacity>
-                            <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                                <Text style={{fontSize:18}}>{rowItem.name}</Text>
-                            </View>
-                            <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
-                                <TouchableOpacity
-                                    style={{padding:5, 
-                                            borderColor:'green', 
-                                            borderRadius:10, 
-                                            borderWidth:.5,
-                                            marginRight:5}}
-                                    onPress={()=>{
-
-                                        console.log(rowItem)
-
-                                        console.log(this.getGroupId())
-                                        
-                                        // (uid, friend_id, group_id, item_id, callback) 
-                                        // this.setState({loading:true})
-                                        this.props.actionMemberInviteAgainGroup(this.props.uid, rowItem.friend_id, this.getGroupId(), rowItem.item_id, (result) => {
-                                            console.log(result)
-
-                                            // setTimeout(() => {
-                                            //     this.setState({loading:false})
-                                            // }, 100);
-                                        })
-                                        
-                                    }}>
-                                    <Text style={{color:'green'}}>Invite</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={{padding:5, 
-                                            borderColor:'red', 
-                                            borderRadius:10, 
-                                            borderWidth:.5}}
-                                    onPress={()=>{
-                                        alert('cancel')
-                                    }}>
-                                    <Text style={{color:'red'}}>Cancel</Text>
-                                </TouchableOpacity>
-                                </View>
-                        </View>)
-            }
-        }
-        
-        return( 
-            <Swipeout 
-                style={{backgroundColor:'white'}} 
-                right={swipeoutRight}>
-                <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
-                  <TouchableOpacity 
-                      style={{height:60,
-                              width: 60,
-                              borderRadius: 10}}>
-                      <ImageWithDefault 
-                        source={{uri: rowItem.image_url}}
-                        style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
-                      />
-                  </TouchableOpacity>
-                  <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                    <Text style={{fontSize:18}}>{rowItem.name}</Text>
-                 </View>
-                </View>
-            </Swipeout>)
-    }
-
-    _renderSection = (section, sectionId, state)  => {
-        let {data} = this.state
-
-        let m_length = data[sectionId].member.length
-        if(m_length == 0){
-            console.log('000001')
-            return ;
-        }
-
-        let ic_collapse = <MyIcon name={state ? 'collapse-up' : 'collapse-down'}
-                                  size={8}
-                                  color={'#C7D8DD'} />
-  
-        return (
-            <View
-                style={{ 
-                        height: 30, 
-                        flexDirection: 'row',
-                        justifyContent: 'space-between', 
-                        alignItems: 'center', 
-                        borderBottomWidth: 0.5,
-                        // borderBottomColor: DictStyle.colorSet.lineColor 
-                        }}>
-            <View style={{ flexDirection: 'row', 
-                        alignItems: 'center'}}>
-                <Text style={{ 
-                                // fontSize: DictStyle.fontSet.mSize, 
-                                color: 'gray',
-                                paddingLeft: 10,
-                                fontWeight:'700' }}>
-                {section + "(" + m_length +")"}
-                </Text>
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                {ic_collapse}
-            </View>
-            </View>
-        )
-    }
-
     renderItem = ({item, index}) => { 
         console.log(item)
+
+        let {uid} = this.props
+
+        if(item.uid === uid){
+
+            let swipeoutRight = [
+                {
+                    component:  <View style={{flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: 'red'}}>
+                                    <Text style={{fontWeight:'bold', color:'white', fontSize:14}}>LEAVE</Text>
+                                </View>,
+                    backgroundColor: 'red',
+                    onPress: () => { 
+                        alert('LEAVE')
+                    }
+                }
+            ]
+
+            let {profiles} = this.props
+            return(<Swipeout 
+                    style={{backgroundColor:'white'}} 
+                    right={swipeoutRight}>
+                    <View style={{height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                        <TouchableOpacity>
+                            <FastImage
+                                style={{width: 60,  
+                                        height: 60,
+                                        borderRadius: 10, 
+                                        borderColor:'gray', 
+                                        // backgroundColor: '#FF83AF',
+                                        borderWidth:1
+                                        }}
+                                source={{
+                                    uri: profiles.image_url,
+                                    headers:{ Authorization: 'someAuthToken' },
+                                    priority: FastImage.priority.normal,
+                                }}
+                                resizeMode={FastImage.resizeMode.normal}
+                            />
+                        </TouchableOpacity>
+                        <View style={{flex:1, flexDirection:'row', alignItems:'baseline', marginLeft:5}}>
+                            <Text style={{fontSize:18}}>{profiles.name}</Text>
+                            <Text style={{fontSize:12, fontStyle:'italic', color:'gray'}}>(You)</Text>
+                        </View>
+
+                        <View style={{position:'absolute', right:0, marginRight:10}}>
+                            <TouchableOpacity
+                                    style={{padding:5}}
+                                    onPress={()=>{
+                                        alert('menu')
+                                    }}>
+                                <MyIcon name={'dot-vertical'}
+                                    size={20}
+                                    color={'#C7D8DD'} />  
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    </Swipeout>)
+        }
+
         return(<View style={{height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                     <TouchableOpacity>
                         <FastImage
@@ -311,7 +162,7 @@ class ListGroupMember_TabAdminPage extends React.Component{
                                     borderWidth:1
                                     }}
                             source={{
-                                uri: item.friend_image_url,
+                                uri: item.friend.profile.image_url,
                                 headers:{ Authorization: 'someAuthToken' },
                                 priority: FastImage.priority.normal,
                             }}
@@ -319,40 +170,33 @@ class ListGroupMember_TabAdminPage extends React.Component{
                         />
                     </TouchableOpacity>
                     <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                        <Text style={{fontSize:18}}>{item.friend_name}</Text>
+                        <Text style={{fontSize:18}}>{item.friend.profile.name}</Text>
+                    </View>
+                    
+                    <View style={{position:'absolute', right:0, marginRight:10}}>
+                        <TouchableOpacity
+                                style={{padding:5}}
+                                onPress={()=>{
+                                    alert('menu')
+                                }}>
+                            <MyIcon name={'dot-vertical'}
+                                size={20}
+                                color={'#C7D8DD'} />  
+                        </TouchableOpacity>
                     </View>
                 </View>)
     }
       
     render() {
-        // return (<ExpandableList
-        //             style={{flex:1}}
-        //             ref={instance => this.ExpandableList = instance}
-        //             dataSource={this.state.data}
-        //             headerKey="title"
-        //             memberKey="member"
-        //             renderRow={this._renderRow}
-        //             headerOnPress={(i, state) => {
-        //             } }
-        //             renderSectionHeaderX={this._renderSection}
-        //             openOptions={[0, 1, 2]}
-        //             removeClippedSubviews={false}
-        //         />
-        // );
-
         let {members} = this.state
 
-        return(<View style={{flex:1}} ><FlatList
-            
-            // key = {this.state.orientation}
-            /*  เราต้องมีการคำนวณ item ให้เต็มแต่ละแถว  */
-            data = {members}
-            // numColumns={this.state.numColumns}
-            renderItem={this.renderItem}
-            // keyExtractor={this.keyExtractor}
-            extraData={this.state}
-            // contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
-          /></View>)
+        console.log(members)
+        return(<View style={{flex:1}} >
+                <FlatList
+                    data = {members}
+                    renderItem={this.renderItem}
+                    extraData={this.state}/>
+                </View>)
     }
 }
 
@@ -365,6 +209,8 @@ const mapStateToProps = (state) => {
   
     return{
         uid:getUid(state),
+        profiles:state.auth.users.profiles,
+        friends:state.auth.users.friends,
         groups:state.auth.users.groups
     }
 }

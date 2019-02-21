@@ -99,7 +99,7 @@ import Constant from '../Utils/Constant'
 
 import {login, 
         people_you_may_khow, 
-        add_friend,
+        invite_friend,
         create_group,
         create_class,
         application_category,
@@ -284,9 +284,9 @@ export const actionPeopleYouMayKhow = () => dispatch=>{
     })
 }
 
-export const actionAddFriend = (uid, friend_id) => dispatch =>{
+export const actionInviteFriend = (uid, friend_id) => dispatch =>{
 
-    return add_friend(uid, friend_id).then(data => {
+    return invite_friend(uid, friend_id).then(data => {
         // this.setState({isShowSpinner:false})
 
         // dispatch({ type: LOADING, isLoading:false})
@@ -314,6 +314,12 @@ export const actionAddFriend = (uid, friend_id) => dispatch =>{
             }
         }
     })
+}
+
+export const actionAddFriend = (uid, friend_id, data, profile, callback) => dispatch =>{
+    dispatch({ type: ADD_FRIEND, friend_id, data, profile})
+    
+    callback({'status':true, friend_id, data, profile})
 }
 
 // create_group
@@ -348,11 +354,26 @@ export const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
 CANCELED_GROUP_MEMBER  = "canceled_group_member"
 */
 export const actionCanceledGroupMember = (uid, group_id, friend_id, member_key, callback) => dispatch =>{
+    /*
     firebase.firestore().collection('users').doc(friend_id).collection('groups').doc(group_id).delete()
     firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_key).set({
         status: Constant.GROUP_STATUS_MEMBER_CANCELED,
         canceler:uid // เก้บ uid ของคนที่ทำการ cancel friend_id 
     }, { merge: true});
+    */
+
+    let batch = firebase.firestore().batch();
+    let usersRef = firebase.firestore().collection('users').doc(friend_id).collection('groups').doc(group_id)
+    batch.delete(usersRef);
+
+    let groupsRef = firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_key)
+    batch.set(groupsRef, {status: Constant.GROUP_STATUS_MEMBER_CANCELED, canceler:uid}, { merge: true})
+    
+    batch.commit().then(function () {
+        console.log("Transaction success: actionMemberJoinGroup");
+    }).catch(function(err) {
+        console.log("Transaction failure: " + err);
+    });
 
     dispatch({ type: CANCELED_GROUP_MEMBER, group_id, friend_id, member_key});
     callback({'status':true})
@@ -407,16 +428,41 @@ export const actionFavoritesGroup = (uid, group_id, favorite_status, callback) =
     - update status GROUP_STATUS_MEMBER_JOINED : users/{user_id}/groups/{group_id}/status = GROUP_STATUS_MEMBER_JOINED
     - update status == GROUP_STATUS_MEMBER_JOINED groups/{group_id}/members/{item_id}/status = GROUP_STATUS_MEMBER_JOINED
 */
-export const actionMemberJoinGroup = (uid, group_id, member_item_id, callback) => dispatch => {
+
+/*
+
+                let batch = firebase.firestore().batch();
+
+                let groupsRef = firebase.firestore().collection('groups').doc(group_id).collection('members').doc(key);
+                let groupsValue = { friend_id, 
+                                    status: Constant.GROUP_STATUS_MEMBER_INVITED}
+                batch.set(groupsRef, groupsValue, { merge: true});
+*/
+export const actionMemberJoinGroup = (uid, group_id, member_key, callback) => dispatch => {
+    /*
     firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).set({
         status: Constant.GROUP_STATUS_MEMBER_JOINED,
     }, { merge: true});
 
-    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_item_id).set({
+    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_key).set({
         status: Constant.GROUP_STATUS_MEMBER_JOINED,
     }, { merge: true});
+    */
 
-    dispatch({ type: MEMBER_JOIN_GROUP, group_id, member_item_id})
+    let batch = firebase.firestore().batch();
+    let usersRef = firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id)
+    batch.set(usersRef, {status: Constant.GROUP_STATUS_MEMBER_JOINED}, { merge: true})
+
+    let groupsRef = firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_key)
+    batch.set(groupsRef, {status: Constant.GROUP_STATUS_MEMBER_JOINED}, { merge: true})
+
+    batch.commit().then(function () {
+        console.log("Transaction success: actionMemberJoinGroup");
+    }).catch(function(err) {
+        console.log("Transaction failure: " + err);
+    });
+
+    dispatch({ type: MEMBER_JOIN_GROUP, group_id, member_key})
     callback({'status':true})
 }
 
@@ -440,31 +486,63 @@ export const actionMemberLeaveGroup = (uid, group_id, member_item_id, callback) 
     - ลบกลุ่มออกจาก  users/{user_id}/groups/{group_id} และ remove group redux local
     - update status == GROUP_STATUS_MEMBER_DECLINE groups/{group_id}/members/{item_id}/status = GROUP_STATUS_MEMBER_DECLINE
 */
-export const actionMemberDeclineGroup = (uid, group_id, member_item_id, callback) => dispatch => {
+export const actionMemberDeclineGroup = (uid, group_id, member_key, callback) => dispatch => {
+    /*
     firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).delete()
-    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_item_id).set({
+    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_key).set({
         status: Constant.GROUP_STATUS_MEMBER_DECLINE,
     }, { merge: true});
+    */
 
-    dispatch({ type: MEMBER_DECLINE_GROUP, group_id, member_item_id});
+    let batch = firebase.firestore().batch();
+    let usersRef = firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id)
+    batch.delete(usersRef);
+
+    let groupsRef = firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_key)
+    batch.set(groupsRef, {status: Constant.GROUP_STATUS_MEMBER_DECLINE}, { merge: true})
+
+    batch.commit().then(function () {
+        console.log("Transaction success: actionMemberJoinGroup");
+    }).catch(function(err) {
+        console.log("Transaction failure: " + err);
+    });
+
+    dispatch({ type: MEMBER_DECLINE_GROUP, group_id, member_key});
     callback({'status':true})
 }
 
 /* 
  การ invite again (กรณีที่เพือนกด decline แล้วเราจะทำการ invite อีกครั้ง)
 */
-export const actionMemberInviteAgainGroup = (uid, friend_id, group_id, item_id, callback) => dispatch => {
+export const actionMemberInviteAgainGroup = (uid, group_id, friend_id, member_key, callback) => dispatch => {
+    /*
     firebase.firestore().collection('users').doc(friend_id).collection('groups').doc(group_id).set({
         item_id: item_id,
         status: Constant.GROUP_STATUS_MEMBER_INVITED,
     }, { merge: true});
 
-    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(item_id).set({
+    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_key).set({
         status: Constant.GROUP_STATUS_MEMBER_INVITED,
     }, { merge: true});
 
-    dispatch({ type: MEMBER_INVITE_AGAIN_GROUP, friend_id, group_id, item_id});
-    callback({'status':true, uid, friend_id, group_id, item_id})
+    dispatch({ type: MEMBER_INVITE_AGAIN_GROUP, friend_id, group_id, member_key});
+    */
+
+    let batch = firebase.firestore().batch();
+    let usersRef = firebase.firestore().collection('users').doc(friend_id).collection('groups').doc(group_id)
+    batch.set(usersRef, {status: Constant.GROUP_STATUS_MEMBER_INVITED}, { merge: true})
+
+    let groupsRef = firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_key)
+    batch.set(groupsRef, {status: Constant.GROUP_STATUS_MEMBER_INVITED}, { merge: true})
+    
+    batch.commit().then(function () {
+        console.log("Transaction success: actionMemberJoinGroup");
+    }).catch(function(err) {
+        console.log("Transaction failure: " + err);
+    });
+
+    dispatch({ type: MEMBER_INVITE_AGAIN_GROUP, friend_id, group_id, member_key});
+    callback({'status':true, uid, friend_id, group_id, member_key})
 }
 
 export const actionDeleteGroup = (uid, group_id, callback) => dispatch =>{
@@ -481,6 +559,8 @@ export const actionGroupInviteMember = (uid, group_id, members, callback) => dis
             // console.log(snapshot)
             if(snapshot.size == 0){
                 let key = randomKey()
+                
+                
 
                 let batch = firebase.firestore().batch();
 
@@ -488,6 +568,8 @@ export const actionGroupInviteMember = (uid, group_id, members, callback) => dis
                 let groupsValue = { friend_id, 
                                     status: Constant.GROUP_STATUS_MEMBER_INVITED}
                 batch.set(groupsRef, groupsValue, { merge: true});
+
+                dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, member_key:key, data:groupsValue});
 
                 let usersRef = firebase.firestore().collection('users').doc(friend_id).collection('groups').doc(group_id);
                 batch.set(usersRef, {status: Constant.GROUP_STATUS_MEMBER_INVITED}, { merge: true});
@@ -497,7 +579,7 @@ export const actionGroupInviteMember = (uid, group_id, members, callback) => dis
                         callback({'status':true})
                     }
                 }).catch(function(err) {
-                    console.error("Transaction failure: " + err);
+                    console.log("Transaction failure: " + err);
                     if(k == members.length-1){
                         callback({'status':false, 'message':err})
                     }
@@ -505,6 +587,10 @@ export const actionGroupInviteMember = (uid, group_id, members, callback) => dis
 
             }else{
                 snapshot.docs.forEach(doc => {
+
+                    let newData = {...doc.data(), status: Constant.GROUP_STATUS_MEMBER_INVITED}
+                    dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, member_key:doc.id, data:newData});
+
                     // console.log(doc.data())
                     let batch = firebase.firestore().batch();
 
@@ -519,7 +605,7 @@ export const actionGroupInviteMember = (uid, group_id, members, callback) => dis
                             callback({'status':true})
                         }
                     }).catch(function(err) {
-                        console.error("Transaction failure: " + err);
+                        console.log("Transaction failure: " + err);
                         if(k == members.length-1){
                             callback({'status':false, 'message':err})
                         }
@@ -1483,21 +1569,21 @@ export function watchTaskEvent(uid, dispatch) {
                                 console.log('added: ', change.doc.id, members_change.doc.id, members_change.doc.data());
 
                                 let group_id = change.doc.id
-                                let item_id = members_change.doc.id
+                                let member_key = members_change.doc.id
                                 let data = members_change.doc.data()
                                 // ADDED_GROUP_MEMBER
 
-                                dispatch({ type: ADDED_GROUP_MEMBER, group_id, item_id, data});
+                                dispatch({ type: ADDED_GROUP_MEMBER, group_id, member_key, data});
                             }
                             if (members_change.type === 'modified') {
                                 console.log('modified: ', change.doc.id, members_change.doc.id, members_change.doc.data());
 
                                 let group_id = change.doc.id
-                                let item_id = change.doc.id
-                                let data = change.doc.data()
+                                let member_key = members_change.doc.id
+                                let data = members_change.doc.data()
                                 // MODIFIED_GROUP_MEMBER
 
-                                // dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, item_id, data});
+                                dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, member_key, data});
                             }
                             if (members_change.type === 'removed') {
                                 console.log('removed: ', change.doc.id, members_change.doc.id, members_change.doc.data());

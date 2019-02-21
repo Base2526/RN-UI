@@ -56,6 +56,8 @@ class GroupsPage extends React.Component{
       // console.log(groups)
       let {groups} = props
 
+      console.log(groups)
+
       let group_invited = []
       let group_joined = []
       let group_favorites = []
@@ -316,21 +318,22 @@ class GroupsPage extends React.Component{
                         onPress={()=>{
                           let members = rowItem.members
                           let uid = this.props.uid
-                          var member = _.find(members, function(item, key) {
-                            return item.friend_id == uid
+
+                          let member_key = _.findKey(members,  function(v, k) { 
+                            return v.friend_id == uid
                           })
-                          // console.log(members)
-                          if(member !== undefined){
-                            // console.log(member)
+
+                          if(member_key !== undefined){
+                            // console.log(this.props.uid, rowItem.group_id, rowItem, member_key)
                             this.setState({loading:true})
-                            this.props.actionMemberJoinGroup(this.props.uid, rowItem.group_id, rowItem.item_id, (result) => {
+                            this.props.actionMemberJoinGroup(uid, rowItem.group_id, member_key, (result) => {
                               console.log(result)
                               setTimeout(() => {
                                 this.setState({loading:false})
                               }, 200);
                             })
                           }else{
-                            console.log(member)
+                            console.log(member_key)
                           }
                         }}>
                         <Text style={{color:'green'}}>Join</Text>
@@ -344,19 +347,23 @@ class GroupsPage extends React.Component{
                           let members = rowItem.members
                           
                           let uid = this.props.uid
-                          var member = _.find(members, function(item, key) {
-                            return item.friend_id == uid
+                          // var member = _.find(members, function(item, key) {
+                          //   return item.friend_id == uid
+                          // })
+
+                          let member_key = _.findKey(members,  function(v, k) { 
+                            return v.friend_id == uid
                           })
 
-                          if(member !== undefined){
+                          if(member_key !== undefined){
                             this.setState({loading:true})
-                            this.props.actionMemberDeclineGroup(this.props.uid, rowItem.group_id, rowItem.item_id, (result) => {
+                            this.props.actionMemberDeclineGroup(uid, rowItem.group_id, member_key, (result) => {
                               setTimeout(() => {
                                 this.setState({loading:false})
                               }, 200);
                             })
                           }else{
-                            console.log(member)
+                            console.log(member_key)
                           }
                         }}>
                         <Text style={{color:'red'}}>Decline</Text>
@@ -504,6 +511,7 @@ class GroupsPage extends React.Component{
       }
 
       let data = [favorites, invited, groups]
+      console.log(data)
       return (
         <View style={{flex:1}}>
         <Spinner
@@ -542,10 +550,8 @@ const mapStateToProps = (state) => {
     return {}
   }
 
-  // groups
   return{
     uid:getUid(state),
-    // auth:state.auth
     groups:state.auth.users.groups
   }
 }

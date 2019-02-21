@@ -1,14 +1,8 @@
 import React from 'react'
 import {View, 
-        Alert, 
         Text, 
-        FlatList, 
-        ActivityIndicator, 
         TouchableOpacity, 
-        Image,
         TextInput,
-        ScrollView,
-        KeyboardAvoidingView
         } from 'react-native'
 import { connect } from 'react-redux';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
@@ -62,8 +56,6 @@ class GroupSettingsPage extends React.Component{
         this.state ={
             data:{},
             group_id:0,
-            name:'',
-            image_url:'',
             loading:false,
         }
     }
@@ -72,13 +64,64 @@ class GroupSettingsPage extends React.Component{
         this.props.navigation.setParams({handleCancel: this.handleCancel })
     
         const { navigation } = this.props;
-        const group = navigation.getParam('group', null);
-        console.log(group)
+        const group_id = navigation.getParam('group_id', null);
+        console.log(group_id)
 
+        this.setState({group_id}, ()=>{
+            this.loadData(this.props)
+        })
+
+        /*
         this.setState({ data: group,
                         group_id: group.group_id,
                         name: group.group_profile.name,
-                        image_url: group.group_profile.image_url})
+                        image_url: group.group_profile.image_url})                
+        */
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log(nextProps);
+        // console.log(state)
+
+        this.loadData(nextProps)
+
+        // let groups = nextProps.auth.users.groups
+        // let group_id = this.state.group_id
+        // console.log(groups)
+        // console.log(group_id)
+
+        // let key = 0
+        // let group = null
+        // _.each(groups, function(_v, _k) { 
+        //     if(_k === group_id){
+        //         key = _k
+        //         group = {..._v, group_id:_k}
+        //     }
+        // });
+        
+        // console.log(group)
+        // if(group !== null){
+        //     this.setState({ data: group,
+        //         name: group.group_profile.name,
+        //         image_url: group.group_profile.image_url})
+        // }
+    }
+
+    loadData = (props) =>{
+        let {group_id} = this.state
+        let {groups} = props
+
+        let group =  _.find(groups, (v, k)=>{
+            return k == group_id
+        })
+
+        if(group === undefined){
+            this.handleCancel()
+        }
+
+        this.setState({data: group})
+
+        console.log(group)
     }
 
     handleCancel = () => {
@@ -89,7 +132,7 @@ class GroupSettingsPage extends React.Component{
         this.setState({name})
     }
 
-    groupProfilePicture = () => {
+    profilePicture = () => {
         let options =  {
             title: 'Select group profile picture',
             noData: true,
@@ -126,40 +169,15 @@ class GroupSettingsPage extends React.Component{
         });
     }
 
-    componentWillReceiveProps(nextProps) {
-        console.log(nextProps);
-        // console.log(state)
-
-        let groups = nextProps.auth.users.groups
-        let group_id = this.state.group_id
-        console.log(groups)
-        console.log(group_id)
-
-        let key = 0
-        let group = null
-        _.each(groups, function(_v, _k) { 
-            if(_k === group_id){
-                key = _k
-                group = {..._v, group_id:_k}
-            }
-        });
-        
-        console.log(group)
-        if(group !== null){
-            this.setState({ data: group,
-                name: group.group_profile.name,
-                image_url: group.group_profile.image_url})
-        }
-    }
-
     render(){
-        let {data, name, image_url, group_id} = this.state
+        let {group_profile} = this.state.data
 
-        if(Object.keys(data).length == 0){
+        // console.log(group_profile)
+        if(group_profile === undefined){
             return(<View style={{flex:1, backgroundColor:'white'}}></View>)
         }
 
-        console.log(group_id)
+        // console.log(group_id)
         return(
         <KeyboardAwareScrollView>
         <View style={{flex:1}}>
@@ -198,13 +216,13 @@ class GroupSettingsPage extends React.Component{
                             marginBottom:10}}>
                             <TouchableOpacity
                                 onPress={()=>{
-                                    this.groupProfilePicture()
+                                    this.profilePicture()
                                 }}>
                                 
                                 <FastImage
                                     style={{width: 150, height: 150}}
                                     source={{
-                                        uri: image_url == '' ? Constant.DEFAULT_AVATARSOURCE_URI : image_url,
+                                        uri: group_profile.image_url,
                                         headers:{ Authorization: 'someAuthToken' },
                                         priority: FastImage.priority.normal,
                                     }}
@@ -212,7 +230,7 @@ class GroupSettingsPage extends React.Component{
                             </TouchableOpacity>
                             <TouchableOpacity style={{position:'absolute', right:0, bottom:0, padding:5, margin:5}}
                                             onPress={()=>{
-                                                this.groupProfilePicture()
+                                                this.profilePicture()
                                             }}>
                                 <MyIcon
                                     name={'camera'}
@@ -246,7 +264,7 @@ class GroupSettingsPage extends React.Component{
                         <TextInput
                             style={{ fontSize: 22, flex: 1 }}
                             placeholder="None"
-                            value={name}
+                            value={group_profile.name}
                             ref= {(el) => { this.name = el; }}
                             onChangeText = {this.handleGroupName}
                             // value={this.state.profiles.name}
@@ -276,7 +294,8 @@ const mapStateToProps = (state) => {
   
     return{
         uid:getUid(state),
-        auth:state.auth
+        auth:state.auth,
+        groups:state.auth.users.groups,
     }
 }
 

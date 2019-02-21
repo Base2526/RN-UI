@@ -17,7 +17,7 @@ module.exports = {
     FORGET_PASSWORD: API_URL + END_POINT + '/user/user_forgot_password',
 
     PEOPLE_YOU_MAY_KNOW: API_URL + END_POINT + '/people_you_may_know',
-    ADD_FRIEND: API_URL + END_POINT + '/add_friend',
+    INVITE_FRIEND: API_URL + END_POINT + '/add_friend',
 
     CREATE_GROUP: API_URL + END_POINT + '/create_chat_group',
     CREATE_CLASS: API_URL + END_POINT + '/create_class',
@@ -79,6 +79,7 @@ module.exports = {
     FRIEND_STATUS_FRIEND_REQUEST: '11',
     FRIEND_STATUS_WAIT_FOR_A_FRIEND: '12',
     FRIEND_STATUS_FRIEND_REMOVE: '41',
+    FRIEND_STATUS_FRIEND_99:'45',
 
     // Members group status invited
     GROUP_STATUS_MEMBER_INVITED: '35', // ส่งคำเชิญถึงเพือนให้เข้าร่วมกลุ่มสนทนา

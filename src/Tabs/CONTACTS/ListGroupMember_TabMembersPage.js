@@ -10,6 +10,7 @@ import {FlatList,
 import ExpandableList from 'react-native-expandable-section-flatlist'
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
+import firebase from 'react-native-firebase';
 
 import Swipeout from 'react-native-swipeout'
 import {
@@ -22,13 +23,10 @@ import {
 
 var _ = require('lodash');
 import ActionButton from 'react-native-action-button';
-
-import ImageWithDefault from '../../Utils/ImageWithDefault'
 import * as actions from '../../Actions'
 
 import Constant from '../../Utils/Constant'
 import MyIcon from '../../config/icon-font.js';
-
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
 class ListGroupMember_TabMembersPage extends React.Component{
@@ -67,14 +65,13 @@ class ListGroupMember_TabMembersPage extends React.Component{
         })
 
         if(group === undefined){
-            this.props.navigation.goBack(null)
+            this.handleCancel()
         }
 
         let members  = []
         let pendings = []
         let declines = []
 
-        console.log(group)
         let group_members = group.members
         _.each(group_members, (v, k)=>{
             console.log(v, k)
@@ -90,7 +87,21 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             pendings.push({...v, member_key:k})
                         }else{
                             // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
+                            firebase.firestore().collection('profiles').doc(v.friend_id).get()
+                            .then(doc => {
+                                if (!doc.exists) {
+                                    console.log('No such document!');
+                                } else {
+                                    console.log(doc.data())
 
+                                    // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                                    //     console.log(result)
+                                    // })
+                                }
+                            })
+                            .catch(err => {
+                                console.log('Error getting document', err);
+                            });
                         }
                     }else{
                         pendings.push({...v, member_key:k, friend:friend_profile})
@@ -103,7 +114,21 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             members.push({...v, member_key:k})
                         }else{
                             // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
+                            firebase.firestore().collection('profiles').doc(v.friend_id).get()
+                            .then(doc => {
+                                if (!doc.exists) {
+                                    console.log('No such document!');
+                                } else {
+                                    console.log(doc.data())
 
+                                    // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                                    //     console.log(result)
+                                    // })
+                                }
+                            })
+                            .catch(err => {
+                                console.log('Error getting document', err);
+                            });
                         }
                     }else{
                         members.push({...v, member_key:k, friend:friend_profile})
@@ -116,7 +141,21 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             declines.push({...v, member_key:k})
                         }else{
                             // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
+                            firebase.firestore().collection('profiles').doc(v.friend_id).get()
+                            .then(doc => {
+                                if (!doc.exists) {
+                                    console.log('No such document!');
+                                } else {
+                                    console.log(doc.data())
 
+                                    // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                                    //     console.log(result)
+                                    // })
+                                }
+                            })
+                            .catch(err => {
+                                console.log('Error getting document', err);
+                            });
                         }
                     }else{
                         declines.push({...v, member_key:k, friend:friend_profile})
@@ -201,6 +240,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
     checkInvitor = (rowItem) =>{
 
+        let {friends} = this.props
         // rowItem.friend_id === this.state.group_profile.creator_id?<Text style={{fontSize:12, color:'gray'}}>Group Creator</Text>:<View />
     
         if(rowItem.friend_id === this.state.group_profile.creator_id){
@@ -213,10 +253,22 @@ class ListGroupMember_TabMembersPage extends React.Component{
                 }
 
                 let member = _.find(this.state.group.members, (mv, mk)=>{
-                    return rowItem.invitor == mv.friend_id
+                    // return rowItem.invitor == mv.friend_id
+                    return '1'
                 })
 
-                return(<Text style={{fontSize:12, color:'gray'}}>Added by {member.friend_name}</Text>)
+                // console.log(member)
+
+                var friend_profile = _.find(friends, function(fv, fk) {
+                    return fk == member.friend_id;
+                });
+
+                let friend_name = ''
+                if(friend_profile !== undefined){
+                    friend_name = friend_profile.profile.name
+                }
+
+                return(<Text style={{fontSize:12, color:'gray'}}>Added by {friend_name}</Text>)
             }
         }
         return(<View />)
@@ -246,11 +298,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
                 if(rowItem.friend_id === uid){
                     let {profiles} = this.props
-                    return( 
-                        <Swipeout 
-                            style={{backgroundColor:'white'}} 
-                            right={swipeoutRight}>
-                            <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                    return( <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                                 <TouchableOpacity>
                                     <FastImage
                                         style={{width: 60,  
@@ -277,14 +325,24 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                         {this.checkInvitor(rowItem)}
                                     </View>
                                 </View>
-                            </View>
-                        </Swipeout>)
+                                <View style={{position:'absolute', right:0, marginRight:10}}>
+                                    <TouchableOpacity
+                                            style={{padding:5}}
+                                            onPress={()=>{
+                                                alert('menu')
+                                            }}>
+                                        <MyIcon name={'dot-vertical'}
+                                            size={20}
+                                            color={'#C7D8DD'} />  
+                                    </TouchableOpacity>
+                                </View>
+                            </View>)
                 }
 
                 return( 
-                    <Swipeout 
-                        style={{backgroundColor:'white'}} 
-                        right={swipeoutRight}>
+                    // <Swipeout 
+                    //     style={{backgroundColor:'white'}} 
+                    //     right={swipeoutRight}>
                         <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                             <TouchableOpacity>
                                 <FastImage
@@ -311,17 +369,16 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             </View>
                             <View style={{position:'absolute', right:0, marginRight:10}}>
                                 <TouchableOpacity
-                                    onPress={()=>{
-                                        alert('menu')
-                                    }}>
-                                    
+                                        style={{padding:5}}
+                                        onPress={()=>{
+                                            alert('menu')
+                                        }}>
                                     <MyIcon name={'dot-vertical'}
-                                        size={14}
-                                        color={'#C7D8DD'} />        
+                                        size={20}
+                                        color={'#C7D8DD'} />  
                                 </TouchableOpacity>
                             </View>
-                        </View>
-                    </Swipeout>)
+                        </View>)
             }
 
             case Constant.GROUP_STATUS_MEMBER_INVITED:{
@@ -475,9 +532,10 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                             borderWidth:.5,
                                             marginRight:5}}
                                     onPress={()=>{
-                                        console.log(rowItem)
+                                        // console.log(rowItem)
+                                        // console.log(this.state.group_id)
                                         this.setState({loading:true})
-                                        this.props.actionMemberInviteAgainGroup(this.props.uid, rowItem.friend_id, this.state.group_id, rowItem.item_id, (result) => {
+                                        this.props.actionMemberInviteAgainGroup(uid, group_id, rowItem.friend_id, rowItem.member_key, (result) => {
                                             console.log(result)
 
                                             this.setState({loading:false})
@@ -491,7 +549,12 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                             borderRadius:10, 
                                             borderWidth:.5}}
                                     onPress={()=>{
-                                        alert('cancel')
+                                        this.setState({loading:true})
+                                        this.props.actionCanceledGroupMember(uid, group_id, rowItem.friend_id, rowItem.member_key, (result) => {
+                                            this.setState({loading:false})
+            
+                                            console.log(result)
+                                        })
                                     }}>
                                     <Text style={{color:'red'}}>Cancel</Text>
                                 </TouchableOpacity>
@@ -540,20 +603,22 @@ class ListGroupMember_TabMembersPage extends React.Component{
     }
       
     render() {
-        return (<View style={{flex:1}}><ExpandableList
-                    style={{flex:1}}
-                    ref={instance => this.ExpandableList = instance}
-                    dataSource={this.state.data}
-                    headerKey="title"
-                    memberKey="member"
-                    renderRow={this._renderRow}
-                    headerOnPress={(i, state) => {
-                    } }
-                    renderSectionHeaderX={this._renderSection}
-                    openOptions={[0, 1, 2]}
-                    removeClippedSubviews={false}
-                />
-                {/* user-plus */}
+        return (<View style={{flex:1}}>
+                    
+                        <ExpandableList
+                            style={{flex:1}}
+                            ref={instance => this.ExpandableList = instance}
+                            dataSource={this.state.data}
+                            headerKey="title"
+                            memberKey="member"
+                            renderRow={this._renderRow}
+                            headerOnPress={(i, state) => {
+                            } }
+                            renderSectionHeaderX={this._renderSection}
+                            openOptions={[0, 1, 2]}
+                            removeClippedSubviews={false}
+                        />
+                    
                     <ActionButton 
                         buttonColor="rgba(231,76,60,1)"
                         renderIcon={() => {

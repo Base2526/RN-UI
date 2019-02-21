@@ -1097,7 +1097,40 @@ export default (state= INITIAL_STATE, action)=>{
             }
 
             let friends = state.users.friends
+            let friend = _.find(friends,  function(v, k) { 
+                return k == action.friend_id
+            })
 
+            if(friend === undefined){
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        friends : {
+                            ...state.users.friends,
+                            [action.friend_id]:{...action.data, ...{profile: action.profile}}
+                        }
+                    }
+                }
+                return v;
+            }else{
+                let newFriend = {...action.data, ...{profile: action.profile}}
+                if(!isEquivalent2Object(friend, newFriend)){
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            friends : {
+                                ...state.users.friends,
+                                [action.friend_id]:newFriend
+                            }
+                        }
+                    }
+                    return v;
+                }
+            }
+
+            /*
             let key = 0
             let value = null
             _.each(friends, function(_v, _k) { 
@@ -1136,6 +1169,7 @@ export default (state= INITIAL_STATE, action)=>{
                     return v;
                 }
             }
+            */
             return state
         }
 
@@ -1532,31 +1566,26 @@ export default (state= INITIAL_STATE, action)=>{
 
             let groups = state.users.groups
 
-            // let key = 0
-            // let value = null
-            // _.each(groups, function(_v, _k) { 
-            //     if(_k === action.group_id){
-            //         key = _k
-            //         value = _v
-            //     }
-            // });
-
             let group = _.find(groups,  function(v, k) { 
                 return k == action.group_id
             })
 
+            if(group === undefined){
+                return state
+            }
+
             if(group.members !== undefined){
-                let member_item_id = action.member_item_id
+                let member_key = action.member_key
 
                 let member = _.find(group.members,  function(v, k) { 
-                    return k == member_item_id && v.status != Constant.GROUP_STATUS_MEMBER_JOINED
+                    return k == member_key && v.status != Constant.GROUP_STATUS_MEMBER_JOINED
                 })
 
                 if(member !== undefined){      
                     let newGroup = {...group, 
                                         members: {
                                             ...group.members,
-                                            [member_item_id]:{...member, status:Constant.GROUP_STATUS_MEMBER_JOINED}
+                                            [member_key]:{...member, status:Constant.GROUP_STATUS_MEMBER_JOINED}
                                         }
                                     }
 
@@ -1676,15 +1705,33 @@ export default (state= INITIAL_STATE, action)=>{
                 return k == action.group_id
             })
 
-            if(group !== undefined){ 
-                let newGroup = _.omit(groups, action.group_id)
-                let newState = {...state,
-                    users : {
-                        ...state.users,
-                        groups : newGroup
+            if(group === undefined){
+                return state 
+            }
+
+            let members = group.members
+            if(members !== undefined){
+                // console.log(action, group)
+                let member_key = action.member_key
+                let member = _.find(members,  function(v, k) { 
+                    return k == member_key
+                })
+
+                if(member !== undefined){
+                    let newMembers = {...members, [member_key]:{...member, status: Constant.MEMBER_DECLINE_GROUP}}
+                    let newGroup = {...group, members: newMembers}
+                    let v = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            groups : {
+                                ...state.users.groups,
+                                [action.group_id]: newGroup
+                            }
+                        }
                     }
+                    return v
                 }
-                return newState
             }
             return state
         }
@@ -1700,16 +1747,20 @@ export default (state= INITIAL_STATE, action)=>{
                 return k == action.group_id
             })
 
-            // console.log(group)
             if(group !== undefined){ 
+                return state
+            }
+
+            // console.log(group)
+            if(group.members !== undefined){ 
                 let member = _.find(group.members,  function(v, k) { 
-                    return k == action.item_id
+                    return k == action.member_key
                 })
 
                 let newGroup = {...group, 
                                     members: {
                                         ...group.members,
-                                        [action.item_id]:{...member, status:Constant.GROUP_STATUS_MEMBER_INVITED}
+                                        [action.member_key]:{...member, status:Constant.GROUP_STATUS_MEMBER_INVITED}
                                     }
                                 }
 
@@ -1734,15 +1785,6 @@ export default (state= INITIAL_STATE, action)=>{
 
             let groups = state.users.groups
 
-            // let key = 0
-            // let value = null
-            // _.each(groups, function(_v, _k) { 
-            //     if(_k === action.group_id){
-            //         key = _k
-            //         value = _v
-            //     }
-            // });
-
             let group = _.find(groups,  function(v, k) { 
                 return k == action.group_id
             })
@@ -1757,7 +1799,7 @@ export default (state= INITIAL_STATE, action)=>{
                 let newGroup = {...group, 
                                     members: {
                                         ...group.members,
-                                        [action.item_id]:action.data
+                                        [action.member_key]:action.data
                                     }
                                 }
                 let v = {
@@ -1775,7 +1817,7 @@ export default (state= INITIAL_STATE, action)=>{
                 console.log(group)
 
                 let oldMember = _.find(group.members,  function(v, k) { 
-                    return k == action.item_id
+                    return k == action.member_key
                 })
 
                 if(!_.isEqual(oldMember, action.data)){
@@ -1783,7 +1825,7 @@ export default (state= INITIAL_STATE, action)=>{
                     let newGroup = {...group, 
                                         members: {
                                             ...group.members,
-                                            [action.item_id]:action.data
+                                            [action.member_key]:action.data
                                         }
                                     }
 
@@ -1813,15 +1855,6 @@ export default (state= INITIAL_STATE, action)=>{
             
             let groups = state.users.groups
 
-            // let key = 0
-            // let value = null
-            // _.each(groups, function(_v, _k) { 
-            //     if(_k === action.group_id){
-            //         key = _k
-            //         value = _v
-            //     }
-            // });
-            // let groups = state.users.groups
             let group = _.find(groups,  function(v, k) { 
                 return k == action.group_id
             })
@@ -1829,40 +1862,58 @@ export default (state= INITIAL_STATE, action)=>{
             if(group === undefined){
                 return state
             }
-            
-            if(value.hasOwnProperty('members') && value.members !== undefined){
-                let m_key = 0
-                let m_value = null
-                _.each(value.members, function(_vv, _kk) { 
-                    if(_kk === action.item_id){
-                        m_key = _kk
-                        m_value = _vv
-                    }
-                });
 
-                if(!_.isEqual(m_value, action.data)){
-                    
-                    let newValue = {...value, 
-                        members: {
-                            ...value.members,
-                            [action.item_id]:action.data
+            console.log(group)
+            console.log(action)
+            if(group.members === undefined){
+                let newGroup = {...group, 
+                    members:{[action.member_key]:action.data}
+                }
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        groups : {
+                            ...state.users.groups,
+                            [action.group_id]: newGroup
                         }
                     }
-    
+                }
+                console.log(v)
+                return v
+            }else{
+
+                let oldMember = _.find(group.members,  function(v, k) { 
+                    return k == action.member_key
+                })
+
+                if(!_.isEqual(oldMember, action.data)){
+                    let newGroup = {...group, 
+                                        members: {
+                                            ...group.members,
+                                            [action.member_key]:action.data
+                                        }
+                                    }
+
                     let v = {
                         ...state,
                         users : {
                             ...state.users,
                             groups : {
                                 ...state.users.groups,
-                                [action.group_id]: newValue
+                                [action.group_id]: newGroup
                             }
                         }
                     }
+
+                    console.log('Not equal')
+                    console.log(v)
                     return v
+                }else{
+                    console.log('equal')
                 }
             }
-
+            
             return state
         }
 

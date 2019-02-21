@@ -174,7 +174,7 @@ export const people_you_may_khow = () => {
         });
 }
 
-export const add_friend = (uid, friend_id) =>{
+export const invite_friend = (uid, friend_id) =>{
     // ADD_FRIEND
 
     // @"uid":[[Configs sharedInstance] getUIDU], @"friend_id":friend_id
@@ -187,7 +187,7 @@ export const add_friend = (uid, friend_id) =>{
         headers: Constant.FETCH_HEADERS
     }
 
-    return fetch(Constant.ADD_FRIEND, data)
+    return fetch(Constant.INVITE_FRIEND, data)
         .then((response) => response.json())
         .then((responseJson) => {
             console.log(responseJson)

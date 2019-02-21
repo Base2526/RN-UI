@@ -241,7 +241,7 @@ class FindFriendPage extends React.Component{
                               let friend_id = item.uid
 
                               this.setState({loading:true})
-                              this.props.actionAddFriend(uid, friend_id).then((result) => {
+                              this.props.actionInviteFriend(uid, friend_id).then((result) => {
                                 console.log(result)
 
                                 console.log('uid : ' + uid)
