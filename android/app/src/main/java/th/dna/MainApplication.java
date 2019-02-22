@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.CallbackManager;
 import com.facebook.react.ReactApplication;
+import com.lewin.qrcode.QRScanReaderPackage;
 import com.reactlibrary.messagecompose.RNMessageComposePackage;
 import com.chirag.RNMail.RNMail;
 //import com.horcrux.svg.SvgPackage;
@@ -42,14 +43,14 @@ import org.pgsqlite.SQLitePluginPackage;
 
 public class MainApplication extends Application implements ShareApplication, ReactApplication {
 
-  CallbackManager mCallbackManager = new CallbackManager.Factory().create();
+    CallbackManager mCallbackManager = new CallbackManager.Factory().create();
 
     @Override
     public String getFileProviderAuthority() {
         return "th.dna.provider";
     }
 
-  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
     public boolean getUseDeveloperSupport() {
       return BuildConfig.DEBUG;
@@ -59,6 +60,7 @@ public class MainApplication extends Application implements ShareApplication, Re
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new QRScanReaderPackage(),
             new RNMessageComposePackage(),
             new RNMail(),
 //            new SvgPackage(),

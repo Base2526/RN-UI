@@ -13,6 +13,7 @@
 		00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302DC1ABCB9D200DB3ED1 /* libRCTNetwork.a */; };
 		00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302E41ABCB9EE00DB3ED1 /* libRCTVibration.a */; };
 		00E356F31AD99517003FC87E /* RN_UITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* RN_UITests.m */; };
+		036905C0482A4DA397C03CD0 /* libQRCode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F6FEE793098403EB1D658A6 /* libQRCode.a */; };
 		11D1A2F320CAFA9E000508D9 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		133E29F31AD74F7200F7D852 /* libRCTLinking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 78C398B91ACF4ADC00677621 /* libRCTLinking.a */; };
 		139105C61AF99C1200B5F7CC /* libRCTSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 139105C11AF99BAD00B5F7CC /* libRCTSettings.a */; };
@@ -54,7 +55,6 @@
 		6051380C21B50F8B0046D911 /* libRCTCameraRoll.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 605137E321B50ED00046D911 /* libRCTCameraRoll.a */; };
 		607B986021C0C6C800AB0CBF /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 607B984321C0BB3D00AB0CBF /* libRNDeviceInfo.a */; };
 		608A2781221FE06F0093DE6C /* libRNMail.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 608A277A221FE05F0093DE6C /* libRNMail.a */; };
-		608A2786221FF3DA0093DE6C /* RNMessageCompose in Resources */ = {isa = PBXBuildFile; fileRef = 608A2785221FF3DA0093DE6C /* RNMessageCompose */; };
 		6099C96522200F8B00B6F046 /* haha.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6099C96422200F8B00B6F046 /* haha.swift */; };
 		6099C9692220102100B6F046 /* RNMessageCompose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6099C9672220102000B6F046 /* RNMessageCompose.swift */; };
 		6099C96A2220102100B6F046 /* RNMessageComposeBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 6099C9682220102100B6F046 /* RNMessageComposeBridge.m */; };
@@ -458,6 +458,13 @@
 			remoteGlobalIDString = 46FEDE8A1AFF192F00D3261C;
 			remoteInfo = RNMailTests;
 		};
+		60BCAD7822204F9C006DE7CA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6F8552FECD6A48B0B944BF4C /* QrCode.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 07FD4BE520874AB3002FBD31;
+			remoteInfo = QRCode;
+		};
 		60F8B5E521F57F8600F10F48 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 60F8B5AF21F57F8500F10F48 /* RNShare.xcodeproj */;
@@ -541,7 +548,6 @@
 		605137D821B50ED00046D911 /* RCTCameraRoll.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTCameraRoll.xcodeproj; path = "../node_modules/react-native/Libraries/CameraRoll/RCTCameraRoll.xcodeproj"; sourceTree = "<group>"; };
 		607B983D21C0BB3D00AB0CBF /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNDeviceInfo.xcodeproj; path = "../node_modules/react-native-device-info/ios/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; };
 		608A2742221FE05F0093DE6C /* RNMail.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNMail.xcodeproj; path = "../node_modules/react-native-mail/RNMail.xcodeproj"; sourceTree = "<group>"; };
-		608A2785221FF3DA0093DE6C /* RNMessageCompose */ = {isa = PBXFileReference; lastKnownFileType = folder; name = RNMessageCompose; path = "../node_modules/react-native-message-compose/ios/RNMessageCompose"; sourceTree = "<group>"; };
 		6099C96322200F8B00B6F046 /* RN_UI-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RN_UI-Bridging-Header.h"; sourceTree = "<group>"; };
 		6099C96422200F8B00B6F046 /* haha.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = haha.swift; sourceTree = "<group>"; };
 		6099C9662220102000B6F046 /* RNMessageCompose-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RNMessageCompose-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -555,6 +561,7 @@
 		65905BFD330C4B9584164E60 /* RNImagePicker.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNImagePicker.xcodeproj; path = "../node_modules/react-native-image-picker/ios/RNImagePicker.xcodeproj"; sourceTree = "<group>"; };
 		688B080E5BC44368B1B0D48F /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		6ECE58078C2E4CD6BB58C892 /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
+		6F8552FECD6A48B0B944BF4C /* QrCode.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = QrCode.xcodeproj; path = "../node_modules/react-native-qr-scanner/ios/QrCode.xcodeproj"; sourceTree = "<group>"; };
 		76DF252D0D354D5FBC91E74E /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = ReactNativePermissions.xcodeproj; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; };
 		771BE37CB7AC470F8D3BD071 /* RNCamera.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNCamera.xcodeproj; path = "../node_modules/react-native-camera/ios/RNCamera.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
@@ -567,6 +574,7 @@
 		89C297FBAF0C4314B57E3929 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		89C6410B67A0CFBDAD9EE9A0 /* Pods-RN_UITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RN_UITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-RN_UITests/Pods-RN_UITests.release.xcconfig"; sourceTree = "<group>"; };
 		8D54157EF2AF6C3EBF5959E5 /* libPods-RN_UI-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RN_UI-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F6FEE793098403EB1D658A6 /* libQRCode.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libQRCode.a; sourceTree = "<group>"; };
 		93EFB1D31B044688A035E90C /* libRNFirebase.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFirebase.a; sourceTree = "<group>"; };
 		953E1094C35F454FA44935B5 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		9A2DF2D9023B4E7D89C5E968 /* RCTContacts.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTContacts.xcodeproj; path = "../node_modules/react-native-contacts/ios/RCTContacts.xcodeproj"; sourceTree = "<group>"; };
@@ -637,6 +645,7 @@
 				C7439A51DEBF480884798316 /* libReactNativePermissions.a in Frameworks */,
 				6EB7211D4BE443EB9FAF7B9C /* libRCTFBSDK.a in Frameworks */,
 				F6725F9C19F83F51F3F3BF76 /* libPods-RN_UI.a in Frameworks */,
+				036905C0482A4DA397C03CD0 /* libQRCode.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -751,10 +760,7 @@
 		13B07FAE1A68108700A75B9A /* RN_UI */ = {
 			isa = PBXGroup;
 			children = (
-				6099C9662220102000B6F046 /* RNMessageCompose-Bridging-Header.h */,
-				6099C9672220102000B6F046 /* RNMessageCompose.swift */,
-				6099C9682220102100B6F046 /* RNMessageComposeBridge.m */,
-				608A2785221FF3DA0093DE6C /* RNMessageCompose */,
+				6099C96B2220117900B6F046 /* RNMessageCompose */,
 				600A0188221E55D00008A21F /* idnaicons.ttf */,
 				60CE1A2821E3A5210014523D /* GoogleService-Info.plist */,
 				60F92ABD21C3A0E100AC5145 /* www */,
@@ -873,6 +879,7 @@
 				E7224421C84C44118C051A70 /* libRNTwitterSignIn.a */,
 				93EFB1D31B044688A035E90C /* libRNFirebase.a */,
 				B0E80BF1C876457DBAD7758D /* libRNImgToBase64.a */,
+				8F6FEE793098403EB1D658A6 /* libQRCode.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -968,6 +975,24 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		6099C96B2220117900B6F046 /* RNMessageCompose */ = {
+			isa = PBXGroup;
+			children = (
+				6099C9662220102000B6F046 /* RNMessageCompose-Bridging-Header.h */,
+				6099C9672220102000B6F046 /* RNMessageCompose.swift */,
+				6099C9682220102100B6F046 /* RNMessageComposeBridge.m */,
+			);
+			name = RNMessageCompose;
+			sourceTree = "<group>";
+		};
+		60BCAD7522204F9C006DE7CA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				60BCAD7922204F9C006DE7CA /* libQRCode.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		60F8B5B021F57F8500F10F48 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -1038,6 +1063,7 @@
 				76DF252D0D354D5FBC91E74E /* ReactNativePermissions.xcodeproj */,
 				4D4F4550A4EF4D6CBF951B1F /* RCTFBSDK.xcodeproj */,
 				2A04F8AD8C3B4136B739C29E /* RNFirebase.xcodeproj */,
+				6F8552FECD6A48B0B944BF4C /* QrCode.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1217,6 +1243,10 @@
 				{
 					ProductGroup = 6039E56321B0DB4D00B34E68 /* Products */;
 					ProjectRef = 9A9F70335B704A9CBCB29714 /* FastImage.xcodeproj */;
+				},
+				{
+					ProductGroup = 60BCAD7522204F9C006DE7CA /* Products */;
+					ProjectRef = 6F8552FECD6A48B0B944BF4C /* QrCode.xcodeproj */;
 				},
 				{
 					ProductGroup = 00C302A81ABCB8CE00DB3ED1 /* Products */;
@@ -1687,6 +1717,13 @@
 			remoteRef = 608A277B221FE05F0093DE6C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		60BCAD7922204F9C006DE7CA /* libQRCode.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libQRCode.a;
+			remoteRef = 60BCAD7822204F9C006DE7CA /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		60F8B5E621F57F8600F10F48 /* libRNShare.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1745,7 +1782,6 @@
 				DC7CBE9223484D19943DFA65 /* EvilIcons.ttf in Resources */,
 				327378A1ED144DD8996B5882 /* Feather.ttf in Resources */,
 				4E74DDC0B8004333A2BCB125 /* FontAwesome.ttf in Resources */,
-				608A2786221FF3DA0093DE6C /* RNMessageCompose in Resources */,
 				2E6827BC590E4C4B8D2310E4 /* FontAwesome5_Brands.ttf in Resources */,
 				F3A22616C251496DAE3B2A41 /* FontAwesome5_Regular.ttf in Resources */,
 				74C40EE8E6684E379B68EEAC /* FontAwesome5_Solid.ttf in Resources */,
@@ -2010,11 +2046,15 @@
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-image-base64/ios",
+					"$(SRCROOT)/../node_modules/react-native-qr-scanner/ios/QrCode",
 				);
 				INFOPLIST_FILE = RN_UITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -2046,11 +2086,15 @@
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-image-base64/ios",
+					"$(SRCROOT)/../node_modules/react-native-qr-scanner/ios/QrCode",
 				);
 				INFOPLIST_FILE = RN_UITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -2088,6 +2132,7 @@
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-qr-scanner/ios/QrCode",
 				);
 				INFOPLIST_FILE = RN_UI/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -2133,6 +2178,7 @@
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-qr-scanner/ios/QrCode",
 				);
 				INFOPLIST_FILE = RN_UI/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -2177,10 +2223,14 @@
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-image-base64/ios",
+					"$(SRCROOT)/../node_modules/react-native-qr-scanner/ios/QrCode",
 				);
 				INFOPLIST_FILE = "RN_UI-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -2220,10 +2270,14 @@
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-image-base64/ios",
+					"$(SRCROOT)/../node_modules/react-native-qr-scanner/ios/QrCode",
 				);
 				INFOPLIST_FILE = "RN_UI-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -2262,10 +2316,14 @@
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-image-base64/ios",
+					"$(SRCROOT)/../node_modules/react-native-qr-scanner/ios/QrCode",
 				);
 				INFOPLIST_FILE = "RN_UI-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -2304,10 +2362,14 @@
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-image-base64/ios",
+					"$(SRCROOT)/../node_modules/react-native-qr-scanner/ios/QrCode",
 				);
 				INFOPLIST_FILE = "RN_UI-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",

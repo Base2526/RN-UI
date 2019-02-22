@@ -105,15 +105,15 @@ class InviteFriendByTextmessagePage extends React.Component{
           await MessageCompose.send({
             recipients: [phoneNumber],
             subject: 'Join me on DNA',
-            body: 'Join me on DNA, the all-in-one communication app!',
+            body: 'Join me on DNA, the all-in-one communication app! https://line.me/ti/p/2NH1U25c58',
             // ![NOTE] SMS attachments are not supported in Android.
-            attachments: [{
-              filename: 'mytext', // [Optional] If not provided, UUID will be generated.
-              ext: '.txt',
-              mimeType: 'text/plain',
-              text: 'Hello my friend', // Use this if the data is in UTF8 text.
-            //   data: '...BASE64_ENCODED_STRING...', // Or, use this if the data is not in plain text.
-            }],
+            // attachments: [{
+            //   filename: 'mytext', // [Optional] If not provided, UUID will be generated.
+            //   ext: '.txt',
+            //   mimeType: 'text/plain',
+            //   text: 'Hello my friend', // Use this if the data is in UTF8 text.
+            // //   data: '...BASE64_ENCODED_STRING...', // Or, use this if the data is not in plain text.
+            // }],
           });
         } catch (e) {
           // e.code may be 'cannotSendText' || 'cancelled' || 'failed'
