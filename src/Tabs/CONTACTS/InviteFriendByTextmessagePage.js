@@ -4,6 +4,8 @@ import Contacts from 'react-native-contacts';
 import { connect } from 'react-redux';
 import {Platform, PermissionsAndroid} from 'react-native'; 
 
+import MessageCompose from 'react-native-message-compose';
+
 import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
@@ -98,6 +100,26 @@ class InviteFriendByTextmessagePage extends React.Component{
         }
     }
 
+    async sendMessage(phoneNumber) {
+        try {
+          await MessageCompose.send({
+            recipients: [phoneNumber],
+            subject: 'Join me on DNA',
+            body: 'Join me on DNA, the all-in-one communication app!',
+            // ![NOTE] SMS attachments are not supported in Android.
+            attachments: [{
+              filename: 'mytext', // [Optional] If not provided, UUID will be generated.
+              ext: '.txt',
+              mimeType: 'text/plain',
+              text: 'Hello my friend', // Use this if the data is in UTF8 text.
+            //   data: '...BASE64_ENCODED_STRING...', // Or, use this if the data is not in plain text.
+            }],
+          });
+        } catch (e) {
+          // e.code may be 'cannotSendText' || 'cancelled' || 'failed'
+        }
+      }
+
     ItemSeparatorComponent = () => {
         return (
           <View
@@ -125,7 +147,7 @@ class InviteFriendByTextmessagePage extends React.Component{
                                 right:0,
                                 marginRight: 10}}
                         onPress={()=>{
-                            
+                            this.sendMessage(item.number)
                         }}>
                         <Text style={{fontWeight:'bold'}}>+ Invite</Text>
                     </TouchableOpacity>

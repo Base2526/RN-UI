@@ -54,6 +54,10 @@
 		6051380C21B50F8B0046D911 /* libRCTCameraRoll.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 605137E321B50ED00046D911 /* libRCTCameraRoll.a */; };
 		607B986021C0C6C800AB0CBF /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 607B984321C0BB3D00AB0CBF /* libRNDeviceInfo.a */; };
 		608A2781221FE06F0093DE6C /* libRNMail.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 608A277A221FE05F0093DE6C /* libRNMail.a */; };
+		608A2786221FF3DA0093DE6C /* RNMessageCompose in Resources */ = {isa = PBXBuildFile; fileRef = 608A2785221FF3DA0093DE6C /* RNMessageCompose */; };
+		6099C96522200F8B00B6F046 /* haha.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6099C96422200F8B00B6F046 /* haha.swift */; };
+		6099C9692220102100B6F046 /* RNMessageCompose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6099C9672220102000B6F046 /* RNMessageCompose.swift */; };
+		6099C96A2220102100B6F046 /* RNMessageComposeBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 6099C9682220102100B6F046 /* RNMessageComposeBridge.m */; };
 		60CE1A2921E3A5210014523D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 60CE1A2821E3A5210014523D /* GoogleService-Info.plist */; };
 		60F8B5EA21F57F8E00F10F48 /* libRNShare.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F8B5E621F57F8600F10F48 /* libRNShare.a */; };
 		60F92A6C21C370F600AC5145 /* libSQLite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F92A6B21C370B900AC5145 /* libSQLite.a */; };
@@ -537,6 +541,12 @@
 		605137D821B50ED00046D911 /* RCTCameraRoll.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTCameraRoll.xcodeproj; path = "../node_modules/react-native/Libraries/CameraRoll/RCTCameraRoll.xcodeproj"; sourceTree = "<group>"; };
 		607B983D21C0BB3D00AB0CBF /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNDeviceInfo.xcodeproj; path = "../node_modules/react-native-device-info/ios/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; };
 		608A2742221FE05F0093DE6C /* RNMail.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNMail.xcodeproj; path = "../node_modules/react-native-mail/RNMail.xcodeproj"; sourceTree = "<group>"; };
+		608A2785221FF3DA0093DE6C /* RNMessageCompose */ = {isa = PBXFileReference; lastKnownFileType = folder; name = RNMessageCompose; path = "../node_modules/react-native-message-compose/ios/RNMessageCompose"; sourceTree = "<group>"; };
+		6099C96322200F8B00B6F046 /* RN_UI-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RN_UI-Bridging-Header.h"; sourceTree = "<group>"; };
+		6099C96422200F8B00B6F046 /* haha.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = haha.swift; sourceTree = "<group>"; };
+		6099C9662220102000B6F046 /* RNMessageCompose-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RNMessageCompose-Bridging-Header.h"; sourceTree = "<group>"; };
+		6099C9672220102000B6F046 /* RNMessageCompose.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNMessageCompose.swift; sourceTree = "<group>"; };
+		6099C9682220102100B6F046 /* RNMessageComposeBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNMessageComposeBridge.m; sourceTree = "<group>"; };
 		60CE1A2821E3A5210014523D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		60F8B5AF21F57F8500F10F48 /* RNShare.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNShare.xcodeproj; path = "../node_modules/react-native-share/ios/RNShare.xcodeproj"; sourceTree = "<group>"; };
 		60F92A3421C370B800AC5145 /* SQLite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SQLite.xcodeproj; path = "../node_modules/react-native-sqlite-storage/src/ios/SQLite.xcodeproj"; sourceTree = "<group>"; };
@@ -741,6 +751,10 @@
 		13B07FAE1A68108700A75B9A /* RN_UI */ = {
 			isa = PBXGroup;
 			children = (
+				6099C9662220102000B6F046 /* RNMessageCompose-Bridging-Header.h */,
+				6099C9672220102000B6F046 /* RNMessageCompose.swift */,
+				6099C9682220102100B6F046 /* RNMessageComposeBridge.m */,
+				608A2785221FF3DA0093DE6C /* RNMessageCompose */,
 				600A0188221E55D00008A21F /* idnaicons.ttf */,
 				60CE1A2821E3A5210014523D /* GoogleService-Info.plist */,
 				60F92ABD21C3A0E100AC5145 /* www */,
@@ -751,6 +765,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				6099C96422200F8B00B6F046 /* haha.swift */,
+				6099C96322200F8B00B6F046 /* RN_UI-Bridging-Header.h */,
 			);
 			name = RN_UI;
 			sourceTree = "<group>";
@@ -1168,6 +1184,7 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = 32ENZ344NK;
+						LastSwiftMigration = 1010;
 						ProvisioningStyle = Automatic;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
@@ -1728,6 +1745,7 @@
 				DC7CBE9223484D19943DFA65 /* EvilIcons.ttf in Resources */,
 				327378A1ED144DD8996B5882 /* Feather.ttf in Resources */,
 				4E74DDC0B8004333A2BCB125 /* FontAwesome.ttf in Resources */,
+				608A2786221FF3DA0093DE6C /* RNMessageCompose in Resources */,
 				2E6827BC590E4C4B8D2310E4 /* FontAwesome5_Brands.ttf in Resources */,
 				F3A22616C251496DAE3B2A41 /* FontAwesome5_Regular.ttf in Resources */,
 				74C40EE8E6684E379B68EEAC /* FontAwesome5_Solid.ttf in Resources */,
@@ -1915,8 +1933,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6099C9692220102100B6F046 /* RNMessageCompose.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				6099C96A2220102100B6F046 /* RNMessageComposeBridge.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				6099C96522200F8B00B6F046 /* haha.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1969,6 +1990,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E3A9FA302198EDE7C19B4A80 /* Pods-RN_UITests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -2007,6 +2029,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 89C6410B67A0CFBDAD9EE9A0 /* Pods-RN_UITests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				HEADER_SEARCH_PATHS = (
@@ -2043,6 +2066,7 @@
 			baseConfigurationReference = 7A874998E337E24C9E6F1E0A /* Pods-RN_UI.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -2076,6 +2100,9 @@
 				PRODUCT_NAME = RN_UI;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "RN_UI-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -2085,6 +2112,7 @@
 			baseConfigurationReference = 1DCF7581E40306CC930253CE /* Pods-RN_UI.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -2116,6 +2144,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = th.dna;
 				PRODUCT_NAME = RN_UI;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "RN_UI-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -2338,6 +2368,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
+				NEW_SETTING = "";
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
@@ -2384,6 +2415,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				NEW_SETTING = "";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
