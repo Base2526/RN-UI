@@ -9,14 +9,22 @@ import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 var _ = require('lodash');
 import ActionButton from 'react-native-action-button';
+import {
+    MenuProvider,
+    Menu,
+    MenuContext,
+    MenuTrigger,
+    MenuOptions,
+    MenuOption,
+} from 'react-native-popup-menu';
 
 import * as actions from '../../Actions'
-import {getUid} from '../../Utils/Helpers'
+import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
 class ListClassMemberPage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
-        title: "Class members",
+        title: "List members",
         headerTintColor: '#C7D8DD',
         headerStyle: {
             backgroundColor: 'rgba(186, 53, 100, 1.0)',
@@ -150,7 +158,7 @@ class ListClassMemberPage extends React.Component{
                             return v.friend_id == kk
                         })
                 
-                newData.push( {...{friend_id:v.friend_id}, ...{member_item_id:k}, ...friend} )
+                newData.push( {...{friend_id:v.friend_id}, ...{member_key:k}, ...friend} )
             }
         })
 
@@ -172,49 +180,85 @@ class ListClassMemberPage extends React.Component{
         return (
           <View
             style={{
-              height: 1,
-              width: "100%",
+              height: .5,
+              width: "86%",
               backgroundColor: "#CED0CE",
-            //   marginLeft: "14%"
+              marginLeft: "14%"
             }}
           />
         );
     }
 
-    renderItem = ({item, index}) => { 
-        let swipeoutRight = [
-            {
-                component: <View style={{flex: 1, 
-                                        justifyContent:'center', 
-                                        alignItems:'center'}}>
-                                        <Text style={{color:'white', fontSize:18, fontWeight:'bold'}}>Delete</Text>
-                            </View>,
-                backgroundColor: 'red',
-                onPress: () => { 
-                    console.log(item)
-
-                    this.setState({loading:true})
-
-                    // console.log(this.props.uid, this.state.class_id, item.member_item_id)
-                    this.props.actionDeleteClassMember(this.props.uid, this.state.class_id, item.member_item_id, (result) => {
-                        console.log(result)
-                        this.setState({loading:false})
-                    })
-                }
-            }
-        ]
-
-        return( 
-            <Swipeout 
-                style={{backgroundColor:'white'}} 
-                right={swipeoutRight}>
-                <TouchableOpacity   
-                onPress={()=>{  
+    showMenu = (item)=>{
+        return( <View style={{flex:1,
+                              position:'absolute', 
+                              top:0,
+                              right:0, 
+                              marginRight:10,}}>
+                  <Menu>
+                    <MenuTrigger>
+                        <MyIcon 
+                            style={{padding:10}}
+                            name={'dot-vertical'}
+                            size={15}
+                            color={'gray'} />  
+                    </MenuTrigger>
+                    <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
+                        <MenuOption onSelect={() => {
                             this.props.navigation.navigate("FriendProfilePage",{'friend_id': item.friend_id})
-                            }}>
-                <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                        }}>
+                            <Text style={{padding:10, fontSize:18}}>View profile</Text>
+                        </MenuOption>
+                        <MenuOption onSelect={() => {
+                            this.setState({loading:true})
+                            this.props.actionDeleteClassMember(this.props.uid, this.state.class_id, item.member_key, (result) => {
+                                console.log(result)
+                                this.setState({loading:false})
+                            })
+                        }}>
+                            <Text style={{padding:10, fontSize:18}}>Remove from class</Text>
+                        </MenuOption>
+                    </MenuOptions>
+                </Menu>
+              </View>)
+    }
+
+    renderItem = ({item, index}) => { 
+        // let swipeoutRight = [
+        //     {
+        //         component: <View style={{flex: 1, 
+        //                                 justifyContent:'center', 
+        //                                 alignItems:'center'}}>
+        //                                 <Text style={{color:'white', fontSize:18, fontWeight:'bold'}}>Delete</Text>
+        //                     </View>,
+        //         backgroundColor: 'red',
+        //         onPress: () => { 
+        //             console.log(item)
+
+        //             this.setState({loading:true})
+
+        //             // console.log(this.props.uid, this.state.class_id, item.member_item_id)
+        //             this.props.actionDeleteClassMember(this.props.uid, this.state.class_id, item.member_item_id, (result) => {
+        //                 console.log(result)
+        //                 this.setState({loading:false})
+        //             })
+        //         }
+        //     }
+        // ]
+
+        return(
+        // <TouchableOpacity   
+        //         onPress={()=>{  
+        //                     this.props.navigation.navigate("FriendProfilePage",{'friend_id': item.friend_id})
+        //                     }}>
+                <View style={{flex:1, 
+                            //   height:100, 
+                              padding:10, 
+                              backgroundColor:'white', 
+                              flexDirection:'row', 
+                              alignItems:'center',}}>
                     <FastImage
-                        style={{width: 60, height: 60, borderRadius: 10, borderColor:'gray', borderWidth:1}}
+                        style={{width: 50, height: 50, borderRadius: 10, borderColor:'gray', borderWidth:.5}}
                         source={{
                             uri: item.profile.image_url,
                             headers:{ Authorization: 'someAuthToken' },
@@ -224,14 +268,16 @@ class ListClassMemberPage extends React.Component{
                     <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
                         <Text style={{fontSize:18}}>{item.profile.name}</Text>
                     </View>
+                    {this.showMenu(item)}
                 </View>
-                </TouchableOpacity>
-            </Swipeout>)
+                // </TouchableOpacity>
+                )
     }
 
     render() {
         let {renderContent, data} = this.state;
         return (
+            <MenuContext>
             <View style={{ flex:1}}>
             <Spinner
                 visible={this.state.loading}
@@ -246,41 +292,21 @@ class ListClassMemberPage extends React.Component{
                 extraData={data}
                 />
             }
-                <ActionButton buttonColor="rgba(231,76,60,1)"
+                <ActionButton 
+                    buttonColor="rgba(231,76,60,1)"
+                    hideShadow={true}
                     renderIcon={() => {
                         return(<MyIcon
-                            name={'plus'}
+                            name={'user-plus'}
                             size={25}
                             color={'#C7D8DD'} />)
-                        }}>
-                    <ActionButton.Item 
-                        buttonColor='#3498db' 
-                        title="Settings" 
-                        onPress={() => {
-                            this.props.navigation.navigate('ClasssSettingsPage', {'class_id':this.state.class_id})
-                        }}>
-                        <Text>
-                            <MyIcon
-                                name={'settings'}
-                                size={25}
-                                color={'#C7D8DD'} />
-                        </Text>
-                    </ActionButton.Item>
-                    <ActionButton.Item 
-                        buttonColor='#9b59b6' 
-                        title="Add Friend" 
-                        onPress={()=>{
-                            this.props.navigation.navigate("ClasssMemberAddFriend", {'class_id':this.state.class_id})
-                        }}>
-                        <Text>
-                            <MyIcon
-                                name={'user-plus'}
-                                size={25}
-                                color={'#C7D8DD'} />
-                        </Text>
-                    </ActionButton.Item>
+                        }}
+                    onPress={()=>{
+                        this.props.navigation.navigate("ClasssMemberAddFriend", {'class_id':this.state.class_id})
+                    }}>
                 </ActionButton>
             </View>
+            </MenuContext>
         );
     }
 }

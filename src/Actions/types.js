@@ -32,7 +32,7 @@ export const MODIFIED_GROUP_MEMBER  = "modified_group_member" // modified
 export const REMOVED_GROUP_MEMBER   = "removed_group_member"
 
 // ADDED_GROUP_ADMIN
-export const ADDED_GROUP_ADMIN     = "added_group_admin"
+// export const ADDED_GROUP_ADMIN     = "added_group_admin"
 export const MODIFIED_GROUP_ADMIN  = "modified_group_admin" // modified
 export const REMOVED_GROUP_ADMIN   = "removed_group_admin"
 

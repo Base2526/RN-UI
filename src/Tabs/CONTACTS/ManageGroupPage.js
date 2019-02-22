@@ -67,7 +67,7 @@ class ManageGroupPage extends React.Component{
             this.props.navigation.goBack(null)
         }
 
-        console.log(group)
+        // console.log(group)
 
         let members = {}
         _.each(group.members, (v, k)=>{
@@ -330,5 +330,4 @@ const mapStateToProps = (state) => {
         isConnected:state.offline.online,
     }
 }
-
 export default connect(mapStateToProps, actions)(ManageGroupPage);

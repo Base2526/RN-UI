@@ -24,7 +24,7 @@ import {USER_LOGIN_SUCCESS,
         ADDED_GROUP_MEMBER,
         MODIFIED_GROUP_MEMBER,
         REMOVED_GROUP_MEMBER,
-        ADDED_GROUP_ADMIN,
+        // ADDED_GROUP_ADMIN,
         MODIFIED_GROUP_ADMIN, 
         REMOVED_GROUP_ADMIN,
         ADDED_CLASS,
@@ -1965,6 +1965,7 @@ export default (state= INITIAL_STATE, action)=>{
             return state
         }
 
+        /*
         case ADDED_GROUP_ADMIN:{
             if(state.users === null){
                 return state
@@ -2030,9 +2031,9 @@ export default (state= INITIAL_STATE, action)=>{
                     console.log('equal')
                 }
             }
-
             return state
         }
+        */
 
         case ADDED_CLASS:{
             if(state.users === null){
@@ -2318,7 +2319,6 @@ export default (state= INITIAL_STATE, action)=>{
         }
 
         case REMOVED_CLASS_MEMBER:{
-
             if(state.users === null){
                 return state
             }
@@ -2335,14 +2335,12 @@ export default (state= INITIAL_STATE, action)=>{
             if(_class.members !== undefined){
                 let members = _class.members
                 let member = _.find(members,  function(v, k) { 
-                    return k == action.class_member_id && !v.status
+                    return k == action.member_key // && !v.status
                 })
 
                 if(member !== undefined){
-                    let newMembers = {...members, [action.class_member_id ]:{...member, status:false}}
-                    // console.log(newMembers)
-                    // let newMembers = _.omit(members, action.class_member_id)
-
+                    let newMembers = {...members, [action.member_key ]:{...member, status:false}}
+                    
                     let v = {
                         ...state,
                         users : {
@@ -2353,11 +2351,10 @@ export default (state= INITIAL_STATE, action)=>{
                             }
                         }
                     }  
-                    console.log("Classs", v)
+                    // console.log("Classs", v)
                     return v
                 }
             }
-
             return state
         }
 

@@ -39,22 +39,22 @@ class ClasssSettingsPage extends React.Component{
             elevation: 0,
             shadowOpacity: 0
           },
-          headerRight: (
-            <View style={{marginRight:10}}>
-                <TouchableOpacity
-                    style={{padding:5}}
-                    // disabled={isModify ? false: true}
-                    onPress={() => {
-                        const { params = {} } = navigation.state
-                        params.handleCancel()
-                    }}>
-                    <MyIcon
-                        name={'cancel'}
-                        size={25}
-                        color={'#C7D8DD'} />
-                </TouchableOpacity>
-            </View>
-        ),
+        //   headerRight: (
+        //     <View style={{marginRight:10}}>
+        //         <TouchableOpacity
+        //             style={{padding:5}}
+        //             // disabled={isModify ? false: true}
+        //             onPress={() => {
+        //                 const { params = {} } = navigation.state
+        //                 params.handleCancel()
+        //             }}>
+        //             <MyIcon
+        //                 name={'cancel'}
+        //                 size={25}
+        //                 color={'#C7D8DD'} />
+        //         </TouchableOpacity>
+        //     </View>
+        // ),
     });
 
     constructor(props) {

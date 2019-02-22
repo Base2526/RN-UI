@@ -13,9 +13,20 @@ import { connect } from 'react-redux';
 
 import FastImage from 'react-native-fast-image'
 import Spinner from 'react-native-loading-spinner-overlay';
+import {
+  MenuProvider,
+  Menu,
+  MenuContext,
+  MenuTrigger,
+  MenuOptions,
+  MenuOption,
+} from 'react-native-popup-menu';
+
+import ActionButton from 'react-native-action-button';
+
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
-import {getUid} from '../../Utils/Helpers'
+import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
 import MyIcon from '../../config/icon-font.js';
 
@@ -26,6 +37,7 @@ class FriendsPage extends React.Component{
         this.state = {
           renderContent: false,
           loading: false,
+          // data:[],
 
           sectionID: null,
           rowID: null,
@@ -35,18 +47,19 @@ class FriendsPage extends React.Component{
     componentDidMount() {
       setTimeout(() => {this.setState({renderContent: true})}, 0);
 
+      this.loadData()
     }
 
-    componentWillReceiveProps(nextProps){
-      /* 
-      check ว่ามี property auth ถ้าไม่มีแสดงข้อมูลอาจผิดพลาดเราจะไม่ทำอะไร
-      */
-      if(!nextProps.hasOwnProperty('auth')){
-        return;
-      }
+    // componentWillReceiveProps(nextProps){
+    //   /* 
+    //   check ว่ามี property auth ถ้าไม่มีแสดงข้อมูลอาจผิดพลาดเราจะไม่ทำอะไร
+    //   */
+    //   if(!nextProps.hasOwnProperty('auth')){
+    //     return;
+    //   }
 
-      // console.log('componentWillReceiveProps')
-    }
+    //   // console.log('componentWillReceiveProps')
+    // }
 
     loadData=()=>{
         let profile = {
@@ -141,7 +154,9 @@ class FriendsPage extends React.Component{
           member: friend_member
         }
 
-        return [profile, favorites, friendRequests, friendRequestSents, friends];        
+        return [profile, favorites, friendRequests, friendRequestSents, friends];     
+        
+        // this.setState({data})
     }
 
     _itemOnPress=(item, rowId, sectionId)=>{
@@ -150,6 +165,118 @@ class FriendsPage extends React.Component{
       }else{
         this.props.params.navigation.navigate("FriendProfilePage",{'friend_id': item.friend_id})
       }
+    }
+
+    showMenuFriend = (rowItem)=>{
+      console.log(rowItem)
+      return( <View style={{flex:1,
+                            position:'absolute', 
+                            top:0,
+                            right:0, 
+                            marginRight:10,}}>
+                <Menu>
+                  <MenuTrigger>
+                      <MyIcon 
+                          style={{padding:10}}
+                          name={'dot-vertical'}
+                          size={15}
+                          color={'gray'} />  
+                  </MenuTrigger>
+                  <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
+                      <MenuOption onSelect={() => {
+                        this.props.params.navigation.navigate("ChatPage")
+                      }}>
+                          <Text style={{padding:10, fontSize:18}}>Chat</Text>
+                      </MenuOption>
+                      <MenuOption onSelect={() => {
+                        let name = rowItem.change_friend_name ? rowItem.change_friend_name : rowItem.profile.name
+                  
+                        Alert.alert(
+                          '',
+                          'Hide '+ name +'?',
+                          [
+                            // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                            {text: 'Cancel', 
+                            onPress: () => {console.log("cancel")}, 
+                            style: 'cancel'},
+                            {text: 'OK', 
+                            onPress: () => {
+                                this.props.actionFriendHide(this.props.uid, rowItem.friend_id, (result)=>{
+                                  console.log(result)
+                                })
+                              }, 
+                            },
+                          ],
+                          { cancelable: false }
+                        )
+                      }}>
+                          <Text style={{padding:10, fontSize:18}}>Hide</Text>
+                      </MenuOption>
+                      <MenuOption onSelect={() => {
+                          let name = rowItem.change_friend_name ? rowItem.change_friend_name : rowItem.profile.name
+                  
+                          Alert.alert(
+                            '',
+                            'Block '+ name + '?',
+                            [
+                              // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                              {text: 'Cancel', 
+                              onPress: () => {console.log("cancel")}, 
+                              style: 'cancel'},
+                              {text: 'OK', 
+                              onPress: () => {
+                                 this.props.actionFriendBlock(this.props.uid, rowItem.friend_id, (result)=>{
+                                  console.log(result)
+                                })
+                              }, 
+                              },
+                            ],
+                            { cancelable: false }
+                          )
+
+                      }}>
+                          <Text style={{padding:10, fontSize:18}}>Block</Text>
+                      </MenuOption>
+                      <MenuOption onSelect={() => {
+                            let mute = false;
+                            if(rowItem.mute !== undefined){
+                              mute = !rowItem.mute
+                            }
+
+                            this.props.actionFriendMute(this.props.uid, rowItem.friend_id, mute,(result)=>{
+                              console.log(result)
+                            })
+                          }}>
+                          <Text style={{padding:10, fontSize:18}}>{rowItem.mute ? 'Mute': 'Unmute'}</Text>
+                      </MenuOption>
+
+                      <MenuOption onSelect={() => {
+                            // let mute = false;
+                            // if(rowItem.mute !== undefined){
+                            //   mute = !rowItem.mute
+                            // }
+
+                            // this.props.actionFriendMute(this.props.uid, rowItem.friend_id, mute,(result)=>{
+                            //   console.log(result)
+                            // })
+
+                            let is_favorite = false
+                            if(rowItem.is_favorite !== undefined){
+                                is_favorite = !rowItem.is_favorite
+                            }
+
+                            this.setState({loading:true})
+                            this.props.actionFriendFavirite(this.props.uid, rowItem.friend_id, is_favorite, (result) => {
+                                console.log(result)
+                                this.setState({loading:false})
+                            })
+
+                          }}>
+                          <Text style={{padding:10, fontSize:18}}>{rowItem.is_favorite ? 'Unfavorite': 'Favorite'}</Text>
+                      </MenuOption>
+                  </MenuOptions>
+              </Menu>
+            </View>)
     }
 
     _renderRow = (rowItem, rowId, sectionId) => {
@@ -183,7 +310,7 @@ class FriendsPage extends React.Component{
                       image_uri={rowItem.image_url}/> */}
 
                     <FastImage
-                      style={{width: 80, height: 80, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
+                      style={{width: 50, height: 50, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
                       source={{
                         uri: rowItem.image_url,
                         headers:{ Authorization: 'someAuthToken' },
@@ -335,20 +462,20 @@ class FriendsPage extends React.Component{
         }
 
         return (
-          <Swipeout 
-            style={{backgroundColor:'white'}} 
-            right={swipeoutRight}
-            left={swipeoutLeft}
-            rowID={rowId}
-            sectionID={sectionId}
-            onOpen={(sectionId, rowId) => {
-              this.setState({
-                sectionID: sectionId,
-                rowID: rowId,
-              })
-            }}
-            close={!(this.state.sectionID === sectionId && this.state.rowID === rowId)}
-            >
+          // <Swipeout 
+          //   style={{backgroundColor:'white'}} 
+          //   right={swipeoutRight}
+          //   left={swipeoutLeft}
+          //   rowID={rowId}
+          //   sectionID={sectionId}
+          //   onOpen={(sectionId, rowId) => {
+          //     this.setState({
+          //       sectionID: sectionId,
+          //       rowID: rowId,
+          //     })
+          //   }}
+          //   close={!(this.state.sectionID === sectionId && this.state.rowID === rowId)}
+          //   >
           <TouchableOpacity 
             key={rowId} 
             onPress={()=>{
@@ -368,14 +495,8 @@ class FriendsPage extends React.Component{
                   onPress={()=>{
                     this._itemOnPress(rowItem, rowId, sectionId)
                   }}>
-                      {/* <TestSVG 
-                        width={80}
-                        height={80}
-                        strokeWidth={3}
-                        image_uri={rowItem.profile.image_url}/> */}
-
-                      <FastImage
-                        style={{width: 80, height: 80, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
+                  <FastImage
+                        style={{width: 50, height: 50, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
                         source={{
                           uri: rowItem.profile.image_url,
                           headers:{ Authorization: 'someAuthToken' },
@@ -439,8 +560,9 @@ class FriendsPage extends React.Component{
                 : null
                 }
             </View>
+            {this.showMenuFriend(rowItem)}
           </TouchableOpacity>
-          </Swipeout>
+          // </Swipeout>
         )
     };
     
@@ -515,6 +637,7 @@ class FriendsPage extends React.Component{
       }
 
       return (
+        <MenuContext>
           <View style={{flex: 1}}>
           <Spinner
             visible={this.state.loading}
@@ -539,7 +662,23 @@ class FriendsPage extends React.Component{
               // onScroll={this.props.handleScroll}
             />
           }
+
+            <ActionButton 
+              buttonColor="rgba(231,76,60,1)"
+              offsetX={10} 
+              offsetY={10}
+              hideShadow={true}
+              renderIcon={() => {
+                  return(<MyIcon
+                      name={'user-plus'}
+                      size={25}
+                      color={'#C7D8DD'} />)
+                  }}
+              onPress={()=>{
+                  this.props.params.navigation.navigate("AddFriendsPage")
+              }} />
           </View>
+      </MenuContext>
       );
     }
 }

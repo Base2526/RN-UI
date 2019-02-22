@@ -46,16 +46,16 @@ class ManageMyApplicationPage extends React.Component{
             elevation: 0,
             shadowOpacity: 0
         },
-        headerRight: (
-            <TouchableOpacity
-                style={{marginRight:10}}
-                onPress={() => {
-                    const { params = {} } = navigation.state
-                    params.handlePost()
-                }}>
-                <Text style={{fontSize:18, fontWeight:'600', color:'white'}}>All post</Text>
-            </TouchableOpacity>
-          ),
+        // headerRight: (
+        //     <TouchableOpacity
+        //         style={{marginRight:10}}
+        //         onPress={() => {
+        //             const { params = {} } = navigation.state
+        //             params.handlePost()
+        //         }}>
+        //         <Text style={{fontSize:18, fontWeight:'600', color:'white'}}>All post</Text>
+        //     </TouchableOpacity>
+        //   ),
     })
 
     constructor(props) {

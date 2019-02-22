@@ -12,8 +12,19 @@ import { connect } from 'react-redux';
 import Spinner from 'react-native-loading-spinner-overlay';
 var _ = require('lodash');
 
+import {
+  MenuProvider,
+  Menu,
+  MenuContext,
+  MenuTrigger,
+  MenuOptions,
+  MenuOption,
+} from 'react-native-popup-menu';
+import ActionButton from 'react-native-action-button';
+
 import * as actions from '../../Actions'
-import {getUid} from '../../Utils/Helpers'
+import {getUid, getHeaderInset} from '../../Utils/Helpers'
+import MyIcon from '../../config/icon-font.js';
 
 class ClasssPage extends React.Component{
     constructor(props) {
@@ -83,6 +94,36 @@ class ClasssPage extends React.Component{
       );
     };
 
+    showMenuClasss = (item)=>{
+      return( <View style={{flex:1,
+                            position:'absolute', 
+                            top:0,
+                            right:0, 
+                            marginRight:10,}}>
+                <Menu>
+                  <MenuTrigger>
+                      <MyIcon 
+                          style={{padding:10}}
+                          name={'dot-vertical'}
+                          size={15}
+                          color={'gray'} />  
+                  </MenuTrigger>
+                  <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
+                      <MenuOption onSelect={() => {
+                        this.props.params.navigation.navigate("ListClassMemberPage", {'class_id': item.class_id})
+                      }}>
+                          <Text style={{padding:10, fontSize:18}}>List members</Text>
+                      </MenuOption>
+                      <MenuOption onSelect={() => {
+                          this.props.params.navigation.navigate('ClasssSettingsPage', {'class_id': item.class_id})
+                      }}>
+                          <Text style={{padding:10, fontSize:18}}>Settings</Text>
+                      </MenuOption>
+                  </MenuOptions>
+              </Menu>
+            </View>)
+    }
+
     countMembers = (item) =>{
       let count = 0
       if(item.members !== undefined){
@@ -151,32 +192,16 @@ class ClasssPage extends React.Component{
                         ]
       }
       
-      return (<Swipeout 
-                style={{backgroundColor:'white'}} 
-                right={swipeoutBtns}
-                rowID={index}
-                sectionID={0}
-                onOpen={(sectionId, rowId) => {
-                  this.setState({
-                    rowID: rowId,
-                  })
-                }}
-                close={!(this.state.rowID === index)}>
-          <TouchableOpacity key={ item.name } onPress={() => {
-            // this.props.params.navigation.navigate("ManageClasssPage", {'data': item, 'class_id':item.class_id})
-
-            this.props.params.navigation.navigate("ListClassMemberPage", {'class_id': item.class_id})
-          }}>
-            <View
+      return (<View
               style={{
                 alignItems: 'center', 
                 padding: 10,
                 flexDirection: 'row'
               }}>
                 <TouchableOpacity 
-                    style={{height:80,
-                            width: 80,
-                            borderRadius: 40,
+                    style={{height: 50,
+                            width: 50,
+                            borderRadius: 25,
                             borderColor:'#DF2D6C',
                             borderWidth:3,
                             justifyContent:'center',
@@ -186,9 +211,9 @@ class ClasssPage extends React.Component{
                       this.props.params.navigation.navigate("ManageClasssPage", {'data': item, 'class_id':item.class_id})
                     }}>
                   <FastImage
-                    style={{width: 64, 
-                            height: 64, 
-                            borderRadius: 32}}
+                    style={{width: 40, 
+                            height: 40, 
+                            borderRadius: 20}}
                     source={{
                       uri: item.image_url,
                       headers:{ Authorization: 'someAuthToken' },
@@ -213,11 +238,22 @@ class ClasssPage extends React.Component{
                     {this.countMembers(item)} Users
                   </Text>
                 </View>
-            </View>
-          </TouchableOpacity>
-        </Swipeout>
-        )
+                {this.showMenuClasss(item)}
+            </View>)
     }
+
+    FlatListItemSeparator = () => {
+      return (
+        <View
+          style={{
+            height: .5,
+            width: "86%",
+            backgroundColor: "#CED0CE",
+            marginLeft: "14%"
+          }}
+        />
+      );
+    };
   
     render() {
       let { renderContent } = this.state;
@@ -228,6 +264,7 @@ class ClasssPage extends React.Component{
 
       console.log(this.state.data)
       return (
+        <MenuContext>
         <View style={{flex:1}}>
         <Spinner
           visible={this.state.loading}
@@ -241,13 +278,29 @@ class ClasssPage extends React.Component{
             data={this.state.data}
             renderItem={this.renderItem}
             keyExtractor = { (item, index) => index.toString() } 
-            ItemSeparatorComponent={this.renderSeparator}
+            ItemSeparatorComponent = {this.FlatListItemSeparator}
             ListFooterComponent={this.renderFooter}
             onEndReachedThreshold={50}
             extraData={this.state}
           />
         }
+
+            <ActionButton 
+              buttonColor="rgba(231,76,60,1)"
+              offsetX={10} 
+              offsetY={10}
+              hideShadow={true}
+              renderIcon={() => {
+                  return(<MyIcon
+                      name={'plus'}
+                      size={25}
+                      color={'#C7D8DD'} />)
+                  }}
+              onPress={()=>{
+                  this.props.params.navigation.navigate("AddClasssPage")
+              }} />
         </View>
+        </MenuContext>
       );
     }
 }

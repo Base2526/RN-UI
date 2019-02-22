@@ -25,6 +25,7 @@
 .icon-all-app:before { content: '\e817'; } /* '' */
 .icon-dot-horizontal:before { content: '\e818'; } /* '' */
 .icon-dot-vertical:before { content: '\e819'; } /* '' */
+.icon-check-ok:before { content: '\e81a'; } /* '' */
 .icon-menu:before { content: '\f0c9'; } /* '' */
 .icon-dot-circled:before { content: '\f192'; } /* '' */
 .icon-user-plus:before { content: '\f234'; } /* '' */

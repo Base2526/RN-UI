@@ -181,11 +181,11 @@ export default class ListCenterPage extends React.Component {
   }
 
   renderSectionHeader = ({ section }) => {
-    return (<View style={{}}>
-              <Text>{section.title}</Text>
+    return (<View>
+              <Text style={{padding:5}}>{section.title}</Text>
               <View
                 style={{
-                  height: 1,
+                  height: .5,
                   width: "100%",
                   backgroundColor: "#CED0CE",
                 }}
@@ -207,17 +207,21 @@ export default class ListCenterPage extends React.Component {
 
     // console.log(item)
     return (
-      <View style={{height: 120, 
-                    width: 100, 
-                    flex:1,
+      <View style={{flex:1,
                     justifyContent:'center', 
-                    alignItems:'center' }}>
+                    alignItems:'center',
+                    // backgroundColor:'red',
+                    padding:10
+                    }}>
         <TouchableOpacity 
             onPress={()=>{
               this.props.params.navigation.navigate("ApplicationDetailPage")
             }}>
             <FastImage
-                style={{width: 80, height: 80, borderRadius: 40}}
+                style={{width: 50, 
+                        height: 50, 
+                        borderRadius: 25,
+                        }}
                 source={{
                 uri: 'https://unsplash.it/400/400?image=1',
                 headers:{ Authorization: 'someAuthToken' },

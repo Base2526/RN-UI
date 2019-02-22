@@ -11,13 +11,21 @@ import FastImage from 'react-native-fast-image'
 import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 // import Image from 'react-native-remote-svg'
+import {
+  MenuProvider,
+  Menu,
+  MenuContext,
+  MenuTrigger,
+  MenuOptions,
+  MenuOption,
+} from 'react-native-popup-menu';
+import ActionButton from 'react-native-action-button';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 import MyIcon from '../../config/icon-font.js';
 
-import Spinner from 'react-native-loading-spinner-overlay';
-
 import * as actions from '../../Actions'
-import {getUid} from '../../Utils/Helpers'
+import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
 class ListMyAppPage extends React.Component{
     constructor(props) {
@@ -90,65 +98,6 @@ class ListMyAppPage extends React.Component{
       );
     };
 
-    renderItem =({ item, index }) => {
-
-      var swipeoutBtns = [
-        {
-          component:<View style={{flex: 1, 
-                                  alignItems: "center", 
-                                  justifyContent: "center", 
-                                  backgroundColor: 'red',
-                                  }}>
-                      <Text style={{fontWeight:'bold', 
-                                    color:'white',
-                                    textAlign:'center',
-                                    fontSize:16}}>DELETE</Text>
-                    </View>,
-          onPress: () => {
-            alert('Delete')
-          }
-        },
-      ]
-      return(
-        <Swipeout 
-            key={item.item_id}
-            style={{backgroundColor:'white'}} 
-            right={swipeoutBtns}
-            
-            >
-            <TouchableOpacity  
-              onPress={() => {
-                this.props.params.navigation.navigate("ApplicationDetailPage")
-              }}>
-                <View
-                  style={{
-                    alignItems: 'center', 
-                    padding: 10,
-                    flexDirection: 'row'
-                  }}>
-                    <TouchableOpacity
-                        onPress={()=>{
-                          this.props.params.navigation.navigate("ApplicationDetailPage")
-                        }}
-                        >
-                        <FastImage
-                            style={{width: 80, height: 80, borderRadius: 40}}
-                            source={{
-                            uri: item.image_url,
-                            headers:{ Authorization: 'someAuthToken' },
-                            priority: FastImage.priority.normal,
-                            }}
-                            resizeMode={FastImage.resizeMode.cover}
-                        />
-                    </TouchableOpacity>
-                    <Text style={{paddingLeft: 10}}>
-                        {item.name}
-                    </Text>
-                </View>
-              </TouchableOpacity>
-            </Swipeout>)
-    }
-
     loadData=()=>{
       let {my_applications} = this.props.auth.users
 
@@ -192,6 +141,44 @@ class ListMyAppPage extends React.Component{
         })
       }
     }
+
+    showMenu = (rowItem)=>{
+      return( <View style={{flex:1,
+                            position:'absolute', 
+                            top:0,
+                            right:0, 
+                            marginRight:10,}}>
+                <Menu>
+                  <MenuTrigger>
+                      <MyIcon 
+                          style={{padding:10}}
+                          name={'dot-vertical'}
+                          size={15}
+                          color={'gray'} />  
+                  </MenuTrigger>
+                  <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
+                      <MenuOption onSelect={() => {
+                          // this.props.navigation.navigate("FriendProfilePage",{'friend_id': item.friend_id})
+
+                          this.props.params.navigation.navigate("MyApplicationMyPost")
+                      }}>
+                          <Text style={{padding:10, fontSize:18}}>All post</Text>
+                      </MenuOption>
+                      <MenuOption onSelect={() => {
+                          // this.setState({loading:true})
+                          // this.props.actionDeleteClassMember(this.props.uid, this.state.class_id, item.member_key, (result) => {
+                          //     console.log(result)
+                          //     this.setState({loading:false})
+                          // })
+                          this.manageMyApplicationPage(rowItem)
+                      }}>
+                          <Text style={{padding:10, fontSize:18}}>Settings</Text>
+                      </MenuOption>
+                  </MenuOptions>
+              </Menu>
+            </View>)
+    }
+
 
     _renderRow = (rowItem, rowId, sectionId) => {
       console.log(rowItem)
@@ -274,27 +261,27 @@ class ListMyAppPage extends React.Component{
       swipeoutRightBtns = []
 
       return (
-        <Swipeout 
-            // key={item.item_id}
-            style={{backgroundColor:'white'}} 
-            right={swipeoutRightBtns}
+        // <Swipeout 
+        //     // key={item.item_id}
+        //     style={{backgroundColor:'white'}} 
+        //     right={swipeoutRightBtns}
             
-            rowID={rowId}
-            sectionID={sectionId}
-            // onOpen={(sectionId, rowId) => {
-            //   this.setState({
-            //     sectionID: sectionId,
-            //     rowID: rowId,
-            //   })
-            // }}
-            close={(this.state.sectionID === sectionId && this.state.rowID === rowId)}>
-        <TouchableOpacity 
-          key={ rowId } 
-          onPress={()=>{
-            // this._itemOnPress(rowItem, rowId, sectionId)
+        //     rowID={rowId}
+        //     sectionID={sectionId}
+        //     // onOpen={(sectionId, rowId) => {
+        //     //   this.setState({
+        //     //     sectionID: sectionId,
+        //     //     rowID: rowId,
+        //     //   })
+        //     // }}
+        //     close={(this.state.sectionID === sectionId && this.state.rowID === rowId)}>
+        // {/* <TouchableOpacity 
+        //   key={ rowId } 
+        //   onPress={()=>{
+        //     // this._itemOnPress(rowItem, rowId, sectionId)
           
-            this.manageMyApplicationPage(rowItem)
-          }}>
+        //     this.manageMyApplicationPage(rowItem)
+        //   }}> */}
           <View
             style={{
               alignItems: 'center', 
@@ -302,14 +289,14 @@ class ListMyAppPage extends React.Component{
               borderColor: '#E4E4E4',
               flexDirection: 'row',
             }}>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={()=>{
                   // this.props.params.navigation.navigate("ManageMyApplicationPage", {item: rowItem})
                 
                   this.manageMyApplicationPage(rowItem)
-                }}>
+                }}> */}
                   <FastImage
-                      style={{width: 80, height: 80, borderRadius: 40}}
+                      style={{width: 50, height: 50, borderRadius: 25}}
                       source={{
                       uri: rowItem.image_url,
                       headers:{ Authorization: 'someAuthToken' },
@@ -317,7 +304,7 @@ class ListMyAppPage extends React.Component{
                       }}
                       resizeMode={FastImage.resizeMode.cover}
                   />
-              </TouchableOpacity>
+              {/* </TouchableOpacity> */}
               <View>
                 <Text style={{fontSize: 18, 
                               fontWeight: '600',
@@ -327,9 +314,10 @@ class ListMyAppPage extends React.Component{
                     {rowItem.name}
                 </Text>
               </View>
+              {this.showMenu(rowItem)}
           </View>
-        </TouchableOpacity>
-        </Swipeout>
+        // {/* </TouchableOpacity> */}
+        // </Swipeout>
       )
     }
 
@@ -375,6 +363,7 @@ class ListMyAppPage extends React.Component{
 
       console.log(this.state.showSpinner)
       return (
+        <MenuContext>
         <View style={{flex:1}}>
         <Spinner
                 visible={this.state.showSpinner}
@@ -398,7 +387,24 @@ class ListMyAppPage extends React.Component{
               openOptions={[0, 1, 2, 3]}
             />
         }
+        <ActionButton 
+              buttonColor="rgba(231,76,60,1)"
+              offsetX={10} 
+              offsetY={10}
+              hideShadow={true}
+              renderIcon={() => {
+                  return(<MyIcon
+                      name={'plus'}
+                      size={25}
+                      color={'#C7D8DD'} />)
+                  }}
+              onPress={()=>{
+                  // this.props.params.navigation.navigate("AddFriendsPage")
+
+                  this.props.params.navigation.navigate("CreateApplicationPage")
+              }} />
         </View>
+        </MenuContext>
       );
     }
 }

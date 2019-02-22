@@ -22,24 +22,24 @@ class home extends Component {
         let __headerRight
         switch(params.positionSelect){
             case 0:{
-                __headerRight = 
-                <View style={{flexDirection:'row'}}>
-                    <TouchableOpacity
-                        style={{height: 25,
-                                width: 25,
-                                alignItems:'center', 
-                                marginRight:10}}
-                        onPress={() => {
-                            const { params = {} } = navigation.state
-                            params.handleAddNewApplication()
-                        }}>
-                        <MyIcon
-                            name={'plus'}
-                            size={25}
-                            color={'#C7D8DD'}
-                            />
-                    </TouchableOpacity>
-                </View>
+                // __headerRight = 
+                // <View style={{flexDirection:'row'}}>
+                //     <TouchableOpacity
+                //         style={{height: 25,
+                //                 width: 25,
+                //                 alignItems:'center', 
+                //                 marginRight:10}}
+                //         onPress={() => {
+                //             const { params = {} } = navigation.state
+                //             params.handleAddNewApplication()
+                //         }}>
+                //         <MyIcon
+                //             name={'plus'}
+                //             size={25}
+                //             color={'#C7D8DD'}
+                //             />
+                //     </TouchableOpacity>
+                // </View>
             }
             break
             case 1:{

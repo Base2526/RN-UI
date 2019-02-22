@@ -160,9 +160,9 @@ const index = createStackNavigator({
     'ChangeFriendsName': {
       screen: ChangeFriendsName
     },
-    // 'ClasssMemberAddFriend': {
-    //   screen: ClasssMemberAddFriend
-    // },
+    'ClasssSettingsPage': {
+      screen: ClasssSettingsPage
+    },
 },{
 //   initialRouteName: 'Base',
 // headerMode: "screen",
@@ -228,6 +228,12 @@ const ListGroupMemberNavigator = createStackNavigator(
   {
     'ListGroupMemberPage': {screen: ListGroupMemberPage},
     'GroupMemberInvite': {screen: GroupMemberInvite},
+    'FriendProfilePage': {
+      screen: FriendProfilePage,
+      navigationOptions: {
+        // title: 'Friend Profile',
+      }
+    },
   },
   {
     // headerMode: 'none',

@@ -11,11 +11,11 @@ import ExpandableList from 'react-native-expandable-section-flatlist'
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
 import firebase from 'react-native-firebase';
-
-import Swipeout from 'react-native-swipeout'
+import Spinner from 'react-native-loading-spinner-overlay';
 import {
     MenuProvider,
     Menu,
+    MenuContext,
     MenuTrigger,
     MenuOptions,
     MenuOption,
@@ -23,8 +23,8 @@ import {
 
 var _ = require('lodash');
 import ActionButton from 'react-native-action-button';
-import * as actions from '../../Actions'
 
+import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
 import MyIcon from '../../config/icon-font.js';
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
@@ -34,6 +34,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
     constructor(){
         super();
         this.state = { 
+            loading: false,
             renderContent: false,
             data:[],
             group_id :0,
@@ -49,6 +50,8 @@ class ListGroupMember_TabMembersPage extends React.Component{
         this.setState({group_id}, ()=>{
             this.loadData(this.props)
         })
+
+        // console.log(getHeaderInset())
     }
 
     componentWillReceiveProps(nextProps) {
@@ -274,6 +277,124 @@ class ListGroupMember_TabMembersPage extends React.Component{
         return(<View />)
     }
 
+    showMenuMembers = (rowItem)=>{
+        console.log(rowItem)
+
+        let {uid} = this.props
+        let {group_id} = this.state
+        let {friend, friend_id} = rowItem
+        // console.log(rowItem)
+        return( <Menu>
+                    <MenuTrigger>
+                        <MyIcon 
+                            style={{padding:10}}
+                            name={'dot-vertical'}
+                            size={15}
+                            color={'#C7D8DD'} />  
+                    </MenuTrigger>
+                    <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
+                        <MenuOption onSelect={() => {
+                            Alert.alert(
+                                'Add group admin',
+                                'As a group admin ' + friend.profile.name + ' will be able to manage the group and remove members from the conversation. They will be able to remove other admins.',
+                                [
+                                
+                                // {text: 'Leave group', onPress: () => console.log('Leave group')},
+                                {
+                                    text: 'Cancel',
+                                    onPress: () => console.log('Cancel Pressed'),
+                                    style: 'cancel',
+                                },
+                                {text: 'Make admin', onPress: () => {
+                                    this.setState({loading:true})
+                                    this.props.actionMakeAdminGroup(uid, group_id, friend_id, (result) => {
+                                        this.setState({loading:false})
+        
+                                        console.log(result)
+                                    })
+                                }},
+                                ],
+                                {cancelable: false},
+                            );
+                        }}>
+                            <Text style={{padding:10, fontSize:18}}>Make admin</Text>
+                        </MenuOption>
+                        <MenuOption onSelect={() => {
+
+                            this.props.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
+                            // this.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
+                        }}>
+                            <Text style={{padding:10, fontSize:18}}>View profile</Text>
+                        </MenuOption>
+                        <MenuOption onSelect={() => {console.log('Remove from group')}}>
+                            <Text style={{padding:10, fontSize:18}}>Remove from group</Text>
+                        </MenuOption>
+                    </MenuOptions>
+                </Menu>)
+    }
+
+    showMenuPending = (rowItem)=>{
+
+        let {group_id} = this.state
+        let {uid} = this.props
+
+        let {friend_id, member_key} = rowItem
+
+        return( <Menu>
+                    <MenuTrigger>
+                        <MyIcon 
+                            style={{padding:10}}
+                            name={'dot-vertical'}
+                            size={15}
+                            color={'#C7D8DD'} />  
+                    </MenuTrigger>
+                    <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
+                        <MenuOption onSelect={() => {
+                            this.props.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
+                        }}>
+                            <Text style={{padding:10, fontSize:18}}>View profile</Text>
+                        </MenuOption>
+                        <MenuOption onSelect={() => {
+                             this.setState({loading:true})
+                             this.props.actionCanceledGroupMember(uid, group_id, friend_id, member_key, (result) => {
+                                 this.setState({loading:false})
+ 
+                                 console.log(result)
+                             })
+                        }}>
+                            <Text style={{padding:10, fontSize:18}}>Cancel</Text>
+                        </MenuOption>
+                        {/*
+                        <MenuOption onSelect={() => {console.log('Navigation Home')}}>
+                            <Text style={{padding:10, fontSize:18}}>Navigation Home</Text>
+                        </MenuOption> */}
+                    </MenuOptions>
+                </Menu>)
+    }
+
+    showMenu = ()=>{
+        return( <Menu>
+                    <MenuTrigger>
+                        <MyIcon 
+                            style={{padding:10}}
+                            name={'dot-vertical'}
+                            size={15}
+                            color={'#C7D8DD'} />  
+                    </MenuTrigger>
+                    <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
+                        <MenuOption onSelect={() => {console.log('Navigation Login')}}>
+                            <Text style={{padding:10, fontSize:18}}>Navigation Login</Text>
+                        </MenuOption>
+                        <MenuOption onSelect={() => {console.log('Navigation Register')}}>
+                            <Text style={{padding:10, fontSize:18}}>Navigation Register</Text>
+                        </MenuOption>
+                        <MenuOption onSelect={() => {console.log('Navigation Home')}}>
+                            <Text style={{padding:10, fontSize:18}}>Navigation Home</Text>
+                        </MenuOption>
+                    </MenuOptions>
+                </Menu>)
+    }
+
     _renderRow = (rowItem, rowId, sectionId) => {
 
         console.log(rowItem)
@@ -326,15 +447,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                     </View>
                                 </View>
                                 <View style={{position:'absolute', right:0, marginRight:10}}>
-                                    <TouchableOpacity
-                                            style={{padding:5}}
-                                            onPress={()=>{
-                                                alert('menu')
-                                            }}>
-                                        <MyIcon name={'dot-vertical'}
-                                            size={20}
-                                            color={'#C7D8DD'} />  
-                                    </TouchableOpacity>
+                                    {this.showMenuMembers(rowItem)} 
                                 </View>
                             </View>)
                 }
@@ -368,15 +481,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                 </View>
                             </View>
                             <View style={{position:'absolute', right:0, marginRight:10}}>
-                                <TouchableOpacity
-                                        style={{padding:5}}
-                                        onPress={()=>{
-                                            alert('menu')
-                                        }}>
-                                    <MyIcon name={'dot-vertical'}
-                                        size={20}
-                                        color={'#C7D8DD'} />  
-                                </TouchableOpacity>
+                                {this.showMenuMembers(rowItem)} 
                             </View>
                         </View>)
             }
@@ -404,11 +509,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
                 if(rowItem.friend_id === uid){
                     let {profiles} = this.props
-                    return( 
-                        <Swipeout 
-                            style={{backgroundColor:'white'}} 
-                            right={swipeoutRight}>
-                            <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                    return( <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                                 <TouchableOpacity>
                                     <FastImage
                                         style={{width: 60,  
@@ -432,15 +533,13 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                         {this.checkInvitor(rowItem)}
                                     </View>
                                 </View>
-                            </View>
-                        </Swipeout>)
+                                <View style={{position:'absolute', right:0, marginRight:10}}>
+                                    {this.showMenuPending(rowItem)} 
+                                </View>
+                            </View>)
                 }
 
-                return( 
-                    <Swipeout 
-                        style={{backgroundColor:'white'}} 
-                        right={swipeoutRight}>
-                        <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                return( <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                             <TouchableOpacity>
                                 <FastImage
                                     style={{width: 60,  
@@ -464,18 +563,16 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                     {this.checkInvitor(rowItem)}
                                 </View>
                             </View>
-                        </View>
-                    </Swipeout>)
+                            <View style={{position:'absolute', right:0, marginRight:10}}>
+                                    {this.showMenuPending(rowItem)} 
+                            </View>
+                        </View>)
             }
 
             case Constant.GROUP_STATUS_MEMBER_DECLINE:{
                 if(rowItem.friend_id === uid){
                     let {profiles} = this.props
-                    return( 
-                        <Swipeout 
-                            style={{backgroundColor:'white'}} 
-                            right={swipeoutRight}>
-                            <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                    return( <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                                 <TouchableOpacity>
                                     <FastImage
                                         style={{width: 60,  
@@ -499,8 +596,10 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                         {this.checkInvitor(rowItem)}
                                     </View>
                                 </View>
-                            </View>
-                        </Swipeout>)
+                                <View style={{position:'absolute', right:0, marginRight:10}}>
+                                    {this.showMenu()} 
+                                </View>
+                            </View>)
                 }
 
                 return(<View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
@@ -586,6 +685,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                         justifyContent: 'space-between', 
                         alignItems: 'center', 
                         borderBottomWidth: 0.5,
+                        borderBottomColor: '#E4E4E4' 
                         }}>
             <View style={{ flexDirection: 'row', 
                         alignItems: 'center'}}>
@@ -595,7 +695,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                 {section + "(" + m_length +")"}
                 </Text>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginRight:10 }}>
                 {ic_collapse}
             </View>
             </View>
@@ -603,8 +703,14 @@ class ListGroupMember_TabMembersPage extends React.Component{
     }
       
     render() {
-        return (<View style={{flex:1}}>
-                    
+        return (<MenuContext>
+                    <View style={{flex:1}}>
+                        <Spinner
+                            visible={this.state.loading}
+                            textContent={'Wait...'}
+                            textStyle={{color: '#FFF'}}
+                            overlayColor={'rgba(0,0,0,0.5)'}
+                            />
                         <ExpandableList
                             style={{flex:1}}
                             ref={instance => this.ExpandableList = instance}
@@ -616,28 +722,28 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             } }
                             renderSectionHeaderX={this._renderSection}
                             openOptions={[0, 1, 2]}
-                            removeClippedSubviews={false}
+                            // removeClippedSubviews={false}
                         />
-                    
-                    <ActionButton 
-                        buttonColor="rgba(231,76,60,1)"
-                        renderIcon={() => {
-                            return(<MyIcon
-                                name={'user-plus'}
-                                size={25}
-                                color={'#C7D8DD'} />)
-                            }}
-                        onPress={()=>{
-                            this.props.props.navigation.navigate("GroupMemberInvite", {'group_id':this.state.group_id})
-                        }}>
-                    </ActionButton>
-                </View>
+                        <ActionButton 
+                            buttonColor="rgba(231,76,60,1)"
+                            renderIcon={() => {
+                                return(<MyIcon
+                                    name={'user-plus'}
+                                    size={25}
+                                    color={'#C7D8DD'} />)
+                                }}
+                            onPress={()=>{
+                                this.props.props.navigation.navigate("GroupMemberInvite", {'group_id':this.state.group_id})
+                            }}>
+                        </ActionButton>
+                    </View>
+                </MenuContext>
         );
     }
 }
 
 const mapStateToProps = (state) => {
-    // console.log(state)
+    console.log(state)
 
     if(!state._persist.rehydrated){
       return {}

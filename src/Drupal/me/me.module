@@ -14330,7 +14330,7 @@ function create_chat_group(){
   $user_name    = $user_profile->field_profile_display_name[LANGUAGE_NONE][0]['value'];
 
   $f_members = array();
-  $group_admins = array();
+  // $group_admins = array();
 
   // $m_profile = getNameImageURLFriend($param_uid);
   
@@ -14345,6 +14345,7 @@ function create_chat_group(){
   $member_v['field_mg_status'][LANGUAGE_NONE][0]['tid']                  = '36';
   $member_v['field_members_group_invitor'][LANGUAGE_NONE][0]['value']    =  $param_uid;
   $member_v['field_object_id'][LANGUAGE_NONE][0]['value']                =  $objectId;
+  $member_v['field_is_admin'][LANGUAGE_NONE][0]['value']                 =  "1";
 
   $member_field_entity = entity_create('field_collection_item', $member_v);
   $member_field_entity->setHostEntity('node', $node);
@@ -14355,6 +14356,7 @@ function create_chat_group(){
   $m_profile['invitor']   = $param_uid;
   $m_profile['status']    = '36';
   $m_profile['item_id']   = $member_field_entity->item_id;
+  $m_profile['is_admin']  = TRUE;
   $f_members[$objectId]   = $m_profile;
 
   // $nycRef = $db->collection('cities')->document('NYC');
@@ -14366,6 +14368,7 @@ function create_chat_group(){
   
 
   // Add group admins
+  /*
   $group_admin = array();
   $group_admin['field_name'] = 'field_group_admins';
   $group_admin['field_group_admins_uid'][LANGUAGE_NONE][0]['value']  = $param_uid;
@@ -14384,6 +14387,7 @@ function create_chat_group(){
 
   $nycRef =firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->collection('admins')->document($key_admin);
   $batch->set($nycRef, $admin, ['merge' => true]);
+  */
 
   /*
 
@@ -14435,9 +14439,14 @@ function create_chat_group(){
   $result['group']   = $f_v;
 
 
+  watchdog(TAG, '@ : %v', array('%v'=> serialize($param_members)), WATCHDOG_INFO);
+
   // $members   = array_keys($param_members);
   // foreach ($members as $members_key => $members_friend_id){
   foreach ($param_members as $members_friend_id){
+
+    watchdog(TAG, '@@ : %v', array('%v'=> $members_friend_id), WATCHDOG_INFO);
+
 
     // if(strcmp($param_uid, $members_friend_id) == 0){
     //   // กรณี  members_friend_id == param_uid ก็คือคนสร้างกลุ่มสนทนาเราจะให้สถานะเป้น joined 
@@ -14456,8 +14465,9 @@ function create_chat_group(){
     // $member_v['field_members_group_friend_name'][LANGUAGE_NONE][0]['value']= $m_profile['friend_name'];
     // $member_v['field_path_uri'][LANGUAGE_NONE][0]['value']                 = $m_profile['friend_image_url'];
     $member_v['field_mg_status'][LANGUAGE_NONE][0]['tid']                  = '35';
-    $member_v['field_members_group_invitor'][LANGUAGE_NONE][0]['value']    =  $param_uid;
-    $member_v['field_object_id'][LANGUAGE_NONE][0]['value']                =  $objectId;
+    $member_v['field_members_group_invitor'][LANGUAGE_NONE][0]['value']    = $param_uid;
+    $member_v['field_object_id'][LANGUAGE_NONE][0]['value']                = $objectId;
+    $member_v['field_is_admin'][LANGUAGE_NONE][0]['value']                 = "0";
 
     $member_field_entity = entity_create('field_collection_item', $member_v);
     $member_field_entity->setHostEntity('node', $node);
@@ -14468,6 +14478,7 @@ function create_chat_group(){
     $m_profile['invitor'] = $param_uid;
     $m_profile['status'] = '35';
     $m_profile['item_id'] = $member_field_entity->item_id;
+    $m_profile['is_admin'] = FALSE;
 
     $f_members[$objectId] = $m_profile;
     
@@ -14557,7 +14568,7 @@ function create_chat_group(){
   $result['result']       = TRUE;
   $result['group_profile']= $f_item;
   $result['members']      = $f_members;
-  $result['group_admins'] = $group_admins;
+  // $result['group_admins'] = $group_admins;
   // $result['t']            = $t;
 
   /*

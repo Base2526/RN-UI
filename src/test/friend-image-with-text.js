@@ -19,7 +19,6 @@ import {getStatusBarHeight} from '../Utils/Helpers'
 
 import ImageWithDefault from '../Utils/ImageWithDefault'
 
-import TestSVG from './TestSVG'
 
 const remote = 'http://s1.bwallpapers.com/wallpapers/2014/05/09/blue-full-hd-desktop-wallpapers_034316171.jpg';
 
@@ -81,21 +80,18 @@ export default class FriendBackgroundImage extends React.Component {
               resizeMode={FastImage.resizeMode.cover}
             />
             <View style={{flexDirection:'row', margin:20}}>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                    
                   >
 
-                  {/* <ImageWithDefault 
-                      source={{uri: image_url}}
-                      style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}
-                  />       */}
+             
 
                     <TestSVG 
                       width={100}
                       height={100}
                       strokeWidth={3}
                       image_uri={image_url}/> 
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <View style={{justifyContent: 'flex-end', }}>
                 <Text style={{fontSize:22, marginLeft:10, color:'white'}}>{name}</Text>
               </View>

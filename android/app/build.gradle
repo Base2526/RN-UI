@@ -166,14 +166,13 @@ android {
 }
 
 dependencies {
-//    compile project(':react-native-svg')
-    implementation project(':react-native-svg') {
-        buildscript {
-            repositories {
-                maven { url = "https://dl.bintray.com/android/android-tools/" }
-            }
-        }
-    }
+//    implementation project(':react-native-svg') {
+//        buildscript {
+//            repositories {
+//                maven { url = "https://dl.bintray.com/android/android-tools/" }
+//            }
+//        }
+//    }
     implementation project(':react-native-share') {
         buildscript {
             repositories {

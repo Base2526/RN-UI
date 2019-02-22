@@ -15,6 +15,12 @@ import ScrollableTabView, {ScrollableTabBar, DefaultTabBar} from 'react-native-s
 import Swipeout from 'react-native-swipeout'
 
 import ActionButton from 'react-native-action-button';
+import Menu, {
+    MenuContext,
+    MenuOptions,
+    MenuOption,
+    MenuTrigger
+  } from 'react-native-popup-menu';
 
 var _ = require('lodash');
 import ImageWithDefault from '../../Utils/ImageWithDefault'
@@ -27,6 +33,7 @@ import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
 import ListGroupMember_TabMembersPage from './ListGroupMember_TabMembersPage'
 import ListGroupMember_TabAdminPage from './ListGroupMember_TabAdminPage'
+
 class ListGroupMemberPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
@@ -90,6 +97,8 @@ class ListGroupMemberPage extends React.Component{
         this.setState({group_id}, ()=>{
             this.loadData(this.props)
         })
+
+        
     }
 
     componentWillReceiveProps(nextProps) {
@@ -117,7 +126,12 @@ class ListGroupMemberPage extends React.Component{
         //     positionSelect:i
         // })
     }
+
+    handlerGoToPage = (index) =>{
+        this.scrollableTabView.goToPage(index)
+    }
       
+    // 
     render() {
         let {group_id} = this.state
 
@@ -125,20 +139,24 @@ class ListGroupMemberPage extends React.Component{
             return (<View />)
         }
 
-        return(<ScrollableTabView
-                // style={{height:500}}
-                initialPage={0}
-                renderTabBar={() => <DefaultTabBar />}
-                locked={true}
-                tabBarPosition='top'
-                //  contentProps={...props}
-                tabBarTextStyle={{fontSize:15}}
-                onChangeTab={this.handleChangeTab.bind(this)}>
-                <ListGroupMember_TabMembersPage tabLabel='Members' index={0} amount={4} params={this.state} props={this.props}/>
-                <ListGroupMember_TabAdminPage tabLabel='Admins' index={1} amount={5} params={this.state} props={this.props}/>
-            
+        return(
+                <ScrollableTabView
+                    ref={(ref) => { this.scrollableTabView = ref; }}
+                    // style={{height:500}}
+                    initialPage={0}
+                    renderTabBar={() => <DefaultTabBar />}
+                    locked={true}
+                    tabBarPosition='top'
+                    //  contentProps={...props}
+                    tabBarTextStyle={{fontSize:15}}
+                    onChangeTab={this.handleChangeTab.bind(this)}
+                    >
+                    <ListGroupMember_TabMembersPage tabLabel='Members' index={0} amount={4} params={this.state} props={this.props}/>
+                    <ListGroupMember_TabAdminPage tabLabel='Admins' index={1} amount={5} params={this.state} props={this.props} handlerGoToPage={this.handlerGoToPage}/>
                 
-            </ScrollableTabView>)
+                </ScrollableTabView>
+            // </MenuContext>
+            )
     }
 }
 

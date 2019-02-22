@@ -25,7 +25,7 @@ import {USER_LOGIN_SUCCESS,
         MODIFIED_GROUP_MEMBER,
         REMOVED_GROUP_MEMBER,
 
-        ADDED_GROUP_ADMIN,
+        // ADDED_GROUP_ADMIN,
         MODIFIED_GROUP_ADMIN, // modified
         REMOVED_GROUP_ADMIN,
 
@@ -337,7 +337,8 @@ export const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
                                  status: data.group.status, 
                                  group_profile: data.group_profile,
                                  members: data.members,
-                                 group_admins: data.group_admins}
+                                //  group_admins: data.group_admins
+                                }
 
                 console.log(newData)
                 console.log(data.item_id)
@@ -559,8 +560,6 @@ export const actionGroupInviteMember = (uid, group_id, members, callback) => dis
             // console.log(snapshot)
             if(snapshot.size == 0){
                 let key = randomKey()
-                
-                
 
                 let batch = firebase.firestore().batch();
 
@@ -613,6 +612,42 @@ export const actionGroupInviteMember = (uid, group_id, members, callback) => dis
                 })
             }
         })
+    })
+}
+
+// Group MakeAdmin
+export const actionMakeAdminGroup = (uid, group_id, frind_id, callback) => dispatch =>{
+    firebase.firestore().collection('groups').doc(group_id).collection('members').where('friend_id', '==', frind_id).get().then(snapshot => {
+        console.log(snapshot)
+        if(snapshot.size == 0){
+            callback({'status':false, 'message':'Friend not found.'})
+        }else{
+            snapshot.docs.forEach(doc => {
+                firebase.firestore().collection('groups').doc(group_id).collection('members').doc(doc.id).set({
+                    is_admin: true
+                }, { merge: true});
+            })
+
+            callback({'status':true})
+        }
+    })
+}
+
+// Remove as admin
+export const actionRemoveAsAdminGroup = (uid, group_id, frind_id, callback) => dispatch =>{
+    firebase.firestore().collection('groups').doc(group_id).collection('members').where('friend_id', '==', frind_id).get().then(snapshot => {
+        console.log(snapshot)
+        if(snapshot.size == 0){
+            callback({'status':false, 'message':'Friend not found.'})
+        }else{
+            snapshot.docs.forEach(doc => {
+                firebase.firestore().collection('groups').doc(group_id).collection('members').doc(doc.id).set({
+                    is_admin: false
+                }, { merge: true});
+            })
+
+            callback({'status':true})
+        }
     })
 }
 
@@ -681,11 +716,11 @@ export const actionClassAddMember = (uid, class_id, members, callback) => dispat
 }
 
 // REMOVED_CLASS_MEMBER
-export const actionDeleteClassMember = (uid, class_id, class_member_id, callback) => dispatch =>{
+export const actionDeleteClassMember = (uid, class_id, member_key, callback) => dispatch =>{
     // users/{userId}/classs/{classId}/members/{key}
-    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(class_member_id).set({status: false}, { merge: true})
-    dispatch({type: REMOVED_CLASS_MEMBER, class_id, class_member_id})
-    callback({'status':true, uid, class_id, class_member_id})
+    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(member_key).set({status: false}, { merge: true})
+    dispatch({type: REMOVED_CLASS_MEMBER, class_id, member_key})
+    callback({'status':true})
 }
 
 export const actionUpdateClassPictureProfile = (uid, class_id, image_uri) => dispatch =>{
@@ -1604,6 +1639,7 @@ export function watchTaskEvent(uid, dispatch) {
                     MODIFIED_GROUP_ADMIN, // modified
                     REMOVED_GROUP_ADMIN,
                     */
+                   /*
                     firebase.firestore().collection('groups').doc(change.doc.id).collection('admins').onSnapshot((querySnapshot) => {
                         querySnapshot.docChanges.forEach(function(admins_change) {
 
@@ -1641,6 +1677,7 @@ export function watchTaskEvent(uid, dispatch) {
                             }
                         })
                     })
+                    */
                     
                     break;
                 }

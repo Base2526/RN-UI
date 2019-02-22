@@ -13,7 +13,7 @@ import { Header } from 'react-navigation';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import FastImage from 'react-native-fast-image'
 import {getStatusBarHeight} from '../Utils/Helpers'
-import TestSVG from './TestSVG'
+
 
 // https://thekevinscott.com/background-images-in-react-native/
 export default class BackgroundImage extends React.Component {
@@ -49,13 +49,13 @@ export default class BackgroundImage extends React.Component {
           resizeMode={FastImage.resizeMode.cover}
         />
         <View style={{flexDirection:'row', margin:20}}>
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
               <TestSVG 
                   width={100}
                   height={100}
                   strokeWidth={3}
                   image_uri={image_url}/> 
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <View style={{justifyContent: 'flex-end', }}>
             <Text style={{fontSize:22, marginLeft:10, color:'white'}}>{name}</Text>
           </View>

@@ -34,14 +34,16 @@ class AuthLoadingScreen extends React.Component {
 
     _bootstrapAsync = () => {
 
-        if(this.props.auth.isLogin){
+        if(this.props.auth === undefined){
+            this.props.navigation.navigate('Auth');
+        }else if(this.props.auth.isLogin){
             // console.log(this.props.uid)
             this.props.watchTaskEvent(this.props.uid, this.props.dispatch)
             this.props.navigation.navigate('App');
         }else{
             this.props.navigation.navigate('Auth');
         }
-    };
+    }
 
     // Render any loading content that you like here
     render() {

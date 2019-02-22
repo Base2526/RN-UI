@@ -10,7 +10,7 @@ import { View,
      } from 'react-native';
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
-import Image from 'react-native-remote-svg'
+import MyIcon from '../../config/icon-font.js';
 
 import * as actions from '../../Actions'
 
@@ -120,21 +120,11 @@ class ListAllCategory extends Component {
       let __check = null
       if(this.state.category_select != null){
         if(this.state.category_select.tid == item.tid) 
-          __check = <View style={{position:'absolute', right:0, paddingRight:10}}><Image
-                              style={{ width: 15, height: 15}}
-                              source={{uri:`data:image/svg+xml;utf8,<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                              width="512.000000pt" height="512.000000pt" viewBox="0 0 512.000000 512.000000"
-                              preserveAspectRatio="xMidYMid meet">
-                            <metadata>
-                            Created by potrace 1.15, written by Peter Selinger 2001-2017
-                            </metadata>
-                            <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-                            fill="#000000" stroke="none">
-                            <path d="M3168 2973 l-1538 -1538 -610 610 -610 610 -207 -208 -208 -207 818
-                            -818 817 -817 1745 1745 c960 960 1745 1750 1745 1755 0 13 -392 405 -405 405
-                            -6 0 -702 -692 -1547 -1537z"/>
-                            </g>
-                            </svg>`}} />
+          __check = <View style={{position:'absolute', right:0, paddingRight:10}}>
+                    <MyIcon
+                      name={'check-ok'}
+                      size={25}
+                      color={'gray'} />
                     </View>
       }
       

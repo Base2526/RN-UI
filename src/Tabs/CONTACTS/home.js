@@ -56,7 +56,7 @@ const _header = props => (
                     size={25}
                     color={'#C7D8DD'} />
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 style={{height: 25,
                         width: 30,
                         alignItems:'center',
@@ -70,7 +70,7 @@ const _header = props => (
                     name={'plus'}
                     size={25}
                     color={'#C7D8DD'} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
                 style={{height: 25,
                         width: 30,

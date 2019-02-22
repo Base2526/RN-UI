@@ -214,7 +214,7 @@ class ClasssMemberAddFriend extends React.Component{
                     this.onSeleted(index)
                 }}>
                 <View style={{flex:1, 
-                    height:100, 
+                    // height:100, 
                     padding:10, 
                     marginRight:10,
                     backgroundColor:'white', 
@@ -226,8 +226,8 @@ class ClasssMemberAddFriend extends React.Component{
                         size={30}
                         color={seleted ? '#E9E9E9' : '#DF2D6C'} />
                         <FastImage
-                            style={{width: 60, 
-                                    height: 60, 
+                            style={{width: 50, 
+                                    height: 50, 
                                     borderRadius: 10, 
                                     backgroundColor: '#FF83AF',
                                     }}
@@ -249,8 +249,8 @@ class ClasssMemberAddFriend extends React.Component{
         return (
           <View
             style={{
-              height: 1,
-              width: "100%",
+              height: .5,
+              width: "86%",
               backgroundColor: "#CED0CE",
               marginLeft: "14%"
             }}

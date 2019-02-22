@@ -6,13 +6,22 @@ import {View,
 import ExpandableList from 'react-native-expandable-section-flatlist'
 import { connect } from 'react-redux';
 import FastImage from 'react-native-fast-image'
-import Swipeout from 'react-native-swipeout'
 import Spinner from 'react-native-loading-spinner-overlay';
 var _ = require('lodash');
 
+import {
+  MenuProvider,
+  Menu,
+  MenuContext,
+  MenuTrigger,
+  MenuOptions,
+  MenuOption,
+} from 'react-native-popup-menu';
+import ActionButton from 'react-native-action-button';
+
 import Constant from '../../Utils/Constant'
 import * as actions from '../../Actions'
-import {getUid} from '../../Utils/Helpers'
+import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
 class GroupsPage extends React.Component{
@@ -102,105 +111,147 @@ class GroupsPage extends React.Component{
               })).length
     }
 
-    renderItem = ({item, index}) => { 
-      // console.log(index)
-      let swipeoutRight = [{component:<View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
-                                        <Text style={{fontWeight:'bold', color:'white', fontSize:16, textAlign:'center'}}>DELETE GROUP</Text>
-                                      </View>,
-                            backgroundColor: 'blue',
-                              onPress: () => { 
-                                Alert.alert(
-                                  '',
-                                  'การลบกลุ่มจะลบได้เฉพาะตอนเทสระบบเท่านั้น',
-                                  [
-                                  //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-                                    {text: 'Cancel', onPress: () => {
+    /* 
+    
+    let is_favorites = true;
+    if(group.is_favorites !== undefined){
+        is_favorites = !group.is_favorites
+    }
+    this.setState({loading:true})
+    this.props.actionFavoritesGroup(this.props.uid, group_id, is_favorites, (result) => {
+        // console.log(result)
+        this.setState({loading:false})
+    })
+    */
 
-                                    }, style: 'cancel'},
-                                    {text: 'OK', onPress: () => {
-                                      console.log(item) // group_id
+    favorites = (group_id, status) =>{
+      this.setState({loading:true})
+      this.props.actionFavoritesGroup(this.props.uid, group_id, status, (result) => {
+          this.setState({loading:false})
+      })
+    }
 
-                                      // this.setState({loading:true})
-                                      // this.props.actionDeleteGroup(this.props.uid, item.group_id, (result) => {
-                                      //   console.log(result)
+    showMenuInvited = (rowItem)=>{
+      let {uid} = this.props
+      let {members, group_id} = rowItem
 
-                                      //   this.setState({loading:false})
-                                      // })
-                                    }},
-                                  ],
-                                  { cancelable: false }
-                                )
-                              }
-                            },{
-                            component:<View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
-                                        <Text style={{fontWeight:'bold', color:'white', fontSize:16, textAlign:'center'}}>LEAVE GROUP</Text>
-                                      </View>,
-                            backgroundColor: 'red',
-                            onPress: () => { 
-                              Alert.alert(
-                                '',
-                                'If you leave this group, you\'ll no longer be able to see its member list or chat history Continue?',
-                                [
-                                //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-                                  {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-                                  {text: 'OK', onPress: () => console.log('OK Pressed')},
-                                ],
-                                { cancelable: false }
-                              )
+      let member_key = _.findKey(members,  function(v, k) { 
+        return v.friend_id == uid
+      })
+
+      return( <View style={{flex:1,position:'absolute', right:0, marginRight:10}}>
+                <Menu>
+                  <MenuTrigger>
+                      <MyIcon 
+                          style={{padding:10}}
+                          name={'dot-vertical'}
+                          size={15}
+                          color={'gray'} />  
+                  </MenuTrigger>
+                  <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
+                      <MenuOption onSelect={() => {
+                            
+                            if(member_key !== undefined){
+                              this.setState({loading:true})
+                              this.props.actionMemberJoinGroup(uid, group_id, member_key, (result) => {
+                                console.log(result)
+                                setTimeout(() => {
+                                  this.setState({loading:false})
+                                }, 200);
+                              })
+                            }else{
+                              console.log(member_key)
                             }
-                          }]
+                          }}>
+                          <Text style={{padding:10, fontSize:18}}>Join</Text>
+                      </MenuOption>
+                      <MenuOption onSelect={() => {
+                            if(member_key !== undefined){
+                              this.setState({loading:true})
+                              this.props.actionMemberDeclineGroup(uid, group_id, member_key, (result) => {
+                                setTimeout(() => {
+                                  this.setState({loading:false})
+                                }, 200);
+                              })
+                            }else{
+                              console.log(member_key)
+                            }
+                          }}>
+                          <Text style={{padding:10, fontSize:18}}>Decline</Text>
+                      </MenuOption>
+                  </MenuOptions>
+              </Menu>
+            </View>)
+    }
 
-      return(
-        <Swipeout 
-          style={{backgroundColor:'white'}} 
-          right={swipeoutRight}
-          rowID={index}
-          sectionID={0}
-          onOpen={(sectionId, rowId) => {
-            this.setState({
-              sectionID: sectionId,
-              rowID: rowId,
-            })
-          }}
-          close={!(this.state.rowID === index)}
-          >
-          <TouchableOpacity 
-            key={item.item_id} 
-            onPress={() => {
-              this.props.params.navigation.navigate("ManageGroupPage", {'group_id': item.group_id}) 
-            }}>
-            <View
-              style={{
-                alignItems: 'center', 
-                padding: 10,
-                flexDirection: 'row'
-              }}>
-                <TouchableOpacity
-                  style={{width: 80, height: 80, borderRadius: 40}}
-                  onPress={() => {
-                    this.props.params.navigation.navigate("ManageGroupPage", {'group_id': item.group_id}) 
-                  }}>
-                  <FastImage
-                      style={{width: 80, height: 80, borderRadius: 40, borderWidth:.5, borderColor:'gray'}}
-                      source={{
-                        uri: item.group_profile.image_url,
-                        headers:{ Authorization: 'someAuthToken' },
-                        priority: FastImage.priority.normal,
-                      }}
-                      resizeMode={FastImage.resizeMode.cover}
-                    />
-                </TouchableOpacity>
-                <View style={{paddingLeft: 10}}>
-                  <Text style={{fontSize: 18, 
-                                fontWeight: '600', 
-                                paddingBottom:5
-                              }}>
-                      {item.group_profile.name} ({ Object.keys(item.members).length })
-                  </Text>
-                </View>
-            </View>
-          </TouchableOpacity>
-      </Swipeout>)
+    showMenuGroup = (rowItem)=>{
+      let {members, group_id, item_id} = rowItem
+      let {uid} = this.props
+
+      var member = _.find(members, function(item, key) {
+        return item.friend_id == uid
+      })
+
+      return( <View style={{flex:1,
+                            position:'absolute', 
+                            top:0,
+                            right:0, 
+                            marginRight:10,}}>
+                <Menu>
+                  <MenuTrigger>
+                      <MyIcon 
+                          style={{padding:10}}
+                          name={'dot-vertical'}
+                          size={15}
+                          color={'gray'} />  
+                  </MenuTrigger>
+                  <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
+                      <MenuOption onSelect={() => {
+                        // if(member !== undefined){
+                        //   // console.log(rowItem, member)
+                        //   this.setState({loading:true})
+                        //   this.props.actionMemberLeaveGroup(uid, group_id, item_id, (result) => {
+                        //     console.log(result)
+                        //     setTimeout(() => {
+                        //       this.setState({loading:false})
+                        //     }, 200);
+                        //   })
+                        // }else{
+                        //   console.log(member)
+                        // }
+
+                        this.props.params.navigation.navigate("ChatPage")
+                      }}>
+                          <Text style={{padding:10, fontSize:18}}>Group Chat</Text>
+                      </MenuOption>
+
+                      {rowItem.is_favorites ? <MenuOption onSelect={() => {this.favorites(group_id, false)}}>
+                                                  <Text style={{padding:10, fontSize:18}}>Unfavorites</Text>
+                                              </MenuOption>:
+                                              <MenuOption onSelect={() => {this.favorites(group_id, true)}}>
+                                                  <Text style={{padding:10, fontSize:18}}>Favorites</Text>
+                                              </MenuOption>
+                      }
+                  </MenuOptions>
+              </Menu>
+            </View>)
+    }
+
+    actionAddGroup = () =>{
+      return(<ActionButton 
+        buttonColor="rgba(231,76,60,1)"
+        offsetX={10} 
+        offsetY={10}
+        hideShadow={true}
+        renderIcon={() => {
+            return(<MyIcon
+                name={'plus'}
+                size={25}
+                color={'#C7D8DD'} />)
+            }}
+        onPress={()=>{
+            this.props.params.navigation.navigate("AddGroupsPage")
+        }} />)
     }
 
     _renderSection = (section, sectionId, state)  => {
@@ -281,15 +332,15 @@ class GroupsPage extends React.Component{
                       style={{
                         alignItems: 'center', 
                         padding: 10,
-                        flexDirection: 'row'
+                        flexDirection: 'row',
                       }}>
                         <TouchableOpacity
-                          style={{width: 80, height: 80, borderRadius: 40}}
+                          // style={{width: 80, height: 80, borderRadius: 40}}
                           onPress={() => {
                             this.props.params.navigation.navigate("ManageGroupPage", {'group_id': rowItem.group_id}) 
                           }}>
                           <FastImage
-                              style={{width: 80, height: 80, borderRadius: 40, borderWidth:.5, borderColor:'gray'}}
+                              style={{width: 50, height: 50, borderRadius: 25, borderWidth:.5, borderColor:'gray'}}
                               source={{
                                 uri: rowItem.group_profile.image_url,
                                 headers:{ Authorization: 'someAuthToken' },
@@ -306,68 +357,7 @@ class GroupsPage extends React.Component{
                               {rowItem.group_profile.name} { rowItem.group_profile.members === undefined ? '' : "(" + Object.keys(rowItem.group_profile.members).length +")" }
                           </Text>
                         </View>
-                    </View>
-                  
-                    <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
-                      <TouchableOpacity
-                        style={{padding:5, 
-                                borderColor:'green', 
-                                borderRadius:10, 
-                                borderWidth:.5,
-                                marginRight:5}}
-                        onPress={()=>{
-                          let members = rowItem.members
-                          let uid = this.props.uid
-
-                          let member_key = _.findKey(members,  function(v, k) { 
-                            return v.friend_id == uid
-                          })
-
-                          if(member_key !== undefined){
-                            // console.log(this.props.uid, rowItem.group_id, rowItem, member_key)
-                            this.setState({loading:true})
-                            this.props.actionMemberJoinGroup(uid, rowItem.group_id, member_key, (result) => {
-                              console.log(result)
-                              setTimeout(() => {
-                                this.setState({loading:false})
-                              }, 200);
-                            })
-                          }else{
-                            console.log(member_key)
-                          }
-                        }}>
-                        <Text style={{color:'green'}}>Join</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={{padding:5, 
-                                borderColor:'red', 
-                                borderRadius:10, 
-                                borderWidth:.5}}
-                        onPress={()=>{
-                          let members = rowItem.members
-                          
-                          let uid = this.props.uid
-                          // var member = _.find(members, function(item, key) {
-                          //   return item.friend_id == uid
-                          // })
-
-                          let member_key = _.findKey(members,  function(v, k) { 
-                            return v.friend_id == uid
-                          })
-
-                          if(member_key !== undefined){
-                            this.setState({loading:true})
-                            this.props.actionMemberDeclineGroup(uid, rowItem.group_id, member_key, (result) => {
-                              setTimeout(() => {
-                                this.setState({loading:false})
-                              }, 200);
-                            })
-                          }else{
-                            console.log(member_key)
-                          }
-                        }}>
-                        <Text style={{color:'red'}}>Decline</Text>
-                      </TouchableOpacity>
+                        {this.showMenuInvited(rowItem)} 
                     </View>
                   </TouchableOpacity>)
         }
@@ -379,86 +369,7 @@ class GroupsPage extends React.Component{
         }
       }
       
-      let swipeoutRight = [{component:<View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
-                                        <Text style={{fontWeight:'bold', color:'white', fontSize:16, textAlign:'center'}}>DELETE GROUP</Text>
-                                      </View>,
-                            backgroundColor: 'blue',
-                              onPress: () => { 
-                                Alert.alert(
-                                  '',
-                                  'การลบกลุ่มจะลบได้เฉพาะตอนเทสระบบเท่านั้น',
-                                  [
-                                  //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-                                    {text: 'Cancel', onPress: () => {
-
-                                    }, style: 'cancel'},
-                                    {text: 'OK', onPress: () => {
-                                      console.log(rowItem) // group_id
-
-                                      this.setState({loading:true})
-                                      this.props.actionDeleteGroup(this.props.uid, rowItem.group_id, (result) => {
-                                        console.log(result)
-
-                                        this.setState({loading:false})
-                                      })
-                                    }},
-                                  ],
-                                  { cancelable: false }
-                                )
-                              }
-                            },{
-                            component:<View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
-                                        <Text style={{fontWeight:'bold', color:'white', fontSize:16, textAlign:'center'}}>LEAVE GROUP</Text>
-                                      </View>,
-                            backgroundColor: 'red',
-                            onPress: () => { 
-                              Alert.alert(
-                                '',
-                                'If you leave this group, you\'ll no longer be able to see its member list or chat history Continue?',
-                                [
-                                //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-                                  {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-                                  {text: 'OK', onPress: () => {
-                                    
-                                    let members = rowItem.members
-                                    let uid = this.props.uid
-                                    var member = _.find(members, function(item, key) {
-                                      return item.friend_id == uid
-                                    })
-                                    // console.log(members)
-                                    if(member !== undefined){
-                                      // console.log(rowItem)
-                                      this.setState({loading:true})
-                                      this.props.actionMemberLeaveGroup(this.props.uid, rowItem.group_id, rowItem.item_id, (result) => {
-                                        console.log(result)
-                                        setTimeout(() => {
-                                          this.setState({loading:false})
-                                        }, 200);
-                                      })
-                                    }else{
-                                      console.log(member)
-                                    }
-                                  }},
-                                ],
-                                { cancelable: false }
-                              )
-                            }
-                          }]
-
       return(
-        <Swipeout 
-          style={{backgroundColor:'white'}} 
-          right={swipeoutRight}
-          rowID={rowId}
-          sectionID={0}
-          onOpen={(sectionId, rowId) => {
-            this.setState({
-              sectionID: sectionId,
-              rowID: rowId,
-            })
-          }}
-          close={!(this.state.rowID === rowId)}
-          >
           <TouchableOpacity 
             key={rowItem.item_id} 
             onPress={() => {
@@ -468,15 +379,16 @@ class GroupsPage extends React.Component{
               style={{
                 alignItems: 'center', 
                 padding: 10,
-                flexDirection: 'row'
+                flexDirection: 'row',
+                // backgroundColor: 'red'
               }}>
                 <TouchableOpacity
-                  style={{width: 80, height: 80, borderRadius: 40}}
+                  // style={{width: 80, height: 80, borderRadius: 40}}
                   onPress={() => {
                     this.props.params.navigation.navigate("ManageGroupPage", {'group_id': rowItem.group_id}) 
                   }}>
                   <FastImage
-                      style={{width: 80, height: 80, borderRadius: 40, borderWidth:.5, borderColor:'gray'}}
+                      style={{width: 50, height: 50, borderRadius: 25, borderWidth:.5, borderColor:'gray'}}
                       source={{
                         uri: rowItem.group_profile.image_url,
                         headers:{ Authorization: 'someAuthToken' },
@@ -493,10 +405,10 @@ class GroupsPage extends React.Component{
                       {rowItem.group_profile.name} { rowItem.members === undefined ? '' : "(" + this.countMembers(rowItem.members) /*Object.keys(rowItem.members).length*/ +")" }
                   </Text>
                 </View>
+                {this.showMenuGroup(rowItem)} 
             </View>
           </TouchableOpacity>
-      </Swipeout>)
-
+      )
     }
   
     render() {
@@ -507,12 +419,16 @@ class GroupsPage extends React.Component{
       }
 
       if(favorites.member.length == 0 && invited.member.length == 0 && groups.member.length == 0){
-        return <View style={{flex: 1}}><Text>Empty Group</Text></View>
+        return  <View style={{flex: 1}}>
+                  <Text>Empty Group</Text>
+                  {this.actionAddGroup()}
+                </View>
       }
 
       let data = [favorites, invited, groups]
       console.log(data)
       return (
+        <MenuContext>
         <View style={{flex:1}}>
         <Spinner
           visible={this.state.loading}
@@ -536,7 +452,9 @@ class GroupsPage extends React.Component{
               // onScroll={this.props.handleScroll}
             />
         }
+        {this.actionAddGroup()}
         </View>
+        </MenuContext>
       );
     }
 }
