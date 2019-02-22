@@ -941,7 +941,7 @@ class EditMyProfilePage extends React.Component{
                         accessory="DisclosureIndicator"
                         cellContentView={
                             <TextInput
-                                style={{ fontSize: 22, flex: 1 }}
+                                style={{ fontSize: 22, flex: 1, color:'gray' }}
                                 placeholder="None"
                                 // value={this.state.profiles.name}
                                 ref= {(el) => { this.name = el; }}
@@ -973,7 +973,7 @@ class EditMyProfilePage extends React.Component{
                         accessory="DisclosureIndicator"
                         cellContentView={
                             <TextInput
-                                style={{ fontSize: 22, flex: 1, marginBottom:10}}
+                                style={{ fontSize: 22, flex: 1, marginBottom:10, color:'gray'}}
                                 placeholder="Not set"
                                 // value={this.state.profiles.status_message}
                                 multiline={true}

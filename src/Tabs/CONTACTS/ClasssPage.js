@@ -64,20 +64,7 @@ class ClasssPage extends React.Component{
       }
       this.setState({data,});
     }
-
-    renderSeparator = () => {
-      return (
-        <View
-          style={{
-            height: 1,
-            width: "100%",
-            backgroundColor: "#CED0CE",
-            // marginLeft: "14%"
-          }}
-        />
-      );
-    };
-    
+  
     renderFooter = () => {
       if (!this.state.loading) return null;
 
@@ -92,8 +79,8 @@ class ClasssPage extends React.Component{
           <ActivityIndicator animating size="large" />
         </View>
       );
-    };
-
+    }
+    
     showMenuClasss = (item)=>{
       return( <View style={{flex:1,
                             position:'absolute', 
@@ -207,9 +194,10 @@ class ClasssPage extends React.Component{
                             justifyContent:'center',
                             alignItems:'center'
                             }}
-                    onPress={()=>{
-                      this.props.params.navigation.navigate("ManageClasssPage", {'data': item, 'class_id':item.class_id})
-                    }}>
+                    // onPress={()=>{
+                    //   this.props.params.navigation.navigate("ManageClasssPage", {'data': item, 'class_id':item.class_id})
+                    // }}
+                    >
                   <FastImage
                     style={{width: 40, 
                             height: 40, 
@@ -284,21 +272,20 @@ class ClasssPage extends React.Component{
             extraData={this.state}
           />
         }
-
-            <ActionButton 
-              buttonColor="rgba(231,76,60,1)"
-              offsetX={10} 
-              offsetY={10}
-              hideShadow={true}
-              renderIcon={() => {
-                  return(<MyIcon
-                      name={'plus'}
-                      size={25}
-                      color={'#C7D8DD'} />)
-                  }}
-              onPress={()=>{
-                  this.props.params.navigation.navigate("AddClasssPage")
-              }} />
+        <ActionButton 
+          buttonColor="rgba(231,76,60,1)"
+          offsetX={10} 
+          offsetY={10}
+          hideShadow={true}
+          renderIcon={() => {
+              return(<MyIcon
+                  name={'plus'}
+                  size={25}
+                  color={'#C7D8DD'} />)
+              }}
+          onPress={()=>{
+              this.props.params.navigation.navigate("AddClasssPage")
+          }} />
         </View>
         </MenuContext>
       );

@@ -6083,27 +6083,25 @@ function people_you_may_know(){
 
   $param = json_decode(file_get_contents('php://input'), true);
 
-  if (empty($param['uid'])) {
+  $uid = $param['uid'];
+  if (empty($uid)) {
     $result['result']   = FALSE;
-    $result['message']  = "function : people_you_may_know, parameter";
+    // $result['message']  = "function : people_you_may_know, parameter";
     return $result;
   }
 
-  $uid = $param['uid'];
+  $time_start = microtime(true);
 
   $profile = profile2_by_uid_load($uid, 'main');
   $uid_friends = array('0', '1', $uid);
 
-  $tm =array();
   foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
     // Build array of field collection values.
-
     $data_item_load = field_collection_item_load($value['value']);
-
     $uid_friends[] = $data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'];
   }
-  // เป้นการโหลดข้อมูลของ profile user ซึ่งจะได้รู้ว่า friend ของ user 
 
+  // เป้นการโหลดข้อมูลของ profile user ซึ่งจะได้รู้ว่า friend ของ user 
   $uids = db_select('users', 'ur')
         ->fields('ur', array('uid'))
         // ->condition('ur.uid', $uid, '!=')
@@ -6117,32 +6115,37 @@ function people_you_may_know(){
   $users =  user_load_multiple($uids);
 
   $data = array();
-  foreach ($users as $account) {
+  foreach ($users as $user) {
     # code...
+    $friend = array();
     
-    $tmp['uid'] = $account->uid;
-    // $tmp['name'] = $account->name;
-    $tmp['mail'] = $account->mail;
+    $friend['uid'] = $user->uid;
+    // $tmp['name'] = $user->name;
+    $friend['mail'] = $user->mail;
 
-    $profile_friend = profile2_by_uid_load($account->uid, 'main');
-    $tmp['name'] = $profile_friend->field_profile_name[LANGUAGE_NONE][0]['value'];
-    if(isset($profile_friend->field_profile_image[LANGUAGE_NONE])){
-      // $tmp['url_image'] = substr(file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+    $profile_friend = profile2_by_uid_load($user->uid, 'main');
 
-      $tmp['url_image'] = file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']));
-    }else{
-      $tmp['url_image'] = getDefualtProfilePicture();
+    $friend_name = $profile_friend->field_profile_name[LANGUAGE_NONE][0]['value'];
+    if($friend_name === NULL) {
+      $friend_name = $user->name;
     }
-    $data[] = $tmp;
+
+    $friend['name'] = $friend_name;
+    
+    if(isset($profile_friend->field_profile_image[LANGUAGE_NONE])){
+      $friend['url_image'] = file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']));
+    }else{
+      $friend['url_image'] = getDefualtProfilePicture();
+    }
+    $data[] = $friend;
   }
 
+  $time_end = microtime(true);
+  $execution_times = number_format(($time_end - $time_start), 2);
+  $result['execution_times'] = $execution_times;
+
   $result['result'] = TRUE;
-  $result['function'] = "people_you_may_know";
   $result['data'] = $data;
-
-  $result['uid_friends'] = $uid_friends;
-  $result['tm'] = $tm;
-
   return $result;
 }
 

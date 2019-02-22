@@ -155,11 +155,11 @@ return fetch('/appointments/get_appos', data)
 } 
  */
 
-export const people_you_may_khow = () => {
+export const people_you_may_khow = (uid) => {
     let data = {
         method: 'POST',
         body: JSON.stringify({
-            'uid': '1',
+            'uid': uid,
         }),
         headers: Constant.FETCH_HEADERS
     }

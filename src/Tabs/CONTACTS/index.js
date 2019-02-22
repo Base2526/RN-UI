@@ -16,6 +16,9 @@ import QRCodeReaderPage from './QRCodeReaderPage'
 import FindFriendPage from './FindFriendPage'
 import InviteFriendForContactPage from './InviteFriendForContactPage'
 
+import InviteFriendByEmailPage from './InviteFriendByEmailPage'
+import InviteFriendByTextmessagePage from './InviteFriendByTextmessagePage'
+
 import ContactsSearch from './ContactsSearch'
 
 import ChatPage from '../RECENT/ChatPage'
@@ -135,6 +138,18 @@ const index = createStackNavigator({
     },
     'InviteFriendForContactPage': {
       screen: InviteFriendForContactPage,
+      navigationOptions: {
+        // title: 'Invite Friend',
+      }
+    },
+    'InviteFriendByEmailPage': {
+      screen: InviteFriendByEmailPage,
+      navigationOptions: {
+        // title: 'Invite Friend',
+      }
+    },
+    'InviteFriendByTextmessagePage': {
+      screen: InviteFriendByTextmessagePage,
       navigationOptions: {
         // title: 'Invite Friend',
       }
@@ -346,6 +361,8 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
       routeName === 'QRCodeReaderPage' ||
       routeName === 'FindFriendPage' ||
       routeName === 'InviteFriendForContactPage' ||
+      routeName === 'InviteFriendByEmailPage' ||
+      routeName === 'InviteFriendByTextmessagePage' ||
       routeName === 'ChatPage' ||
       routeName === 'ContactsSearch' ||
       routeName === 'ListGroupMemberPage' ||
