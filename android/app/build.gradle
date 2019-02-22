@@ -166,6 +166,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-mail')
 //    implementation project(':react-native-svg') {
 //        buildscript {
 //            repositories {

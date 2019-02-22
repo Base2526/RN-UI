@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.CallbackManager;
 import com.facebook.react.ReactApplication;
+import com.chirag.RNMail.RNMail;
 //import com.horcrux.svg.SvgPackage;
 import cl.json.RNSharePackage;
 //import fr.snapp.imagebase64.RNImgToBase64Package;
@@ -57,6 +58,7 @@ public class MainApplication extends Application implements ShareApplication, Re
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNMail(),
 //            new SvgPackage(),
             new RNSharePackage(),
 //            new RNImgToBase64Package(),

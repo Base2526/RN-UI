@@ -1,13 +1,13 @@
 import React from 'react'
 import {View, Text, FlatList, TouchableOpacity} from 'react-native'
 import Contacts from 'react-native-contacts';
-import { ListItem } from "react-native-elements";
+import { connect } from 'react-redux';
 import {Platform, PermissionsAndroid} from 'react-native'; 
-import Icon from 'react-native-vector-icons/FontAwesome5';
 
+import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
-export default class InviteFriendByTextmessagePage extends React.Component{
+class InviteFriendByTextmessagePage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
         title: 'Invite friend by text',
@@ -131,28 +131,24 @@ export default class InviteFriendByTextmessagePage extends React.Component{
                     </TouchableOpacity>
                </View>)
     }
-    
+
     render(){
         return(<View style={{flex:1}}>
                 <FlatList
                     data={this.state.contacts}
                     renderItem={this.renderItem}
                     ItemSeparatorComponent={this.ItemSeparatorComponent}
-                    // renderItem={({ item }) => (
-                    //     // console.log(item)
-                    //     // <View>
-                    //     //     <Text>{item.name}</Text>
-                    //     //     <Text>{item.number}</Text>
-                    //     //     <Text>{JSON.stringify(item.email)}</Text>
-                    //     // </View>
-                    // <ListItem
-                    //     roundAvatar
-                    //     title={item.name}
-                    //     subtitle={`${item.number} : ${JSON.stringify(item.email)}`}
-                    //     // avatar={{ uri: item.picture.thumbnail }}
-                    // />
-                    // )}
                 />
                 </View>)
     }
 }
+
+const mapStateToProps = (state) => {
+    console.log(state)
+    return({
+        uid:getUid(state),
+        profiles: state.auth.users.profiles
+    })
+}
+  
+export default connect(mapStateToProps, actions)(InviteFriendByTextmessagePage);

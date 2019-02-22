@@ -33,6 +33,8 @@ target 'RN_UI' do
 
     pod 'RNSVG', :path => '../node_modules/react-native-svg'
 
+    pod 'react-native-mail', :path => '../node_modules/react-native-mail'
+
   end
 
   target 'RN_UITests' do

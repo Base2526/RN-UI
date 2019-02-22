@@ -5,10 +5,13 @@ import {View,
         TouchableOpacity} from 'react-native'
 import Contacts from 'react-native-contacts'
 import {Platform, PermissionsAndroid} from 'react-native'
+import { connect } from 'react-redux';
+import Mailer from 'react-native-mail';
 
+import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
-export default class InviteFriendByEmailPage extends React.Component{
+class InviteFriendByEmailPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
         title: 'Invite friend by email',
@@ -114,6 +117,36 @@ export default class InviteFriendByEmailPage extends React.Component{
         );
     }
 
+    sendMail = (mail) =>{
+        let {profiles} = this.props
+
+        let body = profiles.name + ' is inviting you to join DNA, the all-in-one communication app! Enjoy free voice and video calls, group chats, stickers, games, and more with your friends and family. Download DNA here: https://line.me/D Add ' + profiles.name + ' as a friend by accessing the link below or scanning the attached QR code. https://line.me/ti/p/2NH1U25c58'
+        Mailer.mail({
+            subject: 'Join me on DNA',
+            recipients: [mail],
+            ccRecipients: [''],
+            bccRecipients: [''],
+            body,
+            isHTML: true,
+            // attachment: {
+            //   path: 'https://line.me/ti/p/2NH1U25c58',  // The absolute path of the file from which to read data.
+            //   type: 'html',   // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+            //   name: 'default',   // Optional: Custom filename for attachment
+            // }
+          }, (error, event) => {
+            // Alert.alert(
+            //   error,
+            //   event,
+            //   [
+            //     {text: 'Ok', onPress: () => console.log('OK: Email Error Response')},
+            //     {text: 'Cancel', onPress: () => console.log('CANCEL: Email Error Response')}
+            //   ],
+            //   { cancelable: true }
+            // )
+          });
+
+    }
+
     renderItem = ({item, index}) => {
         console.log(item)
         return(<View style={{padding:10, justifyContent:'center'}}>
@@ -128,7 +161,7 @@ export default class InviteFriendByEmailPage extends React.Component{
                                 right:0,
                                 marginRight: 10}}
                         onPress={()=>{
-                            
+                            this.sendMail(item.email)
                         }}>
                         <Text style={{fontWeight:'bold'}}>+ Invite</Text>
                     </TouchableOpacity>
@@ -141,21 +174,17 @@ export default class InviteFriendByEmailPage extends React.Component{
                     data={this.state.contacts}
                     renderItem={this.renderItem}
                     ItemSeparatorComponent={this.ItemSeparatorComponent}
-                    // renderItem={({ item }) => (
-                    //     // console.log(item)
-                    //     // <View>
-                    //     //     <Text>{item.name}</Text>
-                    //     //     <Text>{item.number}</Text>
-                    //     //     <Text>{JSON.stringify(item.email)}</Text>
-                    //     // </View>
-                    //   <ListItem
-                    //     roundAvatar
-                    //     title={item.name}
-                    //     subtitle={`${item.number} : ${JSON.stringify(item.email)}`}
-                    //     // avatar={{ uri: item.picture.thumbnail }}
-                    //   />
-                    // )}
                 />
             </View>)
     }
 }
+
+const mapStateToProps = (state) => {
+    console.log(state)
+    return({
+        uid:getUid(state),
+        profiles: state.auth.users.profiles
+    })
+}
+  
+export default connect(mapStateToProps, actions)(InviteFriendByEmailPage);
