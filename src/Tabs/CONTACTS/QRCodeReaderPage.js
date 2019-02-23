@@ -27,6 +27,7 @@ export default class QRCodeReaderPage extends Component {
   static navigationOptions = ({navigation}) => { 
     return { 
       // headerTitle: <Text style={{color: 'white', fontSize: 18}}>Test</Text>, 
+      headerTintColor: '#C7D8DD',
       headerTransparent: true, 
       headerStyle: { borderBottomWidth: 0, } 
     } 
@@ -50,7 +51,9 @@ export default class QRCodeReaderPage extends Component {
     );
   }
   onRead = (res) => {
-    console.log(res);
+    console.log(res.data);
+    
+    alert(res.data)
   }
 
   render() {
@@ -66,6 +69,9 @@ export default class QRCodeReaderPage extends Component {
           hintText=''
           rectHeight={300}
           rectWidth={300}
+          // isRepeatScan={true}
+
+          // renderBottomView
           />
       </View>
     );

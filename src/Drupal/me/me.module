@@ -6125,8 +6125,13 @@ function people_you_may_know(){
 
     $profile_friend = profile2_by_uid_load($user->uid, 'main');
 
-    $friend_name = $profile_friend->field_profile_name[LANGUAGE_NONE][0]['value'];
-    if($friend_name === NULL) {
+    $friend_name = '';
+    if(isset($profile_friend->field_profile_name[LANGUAGE_NONE])){
+      $friend_name = $profile_friend->field_profile_name[LANGUAGE_NONE][0]['value'];
+      if($friend_name === NULL) {
+        $friend_name = $user->name;
+      }
+    }else{
       $friend_name = $user->name;
     }
 
@@ -9678,6 +9683,8 @@ function chat_upload_picture(){
       // $result['_FILES'] = $_FILES["idna"];
       return $result;
     }
+
+    watchdog(TAG, 'chat_upload_picture: %type', array('%type'=> serialize(strtolower($_FILES["idna"]["type"])) ), WATCHDOG_INFO);
 
     $uid = $_REQUEST['uid'];
 
