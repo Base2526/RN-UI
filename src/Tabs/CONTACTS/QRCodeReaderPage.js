@@ -53,7 +53,9 @@ export default class QRCodeReaderPage extends Component {
   onRead = (res) => {
     console.log(res.data);
     
-    alert(res.data)
+    // alert(res.data)
+
+    this.props.navigation.goBack(null)
   }
 
   render() {
