@@ -57,6 +57,10 @@ import EditAddressPage from './EditAddressPage'
 import EditGroupNamePage from './EditGroupNamePage'
 import EditClassNamePage from './EditClassNamePage'
 
+import ResultScanForQRcode from './ResultScanForQRcode'
+
+import testPushNotifications from './testPushNotifications'
+
 const index = createStackNavigator({
     'Home': {
         screen: home,
@@ -178,6 +182,11 @@ const index = createStackNavigator({
     'ClasssSettingsPage': {
       screen: ClasssSettingsPage
     },
+
+    'testPushNotifications': {
+      screen: testPushNotifications
+    },
+    
 },{
 //   initialRouteName: 'Base',
 // headerMode: "screen",
@@ -233,7 +242,21 @@ const BasicInfoNavigator = createStackNavigator(
 const MyQRcodeNavigator = createStackNavigator(
 {
   'MyQRcode': {screen: MyQRcode},
-  'MyQRcode_QRCodeReaderPage' : {screen:QRCodeReaderPage}
+  'MyQRcode_QRCodeReaderPage' : {screen: QRCodeReaderPage},
+  // 'ResultScanForQRcode': {screen: ResultScanForQRcode}
+},
+{
+  // headerMode: 'none',
+},);
+
+const ResultScanForQRcodeNavigator = createStackNavigator({
+  'ResultScanForQRcode': {screen: ResultScanForQRcode},
+  'FriendProfilePage': {screen: FriendProfilePage,},
+  'ChatPage': {
+    screen: ChatPage,
+    navigationOptions: {
+    }
+  },
 },
 {
   // headerMode: 'none',
@@ -295,6 +318,16 @@ const GroupSettingsNavigator = createStackNavigator(
 // {
 //   // headerMode: 'none',
 // },);
+const testPushNotificationsNavigator = createStackNavigator(
+  {
+    'testPushNotifications': {
+      screen: testPushNotifications
+    }
+  },
+  {
+    // headerMode: 'none',
+  },
+);
 
 // https://github.com/react-navigation/react-navigation/issues/707#issuecomment-299859578
 const MainModalNavigator = createStackNavigator(
@@ -311,10 +344,13 @@ const MainModalNavigator = createStackNavigator(
     'ListClassMemberNavigator': {screen: ListClassMemberNavigator},
     
     // 'ClasssSettingsPage': {screen: ClasssSettingsPage},
-    // 'ClasssMemberAddFriend': {screen: ClasssMemberAddFriend},
+    'testPushNotificationsNavigator': {screen: testPushNotificationsNavigator},
     
     'MyQRcodeNavigator': {screen: MyQRcodeNavigator},
     'BasicInfoNavigator': {screen: BasicInfoNavigator},
+
+
+    'ResultScanForQRcodeNavigator': {screen: ResultScanForQRcodeNavigator},
 
     // 'ContactInfoNavigator': {screen: ContactInfoNavigator}
   },
@@ -379,13 +415,15 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
       routeName === 'EditAddressPage' ||
       routeName === 'MyQRcode' ||
       routeName === 'MyQRcode_QRCodeReaderPage' ||
+      routeName === 'ResultScanForQRcode' ||
       routeName === 'GroupSettingsPage' ||
       routeName === 'EditGroupNamePage' ||
       routeName === 'GroupMemberInvite' ||
       routeName === 'ChangeFriendsName' ||
       routeName === 'ClasssSettingsPage' ||
       routeName === 'ClasssMemberAddFriend' ||
-      routeName === 'EditClassNamePage'
+      routeName === 'EditClassNamePage' ||
+      routeName === 'testPushNotifications'
       ) {
     navigationOptions.tabBarVisible = false;
   }

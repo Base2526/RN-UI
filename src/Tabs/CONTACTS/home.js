@@ -300,43 +300,27 @@ class home extends Component {
         }
     
         return (
-          <View style={{height: 80, 
-                        width: 80, 
-                        flex:1,
-                        // borderColor: "green", 
-                        // borderWidth: 1, 
-                        // backgroundColor:'red',
-                        justifyContent:'center', 
-                        alignItems:'center',
-                        borderWidth:.5, 
-                        borderColor:'#C9C4C4',}}>
-
             <TouchableOpacity 
                 onPress={()=>{
-                //   this.props.params.navigation.navigate("ApplicationDetailPage")
-                    alert("Click Menu")
+                    this.props.navigation.navigate("testPushNotifications")
+                    // this.props.navigation.navigate("AddClasssPage")
                 }}>
-                {/* <FastImage
-                    style={{width: 40, height: 40, borderRadius: 10}}
-                    source={{
-                        uri: 'https://unsplash.it/400/400?image=1',
-                        headers:{ Authorization: 'someAuthToken' },
-                        priority: FastImage.priority.normal,
-                    }}
-                    resizeMode={FastImage.resizeMode.contain}
-                /> */}
-                {/* <PlaceHolderFastImage 
-                    source={{uri: 'https://unsplash.it/400/400?image=1', priority: FastImage.priority.normal}}
-                    style={{width: 40, height: 40, borderRadius: 10}}/> */}
-
-                {/* <Image 
-                    source={require('../../Images/icon-error.png')}
-                    style={{width: 40, height: 40, borderRadius: 10}}/> */}
+                <View style={{
+                            height: 80, 
+                            width: 80, 
+                            flex:1,
+                            // borderColor: "green", 
+                            // borderWidth: 1, 
+                            // backgroundColor:'red',
+                            justifyContent:'center', 
+                            alignItems:'center',
+                            borderWidth:.5, 
+                            borderColor:'#C9C4C4',}}>
+                    <View style={{justifyContent:'center', paddingTop:5}}>
+                        <Text >{item.name}</Text>
+                    </View>
+                </View>
             </TouchableOpacity>
-            <View style={{justifyContent:'center', paddingTop:5}}>
-              <Text >{item.name}</Text>
-            </View>
-          </View>
         )
       }
 

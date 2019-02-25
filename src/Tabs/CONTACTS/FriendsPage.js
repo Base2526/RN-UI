@@ -8,7 +8,6 @@ import {
 } from 'react-native'
   
 import ExpandableList from 'react-native-expandable-section-flatlist'
-import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 
 import FastImage from 'react-native-fast-image'
@@ -27,7 +26,6 @@ import ActionButton from 'react-native-action-button';
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
-
 import MyIcon from '../../config/icon-font.js';
 
 class FriendsPage extends React.Component{

@@ -1,52 +1,43 @@
 import React from 'react'
+import {View, 
+        Text, 
+        Keyboard, 
+        TouchableOpacity, 
+        FlatList, 
+        ActivityIndicator, 
+        TextInput } from 'react-native';
 
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, TextInput } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import { connect } from 'react-redux';
+import Spinner from 'react-native-loading-spinner-overlay';
+var _ = require('lodash');
+import FastImage from 'react-native-fast-image'
+import {
+  MenuProvider,
+  Menu,
+  MenuContext,
+  MenuTrigger,
+  MenuOptions,
+  MenuOption,
+} from 'react-native-popup-menu';
 
-import DictStyle from './dictStyle';
-
+import MyIcon from '../../config/icon-font.js';
 import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
-import ImageWithDefault from '../../Utils/ImageWithDefault'
-
-const Header = props => (
-  <View style={{flex:1, alignItems:'flex-end', flexDirection:'row'}}>
-      <View style={{flex:1}}>
-          <TouchableOpacity
-              style={{marginBottom:10}}
-              onPress={() => {
-                  props.navigation.goBack(null)
-              }}>
-              <View style={{flexDirection:'row', marginLeft:5}}>
-                <Icon name={'chevron-left'} size={25} />
-                <Text style={{alignSelf:'center', fontSize:18, marginLeft:5}}>Back</Text>
-              </View>
-          </TouchableOpacity>
-      </View>
-  </View>
-);
-
-const ImageHeader = (props) => {
-  return(<View style={{ backgroundColor: 'rgba(186, 53, 100, 1.0)', height: getHeaderInset(true) }}>
-          <Header {...props} style={{ backgroundColor: 'transparent' }}/> 
-        </View>)
-}
+import Constant from '../../Utils/Constant'
 
 class FindFriendPage extends React.Component{
-
   static navigationOptions = ({ navigation }) => ({
       title: "Find Friend",
       headerTintColor: 'white',
       headerStyle: {
         backgroundColor: 'rgba(186, 53, 100, 1.0)',
+        
+        // ios navigationoptions underline hide
+        borderBottomWidth: 0,
 
-         // ios navigationoptions underline hide
-         borderBottomWidth: 0,
-
-         // android navigationoptions underline hide
-         elevation: 0,
-         shadowOpacity: 0
+        // android navigationoptions underline hide
+        elevation: 0,
+        shadowOpacity: 0
       },
   })
 
@@ -60,7 +51,10 @@ class FindFriendPage extends React.Component{
         page: 1,
         seed: 1,
         error: null,
-        refreshing: false
+        refreshing: false,
+        text: '',
+        friends: [],
+        isSearch : false,
       };
   }
 
@@ -71,59 +65,36 @@ class FindFriendPage extends React.Component{
       error: null,
       refreshing: false
     });
+  }
 
-    this.props.actionPeopleYouMayKhow().then((result) => {
+  handleSearch = () => {
+    let text = this.state.text.trim()
+    // console.log(text)
+
+    if(text.length == 0){
+      alert('Empty?')
+      return;
+    }
+
+    // Hide that keyboard!
+    Keyboard.dismiss()
+
+    this.setState({friends:[]})
+
+    this.setState({loading:true})
+    this.props.actionFindMyID(this.props.uid, 'text', text).then((result) => {
+      // console.log(result)  
+      this.setState({loading:false})
       if(result.status){
-        // this.setState({data:result.data.data});
-      }else{
+        let {friends} = result.data
+        let __ = _.map(friends, (v, k)=> {
+                  return {item_id:k, ...v}
+                })
 
+        this.setState({friends:__, isSearch:true})
       }
     })
   }
-
-  makeRemoteRequest = () => {
-    const { page, seed } = this.state;
-    const url = `https://randomuser.me/api/?seed=${seed}&page=${page}&results=20`;
-    this.setState({ loading: true });
-
-    fetch(url)
-      .then(res => res.json())
-      .then(res => {
-        this.setState({
-          data: page === 1 ? res.results : [...this.state.data, ...res.results],
-          error: res.error || null,
-          loading: false,
-          refreshing: false
-        });
-      })
-      .catch(error => {
-        this.setState({ error, loading: false });
-      });
-  };
-    
-  handleRefresh = () => {
-    // this.setState(
-    //   {
-    //     page: 1,
-    //     seed: this.state.seed + 1,
-    //     refreshing: true
-    //   },
-    //   () => {
-    //     this.makeRemoteRequest();
-    //   }
-    // );
-  };
-
-  handleLoadMore = () => {
-    // this.setState(
-    //   {
-    //     page: this.state.page + 1
-    //   },
-    //   () => {
-    //     this.makeRemoteRequest();
-    //   }
-    // );
-  };
 
   renderSeparator = () => {
     return (
@@ -138,25 +109,6 @@ class FindFriendPage extends React.Component{
     );
   };
 
-  renderHeader = () => {
-    // return <SearchBar placeholder="Type Here..." lightTheme round />;
-    return(
-      <View style={{flexDirection:'row', backgroundColor:'rgba(186, 53, 100, 1.0)', padding:20}}>
-          <View style={{flex:1}}>
-            <TextInput
-              style={{height: 40, borderColor: 'gray', borderWidth: 1, backgroundColor:'gray'}}
-              onChangeText={(text) => this.setState({text})}
-              value={this.state.text}
-            />
-          </View>
-          <View style={{justifyContent: 'center', alignItems: 'center', marginLeft:10, padding:5 }}>
-            <TouchableOpacity>
-              <Text style={{}}>Search</Text>
-            </TouchableOpacity>
-          </View>
-      </View>)
-  };
-
   renderFooter = () => {
     if (!this.state.loading) return null;
 
@@ -166,174 +118,209 @@ class FindFriendPage extends React.Component{
           paddingVertical: 20,
           borderTopWidth: 1,
           borderColor: "#CED0CE"
-        }}
-      >
+        }}>
         <ActivityIndicator animating size="large" />
       </View>
     );
-  };
+  }
+
+  showMenu = (item)=>{
+    console.log(item)
+
+    let menuOptions = <View />
+    switch(item.friend_status){
+      case Constant.FRIEND_STATUS_FRIEND:{
+        menuOptions = <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
+                        <MenuOption onSelect={() => {
+                          this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
+                        }}>
+                            <Text style={{padding:10, fontSize:18}}>View profile</Text>
+                        </MenuOption>
+                        <MenuOption onSelect={() => {
+                          this.props.navigation.navigate("ChatPage")
+                        }}>
+                            <Text style={{padding:10, fontSize:18}}>Chat</Text>
+                        </MenuOption>
+                      </MenuOptions>
+        break
+      }
+
+      case Constant.FRIEND_STATUS_FRIEND_REQUEST:{
+        menuOptions = <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
+                        <MenuOption onSelect={() => {
+                          this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
+                        }}>
+                            <Text style={{padding:10, fontSize:18}}>View profile</Text>
+                        </MenuOption>
+                        <MenuOption onSelect={() => {
+                            // this.props.navigation.navigate("ChatPage")
+                          }}>
+                          <Text style={{padding:10, fontSize:18}}>Cancel request</Text>
+                        </MenuOption>
+                      </MenuOptions>
+        break
+      }
+
+      case Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND:{
+        menuOptions = <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
+                        <MenuOption onSelect={() => {
+                          this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
+                        }}>
+                            <Text style={{padding:10, fontSize:18}}>View profile</Text>
+                        </MenuOption>
+                        <MenuOption onSelect={() => {
+                            // this.props.navigation.navigate("ChatPage")
+                          }}>
+                          <Text style={{padding:10, fontSize:18}}>Cancel request</Text>
+                        </MenuOption>
+                      </MenuOptions>
+        break
+      }
+
+      case 0:{
+
+        menuOptions = <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
+                        <MenuOption onSelect={() => {
+                          this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
+                        }}>
+                            <Text style={{padding:10, fontSize:18}}>View profile</Text>
+                        </MenuOption>
+                        <MenuOption onSelect={() => {
+                            // this.props.navigation.navigate("ChatPage")
+                          }}>
+                          <Text style={{padding:10, fontSize:18}}>Add friend</Text>
+                        </MenuOption>
+                      </MenuOptions>
+        break
+      }
+    }
+
+    return( <View style={{flex:1,
+                          position:'absolute', 
+                          top:0,
+                          right:0, 
+                          marginRight:10,}}>
+              <Menu>
+                <MenuTrigger>
+                    <MyIcon 
+                        style={{padding:10}}
+                        name={'dot-vertical'}
+                        size={15}
+                        color={'gray'} />  
+                </MenuTrigger>
+                {menuOptions}
+              </Menu>
+            </View>)
+  }
 
   renderItem = ({item, index}) => {
-      // return here
-      // console.log("renderItem : " + index)
-      
-    switch(index){
-      case 0:{
-          return(<View><Text>People you may know.</Text></View>)
-      }
-      break
-      default:{
-          return(
-                <View
-                  style={{
-                    alignItems: 'center', 
-                    padding: 10,
-                    borderColor: DictStyle.colorSet.lineColor,
-                    flexDirection: 'row',
-                    backgroundColor: 'white'
-                  }}>
-                  <View style={{flex:1, alignItems:'center'}}>
-                    <TouchableOpacity 
-                      style={{
-                              height: 40,
-                              width: 40,
-                              borderRadius: 10,
-                              alignItems:'center'}}
-                      onPress={
-                        ()=>this.props.navigation.navigate("FriendProfilePage")
-                      }>
-                      <ImageWithDefault 
-                        source={{uri: item.url_image}}
-                        style={{width: 40, height: 40, borderRadius: 10, borderWidth:1, borderColor:'gray'}}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  <View style={{flex:3}}>
-                    <TouchableOpacity 
-                          onPress={
-                            ()=>this.props.navigation.navigate("FriendProfilePage")
-                          }>
-                      <Text style={{
-                                  fontSize: 18, 
-                                  color: DictStyle.colorSet.normalFontColor,
-                                  paddingLeft: 5}}>
-                          {item.name}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={{flex:2}}>
-                    <TouchableOpacity
-                        style={{
-                            borderRadius:10,
-                            top:3,
-                            right:0,
-                            borderWidth:1,
-                            borderColor:'gray',
-                            alignItems:'center',
-                            padding:10}}
-                          onPress={
-                            ()=>{
-                              // console.log(item.uid)
-                              // console.log(this.props.uid)
-                              // this.props.navigation.goBack()
-
-                              let uid = this.props.uid
-                              let friend_id = item.uid
-
-                              this.setState({loading:true})
-                              this.props.actionInviteFriend(uid, friend_id).then((result) => {
-                                console.log(result)
-
-                                console.log('uid : ' + uid)
-                                console.log('friend_id : ' + friend_id)
-
-                                this.setState({loading:false})
-                                // this.setState({loading: false})
-                                if(result.status){
-                                  // this.props.navigation.navigate("App") 
-                                  // this.setState({data:result.data.data});
-
-                                  switch(result.data.friend_status){
-                                    case 99:{
-                                      
-                                    }
-                                    case -1:{
-
-                                    }
-                                  }
-                                }else{
-                          
-                                }
-                              })
-                            }
-                          }>
-                        <Text style={{color:'red', fontSize:14}}>Add Friend</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-          )
-      }
-    }   
+    // console.log(item)
+    return(
+      <View
+        style={{
+          alignItems: 'center', 
+          padding: 10,
+          flexDirection: 'row',
+          backgroundColor: 'white'
+        }}>
+        <View>
+          <TouchableOpacity>
+             <FastImage
+                  style={{width: 40, 
+                          height: 40, 
+                          borderRadius: 10, 
+                          borderWidth:.5, 
+                          borderColor:'gray'}}
+                  source={{
+                    uri: item.image_url,
+                    headers:{ Authorization: 'someAuthToken' },
+                    priority: FastImage.priority.normal,
+                  }}
+                  resizeMode={FastImage.resizeMode.cover}
+                />
+          </TouchableOpacity>
+        </View>
+        <View>
+          <Text style={{fontSize: 18,
+                        paddingLeft: 5,
+                        fontWeight: 'bold'}}>{item.name} {this.props.uid == item.uid ? '(You)' : ''}</Text>
+          <Text style={{fontSize: 14,
+                        paddingLeft: 5,
+                        fontStyle: 'italic',
+                        color: 'gray'}}>{item.id}(id) </Text>
+        </View>
+        {this.props.uid == item.uid ? <View /> : this.showMenu(item)}
+      </View>) 
   }
   
   render() {
-      // let swipeBtns = [{
-      //   text: 'Delete',
-      //   backgroundColor: 'red',
-      //   underlayColor: 'rgba(0, 0, 0, 1, 0.6)',
-      //   onPress: () => { this.deleteNote(rowData) }
-      // }];
+      let {renderContent, friends, isSearch} = this.state;
+      // console.log(friends)
 
-      let {
-        renderContent
-      } = this.state;
+      let userNotFound = <View />
+      if(friends.length == 0 && isSearch){
+        userNotFound = <View style={{flex:1, 
+                                    backgroundColor: 'white', 
+                                    padding:10}}>
+                          <Text style={{fontSize:18, color:'gray'}}>User not found.</Text>
+                        </View>
+      }
 
-      // this.setState({data:result.data.data});
-
-      console.log(this.state.data)
-
-      // if (this.state.data instanceof Object) console.log('Object!');
-  
       return (
+        <MenuContext>
         <View style={{flex:1, backgroundColor: 'white'}}>
-        {this.renderHeader()}
+          <Spinner
+            visible={this.state.loading}
+            textContent={'Wait...'}
+            textStyle={{color: '#FFF'}}
+            overlayColor={'rgba(0,0,0,0.5)'}/>
+          <View style={{flexDirection:'row', margin:10}}>
+            <TextInput
+                style={{flex:1,
+                        fontSize: 18, 
+                        padding:10, 
+                        borderColor:'gray', 
+                        borderWidth:.5}}
+                onChangeText={(text) => this.setState({text})}
+                value={this.state.text}
+                clearButtonMode='while-editing'
+                // maxLength={30}
+                placeholder= "Enter your friend's ID"
+                // editable={this.state.data.length -1 == 10?false:true} 
+            />
+            <TouchableOpacity 
+                style={{paddingLeft:10, 
+                        paddingRight:10,
+                        marginLeft:10,
+                        // backgroundColor:this.state.data.length -1 == 10?'gray':'red',
+                        backgroundColor:'#CE3B6E',
+                        justifyContent:'center'}}
+                onPress={()=>{
+                    this.handleSearch()
+                }}
+                // disabled={this.state.data.length -1 == 10? true:false}
+                >
+                <Text style={{color:'#C7D8DD', fontWeight:'bold'}}>Search</Text>
+            </TouchableOpacity>
+          </View>
+          {userNotFound}
         {
-        renderContent && 
-          
+          renderContent && 
           <FlatList
-            data={this.state.data}
-            // renderItem={({ item }) => (
-            //   <ListItem
-            //     roundAvatar
-            //     title={`${item.name.first} ${item.name.last}`}
-            //     subtitle={item.email}
-            //     avatar={{ uri: item.picture.thumbnail }}
-            //     containerStyle={{ borderBottomWidth: 0 }}
-            //     onPress={()=>console.log("item click")}
-            //   />
-            // )}
-            renderItem={this.renderItem.bind(this)}
-            keyExtractor={item => item.name}
+            data={friends}
+            renderItem={this.renderItem}
+            keyExtractor={item => item.item_id}
             ItemSeparatorComponent={this.renderSeparator}
-            // ListHeaderComponent={this.renderHeader}
             ListFooterComponent={this.renderFooter}
-            // onRefresh={this.handleRefresh}
-            // refreshing={this.state.refreshing}
-            // onEndReached={this.handleLoadMore}
             onEndReachedThreshold={20}
             initialNumToRender={5}
           />
         }
         </View>
+        </MenuContext>
       );
   }
 }
-
-// const mapDispatchToProps = (dispatch) => {
-//   return {
-//     actions
-//   }
-// }
 
 const mapStateToProps = (state) => {
   console.log(state)

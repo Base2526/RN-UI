@@ -372,6 +372,24 @@ exports.createProfiles_myID = functions.firestore
     }
 );
 
+exports.updateProfiles_myID = functions.firestore
+    .document('profiles/{userId}/my_ids/{myIDId}')
+    .onUpdate((change, context) => {
+        const newValue = change.after.data();
+        let mode = 'modified';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PROFILE_MYIDS, form: {context, mode, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
+
 exports.deleteProfiles_myID = functions.firestore
     .document('profiles/{userId}/my_ids/{myIDId}')
     .onDelete((snap, context) => {

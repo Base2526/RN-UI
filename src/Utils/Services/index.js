@@ -397,12 +397,13 @@ export const update_group_picture_profile = (uid, group_id, image_uri) =>{
     })
 }
 
-export const check_my_id = (uid, id) => {
+export const check_my_id = (uid, type, id) => {
     let data = {
         method: 'POST',
         body: JSON.stringify({
             'uid':uid,
-            'id' :id,
+            'type':type,
+            'id':id,
         }),
         headers: Constant.FETCH_HEADERS
     }

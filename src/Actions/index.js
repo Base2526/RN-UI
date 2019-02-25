@@ -1122,7 +1122,7 @@ export const actionRemoveEmailProfile = (uid, email_key, callback) => dispatch =
 
 // my id
 export const actionAddMyIDProfile = (uid, id) => dispatch =>{
-    return check_my_id(uid, id).then(data => {
+    return check_my_id(uid, 'check', id).then(data => {
         // console.log(data)
         if((data instanceof Array)){
             return {'status':false, 'message': data.message}
@@ -1201,6 +1201,33 @@ export const actionSelectMyIDProfile = (uid, id, callback) => dispatch =>{
     }
 }
 
+export const actionFindMyID = (uid, type, id) => dispatch=>{
+    return check_my_id(uid, type, id).then(data => {
+        // console.log(data)
+        if((data instanceof Array)){
+            return {'status':false, 'message': data.message}
+        }else{
+            if(!data.result){
+                return {'status':false, 'message': data.message}
+            }else{
+                // if(data.is_exist){
+                //     return {'status':false, 'message': data.message}
+                // }else{
+                    // let key = randomKey()
+                    // let data = {id, enable:false}
+                    // firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(key).set(data, { merge: true})
+
+                    // dispatch({ type: ADD_MY_ID_PROFILE, my_id_key:key, my_id_data:data});
+                    // // callback({'status':true})
+
+                    return {'status':true, data}
+                // }
+            }
+        }
+    })
+
+    // callback({'status':true})
+}
 
 let unsubscribe = null;
 

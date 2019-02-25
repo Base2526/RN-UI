@@ -4,6 +4,23 @@ require_once ( dirname(__FILE__) . '/includes/functions.inc');
 $debug;
 $firebase;
 
+
+function me_query_alter($query) {
+  if ($query->hasTag('efq_debug')) {
+    // dpm((string)$query);
+
+    $sql = (string)$query;
+    $connection = Database::getConnection();
+    foreach ((array) $query->arguments() as $key => $val) {
+      $quoted[$key] = $connection->quote($val);
+    }
+    $sql = strtr($sql, $quoted);
+    // dpm($sql);
+
+    watchdog(TAG, 'me_query_alter sql: %v', array('%v'=> (string)$sql), WATCHDOG_INFO);
+  }
+}
+
 /**
  * Implements hook_menu().
  */
@@ -6159,35 +6176,177 @@ function check_my_id(){
 
   if (!check_header()) {
     $result['result'] = FALSE;
-    $result['message']= "check_header()";
+    // $result['message']= "check_header()";
     return $result;
   }
 
   $param = json_decode(file_get_contents('php://input'), true);
 
-  if (empty($param['uid']) || empty($param['id'])) {
+  if (empty($param['uid']) || empty($param['id']) || empty($param['type']) ) {
     $result['result']   = FALSE;
-    $result['message']  = "function : check_my_id, parameter";
+    // $result['message']  = "function : check_my_id, parameter";
     return $result;
   }
 
-  $query    = new EntityFieldQuery();
-  $entities = $query->entityCondition('entity_type', 'field_collection_item')
-                    ->entityCondition('bundle', 'field_profile_my_id')
-                    ->fieldCondition('field_profile_my_id_value', 'value', $param['id'], '=')
-                    ->execute();
+  $param_uid  = $param['uid'];
+  $param_type = $param['type'];
+  $param_id   = $param['id'];
 
-  if (!empty($entities['field_collection_item'])) {
-    // $item_id = array_keys($entities['field_collection_item'])[0];
+  $time_start = microtime(true);
 
-    $result['result']   = TRUE;
-    $result['is_exist'] = TRUE;
-    $result['message']  = $param['id'] . " is exist.";
-    return $result;
+  switch($param_type){
+    case 'check':{
+
+      $friends = array();
+      $query    = new EntityFieldQuery();
+      $entities = $query->entityCondition('entity_type', 'field_collection_item')
+                        ->entityCondition('bundle', 'field_profile_my_id')
+                        ->fieldCondition('field_profile_my_id_value', 'value', $param['id'], '=')
+                        ->execute();
+
+      if (!empty($entities['field_collection_item'])) {
+        $result['result']   = TRUE;
+        $result['is_exist'] = TRUE;
+        return $result;
+      }
+
+      $result['result']   = TRUE;
+      $result['is_exist'] = FALSE;
+      return $result;
+
+      break;
+    }
+
+    case 'qrcode':{
+
+      $friends = array();
+
+      $query    = new EntityFieldQuery();
+      $entities = $query->entityCondition('entity_type', 'field_collection_item')
+                        ->entityCondition('bundle', 'field_profile_my_id')
+                        ->fieldCondition('field_profile_my_id_value', 'value', $param['id'], '=')
+                        ->execute();
+    
+      if (!empty($entities['field_collection_item'])) {
+        $item_ids = array_keys($entities['field_collection_item']);
+
+        $friend_ids = array();
+        foreach ($item_ids as $creator_k => $creator_v) { 
+          $hostEntity = field_collection_item_load($creator_v)->hostEntity();
+        
+          if (strcasecmp($hostEntity->type, 'main') == 0) {      
+
+            // check ว่าเพือนคนนี้มีความสัมพัน ยังไงกับเราไม
+            $friend_status = 0;
+            $profile_friend = profile2_by_uid_load($hostEntity->uid, 'main');
+            foreach ($profile_friend->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
+              // จะได้ เพือนมาทั้งหมด
+
+              $friend = array();
+
+              $data_item_load = field_collection_item_load($value['value']);
+              if($data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] == $param_uid){
+                $friend_status_tid = $data_item_load->field_friend_status[LANGUAGE_NONE][0]['tid'];
+              
+                $friend_status = $friend_status_tid;
+                break;
+              }
+            }
+
+            $friend = array();
+
+            $friend['name']       = $profile_friend->field_profile_name[LANGUAGE_NONE][0]['value'];
+            $friend['uid']        = $profile_friend->uid;
+            $friend['image_url']  = file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']));
+            $friend['friend_status'] = $friend_status;
+
+            $friends[] = $friend;
+          }
+        }
+
+        $result['result']   = TRUE;
+        $result['message']  = $param['id'] . " is exist.";
+        $result['item_ids'] = $item_ids;
+        $result['friend_ids'] = $friend_ids;
+        $result['friends']  = $friends;
+
+        return $result;
+      }else{
+        $result['result']   = TRUE;
+        $result['friends']  = $friends;
+        return $result;
+      }
+
+      break;
+    }
+
+    case 'text':{
+      $friends = array();
+
+      $query    = new EntityFieldQuery();
+      $entities = $query->entityCondition('entity_type', 'field_collection_item')
+                        ->entityCondition('bundle', 'field_profile_my_id')
+                        // ->fieldCondition('field_profile_my_id_value', 'value', $param['id'], '=')
+                        ->fieldCondition('field_profile_my_id_value', 'value', '%'. $param['id'] .'%', 'LIKE')
+                        ->fieldCondition('field_enable', 'value', '1', '=' )
+                        ->execute();
+
+      if (!empty($entities['field_collection_item'])) {
+        $item_ids = array_keys($entities['field_collection_item']);
+
+        // $item_load = field_collection_item_load($item_id);
+
+        // $result['x'][] = $item_load->field_profile_my_id_value[LANGUAGE_NONE][0]['value'];
+
+        // // $result['item_ids']     = $item_ids;
+        foreach ($item_ids as $key => $value) { 
+          //   // $hostEntity = field_collection_item_load($creator_v)->hostEntity();
+
+          //   $data_item_load = field_collection_item_load($creator_v['value']);
+
+          //   $result[$creator_k][] =  $creator_v['value'];//$data_item_load;//->field_profile_my_id_value[LANGUAGE_NONE][0]['value'];
+        
+          $item_load = field_collection_item_load($value);
+
+          // $hostEntity = field_collection_item_load($creator_v)->hostEntity();
+
+          $profile_friend = profile2_by_uid_load($item_load->hostEntity()->uid, 'main');
+
+          $friend_status = 0;
+          foreach ($profile_friend->field_profile_friends[LANGUAGE_NONE] as $k => $v) {
+            // จะได้ เพือนมาทั้งหมด
+            $data_item_load = field_collection_item_load($v['value']);
+            if($data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] == $param_uid){
+              $friend_status = $data_item_load->field_friend_status[LANGUAGE_NONE][0]['tid'];
+              break;
+            }
+          }
+
+          $v = array();
+          $v['hostEntity->uid']= $item_load->hostEntity()->uid;
+
+          $v['name']       = $profile_friend->field_profile_name[LANGUAGE_NONE][0]['value'];
+          $v['uid']        = $profile_friend->uid;
+          $v['image_url']  = file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']));
+
+          $v['id']     = $item_load->field_profile_my_id_value[LANGUAGE_NONE][0]['value'];
+          $v['enable']    = $item_load->field_enable[LANGUAGE_NONE][0]['value'];
+          $v['objectId']  = $item_load->field_object_id[LANGUAGE_NONE][0]['value'];
+          $v['friend_status'] = $friend_status;
+
+          $friends[$value] = $v;
+        }
+      }
+                        
+      $result['result']   = TRUE;
+      $result['text']     = $param_id;
+      $result['friends']  = $friends;
+
+      return $result;
+    }
   }
 
-  $result['result']   = TRUE;
-  $result['is_exist'] = FALSE;
+  $result['result']   = FALSE;
   return $result;
 }
 
@@ -9753,7 +9912,7 @@ function chat_upload_video(){
     return $result;
   }
 
-  $array_type = array("image/mp4", "video/mp4", "application/mp4", "video/quicktime");
+  $array_type = array("image/mp4", "video/mp4", "application/mp4", "video/quicktime", "audio/mp3", "audio/ogg", "audio/flac");
 
   watchdog(TAG, 'chat_upload_video: %type', array('%type'=> serialize(strtolower($_FILES["idna"]["type"])) ), WATCHDOG_INFO);
 
@@ -11059,7 +11218,7 @@ function profile_myids(){
   $result = array();
   if (!check_header()) {
     $result['result']   = FALSE;
-    $result['message']  = "check_header()";
+    $result['message']  = "Error code : 100";
     return $result;
   }
 
@@ -11069,7 +11228,7 @@ function profile_myids(){
 
   if (empty($uid) || empty($objectId) || empty($mode)) {
     $result['result'] = FALSE;
-    $result['message'] = "function profile_myids : parameter";
+    $result['message']  = "Error code : 101";
     return $result;
   }
 
@@ -11097,26 +11256,36 @@ function profile_myids(){
     return $result;
   }
 
-  // removed 
-  $collection_query    = new EntityFieldQuery();
-  $collection_output   = $collection_query->entityCondition('entity_type', 'field_collection_item')
-                                ->entityCondition('bundle', 'field_profile_my_id')
-                                ->fieldCondition('field_object_id', 'value', $objectId, '=')
-                                ->execute();
+  // modified
+  if(strcasecmp($mode, 'modified') == 0){
+    $data     = $_REQUEST['newValue'];
 
-  // if(strcasecmp($mode, 'modified') == 0){
-  //   $data     = $_REQUEST['newValue'];
-
-  //   if (!empty($collection_output['field_collection_item'])) {
-  //     $collection_item = field_collection_item_load(array_keys($collection_output['field_collection_item'])[0]);
+    $collection_query    = new EntityFieldQuery();
+    $collection_output   = $collection_query->entityCondition('entity_type', 'field_collection_item')
+                                  ->entityCondition('bundle', 'field_profile_my_id')
+                                  ->fieldCondition('field_object_id', 'value', $objectId, '=')
+                                  ->execute();
+    
+    if (!empty($collection_output['field_collection_item'])) {
+      $collection_item = field_collection_item_load(array_keys($collection_output['field_collection_item'])[0]);
       
-  //     $wrapper = entity_metadata_wrapper('field_collection_item', $collection_item);
-  //     $wrapper->field_website_text->set($data['value']); // 
-  //     $wrapper->save();
-  //   }
-  // }
+      $wrapper = entity_metadata_wrapper('field_collection_item', $collection_item);
+      $wrapper->field_profile_my_id_value->set($data['id']); // recheck id for firestore
+      $wrapper->field_enable->set($data['enable']== 'true' ? '1' : '0'); // 
+      $wrapper->save();
 
+      // watchdog(TAG, '->profile_myids : %id : %enable : %objectId', array('%id'=>$data['id'], '%enable'=>$data['enable'] == 'true' ? '1' : '0', '%objectId'=>$objectId), WATCHDOG_INFO);
+    }
+  }
+
+  // removed 
   if(strcasecmp($mode, 'removed') == 0){
+    $collection_query    = new EntityFieldQuery();
+    $collection_output   = $collection_query->entityCondition('entity_type', 'field_collection_item')
+                                  ->entityCondition('bundle', 'field_profile_my_id')
+                                  ->fieldCondition('field_object_id', 'value', $objectId, '=')
+                                  ->execute();
+
     if (!empty($collection_output['field_collection_item'])) {
       entity_delete_multiple('field_collection_item', array(array_keys($collection_output['field_collection_item'])[0]));
     }

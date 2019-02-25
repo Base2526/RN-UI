@@ -33,6 +33,8 @@ import com.facebook.soloader.SoLoader;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import io.invertase.firebase.fabric.crashlytics.RNFirebaseCrashlyticsPackage;
 import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
+import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
+import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -70,6 +72,8 @@ public class MainApplication extends Application implements ShareApplication, Re
 //            new RCTLocalePackage(),
 //            new RNFetchBlobPackage(),
             new RNFirebasePackage(),
+            new RNFirebaseMessagingPackage(),
+            new RNFirebaseNotificationsPackage(),
             new RNFirebaseDatabasePackage(),
             new FBSDKPackage(mCallbackManager),
             new RNGestureHandlerPackage(),

@@ -58,6 +58,7 @@
 		6099C96522200F8B00B6F046 /* haha.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6099C96422200F8B00B6F046 /* haha.swift */; };
 		6099C9692220102100B6F046 /* RNMessageCompose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6099C9672220102000B6F046 /* RNMessageCompose.swift */; };
 		6099C96A2220102100B6F046 /* RNMessageComposeBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 6099C9682220102100B6F046 /* RNMessageComposeBridge.m */; };
+		60C41D6E2223B5B300EE298A /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60C41D352223B5B300EE298A /* UserNotifications.framework */; };
 		60CE1A2921E3A5210014523D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 60CE1A2821E3A5210014523D /* GoogleService-Info.plist */; };
 		60F8B5EA21F57F8E00F10F48 /* libRNShare.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F8B5E621F57F8600F10F48 /* libRNShare.a */; };
 		60F92A6C21C370F600AC5145 /* libSQLite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F92A6B21C370B900AC5145 /* libSQLite.a */; };
@@ -554,6 +555,7 @@
 		6099C9672220102000B6F046 /* RNMessageCompose.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNMessageCompose.swift; sourceTree = "<group>"; };
 		6099C9682220102100B6F046 /* RNMessageComposeBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNMessageComposeBridge.m; sourceTree = "<group>"; };
 		60C41D172223B22D00EE298A /* RN_UI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = RN_UI.entitlements; path = RN_UI/RN_UI.entitlements; sourceTree = "<group>"; };
+		60C41D352223B5B300EE298A /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		60CE1A2821E3A5210014523D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		60F8B5AF21F57F8500F10F48 /* RNShare.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNShare.xcodeproj; path = "../node_modules/react-native-share/ios/RNShare.xcodeproj"; sourceTree = "<group>"; };
 		60F92A3421C370B800AC5145 /* SQLite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SQLite.xcodeproj; path = "../node_modules/react-native-sqlite-storage/src/ios/SQLite.xcodeproj"; sourceTree = "<group>"; };
@@ -614,6 +616,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60C41D6E2223B5B300EE298A /* UserNotifications.framework in Frameworks */,
 				608A2781221FE06F0093DE6C /* libRNMail.a in Frameworks */,
 				60F8B5EA21F57F8E00F10F48 /* libRNShare.a in Frameworks */,
 				6029165221D5BE4100401259 /* libART.a in Frameworks */,
@@ -805,6 +808,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				60C41D352223B5B300EE298A /* UserNotifications.framework */,
 				6048BF0921CB2D8E00B1E049 /* FBSDKCoreKit.framework */,
 				6048BF0721CB2D8E00B1E049 /* FBSDKLoginKit.framework */,
 				6048BF0821CB2D8E00B1E049 /* FBSDKShareKit.framework */,
