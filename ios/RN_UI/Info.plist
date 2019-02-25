@@ -53,9 +53,9 @@
 		<dict>
 			<key>localhost</key>
 			<dict>
-        <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-        <true/>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
 			</dict>
 		</dict>
@@ -76,12 +76,12 @@
 	<string>using microphone</string>
 	<key>NSMotionUsageDescription</key>
 	<string>using motion</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>$(PRODUCT_NAME) wants to save photos</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Your message to user when the photo library is accessed for the first time</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>using speech recognition</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>$(PRODUCT_NAME) wants to save photos</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>idnaicons.ttf</string>
@@ -103,6 +103,10 @@
 		<string>Roboto_medium.ttf</string>
 		<string>Roboto.ttf</string>
 		<string>rubicon-icon-font.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

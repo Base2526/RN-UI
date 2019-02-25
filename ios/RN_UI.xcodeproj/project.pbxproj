@@ -553,6 +553,7 @@
 		6099C9662220102000B6F046 /* RNMessageCompose-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RNMessageCompose-Bridging-Header.h"; sourceTree = "<group>"; };
 		6099C9672220102000B6F046 /* RNMessageCompose.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNMessageCompose.swift; sourceTree = "<group>"; };
 		6099C9682220102100B6F046 /* RNMessageComposeBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNMessageComposeBridge.m; sourceTree = "<group>"; };
+		60C41D172223B22D00EE298A /* RN_UI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = RN_UI.entitlements; path = RN_UI/RN_UI.entitlements; sourceTree = "<group>"; };
 		60CE1A2821E3A5210014523D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		60F8B5AF21F57F8500F10F48 /* RNShare.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNShare.xcodeproj; path = "../node_modules/react-native-share/ios/RNShare.xcodeproj"; sourceTree = "<group>"; };
 		60F92A3421C370B800AC5145 /* SQLite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SQLite.xcodeproj; path = "../node_modules/react-native-sqlite-storage/src/ios/SQLite.xcodeproj"; sourceTree = "<group>"; };
@@ -760,6 +761,7 @@
 		13B07FAE1A68108700A75B9A /* RN_UI */ = {
 			isa = PBXGroup;
 			children = (
+				60C41D172223B22D00EE298A /* RN_UI.entitlements */,
 				6099C96B2220117900B6F046 /* RNMessageCompose */,
 				600A0188221E55D00008A21F /* idnaicons.ttf */,
 				60CE1A2821E3A5210014523D /* GoogleService-Info.plist */,
@@ -1212,6 +1214,14 @@
 						DevelopmentTeam = 32ENZ344NK;
 						LastSwiftMigration = 1010;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -2111,6 +2121,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = RN_UI/RN_UI.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -2158,6 +2169,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = RN_UI/RN_UI.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

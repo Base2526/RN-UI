@@ -10,6 +10,7 @@ target 'RN_UI' do
   pod 'Firebase/Core'
   pod 'Firebase/Database'
   pod 'Firebase/Firestore'
+  pod 'Firebase/Messaging'
   
   pod 'Fabric'
   pod 'Crashlytics'
