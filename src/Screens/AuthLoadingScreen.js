@@ -3,12 +3,12 @@ import {
     StatusBar,
     StyleSheet,
     View,
-    Text
+    AsyncStorage
 } from 'react-native';
 import { connect } from 'react-redux';
 // import * as actions from '../Actions';
 
-
+import firebase from 'react-native-firebase';
 
 import {watchTaskEvent} from '../Actions'
 
@@ -25,7 +25,61 @@ class AuthLoadingScreen extends React.Component {
         this._bootstrapAsync();
 
         // this._testCrashlytics();
+
+        this.hasPermission()
+
+        // AsyncStorage.getItem('fcmToken', null).then((fcmToken) => {
+        //     console.log('fcmToken: ',values);
+        // });
+
+        // console.log('fcmToken')
+        // console.log('fcmToken', fcmToken)
     }
+
+    hasPermission = () =>{
+        firebase.messaging().hasPermission().then(enabled => {
+            if (enabled) {
+                // user has permissions
+                this.getToken()
+            } else {
+                // user doesn't have permission
+                this.requestPermission();
+            } 
+        });
+    }
+
+
+    requestPermission() {
+        firebase.messaging().requestPermission().then(() => {
+            // User has authorised  
+            this.getToken()
+        })
+        .catch(error => {
+            // User has rejected permissions  
+        });
+    }
+
+    //3
+    async getToken() {
+        let fcmToken = await AsyncStorage.getItem('fcmToken', null);
+        if (!fcmToken) {
+            fcmToken = await firebase.messaging().getToken();
+            // console.log(fcmToken)
+            if (fcmToken) {
+                // user has a device token
+                await AsyncStorage.setItem('fcmToken', fcmToken);
+            }
+        }
+        // console.log(fcmToken)
+    }
+
+
+    // ry {
+//     await firebase.messaging().requestPermission();
+//     // User has authorised
+// } catch (error) {
+//     // User has rejected permissions
+// }
 
     _testCrashlytics = () =>{
         firebase.crashlytics().log('TEST CRASH LOG');
@@ -38,8 +92,14 @@ class AuthLoadingScreen extends React.Component {
             this.props.navigation.navigate('Auth');
         }else if(this.props.auth.isLogin){
             // console.log(this.props.uid)
-            this.props.watchTaskEvent(this.props.uid, this.props.dispatch)
-            this.props.navigation.navigate('App');
+
+            AsyncStorage.getItem('fcmToken', null).then((fcmToken) => {
+                // console.log('fcmToken: ',fcmToken);
+
+                this.props.watchTaskEvent(this.props.uid, fcmToken,this.props.dispatch)
+                this.props.navigation.navigate('App');
+            });
+            
         }else{
             this.props.navigation.navigate('Auth');
         }

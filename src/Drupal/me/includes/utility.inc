@@ -383,13 +383,17 @@ function ffmpeg_thumbnail_extract_frame($file, \FFMpeg\Coordinate\TimeCode $at =
 
     $video_stream = $video->getStreams()->videos()->first();
     if (empty($at)) {
-      if ($video_stream->has('duration')) {
-        $duration = $video_stream->get('duration');
-        $at = FFMpeg\Coordinate\TimeCode::fromSeconds($duration / 2);
-      }
-      else {
-        $at = FFMpeg\Coordinate\TimeCode::fromSeconds(1);
-      }
+      // if ($video_stream->has('duration')) {
+      //   $duration = $video_stream->get('duration');
+      //   watchdog(TAG, '1, ffmpeg_thumbnail_extract_frame: %duration', array('%duration'=> $duration), WATCHDOG_INFO);
+
+      //   $at = FFMpeg\Coordinate\TimeCode::fromSeconds($duration / 2);
+      // }
+      // else {
+        $at = FFMpeg\Coordinate\TimeCode::fromSeconds(0);
+
+        watchdog(TAG, 'ffmpeg_thumbnail_extract_frame: %at', array('%at'=> $at), WATCHDOG_INFO);
+      // }
     }
     if (!file_prepare_directory($thumbnail_dir, FILE_CREATE_DIRECTORY)) {
       throw new RuntimeException(t('Unable to create @directory.', array('@directory' => $thumbnail_dir)));
@@ -434,6 +438,10 @@ function IsEmail($email) {
    else {
       return false;
    }
+}
+
+function array_key_isset($k, $a){
+  return isset($a[$k]) || array_key_exists($k, $a);
 }
 
 ?>

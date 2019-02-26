@@ -1,4 +1,4 @@
-import {Platform} from 'react-native'
+import {Platform, AsyncStorage} from 'react-native'
 import firebase from 'react-native-firebase';
 const FBSDK = require('react-native-fbsdk');
 const { LoginButton, AccessToken, LoginManager } = FBSDK;
@@ -92,7 +92,12 @@ import {USER_LOGIN_SUCCESS,
         ADD_MY_ID_PROFILE,
         EDIT_MY_ID_PROFILE,
         REMOVE_MY_ID_PROFILE,
-        FRIEND_FAVORITE,} from './types'
+        FRIEND_FAVORITE,
+    
+    
+        ADDED_PRESENCE,
+        CHANGED_PRESENCE,
+        REMOVED_PRESENCE} from './types'
 
 import {randomKey} from '../Utils/Helpers'
 import Constant from '../Utils/Constant'
@@ -212,8 +217,14 @@ export const updateIsLogin = (users, callback) => {
     // })    
 }
 
-export const actionLogout = (dispatch, callback) => {
-    // console.log('actionLogout')
+export const actionLogout = (uid, dispatch, callback) => {
+    firebase.database().ref('user_presence/' + uid).orderByChild("udid").equalTo(DeviceInfo.getUniqueID()).once('value').then(function (snapshot) { 
+        if(snapshot.val() !== null){
+          firebase.database().ref("user_presence/" + uid + "/"+ Object.keys(snapshot.val())[0] +"/").update({
+            'status':'offline'
+          });
+        }
+    })
 
     // firebase.database().ref('idna/user/1').off()
     unsubscribe();
@@ -1231,7 +1242,7 @@ export const actionFindMyID = (uid, type, id) => dispatch=>{
 
 let unsubscribe = null;
 
-export function watchTaskEvent(uid, dispatch) {
+export function watchTaskEvent(uid, fcmToken, dispatch) {
     console.log('-------------- watchTaskEvent()')
     
     // track profile
@@ -1491,6 +1502,45 @@ export function watchTaskEvent(uid, dispatch) {
                         }
                     })
                 })
+
+
+                // firebase.database().ref('user_presence/' + change.doc.id).on('value', function (snapshot) {
+                //     console.log(change.doc.id, snapshot.val())
+                // });
+
+                /*
+                usersRef.on('child_added', (snapshot) => {
+                    console.log('user was added !!');
+                });
+
+                usersRef.on('child_removed', (snapshot) => {
+                    console.log('user was removed !!' );
+                });
+
+
+                usersRef.on('child_changed', (snapshot) => {
+                    console.log('user was changed !!' ;
+                });
+                */
+
+            
+                firebase.database().ref('user_presence/' + change.doc.id).on('child_added', function (snapshot) {
+                    // console.log(change.doc.id, snapshot.key, snapshot.val())
+
+                    dispatch({ type: ADDED_PRESENCE, userId:change.doc.id, presenceKey:snapshot.key, presenceData:snapshot.val()})
+                });
+
+                firebase.database().ref('user_presence/' + change.doc.id).on('child_changed', function (snapshot) {
+                    // console.log(change.doc.id, snapshot.key, snapshot.val())
+
+                    dispatch({ type: CHANGED_PRESENCE, userId:change.doc.id, presenceKey:snapshot.key, presenceData:snapshot.val()})
+                });
+
+                firebase.database().ref('user_presence/' + change.doc.id).on('child_removed', function (snapshot) {
+                    // console.log(change.doc.id, snapshot.key, snapshot.val())
+
+                    dispatch({ type: REMOVED_PRESENCE, userId:change.doc.id, presenceKey:snapshot.key})
+                });
             }
             if (change.type === 'modified') {
                 dispatch({ type: MODIFIED_FRIEND, friend_id:change.doc.id, data:change.doc.data() });
@@ -1499,24 +1549,24 @@ export function watchTaskEvent(uid, dispatch) {
     })
 
     // track device access
-    firebase.firestore().collection('users').doc(uid).collection('device_access').onSnapshot((querySnapshot) => {
+    // firebase.firestore().collection('users').doc(uid).collection('device_access').onSnapshot((querySnapshot) => {
 
-        let _this = this
-        querySnapshot.forEach(function(doc) {
-            let id = doc.id
-            let data = doc.data()
+    //     let _this = this
+    //     querySnapshot.forEach(function(doc) {
+    //         let id = doc.id
+    //         let data = doc.data()
 
-            //  check ว่ามีการ force logout จากระบบหรือไม่
-            if(data.udid === DeviceInfo.getUniqueID() && data.is_login == 0){
-                actionLogout(dispatch, ()=>{
-                    // console.log(this)                
-                    _this.navigation.navigate("AuthLoading")
-                })
-            }
+    //         //  check ว่ามีการ force logout จากระบบหรือไม่
+    //         if(data.udid === DeviceInfo.getUniqueID() && data.is_login == 0){
+    //             actionLogout(dispatch, ()=>{
+    //                 // console.log(this)                
+    //                 _this.navigation.navigate("AuthLoading")
+    //             })
+    //         }
 
-            dispatch({ type: DEVICE_ACCESS_ADDED, id, data});
-        });
-    })
+    //         dispatch({ type: DEVICE_ACCESS_ADDED, id, data});
+    //     });
+    // })
 
     // track grouds
     firebase.firestore().collection('users').doc(uid).collection('groups').onSnapshot((querySnapshot) => {
@@ -1799,6 +1849,12 @@ export function watchTaskEvent(uid, dispatch) {
         })
     })
 
+    /* 
+         // AsyncStorage.getItem('fcmToken', null).then((values) => {
+        //     console.log('fcmToken: ',values);
+        // });
+    */
+
     // track online/offline
     let flag = false
     const oldRealTimeDb = firebase.database();
@@ -1819,7 +1875,10 @@ export function watchTaskEvent(uid, dispatch) {
                             'platform': Platform.OS,
                             'udid': DeviceInfo.getUniqueID(),
                             'bundle_identifier': DeviceInfo.getBundleId(),
+                            'build_number': DeviceInfo.getBuildNumber(),
+                            'build_version':DeviceInfo.getVersion(),
                             'model_number': DeviceInfo.getModel(),
+                            'fcmToken':fcmToken,
                             'status':'online'
                         });
                 }else{
@@ -1830,7 +1889,10 @@ export function watchTaskEvent(uid, dispatch) {
                     'platform': Platform.OS,
                     'udid': DeviceInfo.getUniqueID(),
                     'bundle_identifier': DeviceInfo.getBundleId(),
+                    'build_number': DeviceInfo.getBuildNumber(),
+                    'build_version':DeviceInfo.getVersion(),
                     'model_number': DeviceInfo.getModel(),
+                    'fcmToken':fcmToken,
                     'status':'online'
                 });
 
@@ -1840,10 +1902,14 @@ export function watchTaskEvent(uid, dispatch) {
                         'platform': Platform.OS,
                         'udid': DeviceInfo.getUniqueID(),
                         'bundle_identifier': DeviceInfo.getBundleId(),
+                        'build_number': DeviceInfo.getBuildNumber(),
+                        'build_version':DeviceInfo.getVersion(),
                         'model_number': DeviceInfo.getModel(),
+                        'fcmToken':fcmToken,
                         'status':'offline'
                     });
             } 
         });     
     });
+
 }

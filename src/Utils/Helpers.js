@@ -9,6 +9,11 @@ export const getUid = (state) =>{
     if(!state._persist.rehydrated){
         return -1
     }
+
+    if(state.auth.users === null){
+        return -1 
+    }
+
     return state.auth.users.user.uid
 }
 

@@ -2808,6 +2808,27 @@ function me_services_resources()
         ),
       ),
     ),
+
+    'presence'=>array(
+      'create' =>array(
+        'help'=>'Services presence',
+        'callback'=>'presence',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+        /* กรณีที่เราต้องการ pass parameter */
+        'args' => array(
+          array(
+           'name' => 'parameters',
+           'type' => 'array',
+           'description' => '',
+           'source' => 'param',
+           'optional' => TRUE,
+           'default value' => array(),
+          ),
+        ),
+      ),
+    ),
   
     'delete_center_chat'=>array(
       'create' =>array(

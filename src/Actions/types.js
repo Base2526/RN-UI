@@ -101,3 +101,8 @@ export const REMOVE_EMAIL_PROFILE           = 'remove_email_profile'
 export const ADD_MY_ID_PROFILE              = 'add_my_id_profile'
 export const EDIT_MY_ID_PROFILE             = 'edit_my_id_profile'
 export const REMOVE_MY_ID_PROFILE           = 'remove_my_id_profile'
+
+
+export const ADDED_PRESENCE                 = 'added_presence'
+export const CHANGED_PRESENCE               = 'changed_presence'
+export const REMOVED_PRESENCE               = 'removed_presence'

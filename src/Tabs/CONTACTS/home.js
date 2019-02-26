@@ -10,6 +10,15 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import ScrollableTabView, {ScrollableTabBar, DefaultTabBar} from 'react-native-scrollable-tab-view';
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
+import {
+    MenuProvider,
+    Menu,
+    MenuContext,
+    MenuTrigger,
+    MenuOptions,
+    MenuOption,
+} from 'react-native-popup-menu';
+
 import FriendsPage from './FriendsPage'
 import GroupsPage from './GroupsPage'
 import ClasssPage from './ClasssPage'
@@ -393,6 +402,7 @@ class home extends Component {
         // console.log(this.state.isConnected)
 
         return (
+            <MenuContext>
             <View style={{backgroundColor:'white', flex:1}} onLayout={this.onLayout.bind(this)} >
                 {menuView}
                 {!isConnected ?<OfflineNotice />:<View />}
@@ -417,6 +427,7 @@ class home extends Component {
                 {/* </View> */}
                 {/* } */}
             </View>
+            </MenuContext>
         );
     }
 }

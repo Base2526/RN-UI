@@ -920,6 +920,180 @@ function classs(){
 	return  $result;
 }
 
+function presence(){
+	$result = array();
+	if (!check_header()) {
+	  $result['result'] = FALSE;
+	  return $result;
+	}
+
+	$mode  = $_REQUEST['mode'];
+	if(empty($mode)){
+		$result['result'] = FALSE;
+	  return $result;
+	}
+
+	$param = $_REQUEST['context']['params'];
+	if (empty($param['userId']) || empty($param['objectId'])) {
+	  $result['result'] 	= FALSE;
+	  return $result;
+	}
+
+	$userId 	= $param['userId'];
+	$objectId = $param['objectId'];
+
+	if(strcasecmp($mode, 'added') == 0){
+		$newValue 		= $_REQUEST['newValue'];
+
+		$query  = new EntityFieldQuery();
+		$entities = $query->entityCondition('entity_type', 'field_collection_item')
+											->entityCondition('bundle', 'field_device_access')
+											->fieldCondition('field_udid', 'value', $newValue['udid'], '=')
+											->fieldCondition('field_object_id', 'value', $objectId, '=')
+											->execute();
+
+		if (empty($entities['field_collection_item'])) {
+			$profile = profile2_by_uid_load($userId, 'main');
+
+			$vs = array();
+			$vs['field_name'] = 'field_device_access'; 
+			$vs['field_udid'][LANGUAGE_NONE][0]['value'] 			= $newValue['udid'];
+			$vs['field_platform'][LANGUAGE_NONE][0]['value'] 	= $newValue['platform'];
+			$vs['field_bundle_identifier'][LANGUAGE_NONE][0]['value'] = $newValue['bundle_identifier'];
+			$vs['field_model_number'][LANGUAGE_NONE][0]['value']      = $newValue['model_number'];
+			$vs['field_device_access_version'][LANGUAGE_NONE][0]['value']    = $newValue['build_version'];
+			$vs['field_device_access_build'][LANGUAGE_NONE][0]['value']      = $newValue['build_number'];
+
+			$vs['field_online'][LANGUAGE_NONE][0]['value']                   = $newValue['status'];
+			$vs['field_key_token_notification'][LANGUAGE_NONE][0]['value']   = $newValue['fcmToken'];
+			$vs['field_object_id'][LANGUAGE_NONE][0]['value']   						 = $objectId;
+			
+			// Create the field collection entry and associate it with the profile
+			$field_entity = entity_create('field_collection_item', $vs);
+			$field_entity->setHostEntity('profile2', $profile);
+			$field_entity->save();
+		}
+
+		/* 
+		$values = array();
+		$values['field_name'] = 'field_device_access'; 
+		$values['field_udid'][LANGUAGE_NONE][0]['value']              = $getallheaders['udid'];
+		$values['field_platform'][LANGUAGE_NONE][0]['value']          = $getallheaders['platform'];
+		$values['field_bundle_identifier'][LANGUAGE_NONE][0]['value'] = $getallheaders['bundle_identifier'];
+		$values['field_device_name'][LANGUAGE_NONE][0]['value']       = $getallheaders['device_name'];
+		$values['field_model_number'][LANGUAGE_NONE][0]['value']      = $getallheaders['model_number'];
+		$values['field_device_access_version'][LANGUAGE_NONE][0]['value']    = $getallheaders['version_application'];
+		$values['field_device_access_build'][LANGUAGE_NONE][0]['value']      = $getallheaders['build'];
+		$values['field_is_login'][LANGUAGE_NONE][0]['value']                 = '1';
+		$values['field_online'][LANGUAGE_NONE][0]['value']                   = '1';
+		$values['field_key_token_notification'][LANGUAGE_NONE][0]['value']   = $getallheaders['token_notification'];
+		$values['field_pushkit_token'][LANGUAGE_NONE][0]['value']            = $getallheaders['token_pushkit'];
+
+		// Create the field collection entry and associate it with the profile
+		$field_entity = entity_create('field_collection_item', $values);
+		$field_entity->setHostEntity('profile2', $profile);
+		$field_entity->save();
+		*/
+	}
+
+	if(strcasecmp($mode, 'modified') == 0){
+		$beforeValue 		= $_REQUEST['beforeValue'];
+		$afterValue 		= $_REQUEST['afterValue'];
+
+		$a1 = (array)$beforeValue;
+		$a2 = (array)$afterValue;
+
+		// $result['beforeValue'] 			= $beforeValue;
+		// $result['afterValue']  			= $afterValue;
+		
+		$array_diff_assoc  = array_diff_assoc($a2, $a1);
+
+		// $result['array_diff_assoc'] = $array_diff_assoc;
+
+		// if (property_exists($array_diff_assoc, 'status')) {
+		// $result['-x-'] = array_key_exists('status', $array_diff_assoc);//property_exists((array)$array_diff_assoc, 'status');
+		// $result['-x2-'] = array_key_exists('status3', $array_diff_assoc);//property_exists((array)$array_diff_assoc, 'status');
+		// $result['--c--'] = gettype($array_diff_assoc);
+		// }
+
+		// กรณีข้อมูลไม่มีการเปลียนแปลง
+		if(count($array_diff_assoc) < 1){
+			$result['result'] 	= TRUE;
+			return $result;
+		}
+
+		$result['array_key_isset'] = array_key_isset('status', $array_diff_assoc);
+
+		$query  = new EntityFieldQuery();
+		$entities = $query->entityCondition('entity_type', 'field_collection_item')
+											->entityCondition('bundle', 'field_device_access')
+											// ->fieldCondition('field_udid', 'value', $newValue['udid'], '=')
+											->fieldCondition('field_object_id', 'value', $objectId, '=')
+											->execute();
+
+		if (!empty($entities['field_collection_item'])) {
+      $collection_item = field_collection_item_load(array_keys($entities['field_collection_item'])[0]);
+      $wrapper = entity_metadata_wrapper('field_collection_item', $collection_item);
+
+			if (array_key_isset('build_number', $array_diff_assoc)) {
+				$wrapper->field_device_access_build->set($array_diff_assoc['build_number']);
+			}
+
+			if (array_key_isset('build_version', $array_diff_assoc)) {
+				$wrapper->field_device_access_version->set($array_diff_assoc['build_version']);
+			}
+
+			if (array_key_isset('bundle_identifier', $array_diff_assoc)) {
+				$wrapper->field_bundle_identifier->set($array_diff_assoc['bundle_identifier']);
+			}
+
+			if (array_key_isset('fcmToken', $array_diff_assoc)) {
+				$wrapper->field_key_token_notification->set($array_diff_assoc['fcmToken']);
+			}
+
+			if (array_key_isset('model_number', $array_diff_assoc)) {
+				$wrapper->field_model_number->set($array_diff_assoc['model_number']);
+			}
+
+			if (array_key_isset('platform', $array_diff_assoc)) {
+				$wrapper->field_platform->set($array_diff_assoc['platform']);
+			}
+
+			if (array_key_isset('status', $array_diff_assoc)) {
+				$wrapper->field_online->set($array_diff_assoc['status']);
+			}
+
+			if (array_key_isset('udid', $array_diff_assoc)) {
+				$wrapper->field_udid->set($array_diff_assoc['udid']);
+			}
+      $wrapper->save();
+    }
+	}
+
+	if(strcasecmp($mode, 'removed') == 0){
+		$query  = new EntityFieldQuery();
+		$collection_item = 	$query->entityCondition('entity_type', 'field_collection_item')
+															->entityCondition('bundle', 'field_device_access')
+															->fieldCondition('field_object_id', 'value', $objectId, '=')
+															->execute();
+
+		if (!empty($collection_item['field_collection_item'])) {
+      // entity_delete_multiple('field_collection_item', array(array_keys($collection_item['field_collection_item'])[0]));
+    }
+
+		// $result['result'] = TRUE;
+		// $result['param'] = $param;
+		// $result['_REQUEST'] = $_REQUEST;
+		// return  $result;
+	}
+
+	$result['result'] = TRUE;
+	$result['mode'] 	= $mode;
+	$result['userId'] = $userId;
+	$result['objectId'] = $objectId;
+	return  $result;
+}
+
 function class_member(){
 	$result = array();
 	if (!check_header()) {

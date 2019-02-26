@@ -88,8 +88,6 @@ class DrawerMenu extends React.Component{
             renderContent: false,
             x:100,
             modalVisible: false,
-            
-            data_my_application: []
         }
 
         this.onPressLearnMore = this.onPressLearnMore.bind(this)
@@ -99,8 +97,8 @@ class DrawerMenu extends React.Component{
     componentDidMount(){
         setTimeout(() => {this.setState({renderContent: true})}, 0);
         
-        let {my_applications} = this.props.auth.users
-        this.onLoadDataMyApplication(my_applications)
+        // let {my_applications} = this.props.auth.users
+        // this.onLoadDataMyApplication(my_applications)
 
         console.log(this.props)
 
@@ -110,8 +108,8 @@ class DrawerMenu extends React.Component{
     componentWillReceiveProps(nextProps) {
         // console.log(nextProps.auth)
 
-        let {my_applications} = nextProps.auth.users
-        this.onLoadDataMyApplication(my_applications)
+        // let {my_applications} = nextProps.auth.users
+        // this.onLoadDataMyApplication(my_applications)
     }
 
     navigateToScreen = (route) => {
@@ -125,19 +123,7 @@ class DrawerMenu extends React.Component{
     }
 
     onLoadDataMyApplication = (my_applications) =>{
-        let data_my_application = []
-        /*
-        Object.entries(my_applications).forEach(([key, value]) => {
-
-            if(value.status){
-                data_my_application.push({key, item_id: key, ...value})
-            }else{
-            //   unPublishedMember.push({key, item_id: key, ...value})
-            }
-        })
-        */
-
-        this.setState({data_my_application})
+        // this.setState({data_my_application})
     }
 
     onPressLearnMore(){
@@ -347,15 +333,19 @@ class DrawerMenu extends React.Component{
     }
 
     render(){
-        let {renderContent, data_my_application} = this.state;
+        let {renderContent} = this.state;
         let props = this.props
 
         if(this.state.x === 100){
             menu = <DrawerItems {...props} />
             collapse = require('../Images/collapse_down.png')
             other_user =<View style={{ position:'absolute', right: 0}}>
-                            <TouchableOpacity style={ styles.imageContainer2 }>
-                                <Image style={ styles.image2 } source={{ uri: 'http://www.free-avatars.com/data/media/37/cat_avatar_0597.jpg' }} />
+                            <TouchableOpacity>
+                                <Image 
+                                    style={{height:40,
+                                                width:40,
+                                                borderRadius: 20}} 
+                                    source={{ uri: 'http://www.free-avatars.com/data/media/37/cat_avatar_0597.jpg' }} />
                             </TouchableOpacity> 
                             <Text style={{ color: 'black', fontSize: 10, justifyContent:'flex-end', paddingTop:10, paddingLeft:10 }}>
                                 Somkid Sim 2,
@@ -439,7 +429,7 @@ class DrawerMenu extends React.Component{
                         <View>
                             <Text>Accounts</Text>
                             <FlatList
-                                contentContainerStyle={styles.list}
+                                // contentContainerStyle={styles.list}
                                 data={formatData(data, 4)}
                                 numColumns={4}
                                 scrollEnabled={false}
@@ -480,39 +470,8 @@ class DrawerMenu extends React.Component{
     }
 }
 
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    imageContainer: {
-        height: null,
-        width: null,
-        // borderRadius: 64
-        paddingTop: 25,
-        paddingLeft: 20,
-    },
-    image: {
-        height:80,
-        width:80,
-        borderRadius: 40
-    },
-
-    imageContainer2: {
-        height:40,
-        width: 40,
-        // borderRadius: 64
-        padding: 30,
-    },
-    image2: {
-        height:40,
-        width:40,
-        borderRadius: 20
-    },
-  });
-
 const mapStateToProps = (state) => {
     console.log(state)
-
     if(!state._persist.rehydrated){
         return {}
     }

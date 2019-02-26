@@ -20,16 +20,19 @@ import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import { connect } from 'react-redux';
 
 import DeviceInfo from 'react-native-device-info';
-
+import Spinner from 'react-native-loading-spinner-overlay';
+import firebase from 'react-native-firebase';
 var _ = require('lodash');
 
 const { RNTwitterSignIn } = NativeModules
 const FBSDK = require('react-native-fbsdk');
 const { LoginManager } = FBSDK;
-import Styles from '../../styles';
+
 import Constant from '../../Utils/Constant'
 import { actionLogout, updateIsLogin } from '../../Actions';
 import MyIcon from '../../config/icon-font.js';
+
+import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
 class homeY extends React.Component {
 
@@ -57,32 +60,45 @@ class homeY extends React.Component {
     ),
   }) 
 
+  // loading
+  constructor(props){
+    super(props)
+    this.state = {
+      loading: false,
+    }
+  }
+
   componentDidMount() {
     // console.log(this.props.dispatch)
   }
 
   onLogout = () =>{
+    // let {uid, presences} = this.props
     let {provider, users} = this.props.auth
 
+    this.setState({loading:true})
     this.props.updateIsLogin(users, v=>{
       // console.log(v)
     })
     
     if(provider == Constant.PROVIDERS.USER){
       console.log("Logout User")
-    }else if(provider == Constant.PROVIDERS.TWITTER){
-      console.log("Logout Twitter")
-      RNTwitterSignIn.init(Constant.TWITTER_COMSUMER_KEY, Constant.TWITTER_CONSUMER_SECRET)
-      RNTwitterSignIn.logOut()
-    }else if(provider == Constant.PROVIDERS.GOOGLE){
-      console.log("Logout Google")
-    }else if(provider == Constant.PROVIDERS.FACEBOOK){
-      console.log("Logout Facebook")
-      LoginManager.logOut()
     }
+    // else if(provider == Constant.PROVIDERS.TWITTER){
+    //   console.log("Logout Twitter")
+    //   RNTwitterSignIn.init(Constant.TWITTER_COMSUMER_KEY, Constant.TWITTER_CONSUMER_SECRET)
+    //   RNTwitterSignIn.logOut()
+    // }else if(provider == Constant.PROVIDERS.GOOGLE){
+    //   console.log("Logout Google")
+    // }else if(provider == Constant.PROVIDERS.FACEBOOK){
+    //   console.log("Logout Facebook")
+    //   LoginManager.logOut()
+    // }
     
-    this.props.actionLogout(this.props.dispatch, v=>{
+    this.props.actionLogout(this.props.uid, this.props.dispatch, v=>{
       // console.log(v)
+      this.setState({loading:true})
+
       if(!v.status){
         console.log('Error logout')
       }else{
@@ -96,13 +112,20 @@ class homeY extends React.Component {
      * Uncomment following line to render example with flatlist
      */
 
+    let {loading} = this.state
+
     if(!this.props.hasOwnProperty('auth')){
       return <View style={{flex: 1}}></View>
     }
 
     return (
-
       <ScrollView contentContainerStyle={styles.stage}>
+      <Spinner
+            visible={loading}
+            textContent={'Wait...'}
+            textStyle={{color: '#FFF'}}
+            overlayColor={'rgba(0,0,0,0.5)'}
+          />
         <TableView>
           <Section header="STANDARD">
             <Cell 
@@ -279,7 +302,9 @@ const mapStateToProps = (state) => {
   }
   
   return{
-    auth:state.auth
+    uid:getUid(state),
+    auth:state.auth,
+    // presences:state.presence.user_presences
   }
 }
 

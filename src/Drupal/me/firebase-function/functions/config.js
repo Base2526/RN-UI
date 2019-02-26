@@ -13,6 +13,7 @@ let constants = {
     API_URL_IDNA: 'http://128.199.149.168',
     END_POINT_IDNA: '/api',
     PATH_API_TEST: '/api_test',
+    PRESENCE: '/presence',
     UPDATE_PROFILE: '/update_profile',
     PROFILE_EMAILS: '/profile_emails',
     PROFILE_WEBSITES: '/profile_websites',

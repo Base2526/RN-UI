@@ -22,6 +22,7 @@ import {
 } from 'react-native-popup-menu';
 
 import ActionButton from 'react-native-action-button';
+var _ = require('lodash');
 
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
@@ -60,6 +61,12 @@ class FriendsPage extends React.Component{
     // }
 
     loadData=()=>{
+        if(this.props.auth.users === null){
+          return;
+        }
+
+        let {presences} = this.props
+
         let profile = {
           title: 'Profile',
           member: [
@@ -101,11 +108,29 @@ class FriendsPage extends React.Component{
               } 
               
               if(isAdd){
-                friend_member.push({...friend, friend_id:key});
+
+                // check online/offline
+                let presence =_.find(presences, (presences_v, presences_k)=>{
+                                return presences_k == key
+                              })
+
+                let is_online = false
+                if(presence !== undefined){
+                  let __ =_.find(presence, (presence_v, presence_k)=>{
+                    return presence_v.status == 'online'
+                  })
+                  if(__ !== undefined){
+                    is_online = true
+                  }
+                }
+                // check online/offline
+
+
+                friend_member.push({...friend, friend_id:key, is_online});
 
                 if(friend.is_favorite !== undefined){
                   if(friend.is_favorite){
-                      favorite_member.push({...friend, friend_id:key});
+                      favorite_member.push({...friend, friend_id:key, is_online});
                   }
                 }
               }
@@ -171,7 +196,8 @@ class FriendsPage extends React.Component{
                             position:'absolute', 
                             top:0,
                             right:0, 
-                            marginRight:10,}}>
+                            marginRight:10,
+                            zIndex:100}}>
                 <Menu>
                   <MenuTrigger>
                       <MyIcon 
@@ -278,6 +304,8 @@ class FriendsPage extends React.Component{
     }
 
     _renderRow = (rowItem, rowId, sectionId) => {
+        
+        
         if(rowId == 0 && sectionId == 0){
           return (
             <TouchableOpacity 
@@ -295,20 +323,12 @@ class FriendsPage extends React.Component{
                   borderColor: '#E4E4E4',
                   flexDirection: 'row',
                 }}>
-                
                   <TouchableOpacity
                     onPress={()=>{
                       this._itemOnPress(rowItem, rowId, sectionId)
-                    }}
-                    >
-                    {/* <TestSVG 
-                      width={80}
-                      height={80}
-                      strokeWidth={3}
-                      image_uri={rowItem.image_url}/> */}
-
+                    }}>
                     <FastImage
-                      style={{width: 50, height: 50, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
+                      style={{width: 50, height: 50, borderRadius: 10, borderColor:'gray'}}
                       source={{
                         uri: rowItem.image_url,
                         headers:{ Authorization: 'someAuthToken' },
@@ -347,6 +367,8 @@ class FriendsPage extends React.Component{
         // console.log(rowItem.status)
         switch(rowItem.status){
           case Constant.FRIEND_STATUS_FRIEND:{
+
+            
             swipeoutRight = [
              {
                 // text: 'Hide',
@@ -494,7 +516,7 @@ class FriendsPage extends React.Component{
                     this._itemOnPress(rowItem, rowId, sectionId)
                   }}>
                   <FastImage
-                        style={{width: 50, height: 50, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
+                        style={{width: 50, height: 50, borderRadius: 10, borderColor:'gray'}}
                         source={{
                           uri: rowItem.profile.image_url,
                           headers:{ Authorization: 'someAuthToken' },
@@ -502,6 +524,17 @@ class FriendsPage extends React.Component{
                         }}
                         resizeMode={FastImage.resizeMode.cover}
                       />
+
+                  {rowItem.is_online ? <View style={{width: 16, 
+                                          height: 16, 
+                                          backgroundColor: '#00ff80', 
+                                          position: 'absolute',
+                                          borderWidth: 2,
+                                          borderColor: 'white',
+                                          borderRadius: 8,
+                                          right: -5,
+                                          top: -5}} /> : <View />}
+                  
                 </TouchableOpacity>
                 <View>
                     <Text style={{fontSize: 18, 
@@ -635,7 +668,7 @@ class FriendsPage extends React.Component{
       }
 
       return (
-        <MenuContext>
+        // <MenuContext>
           <View style={{flex: 1}}>
           <Spinner
             visible={this.state.loading}
@@ -676,7 +709,7 @@ class FriendsPage extends React.Component{
                   this.props.params.navigation.navigate("AddFriendsPage")
               }} />
           </View>
-      </MenuContext>
+      // </MenuContext>
       );
     }
 }
@@ -692,7 +725,8 @@ const mapStateToProps = (state) => {
 
   return{
     uid:getUid(state),
-    auth:state.auth
+    auth:state.auth,
+    presences:state.presence.user_presences
   }
 }
 

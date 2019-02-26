@@ -11,11 +11,11 @@ var request = require('request');
 const config = require('./config');
 
 // https://gist.github.com/CodingDoug/490f9222c8b0f696338e2d74fcb78594
-exports.userPresenceCreate = functions.database.ref('user_presence/{userId}').onCreate((snapshot, context) => {
-    console.log(context.params.userId);
-    const original = snapshot.val();
+exports.userPresenceCreate = functions.database.ref('user_presence/{userId}/{objectId}').onCreate((snapshot, context) => {
+    // const original = snapshot.val();
 
-    console.log(original);
+    // console.log(original);
+    // console.log(context.params);
 
     /*
         {   
@@ -23,20 +23,62 @@ exports.userPresenceCreate = functions.database.ref('user_presence/{userId}').on
         model_number: 'iPhone 5s',
         platform: 'ios',
         status: 'online',
-        udid: 'E5EB164A-ED5A-4502-8938-AD18952CB34C' }
-     */
+        udid: 'E5EB164A-ED5A-4502-8938-AD18952CB34C' 
+        }
+    */
+
+    const newValue = snapshot.val();
+    let mode = 'added';
+    request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PRESENCE, form: {context, mode, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+        /* ... */
+        // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+        var objectValue = JSON.parse(body);
+        console.log(objectValue);
+        if (!objectValue.result) {
+            // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+        }
+    });
 
     return true;
 })
 
-exports.userPresenceUpdate = functions.database.ref('user_presence/{userId}').onUpdate((change, context) => {
+exports.userPresenceUpdate = functions.database.ref('user_presence/{userId}/{objectId}').onUpdate((change, context) => {
     // console.log(change);
     // console.log(context.params.userId);
 
-    let before = change.before.val();
-    let after = change.after.val()
-    console.log(before)
-    console.log(after)
+    let beforeValue = change.before.val();
+    let afterValue = change.after.val()
+    // console.log(before)
+    // console.log(after)
+    // console.log(context.params);
+
+    // const newValue = snapshot.val();
+    let mode = 'modified';
+    request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PRESENCE, form: {context, mode, beforeValue, afterValue}, headers: config.headers}, function(err,httpResponse,body){ 
+        /* ... */
+        // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+        var objectValue = JSON.parse(body);
+        console.log(objectValue);
+        if (!objectValue.result) {
+            // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+        }
+    });
+
+    return true;
+})
+
+exports.userPresenceDelete = functions.database.ref('user_presence/{userId}/{objectId}').onDelete((snapshot, context) => {
+    const deleteValue = snapshot.val();
+
+    let mode = 'removed';
+    request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PRESENCE, form: {context, mode, deleteValue}, headers: config.headers}, function(err,httpResponse,body){ 
+        // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+        var objectValue = JSON.parse(body);
+        console.log(objectValue);
+        if (!objectValue.result) {
+            // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+        }
+    });
 
     return true;
 })
