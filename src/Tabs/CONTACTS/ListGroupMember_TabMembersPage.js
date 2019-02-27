@@ -288,7 +288,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                     <MenuTrigger>
                         <MyIcon 
                             style={{padding:10}}
-                            name={'dot-vertical'}
+                            name={'dot-horizontal'}
                             size={15}
                             color={'#C7D8DD'} />  
                     </MenuTrigger>
@@ -344,7 +344,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                     <MenuTrigger>
                         <MyIcon 
                             style={{padding:10}}
-                            name={'dot-vertical'}
+                            name={'dot-horizontal'}
                             size={15}
                             color={'#C7D8DD'} />  
                     </MenuTrigger>
@@ -377,7 +377,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                     <MenuTrigger>
                         <MyIcon 
                             style={{padding:10}}
-                            name={'dot-vertical'}
+                            name={'dot-horizontal'}
                             size={15}
                             color={'#C7D8DD'} />  
                     </MenuTrigger>

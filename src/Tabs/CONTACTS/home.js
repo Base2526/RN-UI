@@ -5,7 +5,8 @@ import { View,
         TouchableOpacity, 
         StyleSheet,
         FlatList, 
-        Dimensions} from 'react-native';
+        Dimensions,
+        Image} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import ScrollableTabView, {ScrollableTabBar, DefaultTabBar} from 'react-native-scrollable-tab-view';
 import FastImage from 'react-native-fast-image'
@@ -91,10 +92,12 @@ const _header = props => (
                     let {params = {}} = props.navigation.state.routes[0]
                     params.handleHeaderRightContactsMenu()
                 } }>
-                <MyIcon
+                {/* <MyIcon
                     name={'collapse-down'}
                     size={15}
-                    color={'#C7D8DD'} />
+                    color={'#C7D8DD'} /> */}
+
+                    
             </TouchableOpacity>
         </View>
     
@@ -162,53 +165,69 @@ class home extends Component {
         // if(!this.props.hasOwnProperty('auth') 
         
         return {
-            title: "Contacts",
+            // title: "Contacts",
             tabBarVisible: false,
-            header: (props) => <ImageHeader {...props} {...navigation}/>,
+            headerBackground: (
+                <Image
+                  style={StyleSheet.absoluteFill}
+                  source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/3/36/Hopetoun_falls.jpg' }}
+                />
+              ),
+            // header: (props) => <ImageHeader {...props} {...navigation}/>,
             headerLeft: (
                 <TouchableOpacity
-                    // style={Styles.headerButton}
-                    onPress={() => navigation.openDrawer()}>
-                    <Icon name="bars" size={25} />
+                    style={{marginBottom:10}}
+                    onPress={() => {
+                        navigation.openDrawer()
+                    }}>
+                    <MyIcon
+                        name={'menu'}
+                        size={30}
+                        color={'#C7D8DD'}
+                        />
                 </TouchableOpacity>
             ),
             headerRight: (
                 <View style={{flexDirection:'row'}}>
                     <TouchableOpacity
-                        style={{height: 20,
-                                width: 30,
-                                alignItems:'center'}}
+                        style={{height: 25,
+                                width: 25,
+                                alignItems:'center',
+                                marginRight:10,}}
                         onPress={() => {
                             const { params = {} } = navigation.state
                             params.handleHeaderRightContactsSearch()
-
-                            // navigation.navigate('Search')
-                        } }>
-                        <Icon name="search" size={20} />
+                        }}>
+                        <MyIcon
+                            name={'contacts-search'}
+                            size={25}
+                            color={'#C7D8DD'} />
                     </TouchableOpacity>
-                    <TouchableOpacity
-                        style={{height: 20,
-                                width: 30,
-                                alignItems:'center'}}
-                        onPress={() => {
-                            const { params = {} } = navigation.state
-                            params.handleHeaderRight()
-                        } }>
-                        <Icon name="plus" size={20} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={{height: 20,
-                                width: 30,
-                                alignItems:'center'}}
-                        onPress={() => {
-                            const { params = {} } = navigation.state
-                            params.handleHeaderRightContactsMenu()
-                        } }>
-                    </TouchableOpacity>
+                    <Menu style={{ zIndex: 10 }}>
+                        <MenuTrigger>
+                            <MyIcon
+                                style={{marginRight:10}}
+                                name={'dot-vertical'}
+                                size={25}
+                                color={'#C7D8DD'} />
+                        </MenuTrigger>
+                        <MenuOptions optionsContainerStyle={{ }}>
+                            <MenuOption onSelect={() => {}}>
+                                <Text style={{padding:10, fontSize:18}}>Menu 1</Text>
+                            </MenuOption>
+                            <MenuOption onSelect={() => {}}>
+                                <Text style={{padding:10, fontSize:18}}>Menu 2</Text>
+                            </MenuOption>
+                            <MenuOption onSelect={() => {}}>
+                                <Text style={{padding:10, fontSize:18}}>Menu 3</Text>
+                            </MenuOption>
+                        </MenuOptions>
+                    </Menu>
                 </View>
             ),
         }
     }
+
     
     constructor(props){
         super(props)
@@ -220,6 +239,32 @@ class home extends Component {
             isOpenMenu:false,
             orientation:'PORTRAIT',
             numMenuColumns:4,
+            menuItem:[  {
+                            name: "menu 1",
+                            color: "Yellow",
+                        },
+                        {
+                            name: "menu 2",
+                            color: "Red",
+                        },
+                        {
+                            name: "menu 3",
+                            color: "Blue",
+                        },
+                        {
+                            name: "menu 4",
+                            color: "Blue",
+                        },
+                        {
+                            name: "menu 5",
+                            color: "Blue",
+                        },{
+                            name: "menu 6",
+                            color: "Green",
+                        },{
+                            name: "menu 7",
+                            color: "Green",
+                        }]
         }
     }
 
@@ -232,6 +277,8 @@ class home extends Component {
 
     componentWillReceiveProps(nextProps) {
         // console.log(nextProps.auth.users);
+
+        console.log('componentWillReceiveProps')
         if(nextProps.auth.users === null){
             return;
         }
@@ -245,7 +292,7 @@ class home extends Component {
 
     onLayout(e) {
         const {width, height} = Dimensions.get('window')
-        // console.log(width, height)
+        console.log(width, height)
     
         if(width<height){
           this.setState({orientation:'PORTRAIT', numMenuColumns:4})
@@ -278,17 +325,12 @@ class home extends Component {
     }
 
     handleHeaderRightContactsMenu= () => {
-        this.setState({
-            isOpenMenu:!this.state.isOpenMenu
-        })
+        // this.setState({
+        //     isOpenMenu:!this.state.isOpenMenu
+        // })
     }
 
     handleChangeTab({i, ref, from, }) {
-        // this.children[i].onEnter();
-        // this.children[from].onLeave();
-
-        // console.log("handleChangeTab : i =" + i)
-
         this.setState({
             positionSelect:i
         })
@@ -296,31 +338,52 @@ class home extends Component {
 
     renderListItem = ({ item }) => {
         if ('empty' in item) {
-          return <View style={{height: 80, 
-            width: 80, 
-            flex:1,
-            // borderColor: "green", 
-            // borderWidth: 1, 
-            justifyContent:'center', 
-            alignItems:'center',
-            backgroundColor: 'transparent',
-            borderWidth:.5, 
-            borderColor:'#C9C4C4',}} />;
+            return <View style={{ height: 80, 
+                                width: 80, 
+                                flex:1,
+                                justifyContent:'center', 
+                                alignItems:'center',
+                                backgroundColor: 'transparent',
+                                borderColor:'#C9C4C4',}} />;
         }
+
+        return (
+            <TouchableOpacity 
+                style={{flex:1,
+                    justifyContent:'center', 
+                    alignItems:'center',
+                    padding:10
+                    }}
+                onPress={()=>{
+                // this.props.params.navigation.navigate("ApplicationDetailPage")
+                }}>
+                <FastImage
+                    style={{width: 50, 
+                            height: 50, 
+                            borderRadius: 25,
+                            }}
+                    source={{
+                    uri: 'https://unsplash.it/400/400?image=1',
+                    headers:{ Authorization: 'someAuthToken' },
+                    priority: FastImage.priority.normal,
+                    }}
+                    resizeMode={FastImage.resizeMode.contain}
+                />
+                <View style={{justifyContent:'center', paddingTop:5}}>
+                    <Text >{item.name}</Text>
+                </View>
+            </TouchableOpacity>
+          )
     
         return (
             <TouchableOpacity 
                 onPress={()=>{
                     this.props.navigation.navigate("testPushNotifications")
-                    // this.props.navigation.navigate("AddClasssPage")
                 }}>
                 <View style={{
                             height: 80, 
                             width: 80, 
                             flex:1,
-                            // borderColor: "green", 
-                            // borderWidth: 1, 
-                            // backgroundColor:'red',
                             justifyContent:'center', 
                             alignItems:'center',
                             borderWidth:.5, 
@@ -335,48 +398,24 @@ class home extends Component {
 
     renderViewMenu(){
         return(
-            <View style={{position:'absolute', backgroundColor:'#F7F6F6', zIndex:100, left:0, right:0}}>
-            <FlatList
-            key = {this.state.orientation}
-            // data={item.list}
-            /*  เราต้องมีการคำนวณ item ให้เต็มแต่ละแถว  */
-            data = {formatData([
-                {
-                  name: "menu 1",
-                  color: "Yellow",
-                },
-                {
-                  name: "menu 2",
-                  color: "Red",
-                },
-                {
-                  name: "menu 3",
-                  color: "Blue",
-                },
-                {
-                  name: "menu 4",
-                  color: "Blue",
-                },
-                {
-                  name: "menu 5",
-                  color: "Blue",
-                },{
-                  name: "menu 6",
-                  color: "Green",
-                },{
-                  name: "menu 7",
-                  color: "Green",
-                }
-      
-              ], this.state.numMenuColumns)}
-            numColumns={this.state.numMenuColumns}
-            renderItem={this.renderListItem}
-            keyExtractor={this.keyExtractor}
-            extraData={this.state}
-            contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
-            // style={{flex:1, backgroundColor:'red'}}
-        />
-        </View>
+            <View style={{position:'absolute', 
+                        backgroundColor:'gray', 
+                        zIndex:100, 
+                        left:0, 
+                        right:0,
+                        flex:1}}>
+                <FlatList
+                    // style={{flex:1, backgroundColor:'red'}}
+                    key = {this.state.orientation}
+                    // data={item.list}
+                    /*  เราต้องมีการคำนวณ item ให้เต็มแต่ละแถว  */
+                    data = {formatData(this.state.menuItem, this.state.numMenuColumns)}
+                    numColumns={this.state.numMenuColumns}
+                    renderItem={this.renderListItem}
+                    keyExtractor={this.keyExtractor}
+                    extraData={this.state}
+                    contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}/>
+            </View>
         )
     }
 
@@ -399,17 +438,10 @@ class home extends Component {
             return(<View style={{flex:1}}></View>)
         }
 
-        // console.log(this.state.isConnected)
-
         return (
-            <MenuContext>
             <View style={{backgroundColor:'white', flex:1}} onLayout={this.onLayout.bind(this)} >
-                {menuView}
+                {/* {menuView} */}
                 {!isConnected ?<OfflineNotice />:<View />}
-                
-                {/* { renderContent && */}
-                {/* <View> */}
-                
                 <ScrollableTabView
                     // style={{height:500}}
                     initialPage={0}
@@ -423,11 +455,7 @@ class home extends Component {
                     <GroupsPage tabLabel='Groups' index={1} amount={5} params={this.props} handleScroll={this.handleScroll}/>
                     <ClasssPage tabLabel='Classs' index={2} amount={6} params={this.props} handleScroll={this.handleScroll}/>
                 </ScrollableTabView>
-                {/*  */}
-                {/* </View> */}
-                {/* } */}
             </View>
-            </MenuContext>
         );
     }
 }

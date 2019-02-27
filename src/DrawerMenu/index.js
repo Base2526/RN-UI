@@ -475,6 +475,10 @@ const mapStateToProps = (state) => {
     if(!state._persist.rehydrated){
         return {}
     }
+
+    if(!state.auth.isLogin){
+        return;
+    }
     
     return{
         auth:state.auth

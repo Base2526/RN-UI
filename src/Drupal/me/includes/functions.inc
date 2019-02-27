@@ -450,6 +450,90 @@ function update_user_chat_group(){
 	$result['$param'] = $param;
 	return  $result;
 }
+
+function user_of_friend(){
+	$result = array();
+  
+	if (!check_header()) {
+	  $result['result'] = FALSE;
+	  // $result['message']= "check_header()";
+	  return $result;
+	}
+
+	$param = $_REQUEST['context']['params'];
+
+	$mode 		 = $_REQUEST['mode'];
+	$userId    = $param['userId'];
+	$friendId  = $param['friendId'];
+
+	if (empty($userId) || empty($friendId) || empty($mode)) {
+	  $result['result'] 	= FALSE;
+	  return $result;
+	}
+
+	/*
+	const newValue = snap.data();
+	let mode = 'added';
+	*/
+	if(strcasecmp($mode, 'added') == 0){
+		$newValue  = $_REQUEST['newValue'];
+
+		$profile = profile2_by_uid_load($userId, 'main');
+
+		$v = array();
+    $v['field_name'] = 'field_profile_friends'; // field collection name
+
+    $v['field_friend_uid'][LANGUAGE_NONE][0]['value']               = $friendId;
+    $v['field_change_friend_name'][LANGUAGE_NONE][0]['value']       = '';
+    $v['field_profile_friends_chat_id'][LANGUAGE_NONE][0]['value']  = $newValue['chat_id'];
+    $v['field_friend_status'][LANGUAGE_NONE][0]['tid']              = $newValue['status'];
+  
+    $field_entity = entity_create('field_collection_item', $v);
+    $field_entity->setHostEntity('profile2', $profile);
+    $field_entity->save();
+	}
+
+	if(strcasecmp($mode, 'modified') == 0){
+		$newValue  = $_REQUEST['newValue'];
+		$previousValue = $_REQUEST['previousValue'];
+
+		$array_diff_assoc  = array_diff_assoc($newValue, $previousValue);
+
+		$result['array_diff_assoc'] = $array_diff_assoc;
+
+
+		$profile = profile2_by_uid_load($userId, 'main');
+		foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
+			// Build array of field collection values.
+
+			$val = field_collection_item_load($value['value']);
+
+			// watchdog(TAG, 'user_for_friend_delete header: %header', array('%header'=> serialize($_REQUEST)), WATCHDOG_INFO);
+			$result['val'] = $val;
+			// จะดึงที่ field_friend_uid = $uid แก้ใข friend status
+			if($val->field_friend_uid[LANGUAGE_NONE][0]['value'] == $friendId){
+				$wrapper = entity_metadata_wrapper('field_collection_item', $val);
+				// $wrapper->field_friend_status->set($data['status']);
+
+				$result['#1'] = $wrapper->field_friend_status->value();
+				if (array_key_exists('status', $array_diff_assoc)) {
+					$wrapper->field_friend_status->set($array_diff_assoc['status']);
+
+					$result['#2'] = $array_diff_assoc['status'];
+				}
+
+				if (array_key_exists('status', $array_diff_assoc)) {
+					
+				}
+
+				$wrapper->save();
+			}
+		}
+	}
+
+	$result['result'] = TRUE;
+	return $result;
+}
   
 /*
    ถุกเรียกใช้จาก firebase เท่านั้น
@@ -627,6 +711,7 @@ function user_for_friend_editupdate(){
 	}
   
 	$result['result'] = TRUE;
+	$result['data']   = $data;
 	return  $result;
 }
   
@@ -1418,8 +1503,10 @@ function generatorQRCode($account, $platform, $bundleidentifier){
 	  //Create the directory if it does not already exist, otherwise check the permissions
 	  file_prepare_directory($PNG_TEMP_DIR, FILE_CREATE_DIRECTORY);
   
-	  $text     = dec_enc('encrypt', $account->uid);
-	  $errorCorrectionLevel = "M";
+	  // $text     = encrypt($account->uid);//dec_enc('encrypt', $account->uid);
+		
+		$encrypt     = dec_enc('encrypt', 'bundle*' . BUNDLE_IDENTIFIER .'|type*friend|friendId*'. $account->uid);//dec_enc('encrypt', $group_id);
+		$errorCorrectionLevel = "M";
 	  $matrixPointSize = 8;
   
 	  // Create Profile2
@@ -1446,8 +1533,8 @@ function generatorQRCode($account, $platform, $bundleidentifier){
 		case BUNDLE_IDENTIFIER:
 		{
 		  // ios
-		  $filename = $PNG_TEMP_DIR.'/'.md5($text.'|'.$errorCorrectionLevel.'|'.$matrixPointSize).'.png';
-		  QRcode::png(URL_SERVER() . "/qe?&bi=" . dec_enc('encrypt', BUNDLE_IDENTIFIER)  . "&bii=" . $text, $filename, $errorCorrectionLevel, $matrixPointSize, 2);  
+		  $filename = $PNG_TEMP_DIR.'/'.md5($encrypt.'|'.$errorCorrectionLevel.'|'.$matrixPointSize).'.png';
+		  QRcode::png(URL_SERVER() . "/qe?" . $encrypt, $filename, $errorCorrectionLevel, $matrixPointSize, 2);  
   
 		  $currentDate = date("Ymd");
 		  $name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
@@ -1514,13 +1601,13 @@ function generatorQRCodeForGroupChat($uid, $group_id){
 	//Create the directory if it does not already exist, otherwise check the permissions
 	file_prepare_directory($PNG_TEMP_DIR, FILE_CREATE_DIRECTORY);
 
-	$text     = dec_enc('encrypt', $group_id);
+	$encrypt     = dec_enc('encrypt', 'bundle*' . BUNDLE_IDENTIFIER .'|type*group|groupId*'. $group_id);//dec_enc('encrypt', $group_id);
 	$errorCorrectionLevel = "M";
 	$matrixPointSize = 8;
 
 	// ios
-	$filename = $PNG_TEMP_DIR.'/'.md5($text.'|'.$errorCorrectionLevel.'|'.$matrixPointSize).'.png';
-	QRcode::png(URL_SERVER() . "/qe?&bi=" . dec_enc('encrypt', BUNDLE_IDENTIFIER)  . "&bii=" . $text, $filename, $errorCorrectionLevel, $matrixPointSize, 2);  
+	$filename = $PNG_TEMP_DIR.'/'.md5($encrypt.'|'.$errorCorrectionLevel.'|'.$matrixPointSize).'.png';
+	QRcode::png(URL_SERVER() . "/qe?" . $encrypt , $filename, $errorCorrectionLevel, $matrixPointSize, 2);  
 
 	$currentDate = date("Ymd");
 	$name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";

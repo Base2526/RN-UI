@@ -21,6 +21,8 @@ let constants = {
     PROFILE_MYIDS: '/profile_myids',
     UPDATE_FOR_FRIEND_EDITUPDATE: '/user_for_friend_editupdate',
 
+    USER_OF_FRIEND: '/user_of_friend',
+
     DELETE_CHAT_GROUP: '/delete_chat_group',
     CLASSS: '/classs',
     CLASS_MEMBER: '/class_member',

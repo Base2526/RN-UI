@@ -125,22 +125,6 @@ exports.deleteClasss = functions.firestore
         return true;
 });
 
-/*
-.onCreate((snap, context) => {
-        const newValue = snap.data();
-        let mode = 'added';
-        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.PROFILE_PHONES, form: {context, mode, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
-            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
-            var objectValue = JSON.parse(body);
-            // console.log(objectValue);
-            if (!objectValue.result) {
-                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
-            }
-        });
-        return true;
-    }
-*/
-
 exports.createClasssMember = functions.firestore
     .document('users/{userId}/classs/{classId}/members/{memberId}')
     .onCreate((snap, context) => {
@@ -449,21 +433,42 @@ exports.deleteProfiles_myID = functions.firestore
     }
 );
 
+exports.createInviteFriend = functions.firestore
+    .document('users/{userId}/friends/{friendId}')
+    .onCreate((snap, context) => {
+        const newValue = snap.data();
+        let mode = 'added';
+        request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.USER_OF_FRIEND, form: {context, mode, newValue}, headers: config.headers}, function(err,httpResponse,body){ 
+            /* ... */
+            // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
+            var objectValue = JSON.parse(body);
+            // console.log(objectValue);
+            if (!objectValue.result) {
+                // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
+            }
+        });
+        return true;
+    }
+);
+
 // UpdateStatusFriend
-exports.updateStatusFriend = functions.firestore
+exports.updateUserOfFriend = functions.firestore
     .document('users/{userId}/friends/{friendId}')
     .onUpdate((change, context) =>{
 
-    const newValue = change.after.data();
+    // const newValue = change.after.data();
     // console.log(newValue);
 
     // user_for_friend_editupdate
 
-    request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.UPDATE_FOR_FRIEND_EDITUPDATE, form: {newValue, context}, headers: config.headers}, function(err,httpResponse,body){ 
+    const newValue = change.after.data();
+    const previousValue = change.before.data();
+    let mode = 'modified';
+    request.post({url:config.API_URL_IDNA + config.END_POINT_IDNA + config.USER_OF_FRIEND, form: {mode, previousValue, newValue, context}, headers: config.headers}, function(err,httpResponse,body){ 
         /* ... */
         // เราต้อง parse value ก่อนถึงจะสามารถใช้งานได้
         var objectValue = JSON.parse(body);
-        // console.log(objectValue);
+        console.log(objectValue);
         if (!objectValue.result) {
             // console.log('#1 : iDNA profiles > edit & updated, Erorr : ' + err);
         }

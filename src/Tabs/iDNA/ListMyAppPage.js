@@ -152,7 +152,7 @@ class ListMyAppPage extends React.Component{
                   <MenuTrigger>
                       <MyIcon 
                           style={{padding:10}}
-                          name={'dot-vertical'}
+                          name={'dot-horizontal'}
                           size={15}
                           color={'gray'} />  
                   </MenuTrigger>
@@ -178,7 +178,6 @@ class ListMyAppPage extends React.Component{
               </Menu>
             </View>)
     }
-
 
     _renderRow = (rowItem, rowId, sectionId) => {
       console.log(rowItem)

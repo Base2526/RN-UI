@@ -1685,6 +1685,16 @@ function me_services_resources()
       ),
     ),
 
+    'scan_qrcode'=>array(
+      'create' =>array(
+        'help'=>'Services scan_qrcode',
+        'callback'=>'scan_qrcode',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+      ),
+    ),
+
     'shby_class'=>array(
       'create' =>array(
         'help'=>'Services Send Heart by Class',
@@ -2687,6 +2697,27 @@ function me_services_resources()
       'create' =>array(
         'help'=>'Services แก้ไข, เพิ่มเติม field friend ของ user : param uid, friend_id, data',
         'callback'=>'user_for_friend_editupdate',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+        /* กรณีที่เราต้องการ pass parameter */
+        'args' => array(
+          array(
+           'name' => 'parameters',
+           'type' => 'array',
+           'description' => '',
+           'source' => 'param',
+           'optional' => TRUE,
+           'default value' => array(),
+          ),
+        ),
+      ),
+    ),
+
+    'user_of_friend'=>array(
+      'create' =>array(
+        'help'=>'Services แก้ไข friend ของ user',
+        'callback'=>'user_of_friend',
         'access callback' => 'user_access',
         'access arguments' => array('access content'),
         'access arguments append' => FALSE,
@@ -6371,6 +6402,100 @@ function check_my_id(){
   return $result;
 }
 
+function scan_qrcode(){
+  $result = array();
+
+  if (!check_header()) {
+    $result['result'] = FALSE;
+    // $result['message']= "check_header()";
+    return $result;
+  }
+
+  $param = json_decode(file_get_contents('php://input'), true);
+  $param_uid  = $param['uid'];
+  $param_qe   = $param['qe'];
+
+  if (empty($param_uid) || empty($param_qe)) {
+    $result['result']   = FALSE;
+    // $result['message']  = "function : check_my_id, parameter";
+    return $result;
+  }
+
+  $time_start = microtime(true);
+
+  // bundle*th.dna|type*friend|friendId*549126
+  $decrypt = dec_enc('decrypt', $param_qe);
+  $decrypt_explode = explode("|", $decrypt);
+
+  if(count($decrypt_explode) == 3){
+
+    // bundle*th.dna
+    $decrypt_bundle = explode("*", $decrypt_explode[0]);
+    if(count($decrypt_bundle) == 2){
+
+      // strcmp($str2, $str2)
+      if(strcmp($decrypt_bundle[1], BUNDLE_IDENTIFIER) === 0){
+
+        // type*friend
+        $decrypt_type     = explode("*", $decrypt_explode[1]);
+        $decrypt_id       = explode("*", $decrypt_explode[2]);
+
+        switch($decrypt_type[1]){
+          case 'friend':{
+            $profile = profile2_by_uid_load($param_uid, 'main');
+
+            $friend_status = 0;
+            foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $k => $v) {
+              // จะได้ เพือนมาทั้งหมด
+              $data_item_load = field_collection_item_load($v['value']);
+              if($data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] == $decrypt_id[1]){
+                $friend_status = $data_item_load->field_friend_status[LANGUAGE_NONE][0]['tid'];
+                break;
+              }
+            }
+
+            $profile_friend = profile2_by_uid_load($decrypt_id[1], 'main');
+
+            $v = array();
+            $v['uid']           = $decrypt_id[1];
+            $v['name']          = $profile_friend->field_profile_name[LANGUAGE_NONE][0]['value'];
+            
+            if(isset($profile_friend->field_profile_image[LANGUAGE_NONE])){
+              $v['image_url']  = file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']));
+            }else{
+              $v['image_url']  = getDefualtProfilePicture();
+            }
+           
+            $v['friend_status'] = $friend_status;
+            $v['type']          = $decrypt_type[1];
+
+            $time_end       = microtime(true);
+            $execution_time = number_format(($time_end - $time_start), 2);
+            $result['execution_time']  = $execution_time;
+
+            $result['result']   = TRUE;
+            $result['data']     = $v;
+            return $result;
+          }
+
+          case 'group':{
+
+            break;
+          }
+        }
+
+        $result['result']   = TRUE;
+      }
+    }
+  }
+
+  $result['result']   = TRUE;
+  // $result['uid']      = $param_uid;
+  // $result['qe']       = $param_qe;
+  // $result['decrypt']  = dec_enc('decrypt', $param_qe);
+  return $result;
+}
+
 function edit_display_name(){
   $result = array();
 
@@ -9077,14 +9202,14 @@ function add_friend(){
 
   if (!check_header()) {
     $result['result']   = FALSE;
-    $result['message']  = "check_header()";
+    // $result['message']  = "check_header()";
     return $result;
   }
 
   $param = json_decode(file_get_contents('php://input'), true);
   if (empty($param['uid']) || empty($param['friend_id'])) {
     $result['result'] = FALSE;
-    $result['param'] = $param;
+    // $result['param'] = $param;
     return $result;
   }
 
@@ -9167,7 +9292,7 @@ function add_friend(){
 
     $chat_id = generateRandomString(LENGTH_CHAT_ID);
 
-    // เป็นการเพือนให้ตัวเรา
+    // เป็นการเพิ่มเพือนให้ตัวเรา
     $user_profile = profile2_by_uid_load($uid, 'main');
 
 
@@ -9204,8 +9329,6 @@ function add_friend(){
 
     $result['values']  = $values;  
 
-
-    
     // เป็นการเพิ่มตัวเรา  ให้เพือน
     $friend_profile = profile2_by_uid_load($friend_id, 'main');
 

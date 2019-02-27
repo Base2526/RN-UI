@@ -5,17 +5,20 @@ import {View,
         TouchableOpacity} from 'react-native'
 
 import { connect } from 'react-redux';
+import Spinner from 'react-native-loading-spinner-overlay';
+import FastImage from 'react-native-fast-image'
 
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
-import FastImage from 'react-native-fast-image'
 import {getUid} from '../../Utils/Helpers'
 
 class SettingListFriendRequestSent extends React.Component{
     constructor(props){
         super(props)
+
         this.state = {
-            data:[]
+          data:[],
+          loading: false
         }
     }
 
@@ -73,12 +76,13 @@ class SettingListFriendRequestSent extends React.Component{
         })
     }
 
-    renderItem({ item, index }) {
+    renderItem = ({item, index}) => {
         // return (<View><Text>{index}</Text></View>)
 
         // console.log(item)
         return(
             <TouchableOpacity 
+            key={item}
             onPress={()=>{
                 this.props.navigation.navigate("FriendProfilePage",{'friend_id': item.friend_id})
             }}>            
@@ -94,11 +98,11 @@ class SettingListFriendRequestSent extends React.Component{
                 <TouchableOpacity 
                     style={{}}>
                     <FastImage
-                        style={{width: 60, 
-                                height: 60, 
+                        style={{width: 50, 
+                                height: 50, 
                                 borderRadius: 10,  
-                                borderWidth:1, 
-                                borderColor:'gray'
+                                // borderWidth:1, 
+                                // borderColor:'gray'
                               }}
                         source={{
                           uri: item.profile.image_url,
@@ -124,42 +128,52 @@ class SettingListFriendRequestSent extends React.Component{
                     </Text>
                 </View>
 
-                <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
+                {/* <TouchableOpacity
+                  style={{backgroundColor:'red'}}
+                  onPress={()=>{
+                    this.setState({loading:true})
+                  }}>
+                  <Text>red</Text>
+                </TouchableOpacity> */}
+
+                <TouchableOpacity
+                  style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}
+                  onPress={()=>{
+                      this.setState({loading:true})
+                      this.props.actionUpdateStatusFriend(this.props.uid, item.friend_id, Constant.FRIEND_STATUS_FRIEND_CANCEL, (result)=>{
+                          // console.log(result)
+                          this.setState({loading:false})
+                      })
+                  }}>
                   <View style={{borderColor:'red', borderWidth:1, borderRadius:10, padding:5, marginLeft:5}}>
-                    <TouchableOpacity
-                    onPress={()=>{
-                        // this.props.actionFriendHide(this.props.uid, item.friend_id, (result)=>{
-                        //     console.log(result)
-                        // })
-                        this.props.actionUpdateStatusFriend(this.props.uid, item.friend_id, Constant.FRIEND_STATUS_FRIEND_CANCEL, (result)=>{
-                            console.log(result)
-                        })
-                    }}>
                       <Text style={{color:'red'}}>Cancel request</Text>
-                    </TouchableOpacity>
                   </View>
-                </View>
+                </TouchableOpacity>
             </View>
             </TouchableOpacity>
         )
     }
 
     render(){
-        let {data} = this.state
-        // console.log(data)
-        return(<View style={{flex:1}}>
-                <FlatList
-                    data={data}
-                    showsVerticalScrollIndicator={false}
-                    renderItem={this.renderItem.bind(this)}
-                    keyExtractor={item => item.item_id}
-                />
-                </View>)
+      let {data} = this.state
+      return(<View style={{flex:1}}>
+              <Spinner
+                visible={this.state.loading}
+                textContent={'Wait...'}
+                textStyle={{color: '#FFF'}}
+                overlayColor={'rgba(0,0,0,0.5)'}/>
+              <FlatList
+                data={data}
+                // showsVerticalScrollIndicator={false}
+                renderItem={this.renderItem}
+                extraData={this.state}
+                keyExtractor = { (item, index) => index.toString() } />
+            </View>)
     }
 }
 
 const mapStateToProps = (state) => {
-    console.log(state)
+    // console.log(state)
   
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
     //_persist.rehydrated parameter is initially set to false

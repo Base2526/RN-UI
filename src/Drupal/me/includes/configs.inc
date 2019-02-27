@@ -175,7 +175,7 @@ function me_init(){
 	// define("BI_IOS_IDNA", "heart.idna");
 	// define("BI_ANDROID_IDNA", "heart.idna");
   
-	define("BUNDLE_IDENTIFIER", "heart.idna");
+	define("BUNDLE_IDENTIFIER", "th.dna");
   
 	// define("DEFUALT_LENGTH_CHAT_ID", 20); 
   

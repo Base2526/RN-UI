@@ -417,6 +417,25 @@ export const check_my_id = (uid, type, id) => {
         });
 }
 
+export const scan_qrcode = (uid, qe) => {
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({
+            'uid':uid,
+            'qe':qe
+        }),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.SCAN_QRCODE, data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+        });
+}
+
 export const update_class_picture_profile = (uid, class_id, image_uri) =>{
     var data = new FormData();
     data.append('idna', {

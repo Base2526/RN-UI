@@ -113,7 +113,8 @@ import {login,
         update_picture_bg_profile,
         update_group_picture_profile,
         update_class_picture_profile,
-        check_my_id,} from '../Utils/Services'
+        check_my_id,
+        scan_qrcode,} from '../Utils/Services'
 
 export const actionApplicationCategory = () =>dispatch =>{
     return application_category().then(data=>{
@@ -277,36 +278,41 @@ export const actionPeopleYouMayKhow = (uid) => dispatch=>{
     })
 }
 
-export const actionInviteFriend = (uid, friend_id) => dispatch =>{
-
-    return invite_friend(uid, friend_id).then(data => {
-        // this.setState({isShowSpinner:false})
-
-        // dispatch({ type: LOADING, isLoading:false})
-
-        // console.log(data)
-        if((data instanceof Array)){
-            // error message
-            // alert(data[0])
-            // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data[0] });
-
-            return {'status':false, 'message': data.message}
-        }else{
-            if(!data.result){
-                // alert(data.message)
-                // dispatch({ type: LOGIN_USER_FAIL, provider: Constant.PROVIDERS.USER, error: data.message });
-        
-                return {'status':false, 'message': data.message}
-            }else{
-                // console.log(data.data.friend_profiles)
-                // console.log(data.data.user)
-                // console.log(data.data.user_profile)
-                // saveAsyncStorage(Constant.USER_LOGIN, {"provider": Constant.PROVIDERS.USER, "user": data.data});
-                // dispatch({ type: LOGIN_USER_SUCCESS, provider: Constant.PROVIDERS.USER, user: data.data });
-                return {'status':true, 'data':data}
+export const actionInviteFriend = (uid, friend_id, callback) => dispatch =>{
+    let userRef = firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
+    userRef.get()
+    .then(doc => {
+        let chat_id = randomKey()
+        if (!doc.exists) {
+        } else {
+            let data = doc.data();
+            if(data.chat_id){
+                chat_id = data.chat_id
             }
         }
+
+        let batch = firebase.firestore().batch();
+
+        let userRef = firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
+        batch.set(userRef, {chat_id, 
+                            status:Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND}, { merge: true})
+
+        let friendRef = firebase.firestore().collection('users').doc(friend_id).collection('friends').doc(uid);
+        batch.set(friendRef, {  chat_id, 
+                                status:Constant.FRIEND_STATUS_FRIEND_REQUEST}, { merge: true})
+
+        batch.commit().then(function () {
+            // console.log("Transaction success: actionInviteFriend");
+            callback({'status':true})
+        }).catch(function(err) {
+            // console.log("Transaction failure: " + err);
+            callback({'status':false, 'message':err})
+        });
     })
+    .catch(err => {
+        // console.log('Error getting document', err);
+        callback({'status':false, 'message':err})
+    });
 }
 
 export const actionAddFriend = (uid, friend_id, data, profile, callback) => dispatch =>{
@@ -746,17 +752,24 @@ export const actionEditClassNameProfile = (uid, class_id, name, callback) => dis
 
 
 export const actionUpdateStatusFriend = (uid, friend_id, status, callback) => dispatch=>{
-    // console.log('-------------- actionAcceptFriend()')
+    let batch = firebase.firestore().batch();
+
     // update status เพือ่นของเรา
-    firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).update({status})
-
+    let userRef = firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id) //.update({status})
+    batch.set(userRef, {status}, { merge: true})
+    
     // update status เราของเพือน
-    firebase.firestore().collection('users').doc(friend_id).collection('friends').doc(uid).update({status})
+    let friendRef = firebase.firestore().collection('users').doc(friend_id).collection('friends').doc(uid) //.update({status})
+    batch.set(friendRef, {status}, { merge: true})
 
-    // status
-    dispatch({ type: UPDATE_STATUS_FRIEND, friend_id, status});
+    batch.commit().then(function () {
+        // status
+        dispatch({ type: UPDATE_STATUS_FRIEND, friend_id, status});
 
-    callback({'status':true, 's' : status})
+        callback({'status':true})
+    }).catch(function(err) {
+        console.log("Transaction failure: " + err);
+    });
 }
 
 // key, this.props.uid, friend.friend_id
@@ -1238,6 +1251,21 @@ export const actionFindMyID = (uid, type, id) => dispatch=>{
     })
 
     // callback({'status':true})
+}
+
+export const actionScanQRcode= (uid, qe) => dispatch=>{
+    return scan_qrcode(uid, qe).then(data => {
+        console.log(data)
+        if((data instanceof Array)){
+            return {'status':false, 'message': data.message}
+        }else{
+            if(!data.result){
+                return {'status':false, 'message': data.message}
+            }else{
+                return {'status':true, data}
+            }
+        }
+    })
 }
 
 let unsubscribe = null;

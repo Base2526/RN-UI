@@ -65,7 +65,7 @@ const index = createStackNavigator({
     'Home': {
         screen: home,
         navigationOptions: {
-          title: 'Contacts',
+          // title: 'Contacts',
         },
     },
     'Details': {

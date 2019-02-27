@@ -2559,29 +2559,27 @@ export default (state= INITIAL_STATE, action)=>{
 
             let friends = state.users.friends
 
-            let key = 0
-            let value = null
-            _.each(friends, function(_v, _k) { 
-                if(_k === action.friend_id){
-                    key = _k
-                    value = _v
-                }
-            });
+            let friend = _.find(friends,  function(v, k) { 
+                return k == action.friend_id
+            })
 
-            value = {...value, mute:action.mute}
+            if(friend !== undefined){
+                if(friend.mute != action.mute){
+                    friend = {...friend, mute:action.mute}
 
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    friends : {
-                        ...state.users.friends,
-                        [action.friend_id]: value
-                    }
+                    let newStatus = {...state,
+                                        users : {
+                                            ...state.users,
+                                            friends : {
+                                                ...state.users.friends,
+                                                [action.friend_id]: friend
+                                            }
+                                        }
+                                    }
+                    return newStatus
                 }
             }
 
-            console.log(v)
             return state
         }
 
@@ -2593,35 +2591,25 @@ export default (state= INITIAL_STATE, action)=>{
 
             let friends = state.users.friends
 
-            let key = 0
-            let value = null
-            _.each(friends, function(_v, _k) { 
-                if(_k === action.friend_id){
-                    key = _k
-                    value = _v
-                }
-            });
+            let friend = _.find(friends,  function(v, k) { 
+                return k == action.friend_id
+            })
 
-            if(value.hide === undefined){
-                value = {...value, hide:true}
-            }else{
-                value = {...value, hide:!value.hide}
-            }
-            // console.log(value)
-
-            // friends
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    friends : {
-                        ...state.users.friends,
-                        [action.friend_id]: value
-                    }
+            if(friend !== undefined){
+                if(friend.hide != action.hide){
+                    friend = {...friend, hide:action.hide}
+                    let newStatus = {...state,
+                                        users : {
+                                            ...state.users,
+                                            friends : {
+                                                ...state.users.friends,
+                                                [action.friend_id]: friend
+                                            }
+                                        }
+                                    }
+                    return newStatus
                 }
             }
-            // console.log(v)
-
             return v
         }
 

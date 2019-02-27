@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import ImagePicker from 'react-native-image-picker';
 import {QRscanner, QRreader} from 'react-native-qr-scanner';
 import Spinner from 'react-native-loading-spinner-overlay';
+import base64 from 'react-native-base64'
 
 import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
@@ -30,7 +31,7 @@ class QRCodeReaderPage extends Component {
       loading:false,
 
       flashMode: false,
-      zoom: 0.2,
+      zoom: 0,
       re_activate: 0,
     }
   }
@@ -73,48 +74,28 @@ class QRCodeReaderPage extends Component {
     
     // this.props.navigation.goBack(null)
 
-    this.findMyID(res.data)
+    // http://128.199.149.168/qe?&bi*aGVhcnQuaWRuYQ==&bii*NTQ5MTI1&biii*ZnJpZW5k
+
+    this.dataSplit(res.data)
   }
 
-  findMyID = (id) =>{
-    // console.log(id)
-    this.setState({loading:true})
-    this.props.actionFindMyID(this.props.uid, 'qrcode', id).then((result) => {
-        this.setState({loading:false})
+  dataSplit = (data) =>{
+    let qe = data.split("?");
+    console.log(qe)
 
-        console.log(result)
+    if(qe.length == 2){
+      this.setState({loading:true})
+      this.props.actionScanQRcode(this.props.uid, qe[1]).then((result) => {
+          this.setState({loading:false})
+          console.log(result)
 
-        // this.props.navigation.navigate("MyQRcodeNavigator")
-      
-        if(!result.status){
-          setTimeout(() => {
-            Alert.alert(
-              '',
-              result.message,
-              [
-                // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-                {
-                  text: 'Close',
-                  onPress: () => {
-                    this.props.navigation.goBack(null)
-                  },
-                  style: 'cancel',
-                },
-                {text: 'Scan again', onPress: () => {
-                  this.scanAgain();
-                }},
-              ],
-              {cancelable: false},
-            )
-          }, 100)
-        }else{
-          // is_exist
-          if(!result.data.is_exist){
+          if(!result.status){
             setTimeout(() => {
               Alert.alert(
                 '',
-                'Friend not found.',
+                result.message,
                 [
+                  // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
                   {
                     text: 'Close',
                     onPress: () => {
@@ -123,26 +104,56 @@ class QRCodeReaderPage extends Component {
                     style: 'cancel',
                   },
                   {text: 'Scan again', onPress: () => {
-                    this.setState({
-                      re_activate: this.state.re_activate + 1
-                    });
+                    this.scanAgain();
                   }},
                 ],
                 {cancelable: false},
               )
             }, 100)
           }else{
-            // onScroll={this.props.handleScroll}
-            // You cannot add yourself as a friend.
+            // is_exist
 
-            let friend = result.data.friends[0]
-            console.log(friend)
+            let data = result.data.data
+            // console.log(data)
 
-            if(friend.uid == this.props.uid){
+            if(data.type == 'friend'){
+              if(data.friend_status == 0){
+                if(data.uid == this.props.uid){
+                  setTimeout(() => {
+                    Alert.alert(
+                      '',
+                      'You cannot add yourself as a friend.',
+                      [
+                        {
+                          text: 'Close',
+                          onPress: () => {
+                            this.props.navigation.goBack(null)
+                          },
+                          style: 'cancel',
+                        },
+                        {text: 'Scan again', onPress: () => {
+                          this.setState({
+                            re_activate: this.state.re_activate + 1
+                          });
+                        }},
+                      ],
+                      {cancelable: false},
+                    )
+                  }, 100)
+                }else{
+                  this.props.navigation.navigate("ResultScanForQRcode", {close:this.close, scanAgain:this.scanAgain, friend:data})
+                }
+              }else{
+                this.props.navigation.navigate("ResultScanForQRcode", {close:this.close, scanAgain:this.scanAgain, friend:data})
+              }
+            }
+
+            /*
+            if(!result.data.is_exist){
               setTimeout(() => {
                 Alert.alert(
                   '',
-                  'You cannot add yourself as a friend.',
+                  'Friend not found.',
                   [
                     {
                       text: 'Close',
@@ -161,19 +172,44 @@ class QRCodeReaderPage extends Component {
                 )
               }, 100)
             }else{
-              this.props.navigation.navigate("ResultScanForQRcode", {close:this.close, scanAgain:this.scanAgain, friend})
+              // onScroll={this.props.handleScroll}
+              // You cannot add yourself as a friend.
+
+              let friend = result.data.friends[0]
+              console.log(friend)
+
+              if(friend.uid == this.props.uid){
+                setTimeout(() => {
+                  Alert.alert(
+                    '',
+                    'You cannot add yourself as a friend.',
+                    [
+                      {
+                        text: 'Close',
+                        onPress: () => {
+                          this.props.navigation.goBack(null)
+                        },
+                        style: 'cancel',
+                      },
+                      {text: 'Scan again', onPress: () => {
+                        this.setState({
+                          re_activate: this.state.re_activate + 1
+                        });
+                      }},
+                    ],
+                    {cancelable: false},
+                  )
+                }, 100)
+              }else{
+                this.props.navigation.navigate("ResultScanForQRcode", {close:this.close, scanAgain:this.scanAgain, friend})
+              }
             }
-          }
-        }    
-    })
+            */
+          }    
+      })
+    }
   }
-
-  /* 
-  , {
-            doSomething: this.doSomething,
-        }
-  */
-
+  
   selectFromDevice(){
     console.log('ImagePicker');
     ImagePicker.launchImageLibrary({}, (response) => {
@@ -195,7 +231,8 @@ class QRCodeReaderPage extends Component {
             // alert(data)
             // this.props.navigation.goBack(null)
 
-            this.findMyID(data)
+            this.dataSplit(data)
+            // this.findMyID(data)
             // console.log(data)
 
             // this.setState({reader: {

@@ -24,35 +24,11 @@ import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
-const Header = props => (
-  <View style={{flex:1, alignItems:'flex-end', flexDirection:'row'}}>
-      <View style={{flex:1}}>
-          <TouchableOpacity
-              style={{marginBottom:10}}
-              onPress={() => {
-                  props.navigation.goBack(null)
-              }}>
-              <View style={{flexDirection:'row', marginLeft:5}}>
-                <Icon name={'chevron-left'} size={25} />
-                <Text style={{alignSelf:'center', fontSize:18, marginLeft:5}}>Back</Text>
-              </View>
-          </TouchableOpacity>
-      </View>
-  </View>
-);
-
-const ImageHeader = (props) => {
-  return(<View style={{ backgroundColor: 'rgba(186, 53, 100, 1.0)', height: getHeaderInset(true) }}>
-          <Header {...props} style={{ backgroundColor: 'transparent' }}/> 
-        </View>)
-}
-
 class AddFriendsPage extends React.Component{
 
   static navigationOptions = ({ navigation }) => ({
       title: "Add Friends",
       headerTintColor: '#C7D8DD',
-      // header: (props) => <ImageHeader {...props} />,
       headerStyle: {
         // color: 'white',
         backgroundColor: 'rgba(186, 53, 100, 1.0)',
@@ -64,7 +40,6 @@ class AddFriendsPage extends React.Component{
         elevation: 0,
         shadowOpacity: 0,
       },
-    //   style: { },
   })
 
   constructor(props) {
@@ -108,7 +83,8 @@ class AddFriendsPage extends React.Component{
     );
   }
 
-  showMenu = (item)=>{
+  showMenu = (item, index)=>{
+    console.log(item)
     return( <View style={{flex:1,
                           position:'absolute', 
                           top:0,
@@ -118,7 +94,7 @@ class AddFriendsPage extends React.Component{
                 <MenuTrigger>
                     <MyIcon 
                         style={{padding:10}}
-                        name={'dot-vertical'}
+                        name={'dot-horizontal'}
                         size={15}
                         color={'gray'} />  
                 </MenuTrigger>
@@ -129,7 +105,14 @@ class AddFriendsPage extends React.Component{
                         <Text style={{padding:10, fontSize:18}}>View profile</Text>
                     </MenuOption>
                     <MenuOption onSelect={() => {
-                      // this.props.params.navigation.navigate("ListClassMemberPage", {'class_id': item.class_id})
+                      this.setState({loading:true})
+                      this.props.actionInviteFriend(this.props.uid, item.uid, (result) => {
+                          this.setState({loading:false})
+
+                          let data = [...this.state.data];
+                          data.splice(index, 1)
+                          this.setState({data})
+                      })
                     }}>
                         <Text style={{padding:10, fontSize:18}}>Add friend</Text>
                     </MenuOption>
@@ -232,25 +215,19 @@ class AddFriendsPage extends React.Component{
           backgroundColor: 'white',
         }}>
         <View style={{flex:1, alignItems:'center', }}>
-          {/* <TouchableOpacity 
-            onPress={
-              ()=>this.props.navigation.navigate("FriendProfilePage")
-            }> */}
-            <FastImage
-              style={{width: 50, 
-                      height: 50, 
-                      borderRadius: 10, 
-                      borderWidth:1, 
-                      borderColor:'gray'
-                    }}
-              source={{
-                uri: item.url_image,
-                headers:{ Authorization: 'someAuthToken' },
-                priority: FastImage.priority.normal,
-              }}
-              resizeMode={FastImage.resizeMode.normal}
-          />
-          {/* </TouchableOpacity> */}
+          <FastImage
+            style={{width: 50, 
+                    height: 50, 
+                    borderRadius: 10, 
+                    borderWidth:1, 
+                    borderColor:'gray'
+                  }}
+            source={{
+              uri: item.url_image,
+              headers:{ Authorization: 'someAuthToken' },
+              priority: FastImage.priority.normal,
+            }}
+            resizeMode={FastImage.resizeMode.normal}/>
         </View>
         <View style={{flex:3}}>
           <TouchableOpacity 
@@ -265,7 +242,7 @@ class AddFriendsPage extends React.Component{
             </Text>
           </TouchableOpacity>
         </View>
-        {this.showMenu(item)}
+        {this.showMenu(item, index)}
         { /*
         <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
           <View style={{borderColor:'green', borderWidth:1, borderRadius:10, padding:5}}>

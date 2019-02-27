@@ -7,6 +7,15 @@ import { AppNavigator } from "./App";
 import configureStore from './configureStore'
 const { persistor, store } = configureStore()
 
+import {
+  MenuProvider,
+  Menu,
+  MenuContext,
+  MenuTrigger,
+  MenuOptions,
+  MenuOption,
+} from 'react-native-popup-menu';
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -28,7 +37,9 @@ export default class App extends React.Component {
   render() {
     return (<Provider store={store}>
               <PersistGate loading={null} persistor={persistor}>
-                <AppNavigator />
+                <MenuContext>
+                  <AppNavigator />
+                </MenuContext>
               </PersistGate>
             </Provider>);
   }

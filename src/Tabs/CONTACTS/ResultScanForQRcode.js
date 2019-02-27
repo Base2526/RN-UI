@@ -4,10 +4,9 @@ import {Alert,
         TouchableOpacity,
         View, } from 'react-native';
 import { connect } from 'react-redux';
-import ImagePicker from 'react-native-image-picker';
-import {QRscanner, QRreader} from 'react-native-qr-scanner';
 import Spinner from 'react-native-loading-spinner-overlay';
 import FastImage from 'react-native-fast-image'
+var _ = require('lodash');
 
 import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
@@ -78,6 +77,7 @@ class ResultScanForQRcode extends Component {
         const friend = navigation.getParam('friend', null);
 
         this.setState({friend})
+
     }
 
     handleCancel = () => {
@@ -96,6 +96,29 @@ class ResultScanForQRcode extends Component {
         this.props.navigation.goBack(null)
     }
 
+    addFriend = (friend_id) =>{
+        let uid = this.props.uid
+
+        this.setState({loading:true})
+        this.props.actionInviteFriend(uid, friend_id, (result) => {
+            this.setState({loading:false})
+        })
+    }
+
+    componentWillReceiveProps(nextProps) {
+        let {friends} = nextProps
+        let {friend}  = this.state
+
+        let __  =   _.find(friends, (v, k)=>{
+                        return k == friend.uid
+                    })
+        
+        if(__ !== undefined){
+            friend = {...friend, friend_status:__.status}
+            this.setState({friend})
+        }
+    }
+
     render() {
         let {friend} = this.state
 
@@ -103,6 +126,33 @@ class ResultScanForQRcode extends Component {
 
         let btn = <View />
         switch(friend.friend_status){
+            case 0 :
+            case Constant.FRIEND_STATUS_FRIEND_CANCEL:{
+                btn =   <View style={{flexDirection:'row', marginTop:20}}>
+                            <TouchableOpacity style={{padding:10, 
+                                                    margin:5, 
+                                                    borderColor:'gray', 
+                                                    borderWidth:1}}
+                                                onPress={()=>{
+                                                    // this.props.navigation.navigate("ChatPage")
+                                                    // alert('add friend')
+
+                                                    this.addFriend(friend.uid)
+                                                }}>
+                                <Text>Add friend</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{padding:10, 
+                                                    margin:5, 
+                                                    borderColor:'gray', 
+                                                    borderWidth:1}}
+                                                onPress={()=>{
+                                                    this.props.navigation.navigate("FriendProfilePage",{'friend_id': friend.uid})
+                                                }}>
+                                <Text>View profile</Text>
+                            </TouchableOpacity>
+                        </View>;
+                break;
+            }
             case Constant.FRIEND_STATUS_FRIEND:{
                 btn =   <View style={{flexDirection:'row', marginTop:20}}>
                             <TouchableOpacity style={{padding:10, 
@@ -126,16 +176,72 @@ class ResultScanForQRcode extends Component {
                         </View>;
                 break;
             }
+
+            case Constant.FRIEND_STATUS_FRIEND_REQUEST:{
+                btn =   <View style={{flexDirection:'row', marginTop:20}}>
+                            <TouchableOpacity style={{padding:10, 
+                                                    margin:5, 
+                                                    borderColor:'gray', 
+                                                    borderWidth:1}}
+                                                onPress={()=>{
+                                                    // this.props.navigation.navigate("ChatPage")
+                                                    alert('Wait friend accept')
+                                                }}>
+                                <Text>Wait friend accept</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{padding:10, 
+                                                    margin:5, 
+                                                    borderColor:'gray', 
+                                                    borderWidth:1}}
+                                                onPress={()=>{
+                                                    this.props.navigation.navigate("FriendProfilePage",{'friend_id': friend.uid})
+                                                }}>
+                                <Text>View profile</Text>
+                            </TouchableOpacity>
+                        </View>;
+                break;
+            }
+
+            case Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND:{
+                btn =   <View style={{flexDirection:'row', marginTop:20}}>
+                            <TouchableOpacity style={{padding:10, 
+                                                    margin:5, 
+                                                    borderColor:'gray', 
+                                                    borderWidth:1}}
+                                                onPress={()=>{
+                                                    // this.props.navigation.navigate("ChatPage")
+                                                    // alert('Cancel request')
+
+                                                    this.setState({loading:true})
+                                                    this.props.actionUpdateStatusFriend(this.props.uid, friend.uid, Constant.FRIEND_STATUS_FRIEND_CANCEL, (result)=>{
+                                                        console.log(result)
+                                                        this.setState({loading:false})
+                                                    })
+                                                }}>
+                                <Text>Cancel request</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{padding:10, 
+                                                    margin:5, 
+                                                    borderColor:'gray', 
+                                                    borderWidth:1}}
+                                                onPress={()=>{
+                                                    this.props.navigation.navigate("FriendProfilePage",{'friend_id': friend.uid})
+                                                }}>
+                                <Text>View profile</Text>
+                            </TouchableOpacity>
+                        </View>;
+                break;
+            }
         }
 
         /*
-            FRIEND_STATUS_FRIEND: '10',
-    FRIEND_STATUS_FRIEND_CANCEL: '13',
-    FRIEND_STATUS_FRIEND_CANCEL_FROM_FRIEND: '40', 
-    FRIEND_STATUS_FRIEND_REQUEST: '11',
-    FRIEND_STATUS_WAIT_FOR_A_FRIEND: '12',
-    FRIEND_STATUS_FRIEND_REMOVE: '41',
-    FRIEND_STATUS_FRIEND_99:'45',
+        FRIEND_STATUS_FRIEND: '10',
+        FRIEND_STATUS_FRIEND_CANCEL: '13',
+        FRIEND_STATUS_FRIEND_CANCEL_FROM_FRIEND: '40', 
+        FRIEND_STATUS_FRIEND_REQUEST: '11',
+        FRIEND_STATUS_WAIT_FOR_A_FRIEND: '12',
+        FRIEND_STATUS_FRIEND_REMOVE: '41',
+        FRIEND_STATUS_FRIEND_99:'45',
         */
 
         return (
@@ -172,7 +278,7 @@ const mapStateToProps = (state) => {
 
   return{
     uid:getUid(state),
-    // groups:state.auth.users.groups
+    friends:state.auth.users.friends
   }
 }
 

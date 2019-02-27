@@ -34,6 +34,8 @@ module.exports = {
     UPDATE_CLASS_PICTURE_PROFILE: API_URL + END_POINT + '/update_class_picture_profile',
 
     CHECK_MY_ID: API_URL + END_POINT + '/check_my_id',
+
+    SCAN_QRCODE: API_URL + END_POINT + '/scan_qrcode',
     // 'Content-Type': 'multipart/form-data'
     FETCH_HEADERS: {
         'Accept': 'application/json',
