@@ -293,6 +293,46 @@ class ManageMyApplicationPage extends React.Component{
         })
     }
 
+    emailsList = () =>{
+        return(<Cell
+            // key={key}
+            cellStyle="Subtitle"
+            titleTextColor="#007AFF"
+            hideSeparator={false} 
+            accessory="DisclosureIndicator"
+            cellContentView={
+            <View style={{flex:1, justifyContent:'center'}}>
+                <Text style={{fontSize: 14}}>
+                    email}
+                </Text>
+            </View>
+            }
+            onPress={()=>{
+                // Linking.openURL('mailto:' + value.email)
+            }}
+            />)
+    }
+
+    phonesList = () =>{
+        return(<Cell
+            // key={key}
+            cellStyle="Subtitle"
+            titleTextColor="#007AFF"
+            hideSeparator={false} 
+            accessory="DisclosureIndicator"
+            cellContentView={
+                <View style={{flex:1, justifyContent:'center'}}>
+                    <Text style={{fontSize: 14}}>
+                        phone}
+                    </Text>
+                </View>
+            }
+            onPress={()=>{
+                // Linking.openURL('mailto:' + value.email)
+            }}
+            />)
+    }
+
     render() {
 
         if(!this.state.loading){
@@ -399,21 +439,23 @@ class ManageMyApplicationPage extends React.Component{
                     <Cell 
                         cellStyle="RightDetail" 
                         title="Emails" 
-                        detail="None"
-                        accessory="DisclosureIndicator"
+                        // detail="None"
+                        // accessory="DisclosureIndicator"
                         contentContainerStyle={{ padding:10}} 
                         onPress={()=>{
                             // this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select })
                         }}/>
+                    {this.emailsList()}
                     <Cell 
                         cellStyle="RightDetail" 
                         title="Phones" 
-                        detail="None"
-                        accessory="DisclosureIndicator"
+                        // detail="None"
+                        // accessory="DisclosureIndicator"
                         contentContainerStyle={{ padding:10}} 
                         onPress={()=>{
                             // this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select })
                         }}/>
+                    {this.phonesList()}
                     <Cell
                         cellStyle="Basic" 
                         title="Published"

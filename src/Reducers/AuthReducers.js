@@ -2607,10 +2607,14 @@ export default (state= INITIAL_STATE, action)=>{
                                             }
                                         }
                                     }
+
+                    // console.log(action)
+                    // console.log(state)
+                    // console.log(newStatus)
                     return newStatus
                 }
             }
-            return v
+            return state
         }
 
         case FRIEND_BLOCK:{
@@ -2621,6 +2625,7 @@ export default (state= INITIAL_STATE, action)=>{
 
             let friends = state.users.friends
 
+            /*
             let key = 0
             let value = null
             _.each(friends, function(_v, _k) { 
@@ -2647,15 +2652,34 @@ export default (state= INITIAL_STATE, action)=>{
                 }
             }
             return v
+            */
+
+            let friend = _.find(friends,  function(v, k) { 
+                return k == action.friend_id
+            })
+
+            if(friend !== undefined){
+                if(friend.block != action.block){
+                    friend = {...friend, block:action.block}
+                    let newStatus = {...state,
+                                        users : {
+                                            ...state.users,
+                                            friends : {
+                                                ...state.users.friends,
+                                                [action.friend_id]: friend
+                                            }
+                                        }
+                                    }
+                    return newStatus
+                }
+            }
+            return state
         }
 
         case FRIEND_FAVORITE:{
             if(state.users === null){
                 return state
             }
-            
-            //  dispatch({ type: FRIEND_FAVORITE, friend_id, favorite_status});
-
             let friends = state.users.friends
 
             let friend = _.find(friends,  function(v, k) { 
@@ -2663,10 +2687,10 @@ export default (state= INITIAL_STATE, action)=>{
             })
 
             if(friend !== undefined){
-
+                /*
                 if(friend.is_favorite === undefined){
                     friend = {...friend, is_favorite:true}
-                    let v = {
+                    let newState = {
                         ...state,
                         users : {
                             ...state.users,
@@ -2676,12 +2700,12 @@ export default (state= INITIAL_STATE, action)=>{
                             }
                         }
                     }
-                    return v
+                    return newState
                 }else{
                     if(friend.is_favorite != action.favorite_status){
                         friend = {...friend, is_favorite:action.favorite_status}
 
-                        let v = {
+                        let newState = {
                             ...state,
                             users : {
                                 ...state.users,
@@ -2691,12 +2715,24 @@ export default (state= INITIAL_STATE, action)=>{
                                 }
                             }
                         }
-                        return v
+                        return newState
                     }
+                }  
+                */   
+               
+                if(friend.is_favorite != action.is_favorite){
+                    friend = {...friend, block:action.is_favorite}
+                    let newStatus = {...state,
+                                        users : {
+                                            ...state.users,
+                                            friends : {
+                                                ...state.users.friends,
+                                                [action.friend_id]: friend
+                                            }
+                                        }
+                                    }
+                    return newStatus
                 }
-                // console.log(friend)
-
-                
             }
             return state
         }

@@ -219,8 +219,15 @@ class FriendsPage extends React.Component{
                             style: 'cancel'},
                             {text: 'OK', 
                             onPress: () => {
-                                this.props.actionFriendHide(this.props.uid, rowItem.friend_id, (result)=>{
+                                // let hide = false;
+                                // if(rowItem.hide !== undefined){
+                                //   hide = !rowItem.hide
+                                // }
+
+                                this.setState({loading:true})
+                                this.props.actionFriendHide(this.props.uid, rowItem.friend_id, true, (result)=>{
                                   console.log(result)
+                                  this.setState({loading:false})
                                 })
                               }, 
                             },
@@ -243,9 +250,14 @@ class FriendsPage extends React.Component{
                               style: 'cancel'},
                               {text: 'OK', 
                               onPress: () => {
+                                // let block = false;
+                                // if(rowItem.block !== undefined){
+                                //   block = !rowItem.block
+                                // }
+
                                 this.setState({loading:true})
-                                 this.props.actionFriendBlock(this.props.uid, rowItem.friend_id, (result)=>{
-                                  console.log(result)
+                                this.props.actionFriendBlock(this.props.uid, rowItem.friend_id, true,(result)=>{
+                                  // console.log(result)
                                   this.setState({loading:false})
                                 })
                               }, 
@@ -258,7 +270,7 @@ class FriendsPage extends React.Component{
                           <Text style={{padding:10, fontSize:18}}>Block</Text>
                       </MenuOption>
                       <MenuOption onSelect={() => {
-                            let mute = false;
+                            let mute = true;
                             if(rowItem.mute !== undefined){
                               mute = !rowItem.mute
                             }
@@ -272,7 +284,7 @@ class FriendsPage extends React.Component{
                           <Text style={{padding:10, fontSize:18}}>{rowItem.mute ? 'Mute': 'Unmute'}</Text>
                       </MenuOption>
                       <MenuOption onSelect={() => {
-                            let is_favorite = false
+                            let is_favorite = true
                             if(rowItem.is_favorite !== undefined){
                                 is_favorite = !rowItem.is_favorite
                             }

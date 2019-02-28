@@ -317,7 +317,6 @@ export const actionInviteFriend = (uid, friend_id, callback) => dispatch =>{
 
 export const actionAddFriend = (uid, friend_id, data, profile, callback) => dispatch =>{
     dispatch({ type: ADD_FRIEND, friend_id, data, profile})
-    
     callback({'status':true, friend_id, data, profile})
 }
 
@@ -807,12 +806,10 @@ export const actionSelectClass = (class_id, uid, friend_id, callback) => dispatc
 
 // Change friend's name
 export const actionChangeFriendsName = (uid, friend_id, name, callback) => dispatch=> {
-    dispatch({ type: CHANGE_FRIEND_NAME, friend_id, change_friend_name:name});
-
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         change_friend_name: name,
     }, { merge: true}).then(result => {
-        
+        dispatch({ type: CHANGE_FRIEND_NAME, friend_id, change_friend_name:name});
         callback({'status':true})
     })
     .catch(error => {
@@ -821,9 +818,9 @@ export const actionChangeFriendsName = (uid, friend_id, name, callback) => dispa
 }
 
 // friend hide
-export const actionFriendHide = (uid, friend_id, callback) => dispatch=> {
+export const actionFriendHide = (uid, friend_id, hide, callback) => dispatch=> {
+    /*
     var hideRef =  firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
-
     firebase.firestore().runTransaction(t => {
         return t.get(hideRef)
         .then(doc => {
@@ -840,53 +837,70 @@ export const actionFriendHide = (uid, friend_id, callback) => dispatch=> {
     }).catch(err => {
         console.log('Transaction failure:', err);
     });
+    */
 
-    dispatch({ type: FRIEND_HIDE, friend_id});
-    callback({'status':true})
+    firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
+        hide,
+    }, { merge: true}).then(()=> {
+        dispatch({ type: FRIEND_HIDE, friend_id, hide});
+        callback({'status':true})
+    }).catch(error => {
+        callback({'status':false, 'message': error})
+    })      
 }
 
 // friend block
-export const actionFriendBlock = (uid, friend_id, callback) => dispatch=> {
-    var blockRef =  firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
+export const actionFriendBlock = (uid, friend_id, block, callback) => dispatch=> {
+    // var blockRef =  firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
+    // firebase.firestore().runTransaction(t => {
+    //     return t.get(blockRef)
+    //     .then(doc => {
+    //         if(doc.data().block === undefined){
+    //             t.set(blockRef, {
+    //                 block: true,
+    //             }, { merge: true});
+    //         }else{
+    //             t.update(blockRef, {block: !doc.data().block});
+    //         }
+    //     });
+    // }).then(result => {
+    //     console.log('Transaction success!');
+    // }).catch(err => {
+    //     console.log('Transaction failure:', err);
+    // });
 
-    firebase.firestore().runTransaction(t => {
-        return t.get(blockRef)
-        .then(doc => {
-            if(doc.data().block === undefined){
-                t.set(blockRef, {
-                    block: true,
-                }, { merge: true});
-            }else{
-                t.update(blockRef, {block: !doc.data().block});
-            }
-        });
-    }).then(result => {
-        console.log('Transaction success!');
-    }).catch(err => {
-        console.log('Transaction failure:', err);
-    });
-
-    dispatch({ type: FRIEND_BLOCK, friend_id});
-    callback({'status':true})
+    firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
+        block,
+    }, { merge: true}).then(()=> {
+        dispatch({ type: FRIEND_BLOCK, friend_id, block});
+        callback({'status':true})
+    }).catch(error => {
+        callback({'status':false, 'message': error})
+    })  
 }
 
 // friend mute/unmute
 export const actionFriendMute = (uid, friend_id, mute, callback) => dispatch=> {
-    dispatch({ type: FRIEND_MUTE, friend_id, mute});
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         mute,
-    }, { merge: true});
-
-    callback({'status':true})
+    }, { merge: true}).then(()=> {
+        dispatch({ type: FRIEND_MUTE, friend_id, mute});
+        callback({'status':true})
+    }).catch(error => {
+        callback({'status':false, 'message': error})
+    })
 }
 
 // friend favorite
 export const actionFriendFavirite = (uid, friend_id, favorite_status, callback) => dispatch=> {
-    dispatch({ type: FRIEND_FAVORITE, friend_id, favorite_status});
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         is_favorite: favorite_status,
-    }, { merge: true});
-    callback({'status':true, uid, friend_id, favorite_status})
+    }, { merge: true}).then(()=> {
+        dispatch({ type: FRIEND_FAVORITE, friend_id, favorite_status});
+        callback({'status':true})
+    }).catch(error => {
+        callback({'status':false, 'message': error})
+    })
 }
 
 // My application published/unpublished 

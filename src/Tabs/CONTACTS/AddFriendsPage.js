@@ -101,6 +101,8 @@ class AddFriendsPage extends React.Component{
                 <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
                     <MenuOption onSelect={() => {
                       // this.props.params.navigation.navigate("ListClassMemberPage", {'class_id': item.class_id})
+
+                      this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
                     }}>
                         <Text style={{padding:10, fontSize:18}}>View profile</Text>
                     </MenuOption>
@@ -116,11 +118,11 @@ class AddFriendsPage extends React.Component{
                     }}>
                         <Text style={{padding:10, fontSize:18}}>Add friend</Text>
                     </MenuOption>
-                    <MenuOption onSelect={() => {
+                    {/* <MenuOption onSelect={() => {
                         // this.props.params.navigation.navigate('ClasssSettingsPage', {'class_id': item.class_id})
                     }}>
                         <Text style={{padding:10, fontSize:18}}>Remove</Text>
-                    </MenuOption>
+                    </MenuOption> */}
                 </MenuOptions>
             </Menu>
           </View>)

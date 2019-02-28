@@ -51,7 +51,7 @@ class ClasssPage extends React.Component{
     }
 
     componentWillReceiveProps(nextProps) {
-      console.log(nextProps)
+      // console.log(nextProps)
       
       this.loadData(nextProps)
     }
@@ -62,7 +62,7 @@ class ClasssPage extends React.Component{
         let classs =  props.classs[key]
         data.push({...{class_id:key}, ...classs});
       }
-      this.setState({data,});
+      this.setState({data});
     }
   
     renderFooter = () => {
@@ -300,7 +300,11 @@ const mapStateToProps = (state) => {
   if(!state._persist.rehydrated){
     return {}
   }
-  // groups
+
+  if(!state.auth.isLogin){
+    return;
+  }
+
   return{
     uid:getUid(state),
     classs:state.auth.users.classs

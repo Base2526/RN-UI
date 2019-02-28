@@ -22,24 +22,25 @@ import AuthLoadingScreen from './Screens/AuthLoadingScreen'
 
 // Inbox: { screen: InboxScreen },
 export const AuthStack = createStackNavigator({
-    Welcome: {
-        screen: Welcome,
-        navigationOptions: {
-            title: "Welcome to iDNA"
-        }
-    },
+    // Welcome: {
+    //     screen: Welcome,
+    //     navigationOptions: {
+    //         title: "Welcome to iDNA"
+    //     }
+    // },
+    SignIn: {
+      screen: SignIn,
+      navigationOptions: {
+          title: "Sign In"
+      }
+  },
     SignUp: {
         screen: SignUp,
         navigationOptions: {
             title: "Sign Up"
         }
     },
-    SignIn: {
-        screen: SignIn,
-        navigationOptions: {
-            title: "Sign In"
-        }
-    },
+    
     ForgotPassword:{
       screen: ForgotPassword,
       navigationOptions:{

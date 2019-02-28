@@ -8,11 +8,35 @@ import { connect } from 'react-redux';
 import Spinner from 'react-native-loading-spinner-overlay';
 import FastImage from 'react-native-fast-image'
 
+import {
+  MenuProvider,
+  Menu,
+  MenuContext,
+  MenuTrigger,
+  MenuOptions,
+  MenuOption,
+} from 'react-native-popup-menu';
+
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
-import {getUid} from '../../Utils/Helpers'
+import {getUid, getHeaderInset} from '../../Utils/Helpers'
+import MyIcon from '../../config/icon-font.js';
 
 class SettingListFriendRequestSent extends React.Component{
+    static navigationOptions = ({ navigation }) => ({
+      title: "Friend request",
+      headerTintColor: '#C7D8DD',
+      headerStyle: {
+        backgroundColor: 'rgba(186, 53, 100, 1.0)',
+        // ios navigationoptions underline hide
+        borderBottomWidth: 0,
+
+        // android navigationoptions underline hide
+        elevation: 0,
+        shadowOpacity: 0
+      },
+    }) 
+
     constructor(props){
         super(props)
 
@@ -76,6 +100,49 @@ class SettingListFriendRequestSent extends React.Component{
         })
     }
 
+    renderSeparator = () => {
+      return (
+        <View
+          style={{
+            height: .5,
+            width: "86%",
+            backgroundColor: "#CED0CE",
+            marginLeft: "14%"
+          }}
+        />
+      );
+    };
+
+    showMenu = (item)=>{
+      return( <View style={{flex:1,
+                            position:'absolute', 
+                            top:0,
+                            right:0, 
+                            marginRight:10,
+                            zIndex:100}}>
+                <Menu>
+                  <MenuTrigger>
+                      <MyIcon 
+                          style={{padding:10}}
+                          name={'dot-horizontal'}
+                          size={15}
+                          color={'gray'} />  
+                  </MenuTrigger>
+                  <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
+                      <MenuOption onSelect={() => {
+                        this.setState({loading:true})
+                        this.props.actionUpdateStatusFriend(this.props.uid, item.friend_id, Constant.FRIEND_STATUS_FRIEND_CANCEL, (result)=>{
+                            // console.log(result)
+                            this.setState({loading:false})
+                        })
+                      }}>
+                      <Text style={{padding:10, fontSize:18}}>Cancel request</Text>
+                    </MenuOption>
+                  </MenuOptions>
+              </Menu>
+            </View>)
+    }
+
     renderItem = ({item, index}) => {
         // return (<View><Text>{index}</Text></View>)
 
@@ -119,12 +186,12 @@ class SettingListFriendRequestSent extends React.Component{
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
 
-                         Name : {item.hasOwnProperty('change_friend_name') ? item.change_friend_name : item.profile.name}
+                          {item.hasOwnProperty('change_friend_name') ? item.change_friend_name : item.profile.name}
                     </Text>
                     <Text style={{fontSize: 13, 
                                 color: '#222',
                                 paddingLeft: 10}}>
-                        Status : {item.profile.status_message}
+                          {item.profile.status_message}
                     </Text>
                 </View>
 
@@ -136,7 +203,7 @@ class SettingListFriendRequestSent extends React.Component{
                   <Text>red</Text>
                 </TouchableOpacity> */}
 
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}
                   onPress={()=>{
                       this.setState({loading:true})
@@ -148,7 +215,8 @@ class SettingListFriendRequestSent extends React.Component{
                   <View style={{borderColor:'red', borderWidth:1, borderRadius:10, padding:5, marginLeft:5}}>
                       <Text style={{color:'red'}}>Cancel request</Text>
                   </View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
+                {this.showMenu(item)}
             </View>
             </TouchableOpacity>
         )
@@ -156,7 +224,8 @@ class SettingListFriendRequestSent extends React.Component{
 
     render(){
       let {data} = this.state
-      return(<View style={{flex:1}}>
+      return(<MenuContext>
+              <View style={{flex:1}}>
               <Spinner
                 visible={this.state.loading}
                 textContent={'Wait...'}
@@ -164,11 +233,13 @@ class SettingListFriendRequestSent extends React.Component{
                 overlayColor={'rgba(0,0,0,0.5)'}/>
               <FlatList
                 data={data}
-                // showsVerticalScrollIndicator={false}
                 renderItem={this.renderItem}
                 extraData={this.state}
-                keyExtractor = { (item, index) => index.toString() } />
-            </View>)
+                keyExtractor = { (item, index) => index.toString() } 
+                ItemSeparatorComponent={this.renderSeparator}
+                />
+            </View>
+            </MenuContext>)
     }
 }
 

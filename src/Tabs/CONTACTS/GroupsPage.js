@@ -468,6 +468,10 @@ const mapStateToProps = (state) => {
     return {}
   }
 
+  if(!state.auth.isLogin){
+    return;
+  }
+
   return{
     uid:getUid(state),
     groups:state.auth.users.groups

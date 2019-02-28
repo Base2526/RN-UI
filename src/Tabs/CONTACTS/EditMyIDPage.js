@@ -143,7 +143,20 @@ class EditMyIDPage extends React.Component{
     }
 
     renderHeader = () => {
-        return(<View><Text style={{fontSize:18}}>Select My ID ({this.state.data.length -1}/10)</Text></View>)
+        return(<View><Text style={{margin:10, fontSize:18, fontWeight:'bold'}}>Select My ID ({this.state.data.length -1}/10)</Text></View>)
+    };
+
+    renderSeparator = () => {
+        return (
+          <View
+            style={{
+              height: .5,
+              width: "86%",
+              backgroundColor: "#CED0CE",
+              marginLeft: "14%"
+            }}
+          />
+        );
     };
 
     renderItem = ({ item, index }) => {
@@ -218,6 +231,7 @@ class EditMyIDPage extends React.Component{
                     </View>
                     </TouchableOpacity>
 
+                    { /*
                     <View style={{flex:1, 
                                 position:'absolute', 
                                 right:0,
@@ -228,9 +242,6 @@ class EditMyIDPage extends React.Component{
                                     zIndex: 10,
                                     marginRight:10}}
                             onPress={()=>{
-                                // this.props.navigation.navigate("AddAnotherPhone", {title:'Edit phone', mode: 'edit', key, value, onAddAnotherPhone: this.onAddAnotherPhone})
-                                // 
-
                                 Alert.alert(
                                     'Delete',
                                     'Are sure delete ' + item.id + ' ?',
@@ -255,6 +266,7 @@ class EditMyIDPage extends React.Component{
                             <Text style={{color:'red', fontSize:16}}>Delete</Text>
                         </TouchableOpacity> 
                     </View>
+                    */ }
                 </View>
             )
     }
@@ -265,14 +277,14 @@ class EditMyIDPage extends React.Component{
                                             }, {
                                                 // marginBottom: 30
                                             })}}>
-                <View style={{margin:10, flex:1}}>
+                <View style={{ flex:1}}>
                     <Spinner
                         visible={this.state.loading}
                         textContent={'Wait...'}
                         textStyle={{color: '#FFF'}}
                         overlayColor={'rgba(0,0,0,0.5)'}
                     />
-                    <View style={{flexDirection:'row'}}>
+                    <View style={{flexDirection:'row', margin:10}}>
                         <TextInput
                             style={{ flex:1,fontSize: 22, padding:10, borderColor:'gray', borderWidth:.5}}
                             onChangeText={(text) => this.setState({text})}
@@ -303,7 +315,7 @@ class EditMyIDPage extends React.Component{
                             renderItem={this.renderItem}
                             extraData={this.state.data}
                             ListHeaderComponent={this.renderHeader}
-                            // ItemSeparatorComponent={this.renderSeparator}
+                            ItemSeparatorComponent={this.renderSeparator}
                         />
                     </View>
                 </View>

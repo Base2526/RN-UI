@@ -9,11 +9,9 @@ import {FlatList,
         ScrollView,
         SafeAreaView,
         Dimensions,
-        Image} from 'react-native'
-
+        Linking} from 'react-native'
+import firebase from 'react-native-firebase';
 import { Header } from 'react-navigation';
-
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
 import { isIphoneX } from 'react-native-iphone-x-helper';
@@ -25,9 +23,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 var _ = require('lodash');
 
 import Moment from 'moment'
-
 import {getStatusBarHeight} from '../../Utils/Helpers'
-import ImageWithDefault from '../../Utils/ImageWithDefault'
 import * as actions from '../../Actions'
 import {getUid} from '../../Utils/Helpers'
 import Constant from '../../Utils/Constant'
@@ -41,7 +37,6 @@ let shareOptions = {
 };
 
 class FriendProfilePage extends React.Component{
-
     static navigationOptions = ({ navigation}) => {
         const { params = {} } = navigation.state
         let {is_favorite} =params
@@ -55,7 +50,7 @@ class FriendProfilePage extends React.Component{
                         onPress={()=>{
                             const { params = {} } = navigation.state
                             if(Object.keys(params).length !== 0){
-                                params.handleFriendFavorite()
+                                params.handleFriendFavorite(is_favorite)
                             }
                         }}>
                         <MyIcon
@@ -87,26 +82,9 @@ class FriendProfilePage extends React.Component{
             loading:false,
             renderContent: false,
             friend:null,
+            friend_id:0,
+            // is_favorite:false
         }
-    }
-
-    // https://github.com/react-navigation/react-navigation/blob/master/examples/NavigationPlayground/js/StackWithTranslucentHeader.js
-    // Inset to compensate for navigation bar being transparent.
-    // And improved abstraction for this will be built in to react-navigation
-    // at some point.
-    getHeaderInset() {
-        const NOTCH_HEIGHT = isIphoneX() ? 25 : 0;
-  
-        // $FlowIgnore: we will remove the HEIGHT static soon enough
-        const BASE_HEADER_HEIGHT = Header.HEIGHT;
-  
-        const HEADER_HEIGHT =
-        Platform.OS === 'ios'
-          ? BASE_HEADER_HEIGHT + NOTCH_HEIGHT
-          : BASE_HEADER_HEIGHT + getStatusBarHeight();
-  
-          console.log("HEADER_HEIGHT : " , HEADER_HEIGHT)
-        return HEADER_HEIGHT
     }
 
     componentDidMount() {
@@ -115,10 +93,14 @@ class FriendProfilePage extends React.Component{
         this.props.navigation.setParams({handleFriendFavorite: this.handleFriendFavorite})
         this.props.navigation.setParams({handleShare: this.handleShare})
 
-       
         const { navigation } = this.props;
         const friend_id = navigation.getParam('friend_id', null);
 
+        this.setState({friend_id}, ()=>{
+            this.loadData(this.props)
+        })
+
+        /*
         let friends = this.props.auth.users.friends;
 
         let friend = null
@@ -138,9 +120,13 @@ class FriendProfilePage extends React.Component{
         }
 
         this.props.navigation.setParams({is_favorite: is_favorite});
+        */
     }
 
     componentWillReceiveProps(nextProps) {
+        this.loadData(nextProps)
+
+        /*
         const { navigation } = this.props;
         const friend_id = navigation.getParam('friend_id', null);
 
@@ -162,19 +148,102 @@ class FriendProfilePage extends React.Component{
         if (friend.is_favorite != this.state.friend.is_favorite) {
             this.props.navigation.setParams({is_favorite: friend.is_favorite});
         }
+        */
     }
 
-    handleFriendFavorite = () =>{
-        let {friend} = this.state
+    loadData = (props) =>{
+        let {friend_id, friend} = this.state
+        let {uid, friends}   = props
 
-        let is_favorite = false
-        if(friend.is_favorite !== undefined){
-            is_favorite = !friend.is_favorite
+        let newFriend = _.find(friends, (v, k)=>{
+                            return friend_id == k
+                        })
+
+        console.log(newFriend)
+        if(newFriend === undefined){
+            this.setState({loading:true})
+
+            let flag = 0
+            let pfriendRef = firebase.firestore().collection('profiles').doc(friend_id);
+            pfriendRef.get().then(doc => {
+                                this.setState({loading:false})
+                                if (!doc.exists) {
+                                    console.log('No such document!');
+                                    if(flag == 0){
+                                        flag =1
+                                        this.props.navigation.goBack(null)
+                                    }
+                                } else {
+                                    let v = {friend_id, 'status':Constant.FRIEND_STATUS_FRIEND_99, profile:doc.data()}
+
+                                    this.setState({friend:v})
+                                    this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                                        console.log(result)
+                                    })
+                                }
+                            })
+                            .catch(err => {
+                                console.log('Error getting document', err);
+                            });
+
+        }else{
+            newFriend = {...newFriend, friend_id:friend_id}
+
+            if(!_.isEqual(newFriend, friend)){
+                // console.log('--+--', newFriend, friend)
+
+                let is_favorite = false;
+                if(newFriend.is_favorite !== undefined){
+                    is_favorite = newFriend.is_favorite;
+                }
+                this.props.navigation.setParams({is_favorite});
+            }
+            this.setState({friend:newFriend})
         }
 
+
+        /*
+        if(friend === null){
+            this.props.navigation.setParams({is_favorite: false});
+            return;
+        }
+
+        console.log(newFriend)
+        console.log(friend)
+        if (newFriend.is_favorite != is_favorite) {
+            console.log('--+--')
+
+
+            this.props.navigation.setParams({is_favorite: friend.is_favorite});
+        }
+        */
+    }
+
+    // https://github.com/react-navigation/react-navigation/blob/master/examples/NavigationPlayground/js/StackWithTranslucentHeader.js
+    // Inset to compensate for navigation bar being transparent.
+    // And improved abstraction for this will be built in to react-navigation
+    // at some point.
+    getHeaderInset() {
+        const NOTCH_HEIGHT = isIphoneX() ? 25 : 0;
+  
+        // $FlowIgnore: we will remove the HEIGHT static soon enough
+        const BASE_HEADER_HEIGHT = Header.HEIGHT;
+  
+        const HEADER_HEIGHT =
+        Platform.OS === 'ios'
+          ? BASE_HEADER_HEIGHT + NOTCH_HEIGHT
+          : BASE_HEADER_HEIGHT + getStatusBarHeight();
+  
+          console.log("HEADER_HEIGHT : " , HEADER_HEIGHT)
+        return HEADER_HEIGHT
+    }
+
+    handleFriendFavorite = (is_favorite) =>{
+        console.log(is_favorite)
+
         this.setState({loading:true})
-        this.props.actionFriendFavirite(this.props.uid, friend.friend_id, is_favorite, (result) => {
-            console.log(result)
+        this.props.actionFriendFavirite(this.props.uid, this.state.friend_id, !is_favorite, (result) => {
+            // console.log(result)
             this.setState({loading:false})
         })
     }
@@ -275,7 +344,11 @@ class FriendProfilePage extends React.Component{
         if(members !== undefined){
             _.each(members, function(_v, _k) { 
                 if(friend.friend_id === _v.friend_id && _v.status){
-                    icon = <Icon name="check" size={25} color="#900" />
+                    icon = <MyIcon
+                            name={'check-ok'}
+                            size={25}
+                            color={'#CE3B6E'}/>//<Icon name="check" size={25} color="#900" />
+                    // check-ok
                 } 
             })
         }
@@ -306,18 +379,15 @@ class FriendProfilePage extends React.Component{
                     alignItems: 'center', 
                     padding: 10,
                     flexDirection: 'row',
-                    height:80,
                   }}>
-                    <TouchableOpacity 
-                        style={{height:60,
-                                width: 60,
-                                borderRadius: 10}}>
-                      {/* <ImageWithDefault 
-                        source={{uri: classs[key].image_url}}
-                        style={{width: 60, height: 60, borderRadius: 10}}
-                      /> */}
+                    <TouchableOpacity>
                         <FastImage
-                            style={{width: 60, height: 60, borderRadius: 30, borderWidth:.5, borderColor:'gray'}}
+                            style={{width: 50, 
+                                    height: 50, 
+                                    borderRadius: 25, 
+                                    // borderWidth:.5, 
+                                    // borderColor:'gray'
+                                    }}
                             source={{
                                 uri: classs[key].image_url,
                                 headers:{ Authorization: 'someAuthToken' },
@@ -340,7 +410,7 @@ class FriendProfilePage extends React.Component{
     
                     <View
                         style={{
-                            height: 1,
+                            height: .5,
                             width: "86%",
                             backgroundColor: "#CED0CE",
                             marginLeft: "14%",
@@ -481,15 +551,23 @@ class FriendProfilePage extends React.Component{
         })
     }
 
-
     render() {
-        let {friend} = this.state
+
+        let {friend_id, friend} = this.state
+        // let {friend} = this.state
+
+        console.log(friend_id, friend)
 
         if(friend === null){
-            return <View></View>
+            return(<View style={{flex:1}}>
+                        <Spinner
+                            visible={this.state.loading}
+                            textContent={'Wait...'}
+                            textStyle={{color: '#FFF'}}
+                            overlayColor={'rgba(0,0,0,0.5)'}
+                            />
+                    </View>)
         }
-
-        console.log(friend)
 
         let {profile} = friend
 
@@ -590,7 +668,12 @@ class FriendProfilePage extends React.Component{
                         <View style={{flexDirection:'row', margin:20}}>
                         <TouchableOpacity>
                             <FastImage
-                                style={{width: 80, height: 80, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
+                                style={{width: 80, 
+                                        height: 80, 
+                                        borderRadius: 10, 
+                                        // borderWidth:.5, 
+                                        // borderColor:'gray'
+                                    }}
                                 source={{
                                     uri: friend.profile.image_url,
                                     headers:{ Authorization: 'someAuthToken' },
@@ -600,7 +683,7 @@ class FriendProfilePage extends React.Component{
                             />
                         </TouchableOpacity>
                         <View style={{justifyContent: 'flex-end', }}>
-                            <Text style={{fontSize:22, marginLeft:10, color:'white'}}>{friend.profile.name}</Text>
+                            <Text style={{fontSize:22, marginLeft:10, color:'white'}}>{friend.hasOwnProperty('change_friend_name') ? friend.change_friend_name : friend.profile.name }</Text>
                         </View>
                         </View>
                     </View>
@@ -617,59 +700,50 @@ class FriendProfilePage extends React.Component{
                                 onPress={() => console.log("open Help/FAQ")}
                                 cellContentView={
                                     <View style={{flex:1, flexDirection:'row', justifyContent:'center'}}>
+                                        {friend.status === Constant.FRIEND_STATUS_FRIEND_99 ? <TouchableOpacity
+                                            style={{padding:5}}
+                                            onPress={()=>{
+                                                this.setState({loading:true})
+                                                this.props.actionInviteFriend(this.props.uid, friend_id, (result) => {
+                                                    this.setState({loading:false})
+                                                })
+                                            }}>
+                                            <MyIcon
+                                                name={'user-plus'}
+                                                size={50}
+                                                color={'#CE3B6E'}/>
+                                        </TouchableOpacity> : <View />}
+                                        
                                         <TouchableOpacity
                                             style={{padding:5}}
                                             onPress={()=>{
-                                                alert('All Application')
-                                            }}     
-                                            >
-
+                                                alert('All application')
+                                            }}>
                                             <MyIcon
                                                 name={'all-app'}
-                                                size={60}
+                                                size={50}
                                                 color={'#CE3B6E'}/>
                                         </TouchableOpacity>
                                         <TouchableOpacity
                                             style={{padding:5}}
                                             onPress={()=>{
                                                 alert('Video call')
-                                            }}     
-                                            >
-                                            {/* <ImageWithDefault 
-                                                // source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
-                                                source={require('../../Images/icon-profile-friend-phone.png')}
-                                                style={{width: 60, height: 60, borderRadius: 30, }}
-                                            />       */}
-
+                                            }}>
                                             <MyIcon
-                                            name={'call'}
-                                            size={60}
-                                            color={'#CE3B6E'}/>
+                                                name={'call'}
+                                                size={50}
+                                                color={'#CE3B6E'}/>
                                         </TouchableOpacity>
                                         <TouchableOpacity
                                             style={{padding:5}}
                                             onPress={()=>{
                                                 this.props.navigation.navigate("ChatPage")
-                                            }}
-                                            >
+                                            }}>
                                             <MyIcon
-                                            name={'friend-chat'}
-                                            size={60}
-                                            color={'#CE3B6E'}/> 
+                                                name={'friend-chat'}
+                                                size={50}
+                                                color={'#CE3B6E'}/> 
                                         </TouchableOpacity>
-                                        {/* <TouchableOpacity
-                                            style={{height:60,
-                                                    width:60,
-                                                    borderRadius: 30,
-                                                    margin:5,
-                                                    backgroundColor:'blue'
-                                                    }}        
-                                            >
-                                            <ImageWithDefault 
-                                                source={{uri: 'https://scontent.fbkk8-2.fna.fbcdn.net/v/t1.0-9/49682566_926064284253361_1603030473750085632_n.jpg?_nc_cat=107&_nc_ht=scontent.fbkk8-2.fna&oh=393d859cd955afe7d6e8f2053c4f5116&oe=5C906265'}}
-                                                style={{width: 60, height: 60, borderRadius: 30, }}
-                                            />      
-                                        </TouchableOpacity> */}
                                     </View>
                                 }
                             />
@@ -701,9 +775,14 @@ class FriendProfilePage extends React.Component{
                                 cellContentView={
                                 <View style={{flex:1}}>
                                     <View >
-                                        <Text style={{ }}>
-                                        Name Subname {friend.hasOwnProperty('change_friend_name') ? " (" + friend.profile.name + ")" : '' }
-                                        </Text>
+                                        <View style={{flexDirection:'row'}}>
+                                            <Text>
+                                                Name Subname
+                                            </Text>
+                                            <Text style={{ fontStyle:'italic', color:'gray' }}>
+                                                {friend.hasOwnProperty('change_friend_name') ? " (" + friend.profile.name + ")" : '' }
+                                            </Text>
+                                        </View>
                                         <Text style={{ fontSize:18 }}>
                                             {friend.hasOwnProperty('change_friend_name') ? friend.change_friend_name: friend.profile.name }
                                         </Text>
@@ -718,7 +797,7 @@ class FriendProfilePage extends React.Component{
                                             <MyIcon
                                                 name={'edit'}
                                                 size={20}
-                                                color={'#C7D8DD'} />
+                                                color={'gray'} />
                                         </TouchableOpacity>
                                     </View>
                                     :null
@@ -749,6 +828,7 @@ class FriendProfilePage extends React.Component{
                             />
                              <Cell
                                 // title="Help / FAQ"
+                                contentContainerStyle={{ padding:10 }} 
                                 cellStyle="Subtitle"
                                 titleTextColor="#007AFF"
                                 hideSeparator={true} 
@@ -756,34 +836,32 @@ class FriendProfilePage extends React.Component{
                                     this.openModal()
                                 }}
                                 cellContentView={
-                                
-                                <View style={{flex:1, }}>
-                                    <Text
-                                        style={{flex:1, fontSize: 18,}}>
-                                        Classs
-                                    </Text>
-                                    <Text style={{ fontSize:18 }}>
-                                         {this.getClasssName()}
-                                    </Text>
-                                    { friend.status == Constant.FRIEND_STATUS_FRIEND ? 
-                                    <View style={{position:'absolute', right:0, bottom:0}}>
-                                        <TouchableOpacity
-                                            onPress={()=>{
-                                                this.openModal()
-                                            }}>
-                                            <MyIcon
-                                                name={'edit'}
-                                                size={20}
-                                                color={'#C7D8DD'} />
-                                        </TouchableOpacity>
+                                    <View style={{flex:1, }}>
+                                        <Text
+                                            style={{}}>
+                                            Classs
+                                        </Text>
+                                        <Text style={{ fontSize:18 }}>
+                                            {this.getClasssName()}
+                                        </Text>
+                                        { friend.status == Constant.FRIEND_STATUS_FRIEND ? 
+                                        <View style={{position:'absolute', right:0, bottom:0}}>
+                                            <TouchableOpacity
+                                                onPress={()=>{
+                                                    this.openModal()
+                                                }}>
+                                                <MyIcon
+                                                    name={'edit'}
+                                                    size={20}
+                                                    color={'gray'} />
+                                            </TouchableOpacity>
+                                        </View>
+                                        : <View />
+                                        }
                                     </View>
-                                    : null
-                                    }
-                                </View>
-                            }
-                            />
+                                }/>
                             
-                            <Cell
+                            {/* <Cell
                                 cellStyle="Basic"
                                 contentContainerStyle={{ padding:10 }} 
                                 hideSeparator={true} 
@@ -799,7 +877,7 @@ class FriendProfilePage extends React.Component{
                                         </View>
                                     </View>
                                 }
-                            />
+                            /> */}
 
                             <Cell
                                 cellStyle="Basic"
@@ -977,8 +1055,10 @@ const mapStateToProps = (state) => {
   
     return{
         uid:getUid(state),
-        auth:state.auth
+        auth:state.auth,
+
+        friends:state.auth.users.friends,
     }
 }
-
+// nextProps.auth.users.friends;
 export default connect(mapStateToProps, actions)(FriendProfilePage);

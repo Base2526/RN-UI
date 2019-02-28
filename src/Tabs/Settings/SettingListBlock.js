@@ -6,17 +6,43 @@ import {View,
         Alert} from 'react-native'
 
 import { connect } from 'react-redux';
+import Spinner from 'react-native-loading-spinner-overlay';
+import FastImage from 'react-native-fast-image'
+import {
+  MenuProvider,
+  Menu,
+  MenuContext,
+  MenuTrigger,
+  MenuOptions,
+  MenuOption,
+} from 'react-native-popup-menu';
 
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
-import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
-import {getUid} from '../../Utils/Helpers'
+// import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
+import {getUid, getHeaderInset} from '../../Utils/Helpers'
+import MyIcon from '../../config/icon-font.js';
 
 class SettingListBlock extends React.Component{
+    static navigationOptions = ({ navigation }) => ({
+      title: "Friend block",
+      headerTintColor: '#C7D8DD',
+      headerStyle: {
+        backgroundColor: 'rgba(186, 53, 100, 1.0)',
+        // ios navigationoptions underline hide
+        borderBottomWidth: 0,
+
+        // android navigationoptions underline hide
+        elevation: 0,
+        shadowOpacity: 0
+      },
+    }) 
+
     constructor(props){
         super(props)
         this.state = {
-            data:[]
+            data:[],
+            loading:false
         }
     }
 
@@ -74,10 +100,49 @@ class SettingListBlock extends React.Component{
         })
     }
 
+    showMenu = (item)=>{
+      return( <View style={{flex:1,
+                            position:'absolute', 
+                            top:0,
+                            right:0, 
+                            marginRight:10,
+                            zIndex:100}}>
+                <Menu>
+                  <MenuTrigger>
+                      <MyIcon 
+                          style={{padding:10}}
+                          name={'dot-horizontal'}
+                          size={15}
+                          color={'gray'} />  
+                  </MenuTrigger>
+                  <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
+                      {/* <MenuOption onSelect={() => {
+                        // this.props.params.navigation.navigate("ChatPage")
+                      }}>
+                          <Text style={{padding:10, fontSize:18}}>Remove</Text>
+                      </MenuOption> */}
+                      <MenuOption onSelect={() => {
+                        this.setState({loading:true})
+                        this.props.actionFriendBlock(this.props.uid, item.friend_id, false, (result)=>{
+                            // console.log(result)
+                            this.setState({loading:false})
+                        })
+                      }}>
+                          <Text style={{padding:10, fontSize:18}}>Unblock</Text>
+                      </MenuOption>
+                      {/* <MenuOption onSelect={() => {
+                          
+                      }}>
+                          <Text style={{padding:10, fontSize:18}}>Block</Text>
+                      </MenuOption> */}
+                  </MenuOptions>
+              </Menu>
+            </View>)
+    }
+
     renderItem({ item, index }) {
         // return (<View><Text>{index}</Text></View>)
-
-        console.log(item)
+        // console.log(item)
         return(
             <View
               style={{
@@ -90,9 +155,24 @@ class SettingListBlock extends React.Component{
               }}>
                 <TouchableOpacity 
                     style={{}}>
-                      <PlaceHolderFastImage 
+                      {/* <PlaceHolderFastImage 
                         source={{uri:item.profile.image_url}}
-                        style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/>
+                        style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/> */}
+
+                      <FastImage
+                        style={{width: 50, 
+                                height: 50, 
+                                borderRadius: 10, 
+                                // borderWidth:.5, 
+                                // borderColor:'gray'
+                            }}
+                        source={{
+                            uri: item.profile.image_url,
+                            headers:{ Authorization: 'someAuthToken' },
+                            priority: FastImage.priority.normal,
+                        }}
+                        resizeMode={FastImage.resizeMode.cover}
+                      />
                 </TouchableOpacity>
                 <View>
                     <Text style={{fontSize: 18, 
@@ -101,15 +181,17 @@ class SettingListBlock extends React.Component{
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
 
-                         Name : {item.hasOwnProperty('change_friend_name') ? item.change_friend_name : item.profile.name}
+                         {item.hasOwnProperty('change_friend_name') ? item.change_friend_name : item.profile.name}
                     </Text>
                     <Text style={{fontSize: 13, 
                                 color: '#222',
                                 paddingLeft: 10}}>
-                        Status : {item.profile.status_message}
+                         {item.profile.status_message}
                     </Text>
                 </View>
-
+                    
+                {this.showMenu(item)}
+                { /*
                 <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0 , margin:5, }}>
                     <TouchableOpacity
                         onPress={()=>{
@@ -127,9 +209,16 @@ class SettingListBlock extends React.Component{
 
                               {text: 'Unblock', 
                                 onPress: () => {
-                                    this.props.actionFriendBlock(this.props.uid, item.friend_id, (result)=>{
-                                        console.log(result)
-                                    })
+
+                                  let block = false;
+                                  if(item.block !== undefined){
+                                    block = !item.block
+                                  }
+                                  this.setState({loading:true})
+                                  this.props.actionFriendBlock(this.props.uid, item.friend_id, block, (result)=>{
+                                      console.log(result)
+                                      this.setState({loading:false})
+                                  })
                                 }, 
                               },
                               {text: 'Cancel', 
@@ -146,22 +235,30 @@ class SettingListBlock extends React.Component{
                             <Text style={{color:'red'}}>Edit</Text>
                         </View>
                     </TouchableOpacity>
-                </View>
+                </View> 
+                */ }
             </View>
         )
     }
 
     render(){
         let {data} = this.state
-        console.log(data)
-        return(<View style={{flex:1}}>
-                <FlatList
-                    data={data}
-                    showsVerticalScrollIndicator={false}
-                    renderItem={this.renderItem.bind(this)}
-                    keyExtractor={item => item.item_id}
-                />
-                </View>)
+        // console.log(data)
+        return( <MenuContext>
+                <View style={{flex:1}}>
+                  <Spinner
+                    visible={this.state.loading}
+                    textContent={'Wait...'}
+                    textStyle={{color: '#FFF'}}
+                    overlayColor={'rgba(0,0,0,0.5)'}/>
+                  <FlatList
+                      data={data}
+                      showsVerticalScrollIndicator={false}
+                      renderItem={this.renderItem.bind(this)}
+                      keyExtractor={item => item.item_id}
+                  />
+                </View>
+                </MenuContext>)
     }
 }
 

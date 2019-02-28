@@ -130,8 +130,9 @@ class ClasssMemberAddFriend extends React.Component{
             return k == class_id; 
         })
 
-        if(cla === undefined || cla.members === undefined){
+        if(cla === undefined){
             this.props.navigation.goBack(null)
+            return;
         }
 
         let newData = []

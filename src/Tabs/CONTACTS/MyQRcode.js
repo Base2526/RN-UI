@@ -74,26 +74,23 @@ class MyQRcode extends React.Component{
         let {profiles} = this.props
         return (
         <SafeAreaView style={{flex:1}}>
-            <View style={{flex: 1,  justifyContent: 'center', alignItems: 'center',}}>
+            <View style={{flex: 1,  
+                          justifyContent: 'center', 
+                          alignItems: 'center',}}>
                 <ImageWithDefault 
                     source={{uri: profiles.url_my_qrcode}}
-                    style={{width: 260,
-                            height: 260,
-                            marginTop: -(130 + getStatusBarHeight()),
-                            marginLeft: -130}}
+                    style={{width: 200,
+                            height: 200,
+                            marginTop: -(100 + getStatusBarHeight()),
+                            marginLeft: -100}}
                     />
             </View>
-            <View style={{}}>
-                <TouchableOpacity style={{
-                                        padding:15, 
-                                        alignItems:'center',
-                                        backgroundColor:'gray'}}
-                                  onPress={()=>{
-                                    this.props.navigation.navigate("MyQRcode_QRCodeReaderPage")
-                                  }}>
-                    <Text style={{fontSize:18}}>QR code reader</Text>
-                </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={{position:'absolute', right:0, bottom:0, padding:10,}}
+                              onPress={()=>{
+                                this.props.navigation.navigate("MyQRcode_QRCodeReaderPage")
+                              }}>
+                <Text style={{fontSize:18}}>QR code reader</Text>
+            </TouchableOpacity>
         </SafeAreaView>
       );
     }

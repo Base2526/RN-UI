@@ -285,7 +285,12 @@ class MyProfilePage extends React.Component{
                         <View style={{flexDirection:'row', margin:20}}>
                         <TouchableOpacity>
                             <FastImage
-                                style={{width: 100, height: 100, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
+                                style={{width: 80, 
+                                        height: 80, 
+                                        borderRadius: 10, 
+                                        // borderWidth:.5, 
+                                        // borderColor:'gray'
+                                    }}
                                 source={{
                                 uri: image_url,
                                 headers:{ Authorization: 'someAuthToken' },
@@ -295,7 +300,7 @@ class MyProfilePage extends React.Component{
                             />
                         </TouchableOpacity>
                         <View style = {{
-                            justifyContent: 'center',
+                            justifyContent: 'flex-end',
                             alignItems: 'center'}}>
                             <Text style={{alignSelf:'center',
                                         fontSize:22,

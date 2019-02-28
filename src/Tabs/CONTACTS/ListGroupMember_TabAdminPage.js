@@ -217,7 +217,6 @@ class ListGroupMember_TabAdminPage extends React.Component{
                     </MenuOptions>
         }
 
-
         return( <View style={{position:'absolute', right:0, marginRight:10}}><Menu>
                     <MenuTrigger>
                         <MyIcon 

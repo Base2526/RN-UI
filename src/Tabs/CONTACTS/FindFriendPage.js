@@ -100,7 +100,7 @@ class FindFriendPage extends React.Component{
     return (
       <View
         style={{
-          height: 1,
+          height: .5,
           width: "86%",
           backgroundColor: "#CED0CE",
           marginLeft: "14%"
@@ -178,7 +178,6 @@ class FindFriendPage extends React.Component{
       }
 
       case 0:{
-
         menuOptions = <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
                         <MenuOption onSelect={() => {
                           this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
@@ -214,7 +213,7 @@ class FindFriendPage extends React.Component{
   }
 
   renderItem = ({item, index}) => {
-    // console.log(item)
+    console.log(item)
     return(
       <View
         style={{

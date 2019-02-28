@@ -97,8 +97,6 @@ class ListGroupMemberPage extends React.Component{
         this.setState({group_id}, ()=>{
             this.loadData(this.props)
         })
-
-        
     }
 
     componentWillReceiveProps(nextProps) {

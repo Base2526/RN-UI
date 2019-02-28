@@ -36,22 +36,6 @@ class ListClassMemberPage extends React.Component{
             elevation: 0,
             shadowOpacity: 0
         },
-        // headerRight: (
-        //     <View style={{flexDirection:'row', flex:1}}>
-        //         <TouchableOpacity
-        //             style={{padding:5}}
-        //             // disabled={isModify ? false: true}
-        //             onPress={() => {
-        //                 const { params = {} } = navigation.state
-        //                 params.handleSetting()
-        //             }}>
-        //             <MyIcon
-        //                 name={'settings'}
-        //                 size={25}
-        //                 color={'#C7D8DD'} />
-        //         </TouchableOpacity>
-        //     </View>
-        // ),
     });
 
     constructor(){
@@ -146,8 +130,9 @@ class ListClassMemberPage extends React.Component{
             return k == class_id; 
         })
 
-        if(cla === undefined || cla.members === undefined){
+        if(cla === undefined){
             this.props.navigation.goBack(null)
+            return;
         }
 
         let newData = []
