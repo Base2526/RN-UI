@@ -139,6 +139,37 @@ export const actionCreateMyApplication = (uid, application_name, category, subca
     })
 }
 
+export const actionMyApplicationEmail = (uid, application_id, emails, callback) => dispatch =>{
+
+    // console.log(intereste_in)
+    // dispatch({ type: INTERESTE_IN_PROFILE, intereste_in});
+
+    // /users/549098/my_applications/1223
+    // my_applications
+    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(application_id).set({
+        emails
+    }, { merge: true});
+
+    callback({'status':true})
+}
+
+
+export const actionMyApplicationPhone = (uid, application_id, phones, callback) => dispatch =>{
+
+    // console.log(intereste_in)
+    // dispatch({ type: INTERESTE_IN_PROFILE, intereste_in});
+
+    // /users/549098/my_applications/1223
+    // my_applications
+    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(application_id).set({
+        phones
+    }, { merge: true});
+
+    callback({'status':true})
+}
+
+
+
 export const actionLogin = ({email, password}) => dispatch => {
     return login(email, password).then(data => {
         if((data instanceof Array)){
@@ -991,6 +1022,7 @@ export const actionGenderProfile = (uid, gender_id, callback) => dispatch =>{
 // InteresteIn
 export const actionInteresteInProfile = (uid, intereste_in, callback) => dispatch =>{
 
+    console.log(intereste_in)
     dispatch({ type: INTERESTE_IN_PROFILE, intereste_in});
 
     firebase.firestore().collection('profiles').doc(uid).set({

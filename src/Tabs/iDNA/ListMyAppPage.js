@@ -417,6 +417,10 @@ const mapStateToProps = (state) => {
     return {}
   }
 
+  if(!state.auth.isLogin){
+    return;
+  }
+
   return{
     uid:getUid(state),
     auth:state.auth

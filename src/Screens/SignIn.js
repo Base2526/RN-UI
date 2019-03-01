@@ -117,7 +117,7 @@ class SignIn extends React.Component{
           </TouchableOpacity>
         </View>
 
-        <View style={{padding:10}}>
+        {/* <View style={{padding:10}}>
           <TouchableOpacity
             style={{backgroundColor:'gray', padding: 10, alignItems:'center'}}
             onPress={() => {
@@ -125,10 +125,10 @@ class SignIn extends React.Component{
             }}>
             <Text style={{color:'white', fontSize: 18, fontWeight:'700'}}>SIGN UP</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       {/* </Card> */}
 
-        <View style={{position:'absolute', bottom: 0, right: 0, padding:10, alignItems:'flex-end'}}>
+        {/* <View style={{position:'absolute', bottom: 0, right: 0, padding:10, alignItems:'flex-end'}}>
           <TouchableOpacity
             // style={{backgroundColor:'gray', padding: 10, alignItems:'center'}}
             onPress={() => {
@@ -136,7 +136,7 @@ class SignIn extends React.Component{
             }}>
             <Text style={{color:'black', fontSize: 18}}>Forgot Password</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
     </View>
     </SafeAreaView>)
   }

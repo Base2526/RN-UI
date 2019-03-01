@@ -103,7 +103,7 @@ android {
         applicationId "th.dna"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        versionCode 4
         versionName "1.0"
         multiDexEnabled true
         ndk {
@@ -167,7 +167,13 @@ android {
 
 dependencies {
     implementation project(':react-native-qr-scanner')
-    implementation project(':react-native-message-compose')
+    implementation project(':react-native-message-compose') {
+        buildscript {
+            repositories {
+                maven { url = "https://dl.bintray.com/android/android-tools/" }
+            }
+        }
+    }
     implementation project(':react-native-mail')
 //    implementation project(':react-native-svg') {
 //        buildscript {

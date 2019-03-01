@@ -21,6 +21,10 @@ import ManageMyApplicationPage from './ManageMyApplicationPage'
 import MyApplicationMyPost from './MyApplicationMyPost'
 import MyApplicationAddPost from './MyApplicationAddPost'
 
+import ManagePhonesPage from './ManagePhonesPage'
+import ManageEmailsPage from './ManageEmailsPage'
+import EditNameMyApplicationPage from './EditNameMyApplicationPage'
+
 const index = createStackNavigator({
     'Home': {
         screen: home,
@@ -88,12 +92,22 @@ const index = createStackNavigator({
         title: '',
       }
     },
-    // 'MyApplicationAddPost': {
-    //   screen: MyApplicationAddPost,
-    //   navigationOptions: {
-    //     title: '',
-    //   }
-    // }
+    'ManagePhonesPage': {
+      screen: ManagePhonesPage,
+      navigationOptions: {
+
+      }
+    },
+    'ManageEmailsPage': {
+      screen: ManageEmailsPage,
+      navigationOptions: {
+      }
+    },
+    'EditNameMyApplicationPage': {
+      screen: EditNameMyApplicationPage,
+      navigationOptions: {
+      }
+    },
 });
 
 const MyApplicationAddPostNavigator = createStackNavigator(
@@ -190,7 +204,10 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
         routeName === 'CenterSearch'||
         routeName === 'ManageMyApplicationPage' ||
         routeName === 'MyApplicationMyPost' ||
-        routeName === 'MyApplicationAddPost') {
+        routeName === 'MyApplicationAddPost' ||
+        routeName === 'ManagePhonesPage' || 
+        routeName === 'ManageEmailsPage' ||
+        routeName === 'EditNameMyApplicationPage') {
       navigationOptions.tabBarVisible = false;
     }
   

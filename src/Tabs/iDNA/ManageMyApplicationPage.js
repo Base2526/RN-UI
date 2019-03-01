@@ -46,16 +46,6 @@ class ManageMyApplicationPage extends React.Component{
             elevation: 0,
             shadowOpacity: 0
         },
-        // headerRight: (
-        //     <TouchableOpacity
-        //         style={{marginRight:10}}
-        //         onPress={() => {
-        //             const { params = {} } = navigation.state
-        //             params.handlePost()
-        //         }}>
-        //         <Text style={{fontSize:18, fontWeight:'600', color:'white'}}>All post</Text>
-        //     </TouchableOpacity>
-        //   ),
     })
 
     constructor(props) {
@@ -95,7 +85,7 @@ class ManageMyApplicationPage extends React.Component{
 
         const { navigation } = this.props;
         const item = navigation.getParam('item', null);
-        // console.log(item)
+        console.log(item)
 
         // _.each(item,  function(_v, _k) { 
         //     console.log(_v, _k)
@@ -404,6 +394,7 @@ class ManageMyApplicationPage extends React.Component{
                         title="Name" 
                     />
                     <Cell
+                        accessory="DisclosureIndicator"
                         cellContentView={
                             <TextInput
                                 style={{ fontSize: 22, flex: 1 }}
@@ -411,11 +402,15 @@ class ManageMyApplicationPage extends React.Component{
                                 ref= {(el) => { this.applicationName = el; }}
                                 onChangeText={(text) => {
                                     this.setState({applicationName:text})
-                                    // console.log(text)
                                 }}
+                                editable={false}
+                                pointerEvents="none"
                                 value={this.state.applicationName}
                             />
                         }
+                        onPress={()=>{
+                            this.props.navigation.navigate("EditNameMyApplicationPage", {'item_id': this.state.item.item_id})
+                        }}
                     />
                     <Cell 
                         cellStyle="RightDetail" 
@@ -439,23 +434,22 @@ class ManageMyApplicationPage extends React.Component{
                     <Cell 
                         cellStyle="RightDetail" 
                         title="Emails" 
-                        // detail="None"
-                        // accessory="DisclosureIndicator"
+                        detail="None"
+                        accessory="DisclosureIndicator"
                         contentContainerStyle={{ padding:10}} 
                         onPress={()=>{
-                            // this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select })
+                            // this.state.item.item_id
+                            this.props.navigation.navigate("ManageEmailsPage", {'item_id': this.state.item.item_id})
                         }}/>
-                    {this.emailsList()}
                     <Cell 
                         cellStyle="RightDetail" 
                         title="Phones" 
-                        // detail="None"
-                        // accessory="DisclosureIndicator"
+                        detail="None"
+                        accessory="DisclosureIndicator"
                         contentContainerStyle={{ padding:10}} 
                         onPress={()=>{
-                            // this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select })
+                            this.props.navigation.navigate("ManagePhonesPage", {'item_id': this.state.item.item_id})
                         }}/>
-                    {this.phonesList()}
                     <Cell
                         cellStyle="Basic" 
                         title="Published"

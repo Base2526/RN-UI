@@ -410,13 +410,6 @@
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNGestureHandler;
 		};
-		6039E6E421B0F79500B34E68 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 76DF252D0D354D5FBC91E74E /* ReactNativePermissions.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 9D23B34F1C767B80008B4819;
-			remoteInfo = ReactNativePermissions;
-		};
 		6039E79621B1099900B34E68 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 4D4F4550A4EF4D6CBF951B1F /* RCTFBSDK.xcodeproj */;
@@ -565,7 +558,6 @@
 		688B080E5BC44368B1B0D48F /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		6ECE58078C2E4CD6BB58C892 /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		6F8552FECD6A48B0B944BF4C /* QrCode.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = QrCode.xcodeproj; path = "../node_modules/react-native-qr-scanner/ios/QrCode.xcodeproj"; sourceTree = "<group>"; };
-		76DF252D0D354D5FBC91E74E /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = ReactNativePermissions.xcodeproj; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; };
 		771BE37CB7AC470F8D3BD071 /* RNCamera.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNCamera.xcodeproj; path = "../node_modules/react-native-camera/ios/RNCamera.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		793A774F8F6344F795C0D794 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
@@ -939,14 +931,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		6039E6E121B0F79500B34E68 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				6039E6E521B0F79500B34E68 /* libReactNativePermissions.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		6039E79321B1099900B34E68 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -1066,7 +1050,6 @@
 				771BE37CB7AC470F8D3BD071 /* RNCamera.xcodeproj */,
 				9A2DF2D9023B4E7D89C5E968 /* RCTContacts.xcodeproj */,
 				E142F57FA9CC4EE4805124F7 /* RNGestureHandler.xcodeproj */,
-				76DF252D0D354D5FBC91E74E /* ReactNativePermissions.xcodeproj */,
 				4D4F4550A4EF4D6CBF951B1F /* RCTFBSDK.xcodeproj */,
 				2A04F8AD8C3B4136B739C29E /* RNFirebase.xcodeproj */,
 				6F8552FECD6A48B0B944BF4C /* QrCode.xcodeproj */,
@@ -1321,10 +1304,6 @@
 				{
 					ProductGroup = 146834001AC3E56700842450 /* Products */;
 					ProjectRef = 146833FF1AC3E56700842450 /* React.xcodeproj */;
-				},
-				{
-					ProductGroup = 6039E6E121B0F79500B34E68 /* Products */;
-					ProjectRef = 76DF252D0D354D5FBC91E74E /* ReactNativePermissions.xcodeproj */;
 				},
 				{
 					ProductGroup = 6039E5DD21B0DC4C00B34E68 /* Products */;
@@ -1680,13 +1659,6 @@
 			fileType = archive.ar;
 			path = libRNGestureHandler.a;
 			remoteRef = 6039E66221B0DF6800B34E68 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		6039E6E521B0F79500B34E68 /* libReactNativePermissions.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libReactNativePermissions.a;
-			remoteRef = 6039E6E421B0F79500B34E68 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		6039E79721B1099900B34E68 /* libRCTFBSDK.a */ = {
