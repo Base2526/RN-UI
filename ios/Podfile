@@ -36,6 +36,8 @@ target 'RN_UI' do
 
     pod 'react-native-mail', :path => '../node_modules/react-native-mail'
 
+    pod 'ReactNativePermissions', :path => '../node_modules/react-native-permissions'
+
   end
 
   target 'RN_UITests' do
