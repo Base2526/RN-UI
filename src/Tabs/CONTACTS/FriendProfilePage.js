@@ -176,10 +176,10 @@ class FriendProfilePage extends React.Component{
                                 } else {
                                     let v = {friend_id, 'status':Constant.FRIEND_STATUS_FRIEND_99, profile:doc.data()}
 
-                                    this.setState({friend:v})
-                                    this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
-                                        console.log(result)
-                                    })
+                                    // this.setState({friend:v})
+                                    // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                                    //     console.log(result)
+                                    // })
                                 }
                             })
                             .catch(err => {

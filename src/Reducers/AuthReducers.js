@@ -8,7 +8,7 @@ import {USER_LOGIN_SUCCESS,
         UPDATE_PROFILE,
         ADD_FRIEND,
         MODIFIED_FRIEND,
-        FRIEND_PROFILE,
+        ADDED_FRIEND_PROFILE,
         UPDATE_STATUS_FRIEND,
         CHANGE_FRIEND_NAME,
         ADD_GROUP,
@@ -99,6 +99,7 @@ import Constant from '../Utils/Constant'
 
 export default (state= INITIAL_STATE, action)=>{
     console.log(action)
+    // return INITIAL_STATE
     switch(action.type){
         case USER_LOGIN_SUCCESS: {
             state = {...state, 
@@ -141,6 +142,7 @@ export default (state= INITIAL_STATE, action)=>{
                     online: action.payload.auth.online,
                     application_category: action.payload.auth.application_category,}
 
+            console.log(state)
             return state
         }
 
@@ -405,21 +407,73 @@ export default (state= INITIAL_STATE, action)=>{
                 return state
             }
 
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    profiles : {
-                        ...state.users.profiles,
-                        // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
-                        phones : {
-                            ...state.users.profiles.phones,
-                            [action.phone_key]:{phone_number: action.phone_number, is_verify:action.is_verify}
+            let phones = state.users.profiles.phones
+            // console.log(phones, action)
+
+            if(phones === undefined){
+                console.log('ADD_PHONE_PROFILE')
+                let newPhone =  {phone_number: action.phone_number, is_verify:action.is_verify}
+                let newState = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                            phones : {
+                                [action.phone_key]:newPhone
+                            }
                         }
                     }
                 }
+                return newState
             }
-            return v
+
+            let phone = _.find(phones,  function(v, k) { 
+                return k == action.phone_key
+            })
+
+            let newPhone =  {phone_number: action.phone_number, is_verify:action.is_verify}
+            if(phone === undefined){
+                console.log('ADD_PHONE_PROFILE', phone, newPhone, phones)
+                let newState = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                            phones : {
+                                ...state.users.profiles.phones,
+                                [action.phone_key]:newPhone
+                            }
+                        }
+                    }
+                }
+                return newState
+            }else{
+
+                if(!_.isEqual(phone, newPhone)){
+                    console.log('ADD_PHONE_PROFILE', phone, newPhone, phones)
+                    let newState = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            profiles : {
+                                ...state.users.profiles,
+                                // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                                phones : {
+                                    ...state.users.profiles.phones,
+                                    [action.phone_key]:newPhone
+                                }
+                            }
+                        }
+                    }
+                    return newState
+                } 
+            }
+
+            return state
         }
 
         case EDIT_PHONE_PROFILE:{
@@ -428,21 +482,16 @@ export default (state= INITIAL_STATE, action)=>{
             }
 
             let phones = state.users.profiles.phones
-            if(Object.keys(phones).length == 0){
+            if(phones === undefined){
                 return state
             }
 
-            let value = null
-            _.each(phones, function(_v, _k) { 
-                if(_k === action.phone_key){
-                    value = _v
-                }
-            });
+            let phone = _.find(phones,  function(v, k) { 
+                return k == action.phone_key
+            })
 
-            if(value !== null){
-                let newPhones = {...phones, [action.phone_key]:{phone_number: action.phone_number}}
-
-                let v = {
+            if(!_.isEqual(phone, action.newValue)){
+                let newState = {
                     ...state,
                     users : {
                         ...state.users,
@@ -450,15 +499,15 @@ export default (state= INITIAL_STATE, action)=>{
                             ...state.users.profiles,
                             // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
                             phones : {
-                                ...state.users.profiles.phones, ...newPhones
+                                ...state.users.profiles.phones,
+                                [action.phone_key]:action.newValue
                             }
                         }
                     }
                 }
-                // console.log(v)
-                return v
+                // console.log('EDIT_PHONE_PROFILE', action, newState)
+                return newState
             }
-
             return state
         }
 
@@ -467,12 +516,164 @@ export default (state= INITIAL_STATE, action)=>{
                 return state
             }
 
-            let phones = {...state.users.profiles.phones}
-            if(Object.keys(phones).length == 0){
+            let phones = state.users.profiles.phones
+            if(phones === undefined){
+                return state
+            }
+
+            let phone = _.find(phones,  function(v, k) { 
+                return k == action.phone_key
+            })
+
+            if(phone === undefined){
                 return state
             }
 
             let newPhones = _.omit(phones, action.phone_key)
+
+            let newState = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        phones: newPhones
+                    }
+                }
+            }
+
+            return newState
+        }
+
+        case ADD_WEBSITE_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let websites = state.users.profiles.websites
+            if(websites === undefined){
+                let newWebsite =  {url: action.url}
+                let newState = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            websites : {
+                                [action.website_key]:newWebsite
+                            }
+                        }
+                    }
+                }
+                console.log('ADD_WEBSITE_PROFILE', newWebsite, newState)
+                return newState
+            }
+
+            let website =   _.find(websites,  function(v, k) { 
+                                return k == action.website_key
+                            })
+
+            let newWebsite = {url: action.url}
+            if(website === undefined){
+                let newState = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                            websites : {
+                                ...state.users.profiles.websites,
+                                [action.website_key]:newWebsite
+                            }
+                        }
+                    }
+                }
+                console.log('ADD_WEBSITE_PROFILE', website, newWebsite, newState)
+                return newState
+            }else{
+                if(!_.isEqual(website, newWebsite)){
+                    let newState = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            profiles : {
+                                ...state.users.profiles,
+                                websites : {
+                                    ...state.users.profiles.websites,
+                                    [action.website_key]:newWebsite
+                                }
+                            }
+                        }
+                    }
+                    console.log('ADD_WEBSITE_PROFILE', website, newWebsite, newState)
+                    return newState
+                } 
+            }
+            return state
+        }
+
+        case EDIT_WEBSITE_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let websites = state.users.profiles.websites
+            if(websites === undefined){
+                return state
+            }
+
+            let website =   _.find(websites,  function(v, k) { 
+                                return k == action.website_key
+                            })
+
+            if(website === undefined){
+                return state
+            }
+
+            let newWebsite = {url: action.url}
+            if(!_.isEqual(website, newWebsite)){
+                // let newWebsites = {...websites, [action.website_key]:{url: action.url}}
+                let newState = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                            websites : {
+                                ...state.users.profiles.websites,
+                                [action.website_key]:newWebsite
+                            }
+                        }
+                    }
+                }
+
+                console.log('EDIT_WEBSITE_PROFILE', website, newWebsite, newState)
+                return newState
+            }
+            return state
+        }
+
+        case REMOVE_WEBSITE_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+            
+            let websites = state.users.profiles.websites
+            if(websites === undefined){
+                return state
+            }
+
+            let website =   _.find(websites,  function(v, k) { 
+                return k == action.website_key
+            })
+            
+            if(website === undefined){
+                return state
+            }
+
+            let newWebsites = _.omit(websites, action.website_key)
 
             let v = {
                 ...state,
@@ -480,11 +681,207 @@ export default (state= INITIAL_STATE, action)=>{
                     ...state.users,
                     profiles : {
                         ...state.users.profiles,
-                        phones : newPhones
+                        websites: newWebsites
                     }
                 }
             }
             return v
+        }
+
+        /*
+        ADD_EMAIL_PROFILE,
+        EDIT_EMAIL_PROFILE,
+        REMOVE_EMAIL_PROFILE,
+        */
+        case ADD_EMAIL_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let emails = state.users.profiles.emails
+
+            // email_data
+            /*
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    profiles : {
+                        ...state.users.profiles,
+                        // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                        emails : {
+                            ...state.users.profiles.emails,
+                            [action.email_key]:{email: action.email}
+                        }
+                    }
+                }
+            }
+            return v
+            */
+
+            if(emails === undefined){
+                let newEmail =  action.email_data
+                let newState = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            emails : {
+                                [action.email_key]:newEmail
+                            }
+                        }
+                    }
+                }
+                console.log('ADD_EMAIL_PROFILE', newEmail, newState)
+                return newState
+            }
+
+            let email = _.find(emails,  function(v, k) { 
+                            return k == action.email_key
+                        })
+
+            let newEmail =  action.email_data
+            if(email === undefined){
+                let newState = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                            emails : {
+                                ...state.users.profiles.emails,
+                                [action.email_key]:newEmail
+                            }
+                        }
+                    }
+                }
+                console.log('ADD_EMAIL_PROFILE', newEmail, newState)
+                return newState
+            }else{
+                if(!_.isEqual(email, newEmail)){
+                    let newState = {
+                        ...state,
+                        users : {
+                            ...state.users,
+                            profiles : {
+                                ...state.users.profiles,
+                                emails : {
+                                    ...state.users.profiles.emails,
+                                    [action.email_key]:newEmail
+                                }
+                            }
+                        }
+                    }
+                    console.log('ADD_EMAIL_PROFILE', email, newEmail, newState)
+                    return newState
+                } 
+            }
+        }
+
+        case EDIT_EMAIL_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let emails = state.users.profiles.emails
+            if(emails === undefined){
+                return state
+            }
+
+            /*
+            if(Object.keys(emails).length == 0){
+                return state
+            }
+
+            let value = null
+            _.each(emails, function(_v, _k) { 
+                if(_k === action.email_key){
+                    value = _v
+                }
+            });
+
+            if(value !== null){
+                let newEmails = {...emails, [action.email_key]:{email: action.email}}
+
+                let v = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
+                            emails : {
+                                ...state.users.profiles.emails, ...newEmails
+                            }
+                        }
+                    }
+                }
+                return v
+            }
+            return state
+            */
+            
+            let email = _.find(emails,  function(v, k) { 
+                            return k == action.email_key
+                        })
+
+            if(email === undefined){
+                return state
+            }
+
+            let newEmail =  action.email_data
+            if(!_.isEqual(email, newEmail)){
+                // let newWebsites = {...websites, [action.website_key]:{url: action.url}}
+                let newState = {...state,
+                                    users: {
+                                        ...state.users,
+                                        profiles: {
+                                            ...state.users.profiles,
+                                            emails: {
+                                                ...state.users.profiles.emails,
+                                                [action.email_key]:newEmail
+                                            }
+                                        }
+                                    }
+                                }
+
+                console.log('EDIT_EMAIL_PROFILE', email, newEmail, newState)
+                return newState
+            }
+            return state
+        }
+
+        case REMOVE_EMAIL_PROFILE:{
+            if(state.users === null){
+                return state
+            }
+
+            let emails = state.users.profiles.emails
+            if(emails === undefined){
+                return state
+            }
+
+            let email = _.find(emails,  function(v, k) { 
+                return k == action.email_key
+            })
+
+            if(email !== undefined){
+                let newEmails = _.omit(emails, action.email_key)
+                let newState = {
+                    ...state,
+                    users : {
+                        ...state.users,
+                        profiles : {
+                            ...state.users.profiles,
+                            emails: newEmails
+                        }
+                    }
+                }
+                return newState
+            }
+            return state
         }
 
         case ADD_PHONE_FRIEND :{
@@ -757,8 +1154,6 @@ export default (state= INITIAL_STATE, action)=>{
             return state
         }
 
-
-
         case ADDRESS_PROFILE : {
             if(state.users === null){
                 return state
@@ -777,196 +1172,6 @@ export default (state= INITIAL_STATE, action)=>{
             return v
         }
 
-
-        /* 
-        ADD_WEBSITE_PROFILE,
-        EDIT_WEBSITE_PROFILE,
-        REMOVE_WEBSITE_PROFILE
-        */
-        case ADD_WEBSITE_PROFILE:{
-            if(state.users === null){
-                return state
-            }
-
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    profiles : {
-                        ...state.users.profiles,
-                        // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
-                        websites : {
-                            ...state.users.profiles.websites,
-                            [action.website_key]:{url: action.url}
-                        }
-                    }
-                }
-            }
-
-            // console.log(v)
-            return v
-        }
-
-        case EDIT_WEBSITE_PROFILE:{
-            if(state.users === null){
-                return state
-            }
-
-            let websites = state.users.profiles.websites
-            if(Object.keys(websites).length == 0){
-                return state
-            }
-
-            let value = null
-            _.each(websites, function(_v, _k) { 
-                if(_k === action.website_key){
-                    value = _v
-                }
-            });
-
-            if(value !== null){
-                let newWebsites = {...websites, [action.website_key]:{url: action.url}}
-
-                let v = {
-                    ...state,
-                    users : {
-                        ...state.users,
-                        profiles : {
-                            ...state.users.profiles,
-                            // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
-                            websites : {
-                                ...state.users.profiles.websites, ...newWebsites
-                            }
-                        }
-                    }
-                }
-                // console.log(v)
-                return v
-            }
-
-            return state
-        }
-
-        case REMOVE_WEBSITE_PROFILE:{
-            if(state.users === null){
-                return state
-            }
-
-            let websites = {...state.users.profiles.websites}
-            if(Object.keys(websites).length == 0){
-                return state
-            }
-
-            let newWebsites = _.omit(websites, action.website_key)
-
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    profiles : {
-                        ...state.users.profiles,
-                        websites : newWebsites
-                    }
-                }
-            }
-            return v
-        }
-
-        /*
-        ADD_EMAIL_PROFILE,
-        EDIT_EMAIL_PROFILE,
-        REMOVE_EMAIL_PROFILE,
-        */
-        case ADD_EMAIL_PROFILE:{
-            if(state.users === null){
-                return state
-            }
-
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    profiles : {
-                        ...state.users.profiles,
-                        // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
-                        emails : {
-                            ...state.users.profiles.emails,
-                            [action.email_key]:{email: action.email}
-                        }
-                    }
-                }
-            }
-
-            // console.log(v)
-            return v
-        }
-
-        case EDIT_EMAIL_PROFILE:{
-            if(state.users === null){
-                return state
-            }
-
-            let emails = state.users.profiles.emails
-            if(Object.keys(emails).length == 0){
-                return state
-            }
-
-            let value = null
-            _.each(emails, function(_v, _k) { 
-                if(_k === action.email_key){
-                    value = _v
-                }
-            });
-
-            if(value !== null){
-                let newEmails = {...emails, [action.email_key]:{email: action.email}}
-
-                let v = {
-                    ...state,
-                    users : {
-                        ...state.users,
-                        profiles : {
-                            ...state.users.profiles,
-                            // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
-                            emails : {
-                                ...state.users.profiles.emails, ...newEmails
-                            }
-                        }
-                    }
-                }
-                return v
-            }
-            return state
-        }
-
-        case REMOVE_EMAIL_PROFILE:{
-            if(state.users === null){
-                return state
-            }
-
-            let emails = {...state.users.profiles.emails}
- 
-            let email = _.find(emails,  function(v, k) { 
-                return k == action.email_key
-            })
-
-            if(email !== undefined){
-                let newEmails = _.omit(emails, action.email_key)
-                let v = {
-                    ...state,
-                    users : {
-                        ...state.users,
-                        profiles : {
-                            ...state.users.profiles,
-                            emails: newEmails
-                        }
-                    }
-                }
-                return v
-            }
-            return state
-        }
-
         case ADD_MY_ID_PROFILE:{
             if(state.users === null){
                 return state
@@ -974,26 +1179,43 @@ export default (state= INITIAL_STATE, action)=>{
 
             let my_ids = state.users.profiles.my_ids
             let my_id = _.find(my_ids,  function(v, k) { 
-                return k == action.my_id_key && _.isEqual(v, action.my_id_data)
+                return k == action.my_id_key // && _.isEqual(v, action.my_id_data)
             })
 
             // console.log(my_id)
             if(my_id === undefined){
-                let v = {
-                    ...state,
-                    users : {
-                        ...state.users,
-                        profiles : {
-                            ...state.users.profiles,
-                            my_ids : {
-                                ...state.users.profiles.my_ids,
-                                [action.my_id_key]:action.my_id_data
+                let newState = {...state,
+                                    users: {
+                                        ...state.users,
+                                        profiles: {
+                                            ...state.users.profiles,
+                                            my_ids: {
+                                                ...state.users.profiles.my_ids,
+                                                [action.my_id_key]:action.my_id_data
+                                            }
+                                        }
+                                    }
+                                }
+                // console.log(v)
+                console.log('ADD_MY_ID_PROFILE', action.my_id_data, newState)
+                return newState
+            }else{
+                if(!_.isEqual(my_id, action.my_id_data)){
+                    let newState = {...state,
+                        users: {
+                            ...state.users,
+                            profiles: {
+                                ...state.users.profiles,
+                                my_ids: {
+                                    ...state.users.profiles.my_ids,
+                                    [action.my_id_key]:action.my_id_data
+                                }
                             }
                         }
                     }
+                    console.log('ADD_MY_ID_PROFILE', action.my_id_data, newState)
+                    return newState
                 }
-                // console.log(v)
-                return v
             }
             return state
         }
@@ -1003,8 +1225,40 @@ export default (state= INITIAL_STATE, action)=>{
                 return state
             }
 
-            let my_ids = {...state.users.profiles.my_ids}
+            let my_ids = state.users.profiles.my_ids
+            if(my_ids === undefined){
+                return state
+            }
 
+            let my_id = _.find(my_ids,  function(v, k) { 
+                return k == action.my_id_key
+            })
+
+            if(my_id === undefined){
+                return state
+            }
+
+            let newMy_id =  action.my_id_data
+            if(!_.isEqual(my_id, newMy_id)){
+                let newState = {...state,
+                    users: {
+                        ...state.users,
+                        profiles: {
+                            ...state.users.profiles,
+                            my_ids: {
+                                ...state.users.profiles.my_ids,
+                                [action.my_id_key]:newMy_id
+                            }
+                        }
+                    }
+                }
+
+                console.log('EDIT_MY_ID_PROFILE', my_id, newMy_id, newState)
+                return newState
+            }
+            return state
+
+            /*
             if(action.my_id_key == 0){
                 let newMyIDs = {}
                 _.each(my_ids, function(_v, _k) { 
@@ -1025,18 +1279,6 @@ export default (state= INITIAL_STATE, action)=>{
                 }
                 return v
             }
-
-
-            // let my_id = _.find(my_ids,  function(v, k) { 
-            //     return k == action.my_id_key &&  v.enable
-            // })
-            // console.log(my_id)
-            // if(my_id !== undefined){
-            //     return state
-            // }
-
-            // dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:doc_id, my_id_data:doc_data});
-            // console.log(my_id)
 
             let newMyIds = {}
             _.each(my_ids, function(_v, _k) { 
@@ -1059,6 +1301,7 @@ export default (state= INITIAL_STATE, action)=>{
             console.log(action.my_id_key)
             console.log(v)
             return v
+            */
         }
 
         case REMOVE_MY_ID_PROFILE:{
@@ -1074,18 +1317,17 @@ export default (state= INITIAL_STATE, action)=>{
 
             if(my_id !== undefined){
                 let newMyIDs = _.omit(my_ids, action.my_id_key)
-                let v = {
-                    ...state,
-                    users : {
-                        ...state.users,
-                        profiles : {
-                            ...state.users.profiles,
-                            my_ids: newMyIDs
-                        }
-                    }
-                }
-                // console.log(v)
-                return v
+                let newState = {...state,
+                                    users : {
+                                        ...state.users,
+                                        profiles : {
+                                            ...state.users.profiles,
+                                            my_ids: newMyIDs
+                                        }
+                                    }
+                                }
+
+                return newState
             }
 
             return state
@@ -1101,8 +1343,48 @@ export default (state= INITIAL_STATE, action)=>{
                 return k == action.friend_id
             })
 
+            // console.log('users>friends', action.friend_data, friend)
+
+            
+            // console.log('users>friends', action.friend_data, friend, newFriend)
+            
             if(friend === undefined){
-                let v = {
+                let newState = {...state,
+                                    users: {
+                                        ...state.users,
+                                        friends : {
+                                            ...state.users.friends,
+                                            [action.friend_id]:action.friend_data
+                                        }
+                                    }
+                                }
+                                
+                console.log('ADD_FRIEND', newState)
+                return newState;
+            }else{
+
+                let newFriend = {...friend, ...action.friend_data}
+                if(!_.isEqual(friend, newFriend)){
+                    let newState = {...state,
+                        users : {
+                            ...state.users,
+                            friends : {
+                                ...state.users.friends,
+                                [action.friend_id]:newFriend
+                            }
+                        }
+                    }
+
+                    console.log('ADD_FRIEND', newFriend, friend, newState)
+                    return newState;
+                }
+            }
+
+            return state
+
+            /*
+            if(friend === undefined){
+                let newState = {
                     ...state,
                     users : {
                         ...state.users,
@@ -1112,23 +1394,26 @@ export default (state= INITIAL_STATE, action)=>{
                         }
                     }
                 }
-                return v;
+                console.log('ADD_FRIEND', friend)
+                return newState;
             }else{
                 let newFriend = {...action.data, ...{profile: action.profile}}
-                if(!isEquivalent2Object(friend, newFriend)){
-                    let v = {
-                        ...state,
-                        users : {
-                            ...state.users,
-                            friends : {
-                                ...state.users.friends,
-                                [action.friend_id]:newFriend
-                            }
-                        }
-                    }
-                    return v;
+                if(!_.isEqual(friend, newFriend)){
+
+                    console.log('ADD_FRIEND', friend, newFriend)
+                    let newState = {...state,
+                                        users : {
+                                            ...state.users,
+                                            friends : {
+                                                ...state.users.friends,
+                                                [action.friend_id]:newFriend
+                                            }
+                                        }
+                                    }
+                    return newState;
                 }
             }
+            */
 
             /*
             let key = 0
@@ -1170,7 +1455,7 @@ export default (state= INITIAL_STATE, action)=>{
                 }
             }
             */
-            return state
+            
         }
 
         case MODIFIED_FRIEND:{
@@ -1214,37 +1499,48 @@ export default (state= INITIAL_STATE, action)=>{
             return state;
         }
 
-        case FRIEND_PROFILE:{
+        case ADDED_FRIEND_PROFILE:{
             if(state.users === null){
                 return state
             }
 
-            // console.log('FRIEND_PROFILE')
-            let friends = state.users.friends
+            let friend_profiles = state.users.friend_profiles
 
-            let key = 0
-            let value = null
-            _.each(friends, function(_v, _k) { 
-                if(_k === action.id){
-                    key = _k
-                    value = _v
-                }
-            });
+            let friend_profile = _.find(friend_profiles,  function(v, k) { 
+                return k == action.friend_id
+            })
 
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    friends : {
-                        ...state.users.friends,
-                        [action.id]: {...value, profile:action.data}
+            if(friend_profile === undefined){
+                let newState = {...state,
+                                    users: {
+                                        ...state.users,
+                                        friend_profiles : {
+                                            ...state.users.friend_profiles,
+                                            [action.friend_id]:action.friend_profile
+                                        }
+                                    }
+                                }
+                
+                console.log('ADDED_FRIEND_PROFILE', action.friend_profile, newState)
+                return newState;
+            }else{
+                if(!_.isEqual(friend_profile, action.friend_profile)){
+                    let newState = {...state,
+                        users : {
+                            ...state.users,
+                            friend_profiles : {
+                                ...state.users.friend_profiles,
+                                [action.friend_id]:action.friend_profile
+                            }
+                        }
                     }
+
+                    console.log('ADDED_FRIEND_PROFILE', friend_profile, action.friend_profile, newState)
+                    return newState;
                 }
             }
 
-            // console.log(v)
-            
-            return v
+            return state
         }
 
         /*
@@ -1375,10 +1671,11 @@ export default (state= INITIAL_STATE, action)=>{
                 // }
 
                 let newGroup = {...group, ...action.data}
-                console.log(newGroup)
-                console.log(group)
+                // console.log(newGroup)
+                // console.log(group)
 
                 if(!_.isEqual(group, newGroup)){
+                    console.log('ADD_GROUP')
                     let v = {
                         ...state,
                         users : {

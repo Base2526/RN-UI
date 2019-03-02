@@ -12,6 +12,11 @@ export const UPDATE_PROFILE = "update_profile"
 export const ADD_FRIEND             = "add_friend"
 export const MODIFIED_FRIEND        = "modified_friend"
 export const FRIEND_PROFILE         = "friend_profile"
+// 
+
+export const ADDED_FRIEND_PROFILE   = "added_friend_profile"
+
+
 export const UPDATE_STATUS_FRIEND   = "update_status_friend" 
 export const CHANGE_FRIEND_NAME     = "change_friend_name"
 

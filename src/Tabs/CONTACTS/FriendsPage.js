@@ -61,8 +61,7 @@ class FriendsPage extends React.Component{
         return;
       }
 
-
-      let {presences, profiles, friends} = props
+      let {presences, profiles, friends, friend_profiles} = props
 
       let profile = {
         title: 'Profile',
@@ -83,6 +82,17 @@ class FriendsPage extends React.Component{
       for (var key in friends) {
 
         let friend = friends[key]
+
+        let friend_profile =_.find(friend_profiles, (fv, fk)=>{
+                              return fk == key
+                            })
+        // console.log(friend, key, friend_profile)
+
+        if(friend_profile === undefined){
+          continue;
+        }
+        friend = {...friend, profile:friend_profile}
+
         switch(friend.status){
           case Constant.FRIEND_STATUS_FRIEND:{
 
@@ -174,6 +184,8 @@ class FriendsPage extends React.Component{
       }
         
       let data = [profile, favorites, friendRequests, friendRequestSents, _friends];
+      
+      // console.log(data)
       this.setState({data})
     }
 
@@ -672,6 +684,7 @@ const mapStateToProps = (state) => {
   return{
     uid:getUid(state),
     friends:state.auth.users.friends,
+    friend_profiles:state.auth.users.friend_profiles,
     profiles:state.auth.users.profiles,
     presences:state.presence.user_presences
   }

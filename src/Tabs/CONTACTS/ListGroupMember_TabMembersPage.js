@@ -61,7 +61,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
     loadData = (props) =>{
         let {group_id}  = this.state
-        let {groups, friends, uid}    = props
+        let {groups, friends, uid, friend_profiles}    = props
 
         let group = _.find(groups,  function(v, k) { 
             return k == group_id
@@ -78,14 +78,22 @@ class ListGroupMember_TabMembersPage extends React.Component{
         let group_members = group.members
         _.each(group_members, (v, k)=>{
             console.log(v, k)
-            var friend_profile = _.find(friends, function(fv, fk) {
+            var friend = _.find(friends, function(fv, fk) {
                 return fk == v.friend_id;
             });
+
+            // friend_profiles
+
+            var friend_profile = _.find(friend_profiles, function(fv, fk) {
+                                    return fk == v.friend_id;
+                                });
+
+            friend = {...friend, profile:friend_profile}
 
             switch(v.status){
                 case Constant.GROUP_STATUS_MEMBER_INVITED:{
                     // console.log(friend_profile)
-                    if(friend_profile === undefined ){
+                    if(friend === undefined ){
                         if(uid === v.friend_id){
                             pendings.push({...v, member_key:k})
                         }else{
@@ -107,12 +115,12 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             });
                         }
                     }else{
-                        pendings.push({...v, member_key:k, friend:friend_profile})
+                        pendings.push({...v, member_key:k, friend})
                     }
                     break;
                 }
                 case Constant.GROUP_STATUS_MEMBER_JOINED:{
-                    if(friend_profile === undefined ){
+                    if(friend === undefined ){
                         if(uid === v.friend_id){
                             members.push({...v, member_key:k})
                         }else{
@@ -134,12 +142,12 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             });
                         }
                     }else{
-                        members.push({...v, member_key:k, friend:friend_profile})
+                        members.push({...v, member_key:k, friend})
                     }
                     break;
                 }
                 case Constant.GROUP_STATUS_MEMBER_DECLINE:{
-                    if(friend_profile === undefined ){
+                    if(friend === undefined ){
                         if(uid === v.friend_id){
                             declines.push({...v, member_key:k})
                         }else{
@@ -161,7 +169,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             });
                         }
                     }else{
-                        declines.push({...v, member_key:k, friend:friend_profile})
+                        declines.push({...v, member_key:k, friend})
                     }
                     break;
                 }
@@ -753,6 +761,7 @@ const mapStateToProps = (state) => {
         uid:getUid(state),
         profiles:state.auth.users.profiles,
         friends:state.auth.users.friends,
+        friend_profiles:state.auth.users.friend_profiles,
         groups:state.auth.users.groups,
     }
 }

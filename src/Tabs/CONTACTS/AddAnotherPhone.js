@@ -43,8 +43,9 @@ class AddAnotherPhone extends React.Component{
     constructor(props){
         super(props)
         this.state ={
-            mode:'add',
-            key:'',
+            mode: 'add',
+            key: '',
+            value: '',
             text: '',
             loading: false,
 
@@ -63,7 +64,7 @@ class AddAnotherPhone extends React.Component{
             const key = navigation.getParam('key', null);
             const value = navigation.getParam('value', null);
 
-            this.setState({mode, key, text:value.phone_number})
+            this.setState({mode, key, text:value.phone_number, value})
         }
     }
 
@@ -108,7 +109,10 @@ class AddAnotherPhone extends React.Component{
                 })
            }else if(this.state.mode === 'edit'){
                 this.setState({loading: true})
-                this.props.actionEditPhoneProfile(this.props.uid, this.state.key,this.state.text, (result) => {
+
+                let newValue = {...this.state.value, phone_number:this.state.text}
+
+                this.props.actionEditPhoneProfile(this.props.uid, this.state.key, newValue, (result) => {
                     this.setState({loading:false})
                     if(result.status){
                         const { navigation } = this.props;

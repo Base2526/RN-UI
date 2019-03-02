@@ -8,7 +8,7 @@ const INITIAL_STATE = {user_presences:null}
 
 import Constant from '../Utils/Constant'
 export default (state= INITIAL_STATE, action)=>{
-    console.log(action)
+    // console.log(action)
 
     switch(action.type){
         case 'persist/REHYDRATE':{

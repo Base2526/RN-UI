@@ -49,6 +49,11 @@ class GroupsPage extends React.Component{
     // invited you to group
     componentDidMount() {
       // setTimeout(() => {this.setState({renderContent: true})}, 0);
+
+      // alert('GroupsPage')
+
+      this.props.watchTaskGroupEvent(this.props.uid)
+
       this.setState({
         error: null,
         loading: false,

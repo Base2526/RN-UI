@@ -123,7 +123,7 @@ class ListClassMemberPage extends React.Component{
 
     loadData = (props) =>{
         let {class_id} = this.state
-        let {friends, classs} = props
+        let {friends, classs, friend_profiles} = props
 
         console.log(friends, classs, class_id)
         let cla = _.find(classs,  function(v, k) { 
@@ -139,11 +139,16 @@ class ListClassMemberPage extends React.Component{
         _.each(cla.members, (v, k)=>{
             if(v.status){
                 // return {...{friend_id:key}, ...friends[key]};
-                friend =_.find(friends, (vv, kk)=>{
-                            return v.friend_id == kk
-                        })
+                // friend =_.find(friends, (vv, kk)=>{
+                //             return v.friend_id == kk
+                //         })
+
+                let friend_profile =_.find(friend_profiles, (vv, kk)=>{
+                                        return v.friend_id == kk
+                                    })
                 
-                newData.push( {...{friend_id:v.friend_id}, ...{member_key:k}, ...friend} )
+                
+                newData.push( {...{friend_id:v.friend_id}, ...{member_key:k}, ...friend_profile} )
             }
         })
 
@@ -209,6 +214,8 @@ class ListClassMemberPage extends React.Component{
     }
 
     renderItem = ({item, index}) => { 
+
+        console.log(item)
         // let swipeoutRight = [
         //     {
         //         component: <View style={{flex: 1, 
@@ -245,13 +252,13 @@ class ListClassMemberPage extends React.Component{
                     <FastImage
                         style={{width: 50, height: 50, borderRadius: 10, borderColor:'gray', borderWidth:.5}}
                         source={{
-                            uri: item.profile.image_url,
+                            uri: item.image_url,
                             headers:{ Authorization: 'someAuthToken' },
                             priority: FastImage.priority.normal,
                         }}
                         resizeMode={FastImage.resizeMode.cover}/>
                     <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                        <Text style={{fontSize:18}}>{item.profile.name}</Text>
+                        <Text style={{fontSize:18}}>{item.name}</Text>
                     </View>
                     {this.showMenu(item)}
                 </View>
@@ -305,6 +312,7 @@ const mapStateToProps = (state) => {
     return{
         uid:getUid(state),
         friends:state.auth.users.friends,
+        friend_profiles:state.auth.users.friend_profiles,
         classs:state.auth.users.classs,
     }
 }

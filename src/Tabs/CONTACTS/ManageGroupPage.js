@@ -56,7 +56,7 @@ class ManageGroupPage extends React.Component{
     }
 
     loadData = (props) =>{
-        let {groups, friends, uid} = props
+        let {groups, friends, uid, friend_profiles} = props
         let {group_id} = this.state
 
         let group  = _.find(groups, (v, k)=>{
@@ -84,11 +84,15 @@ class ManageGroupPage extends React.Component{
         let keys = Object.keys(members);
         for (let i = 0; i < count; i++) {
             let {friend_id}= members[keys[i]]
-            var friend_profile = _.find(friends, function(v, k) {
-                // console.log(k, friend_id)
-                return k == friend_id;
-            });
-            // console.log(friend_profile)
+            // var friend_profile = _.find(friends, function(v, k) {
+            //     // console.log(k, friend_id)
+            //     return k == friend_id;
+            // });
+
+            let friend_profile =_.find(friend_profiles, (fv, fk)=>{
+                return fk == friend_id
+            })
+            console.log(friend_profile)
 
             if(friend_profile === undefined && uid !== friend_id){
                 if(uid === friend_id){
@@ -110,12 +114,12 @@ class ManageGroupPage extends React.Component{
                             //     return k == keys[i];
                             // });
 
-                            members = {...members, [keys[i]]: {...members[keys[i]], friend:{profile:doc.data()} }}
+                            members = {...members, [keys[i]]: {...members[keys[i]], friend:doc.data() }}
 
                             let newGroup = {...this.state.group, members}
-                            this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
-                                console.log(result)
-                            })
+                            // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                            //     console.log(result)
+                            // })
                             this.setState({group: newGroup})
                         }
                     })
@@ -194,7 +198,7 @@ class ManageGroupPage extends React.Component{
                         <FastImage
                             style={{width: 36, height: 36, borderRadius: 18}}
                             source={{
-                                uri: friend.profile.image_url,
+                                uri: friend.image_url,
                                 headers:{ Authorization: 'someAuthToken' },
                                 priority: FastImage.priority.normal,
                             }}
@@ -327,6 +331,7 @@ const mapStateToProps = (state) => {
         profiles:state.auth.users.profiles,
         groups:state.auth.users.groups,
         friends:state.auth.users.friends,
+        friend_profiles:state.auth.users.friend_profiles,
         isConnected:state.offline.online,
     }
 }

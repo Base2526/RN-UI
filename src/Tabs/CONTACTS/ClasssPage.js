@@ -45,6 +45,8 @@ class ClasssPage extends React.Component{
 
     componentDidMount() {
 
+      this.props.watchTaskClassEvent(this.props.uid)
+
       setTimeout(() => {this.setState({renderContent: true})}, 0);
 
       this.loadData(this.props)

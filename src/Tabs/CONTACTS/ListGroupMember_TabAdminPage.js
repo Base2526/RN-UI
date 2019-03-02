@@ -47,9 +47,10 @@ class ListGroupMember_TabAdminPage extends React.Component{
         this.loadData(nextProps)
     }
 
+    // friend_profiles:state.auth.users.friend_profiles,
     loadData = (props) =>{
         let {group_id}  = this.state
-        let {uid, groups, friends}    = props
+        let {uid, groups, friends, friend_profiles}    = props
 
         let group = _.find(groups,  function(v, k) { 
             return k == group_id
@@ -97,9 +98,19 @@ class ListGroupMember_TabAdminPage extends React.Component{
         _.each(group.members, (v, k)=>{
             console.log(v.is_admin)
             if(v.is_admin){
-                let friend = _.find(friends, (fv, fk)=>{
-                    return v.friend_id == fk
-                })
+                // let friend = _.find(friends, (fv, fk)=>{
+                //     return v.friend_id == fk
+                // })
+
+                var friend = _.find(friends, function(fv, fk) {
+                    return fk == v.friend_id;
+                });
+                
+                var friend_profile = _.find(friend_profiles, function(fv, fk) {
+                                        return fk == v.friend_id;
+                                    });
+    
+                friend = {...friend, profile:friend_profile}
 
                 if(friend === undefined){
                     if(v.friend_id == uid){
@@ -370,6 +381,7 @@ const mapStateToProps = (state) => {
         uid:getUid(state),
         profiles:state.auth.users.profiles,
         friends:state.auth.users.friends,
+        friend_profiles:state.auth.users.friend_profiles,
         groups:state.auth.users.groups
     }
 }
