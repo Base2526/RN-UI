@@ -45,15 +45,13 @@ class FriendsPage extends React.Component{
     }
     
     componentDidMount() {
-      setTimeout(() => {this.setState({renderContent: true})}, 0);
+      // setTimeout(() => {this.setState({renderContent: true})}, 0);
 
       this.loadData(this.props)
-
-      // console.log(base64.decode('ZnJpZW5k'))
     }
 
     componentWillReceiveProps(nextProps){
-      this.loadData(nextProps)
+      // this.loadData(nextProps)
     }
 
     loadData=(props)=>{
@@ -61,6 +59,18 @@ class FriendsPage extends React.Component{
         return;
       }
 
+      if( /*_.isEqual(this.props.presences, props.presences) && */
+         _.isEqual(this.props.profiles, props.profiles) &&
+         _.isEqual(this.props.friends, props.friends) &&
+         _.isEqual(this.props.friend_profiles, props.friend_profiles) && this.state.renderContent){
+           return;
+      }
+
+      if(!this.state.renderContent){
+        this.setState({renderContent: true})
+        console.log('FriendsPage > loadData : this.setState({renderContent: true})')
+      }
+      
       let {presences, profiles, friends, friend_profiles} = props
 
       let profile = {
@@ -185,9 +195,17 @@ class FriendsPage extends React.Component{
         
       let data = [profile, favorites, friendRequests, friendRequestSents, _friends];
       
-      // console.log(data)
-      this.setState({data})
+      if(_.isEqual(data, this.state.data)){
+        console.log('FriendsPage > loadData : equal')
+        return;
+      }else{
+        console.log('FriendsPage > loadData : not equal')
+
+        // console.log(data)
+        this.setState({data})
+      }
     }
+
 
     _itemOnPress=(item, rowId, sectionId)=>{
       if(rowId == 0 && sectionId == 0){
@@ -623,6 +641,8 @@ class FriendsPage extends React.Component{
         return <View style={{flex: 1}}></View>
       }
 
+      console.log('FriendsPage > --reder--')
+
       return (
           <View style={{flex: 1}}>
           <Spinner
@@ -668,8 +688,8 @@ class FriendsPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
-  console.log(state)
+const mapStateToProps = (state, ownProps) => {
+  console.log(state, ownProps, ownProps.profiles)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
   //_persist.rehydrated parameter is initially set to false

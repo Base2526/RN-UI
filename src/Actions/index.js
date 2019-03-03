@@ -1851,52 +1851,6 @@ export const watchTaskGroupEvent = (uid) => dispatch =>{
                             }
                         })
                     })
-
-                    // track group > admins
-                    /*
-                    ADDED_GROUP_ADMIN,
-                    MODIFIED_GROUP_ADMIN, // modified
-                    REMOVED_GROUP_ADMIN,
-                    */
-                   /*
-                    firebase.firestore().collection('groups').doc(change.doc.id).collection('admins').onSnapshot((querySnapshot) => {
-                        querySnapshot.docChanges.forEach(function(admins_change) {
-
-                            console.log(change.doc.id, admins_change.type, admins_change.doc.id, admins_change.doc.data())
-                            
-                            if (admins_change.type === 'added') {
-                                console.log('added: ', change.doc.id, admins_change.doc.id, admins_change.doc.data());
-
-                                // let group_id = doc.id
-                                // let item_id = change.doc.id
-                                // let data = change.doc.data()
-                                // // ADDED_GROUP_MEMBER
-
-                                dispatch({ type: ADDED_GROUP_ADMIN, group_id:change.doc.id, admin_item_id:admins_change.doc.id, admin_data: admins_change.doc.data()});
-                            }
-                            if (admins_change.type === 'modified') {
-                                console.log('modified: ', change.doc.id, admins_change.doc.id, admins_change.doc.data());
-
-                                // let group_id = doc.id
-                                // let item_id = change.doc.id
-                                // let data = change.doc.data()
-                                // // MODIFIED_GROUP_MEMBER
-
-                                // dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, item_id, data});
-                            }
-                            if (admins_change.type === 'removed') {
-                                console.log('removed: ', change.doc.id, admins_change.doc.id, admins_change.doc.data());
-
-                                // let group_id = doc.id
-                                // let item_id = change.doc.id
-                                // let data = change.doc.data()
-                                // // REMOVED_GROUP_MEMBER
-
-                                // dispatch({ type: REMOVED_GROUP_MEMBER, group_id, item_id});
-                            }
-                        })
-                    })
-                    */
                     
                     break;
                 }
