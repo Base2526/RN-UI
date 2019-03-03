@@ -53,7 +53,7 @@ class home extends Component {
                         params.handleHeaderRightCenterSearch()
                     }}>
                     <MyIcon
-                        name={'search'}
+                        name={'contacts-search'}
                         size={25}
                         color={'#C7D8DD'}
                         />
