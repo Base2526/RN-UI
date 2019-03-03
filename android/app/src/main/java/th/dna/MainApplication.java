@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.CallbackManager;
 import com.facebook.react.ReactApplication;
+import com.google.firebase.database.FirebaseDatabase;
 import com.reactlibrary.messagecompose.RNMessageComposePackage;
 import com.lewin.qrcode.QRScanReaderPackage;
 import com.reactlibrary.messagecompose.RNMessageComposePackage;
@@ -110,5 +111,7 @@ public class MainApplication extends Application implements ShareApplication, Re
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
+
+    FirebaseDatabase.getInstance().setPersistenceEnabled(true);
   }
 }

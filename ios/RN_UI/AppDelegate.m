@@ -29,6 +29,8 @@
   [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
   [RNFirebaseNotifications configure];
   
+  [FIRDatabase database].persistenceEnabled = YES;
+  
   // fb
 //  [[FBSDKApplicationDelegate sharedInstance] application:application
 //                           didFinishLaunchingWithOptions:launchOptions];
