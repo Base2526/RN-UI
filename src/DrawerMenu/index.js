@@ -18,6 +18,8 @@ import { ifIphoneX } from 'react-native-iphone-x-helper'
 import { connect } from 'react-redux';
 import * as actions from '../Actions'
 
+import {makeProfilesState} from '../Reselect'
+
 const formatData = (data, numColumns) => {
     // เป้นการ ลบ item ที่มี ​field ออกทั้งหมด เพราะว่าเรารองรับการ orientation srceen ด้วย
     data = data.filter(function(item){
@@ -85,7 +87,7 @@ class DrawerMenu extends React.Component{
         super(props)
 
         this.state = {
-            renderContent: false,
+            renderContent:false,
             x:100,
             modalVisible: false,
         }
@@ -95,21 +97,42 @@ class DrawerMenu extends React.Component{
     }
 
     componentDidMount(){
-        setTimeout(() => {this.setState({renderContent: true})}, 0);
+        console.log('DrawerMenu>componentDidMount')
+        // 
         
-        // let {my_applications} = this.props.auth.users
-        // this.onLoadDataMyApplication(my_applications)
+        // // let {my_applications} = this.props.auth.users
+        // // this.onLoadDataMyApplication(my_applications)
 
-        console.log(this.props)
+        // console.log(this.props)
 
-        this.navigateToScreen = this.navigateToScreen.bind(this)
+        // this.navigateToScreen = this.navigateToScreen.bind(this)
+
+        this.loadData(this.props)
     }
 
     componentWillReceiveProps(nextProps) {
-        // console.log(nextProps.auth)
+        console.log('DrawerMenu>componentWillReceiveProps')
 
         // let {my_applications} = nextProps.auth.users
         // this.onLoadDataMyApplication(my_applications)
+
+        // if(!nextProps.navigation.state.isDrawerOpen){
+        //     return;
+        // }
+
+        this.loadData(this.props)
+    }
+
+    componentWillUnmount(){
+        console.log('DrawerMenu>componentWillUnmount')
+    }
+
+    loadData = (props) =>{
+        setTimeout(() => {this.setState({renderContent: true})}, 0);
+        if(!props.navigation.state.isDrawerOpen){
+            return;
+        }
+        console.log('DrawerMenu>loadData')
     }
 
     navigateToScreen = (route) => {
@@ -333,9 +356,13 @@ class DrawerMenu extends React.Component{
     }
 
     render(){
-        let {renderContent} = this.state;
         let props = this.props
+        console.log('DrawerMenu> render', props.navigation.state)
+        if(!this.state.renderContent){
+            return(<View style={{flex:1}}></View>)
+        }
 
+        /*
         if(this.state.x === 100){
             menu = <DrawerItems {...props} />
             collapse = require('../Images/collapse_down.png')
@@ -355,16 +382,15 @@ class DrawerMenu extends React.Component{
             menu = this.renderManageAccounts()
             collapse = require('../Images/collapse_up.png')
         }
-
-        if(!this.props.hasOwnProperty('auth') || !this.props.auth.isLogin){
-            return <View style={{flex: 1}}></View>
-        }
+        */
         
-        let {users} = this.props.auth
-
+        let {profiles} = this.props
+        if(profiles === undefined){
+            return(<View style={{flex:1}}></View>)
+        }
+        // console.log('DrawerMenu>' , profiles)
         return(
             <View style={{flex:1}}>
-            { renderContent &&
                  <View style={{flex:1}}>
                     <View
                         style={{
@@ -390,7 +416,7 @@ class DrawerMenu extends React.Component{
                             style={StyleSheet.absoluteFill}
                             // source={require('../../Images/boxpink.png')}
                             source={{
-                                uri: users.profiles.bg_url,
+                                uri: profiles.bg_url,
                                 headers:{ Authorization: 'someAuthToken' },
                                 priority: FastImage.priority.normal,
                             }}
@@ -409,7 +435,7 @@ class DrawerMenu extends React.Component{
                                 <FastImage
                                     style={{width: 80, height: 80, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
                                     source={{
-                                        uri: users.profiles.image_url,
+                                        uri: profiles.image_url,
                                         headers:{ Authorization: 'someAuthToken' },
                                         priority: FastImage.priority.normal,
                                     }}
@@ -419,7 +445,7 @@ class DrawerMenu extends React.Component{
                             <View style={{marginRight: 90,}}>
                             <Text style={{paddingLeft:10, 
                                         fontSize:25,
-                                        color:'white',}}>{users.profiles.name}</Text>
+                                        color:'white',}}>{profiles.name}</Text>
                             </View>
                         </View>
                         
@@ -462,15 +488,12 @@ class DrawerMenu extends React.Component{
                     </View> */}
                     </ScrollView>
                 </View>  
-            }
-             
-            { /*this.renderManageAccountsView() */}
             </View>
         )
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     console.log(state)
     if(!state._persist.rehydrated){
         return {}
@@ -481,7 +504,7 @@ const mapStateToProps = (state) => {
     }
     
     return{
-        auth:state.auth
+        profiles:makeProfilesState(state, ownProps),
     }
 }
 

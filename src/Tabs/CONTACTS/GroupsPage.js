@@ -24,6 +24,9 @@ import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
+import {makeUidState, 
+        makeGroupsState} from '../../Reselect'
+
 class GroupsPage extends React.Component{
     constructor(props) {
       super(props);
@@ -52,7 +55,7 @@ class GroupsPage extends React.Component{
 
       // alert('GroupsPage')
 
-      this.props.watchTaskGroupEvent(this.props.uid)
+      // this.props.watchTaskGroupEvent(this.props.uid)
 
       this.setState({
         error: null,
@@ -464,7 +467,7 @@ class GroupsPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   // console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
@@ -478,8 +481,11 @@ const mapStateToProps = (state) => {
   }
 
   return{
-    uid:getUid(state),
-    groups:state.auth.users.groups
+    // uid:getUid(state),
+    // groups:state.auth.users.groups
+
+    uid:makeUidState(state, ownProps),
+    groups:makeGroupsState(state, ownProps),
   }
 }
 

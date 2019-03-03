@@ -26,6 +26,9 @@ import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
+import {makeUidState, 
+        makeClasssState} from '../../Reselect'
+
 class ClasssPage extends React.Component{
     constructor(props) {
       super(props);
@@ -45,7 +48,7 @@ class ClasssPage extends React.Component{
 
     componentDidMount() {
 
-      this.props.watchTaskClassEvent(this.props.uid)
+      // this.props.watchTaskClassEvent(this.props.uid)
 
       setTimeout(() => {this.setState({renderContent: true})}, 0);
 
@@ -294,7 +297,7 @@ class ClasssPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
@@ -308,8 +311,11 @@ const mapStateToProps = (state) => {
   }
 
   return{
-    uid:getUid(state),
-    classs:state.auth.users.classs
+    // uid:getUid(state),
+    // classs:state.auth.users.classs
+
+    uid:makeUidState(state, ownProps),
+    classs:makeClasssState(state, ownProps),
   }
 }
 

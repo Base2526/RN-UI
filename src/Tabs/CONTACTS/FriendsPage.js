@@ -30,6 +30,14 @@ import Constant from '../../Utils/Constant'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
+// import { makeGetBarState } from '../selectors'
+
+import {makeUidState, 
+        makeProfilesState, 
+        makeFriendsState, 
+        makeFriendProfilesState, 
+        makePresencesState} from '../../Reselect'
+
 class FriendsPage extends React.Component{
 
     constructor(props){
@@ -51,7 +59,7 @@ class FriendsPage extends React.Component{
     }
 
     componentWillReceiveProps(nextProps){
-      // this.loadData(nextProps)
+      this.loadData(nextProps)
     }
 
     loadData=(props)=>{
@@ -689,7 +697,7 @@ class FriendsPage extends React.Component{
 }
 
 const mapStateToProps = (state, ownProps) => {
-  console.log(state, ownProps, ownProps.profiles)
+  // console.log(state, ownProps)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
   //_persist.rehydrated parameter is initially set to false
@@ -702,12 +710,17 @@ const mapStateToProps = (state, ownProps) => {
   }
 
   return{
-    uid:getUid(state),
-    friends:state.auth.users.friends,
-    friend_profiles:state.auth.users.friend_profiles,
-    profiles:state.auth.users.profiles,
-    presences:state.presence.user_presences
+    // uid:getUid(state),
+    // friends:state.auth.users.friends,
+    // friend_profiles:state.auth.users.friend_profiles,
+    // profiles:state.auth.users.profiles,
+    // presences:state.presence.user_presences,
+
+    uid: makeUidState(state, ownProps),
+    friends:makeFriendsState(state, ownProps),
+    friend_profiles:makeFriendProfilesState(state, ownProps),
+    profiles:makeProfilesState(state, ownProps),
+    presences:makePresencesState(state, ownProps),
   }
 }
-
 export default connect(mapStateToProps, actions)(FriendsPage);

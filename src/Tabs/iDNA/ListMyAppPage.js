@@ -50,7 +50,7 @@ class ListMyAppPage extends React.Component{
 
     componentDidMount() {
 
-      this.props.watchTaskMyApplicationEvent(this.props.uid)
+      // this.props.watchTaskMyApplicationEvent(this.props.uid)
       
       setTimeout(() => {this.setState({renderContent: true})}, 0);
 

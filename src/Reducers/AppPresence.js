@@ -25,9 +25,9 @@ export default (state= INITIAL_STATE, action)=>{
             // }
 
             state = {...state, 
-                    user_presences: action.payload.user_presences,}
+                    user_presences: action.payload.presence.user_presences,}
 
-            // console.log(state)
+            // console.log(state, action)
             return state
         }
     
@@ -37,6 +37,7 @@ export default (state= INITIAL_STATE, action)=>{
             }
 
             let user_presences = state.user_presences
+            // console.log(user_presences)
 
             let userId      = action.userId;
             let presenceKey = action.presenceKey;

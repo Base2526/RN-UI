@@ -142,7 +142,7 @@ export default (state= INITIAL_STATE, action)=>{
                     online: action.payload.auth.online,
                     application_category: action.payload.auth.application_category,}
 
-            console.log(state)
+            // console.log(state)
             return state
         }
 
