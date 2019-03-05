@@ -388,7 +388,7 @@ class DrawerMenu extends React.Component{
         if(profiles === undefined){
             return(<View style={{flex:1}}></View>)
         }
-        // console.log('DrawerMenu>' , profiles)
+        console.log('DrawerMenu>' , profiles)
         return(
             <View style={{flex:1}}>
                  <View style={{flex:1}}>
@@ -406,12 +406,6 @@ class DrawerMenu extends React.Component{
                                 paddingTop: 30
                             })
                         }}>
-                        {/* <FastImage
-                            style={StyleSheet.absoluteFill}
-                            source={require('../Images/boxpink.png')}
-                            // users.profiles.bg_url
-                            resizeMode={FastImage.resizeMode.cover}
-                        /> */}
                         <FastImage
                             style={StyleSheet.absoluteFill}
                             // source={require('../../Images/boxpink.png')}
@@ -463,29 +457,6 @@ class DrawerMenu extends React.Component{
                                 contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
                                 key = {this.state.orientation}/>
                         </View>
-                        {/* <View>
-                            <Text>My Application</Text>
-                            <FlatList
-                                contentContainerStyle={styles.list}
-                                data={formatData(data_my_application, 4)}
-                                numColumns={4}
-                                scrollEnabled={false}
-                                renderItem={this.renderItemMyApplicaton}
-                                // contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
-                                key = {this.state.orientation}
-                                extraData={data_my_application}/>
-                        </View> */}
-                        {/* <View>
-                        <Text>Following</Text>
-                        <FlatList
-                            contentContainerStyle={styles.list}
-                            data={formatData(data, 4)}
-                            numColumns={4}
-                            scrollEnabled={false}
-                            renderItem={this.renderItemFollowing}
-                            contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
-                            key = {this.state.orientation}/>
-                    </View> */}
                     </ScrollView>
                 </View>  
             </View>
@@ -502,7 +473,7 @@ const mapStateToProps = (state, ownProps) => {
     if(!state.auth.isLogin){
         return;
     }
-    
+
     return{
         profiles:makeProfilesState(state, ownProps),
     }

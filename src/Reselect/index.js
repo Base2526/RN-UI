@@ -8,23 +8,42 @@ const getUid = (state, props) => {
     if(!state._persist.rehydrated){
         return -1
     }
-    if(state.auth.users === null){
+    if(state.auth.user === null){
         return -1 
     }
-    return state.auth.users.user.uid
+    return state.auth.user.session.user.uid
 }
 
 const getProfile = (state, props) => {
-    console.log(state.auth.users.profiles)
-    return state.auth.users.profiles
+    return state.auth.user.profile
+}
+
+const getPhones = (state, props) => {
+    return state.auth.user.phones
+}
+
+const getWebsites = (state, props) => {
+    return state.auth.user.websites
+}
+
+const getEmails = (state, props) => {
+    return state.auth.user.emails
+}
+
+const getMyIds= (state, props) => {
+    return state.auth.user.my_ids
+}
+
+const getMyAppications= (state, props) => {
+    return state.auth.user.my_applications
 }
 
 const getFriends = (state, props) => {
-    return state.auth.users.friends
+    return state.auth.user.friends
 }
 
 const getFriendProfiles = (state, props) => {
-    return state.auth.users.friend_profiles
+    return state.auth.user.friend_profiles
 }
 
 const getPresences = (state, props) => {
@@ -38,11 +57,15 @@ const getPresences = (state, props) => {
 }
 
 const getGroups = (state, props) => {
-    return state.auth.users.groups
+    return state.auth.user.groups
 }
 
 const getClasss = (state, props) => {
-    return state.auth.users.classs
+    return state.auth.user.classs
+}
+
+const getIsConnected = (state, props) => {
+    return state.offline.online
 }
 
 export const makeUidState = createSelector(
@@ -55,6 +78,40 @@ export const makeProfilesState = createSelector(
     [ getProfile ],
     (profiles) => profiles
 )
+
+// phones
+export const makePhonesState = createSelector(
+    [ getPhones ],
+    (phones) => phones
+)
+
+// getWebsites
+export const makeWebsitesState = createSelector(
+    [ getWebsites ],
+    (websites) => websites
+)
+
+export const makeEmailsState = createSelector(
+    [ getEmails ],
+    (emails) => emails
+)
+
+export const makeMyIdsState = createSelector(
+    [ getMyIds ],
+    (myIds) => myIds
+)
+
+export const makeMyAppicationsState = createSelector(
+    [ getMyAppications ],
+    (my_applications) => my_applications
+)
+
+
+// 
+// export const makeProfilesMenuState = createSelector(
+//     [ getProfileMenu ],
+//     (v) => v
+// )
 
 export const makeFriendsState = createSelector(
     [ getFriends ],
@@ -83,4 +140,10 @@ export const makeGroupsState = createSelector(
 export const makeClasssState = createSelector(
     [ getClasss ],
     (classs) => classs
+)
+
+// isConnected
+export const makeIsConnectedState = createSelector(
+    [ getIsConnected ],
+    (isConnected) => isConnected
 )

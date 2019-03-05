@@ -15,11 +15,11 @@ export const login = (name, pass) => {
 
     return fetch(Constant.LOGIN, data)
         .then((response) =>{
-            console.log(response)
+            // console.log(response)
             return response.json()
         })
         .then((responseJson) => {
-            console.log(responseJson)
+            // console.log(responseJson)
             return responseJson;
         }).catch((error) => {
             console.error(error);

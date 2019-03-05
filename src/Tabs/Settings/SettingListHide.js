@@ -23,6 +23,9 @@ import Constant from '../../Utils/Constant'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
+import {makeUidState, 
+        makeFriendsState} from '../../Reselect'
+
 class SettingListHide extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
@@ -52,53 +55,57 @@ class SettingListHide extends React.Component{
             data:[]
         })
 
-        this.loadData()
+        this.loadData(this.props)
     }
 
-    loadData = () =>{
-        let friend_member = []
-        for (var key in this.props.auth.users.friends) {
-            let friend =  this.props.auth.users.friends[key]
-            switch(friend.status){
-              case Constant.FRIEND_STATUS_FRIEND:{
-  
-                if(friend.hide){
-                    friend_member.push({...friend, friend_id:key});
-                }
-                break
-              }            
-            }
-        }
+    loadData = (props) =>{
+      let {friends} = props
 
-        this.setState({
-            data:friend_member
-        })
+      let friend_member = []
+      for (var key in friends) {
+          let friend =  friends[key]
+          switch(friend.status){
+            case Constant.FRIEND_STATUS_FRIEND:{
+
+              if(friend.hide){
+                  friend_member.push({...friend, friend_id:key});
+              }
+              break
+            }            
+          }
+      }
+
+      this.setState({
+          data:friend_member
+      })
     }
 
     componentWillReceiveProps(nextProps) {
         // console.log(nextProps)
 
-        if(nextProps.auth === undefined){
-            return;
-        }
+        this.loadData(nextProps)
 
-        let friend_member = []
-        for (var key in nextProps.auth.users.friends) {
-            let friend =  nextProps.auth.users.friends[key]
-            switch(friend.status){
-              case Constant.FRIEND_STATUS_FRIEND:{
+        // if(nextProps.auth === undefined){
+        //     return;
+        // }
+
+        // let friend_member = []
+        // for (var key in nextProps.auth.users.friends) {
+        //     let friend =  nextProps.auth.users.friends[key]
+        //     switch(friend.status){
+        //       case Constant.FRIEND_STATUS_FRIEND:{
   
-                if(friend.hide){
-                    friend_member.push({...friend, friend_id:key});
-                }
-                break
-              }            
-            }
-        }
+        //         if(friend.hide){
+        //             friend_member.push({...friend, friend_id:key});
+        //         }
+        //         break
+        //       }            
+        //     }
+        // }
 
-        this.setState({
-            data:friend_member
-        })
+        // this.setState({
+        //     data:friend_member
+        // })
     }
 
     renderSeparator = () => {
@@ -277,7 +284,7 @@ class SettingListHide extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state,ownProps) => {
     console.log(state)
   
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
@@ -285,10 +292,17 @@ const mapStateToProps = (state) => {
     if(!state._persist.rehydrated){
       return {}
     }
+
+    if(!state.auth.isLogin){
+      return;
+    }
   
     return{
-      uid:getUid(state),
-      auth:state.auth
+      // uid:getUid(state),
+      // auth:state.auth,
+
+      uid: makeUidState(state, ownProps),
+      friends: makeFriendsState(state, ownProps),
     }
 }
   

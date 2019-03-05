@@ -67,20 +67,21 @@ class FriendsPage extends React.Component{
         return;
       }
 
-      if( /*_.isEqual(this.props.presences, props.presences) && */
-         _.isEqual(this.props.profiles, props.profiles) &&
-         _.isEqual(this.props.friends, props.friends) &&
-         _.isEqual(this.props.friend_profiles, props.friend_profiles) && this.state.renderContent){
-           return;
-      }
+      // if( /*_.isEqual(this.props.presences, props.presences) && */
+      //    _.isEqual(this.props.profiles, props.profiles) &&
+      //    _.isEqual(this.props.friends, props.friends) &&
+      //    _.isEqual(this.props.friend_profiles, props.friend_profiles) && this.state.renderContent){
+      //      return;
+      // }
 
-      if(!this.state.renderContent){
-        this.setState({renderContent: true})
-        console.log('FriendsPage > loadData : this.setState({renderContent: true})')
-      }
+      // if(!this.state.renderContent){
+      //   this.setState({renderContent: true})
+      //   console.log('FriendsPage > loadData : this.setState({renderContent: true})')
+      // }
       
       let {presences, profiles, friends, friend_profiles} = props
 
+      // console.log(friends, friend_profiles)
       let profile = {
         title: 'Profile',
         member: [
@@ -109,11 +110,12 @@ class FriendsPage extends React.Component{
         if(friend_profile === undefined){
           continue;
         }
+        
         friend = {...friend, profile:friend_profile}
 
         switch(friend.status){
           case Constant.FRIEND_STATUS_FRIEND:{
-
+            
             // hide, block
             let isAdd = false
             if(friend.hide === undefined && friend.block === undefined){
@@ -132,6 +134,7 @@ class FriendsPage extends React.Component{
               }
             } 
             
+            console.log('XX', friend, friend_profile, friend.hide, friend.block)
             if(isAdd){
 
               // check online/offline
@@ -202,16 +205,17 @@ class FriendsPage extends React.Component{
       }
         
       let data = [profile, favorites, friendRequests, friendRequestSents, _friends];
-      
-      if(_.isEqual(data, this.state.data)){
-        console.log('FriendsPage > loadData : equal')
-        return;
-      }else{
-        console.log('FriendsPage > loadData : not equal')
+      console.log(data)
+      this.setState({data})
+      // if(_.isEqual(data, this.state.data)){
+      //   console.log('FriendsPage > loadData : equal')
+      //   return;
+      // }else{
+      //   console.log('FriendsPage > loadData : not equal')
 
-        // console.log(data)
-        this.setState({data})
-      }
+      //   console.log(data)
+        
+      // }
     }
 
 
@@ -385,6 +389,7 @@ class FriendsPage extends React.Component{
 
     _renderRow = (rowItem, rowId, sectionId) => {
         if(rowId == 0 && sectionId == 0){
+          
           return (
             <TouchableOpacity 
               key={ rowId } 
@@ -649,7 +654,7 @@ class FriendsPage extends React.Component{
         return <View style={{flex: 1}}></View>
       }
 
-      console.log('FriendsPage > --reder--')
+      console.log('FriendsPage > --reder--', data)
 
       return (
           <View style={{flex: 1}}>
@@ -660,7 +665,7 @@ class FriendsPage extends React.Component{
             overlayColor={'rgba(0,0,0,0.5)'}
           />
           {
-            renderContent && 
+            // renderContent && 
             <ExpandableList
               ref={instance => this.ExpandableList = instance}
               dataSource={data}

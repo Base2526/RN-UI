@@ -29,107 +29,105 @@ import {getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 import OfflineNotice from '../../Utils/OfflineNotice'
 
-const _header = props => (
-    <View style={{flex:1, alignItems:'flex-end', flexDirection:'row'}}>
-        <View style={{flex:1}}>
-            <TouchableOpacity
-                style={{marginBottom:10}}
-                onPress={() => {
-                    props.navigation.openDrawer()
-                }}>
-                <MyIcon
-                    name={'menu'}
-                    size={30}
-                    color={'#C7D8DD'}
-                     />
-            </TouchableOpacity>
-        </View>
-        {/* 
-        <View style={{height:Header.HEIGHT, backgroundColor:'green'}}>
-            <Text>Title Header</Text>
-        </View> 
-        */}
-        <View style={{flex:1, flexDirection:'row', marginBottom:10, justifyContent: 'flex-end'}}>
-            <TouchableOpacity
-                style={{height: 25,
-                        width: 30,
-                        alignItems:'center',
-                        marginRight:5,}}
-                onPress={() => {
-                    // const { params = {} } = props.navigation.state
-                    let {params = {}} = props.navigation.state.routes[0]
+import {makeIsConnectedState} from '../../Reselect'
 
-                    params.handleHeaderRightContactsSearch()
-                }}>
-                <MyIcon
-                    name={'search'}
-                    size={25}
-                    color={'#C7D8DD'} />
-            </TouchableOpacity>
-            {/* <TouchableOpacity
-                style={{height: 25,
-                        width: 30,
-                        alignItems:'center',
-                        marginRight:5}}
-                onPress={() => {
-                    // const { params = {} } = navigation.state
-                    let {params = {}} = props.navigation.state.routes[0]
-                    params.handleHeaderRight()
-                } }>
-                 <MyIcon
-                    name={'plus'}
-                    size={25}
-                    color={'#C7D8DD'} />
-            </TouchableOpacity> */}
-            <TouchableOpacity
-                style={{height: 25,
-                        width: 30,
-                        alignItems:'center',
-                        marginRight:5,
-                        justifyContent:'center',}}
-                onPress={() => {
-                    // const { params = {} } = navigation.state
-                    let {params = {}} = props.navigation.state.routes[0]
-                    params.handleHeaderRightContactsMenu()
-                } }>
-                {/* <MyIcon
-                    name={'collapse-down'}
-                    size={15}
-                    color={'#C7D8DD'} /> */}
+// const _header = props => (
+//     <View style={{flex:1, alignItems:'flex-end', flexDirection:'row'}}>
+//         <View style={{flex:1}}>
+//             <TouchableOpacity
+//                 style={{marginBottom:10}}
+//                 onPress={() => {
+//                     props.navigation.openDrawer()
+//                 }}>
+//                 <MyIcon
+//                     name={'menu'}
+//                     size={30}
+//                     color={'#C7D8DD'}
+//                      />
+//             </TouchableOpacity>
+//         </View>
+//         {/* 
+//         <View style={{height:Header.HEIGHT, backgroundColor:'green'}}>
+//             <Text>Title Header</Text>
+//         </View> 
+//         */}
+//         <View style={{flex:1, flexDirection:'row', marginBottom:10, justifyContent: 'flex-end'}}>
+//             <TouchableOpacity
+//                 style={{height: 25,
+//                         width: 30,
+//                         alignItems:'center',
+//                         marginRight:5,}}
+//                 onPress={() => {
+//                     // const { params = {} } = props.navigation.state
+//                     let {params = {}} = props.navigation.state.routes[0]
+
+//                     params.handleHeaderRightContactsSearch()
+//                 }}>
+//                 <MyIcon
+//                     name={'search'}
+//                     size={25}
+//                     color={'#C7D8DD'} />
+//             </TouchableOpacity>
+//             {/* <TouchableOpacity
+//                 style={{height: 25,
+//                         width: 30,
+//                         alignItems:'center',
+//                         marginRight:5}}
+//                 onPress={() => {
+//                     // const { params = {} } = navigation.state
+//                     let {params = {}} = props.navigation.state.routes[0]
+//                     params.handleHeaderRight()
+//                 } }>
+//                  <MyIcon
+//                     name={'plus'}
+//                     size={25}
+//                     color={'#C7D8DD'} />
+//             </TouchableOpacity> */}
+//             <TouchableOpacity
+//                 style={{height: 25,
+//                         width: 30,
+//                         alignItems:'center',
+//                         marginRight:5,
+//                         justifyContent:'center',}}
+//                 onPress={() => {
+//                     // const { params = {} } = navigation.state
+//                     let {params = {}} = props.navigation.state.routes[0]
+//                     params.handleHeaderRightContactsMenu()
+//                 } }>
+//                 {/* <MyIcon
+//                     name={'collapse-down'}
+//                     size={15}
+//                     color={'#C7D8DD'} /> */}
 
                     
-            </TouchableOpacity>
-        </View>
+//             </TouchableOpacity>
+//         </View>
     
-    </View>
-  );
+//     </View>
+//   );
 
-const ImageHeader = (props, navigation) => {
-    let bg_url = '';
-    if(props.navigation.state.routes[0].params !== undefined){
-        if(props.navigation.state.routes[0].params.hasOwnProperty('bg_url')){
-            bg_url = props.navigation.state.routes[0].params.bg_url;
-        }
-    }
+// const ImageHeader = (props, navigation) => {
+//     let bg_url = '';
+//     if(props.navigation.state.routes[0].params !== undefined){
+//         if(props.navigation.state.routes[0].params.hasOwnProperty('bg_url')){
+//             bg_url = props.navigation.state.routes[0].params.bg_url;
+//         }
+//     }
 
-    // console.log(props.navigation.state.routes[0].params, bg_url)
-    /**
-     source={require('../Images/boxpink.png')}
-     */
-    return(<View style={{ backgroundColor: '#eee', height: getHeaderInset(true) }}>
-        <FastImage
-            style={StyleSheet.absoluteFill}
-            // source={require('../../Images/boxpink.png')}
-            source={{
-                uri: bg_url,
-                headers:{ Authorization: 'someAuthToken' },
-                priority: FastImage.priority.normal,
-            }}
-            resizeMode={FastImage.resizeMode.cover}
-        />
-      <_header {...props} style={{ backgroundColor: 'transparent' }}/>
-    </View>)
-}
+//     return(<View style={{ backgroundColor: '#eee', height: getHeaderInset(true) }}>
+//         <FastImage
+//             style={StyleSheet.absoluteFill}
+//             // source={require('../../Images/boxpink.png')}
+//             source={{
+//                 uri: bg_url,
+//                 headers:{ Authorization: 'someAuthToken' },
+//                 priority: FastImage.priority.normal,
+//             }}
+//             resizeMode={FastImage.resizeMode.cover}
+//         />
+//       <_header {...props} style={{ backgroundColor: 'transparent' }}/>
+//     </View>)
+// }
 
 const formatData = (data, numColumns) => {
     // เป้นการ ลบ item ที่มี ​field ออกทั้งหมด เพราะว่าเรารองรับการ orientation srceen ด้วย
@@ -279,15 +277,15 @@ class home extends Component {
         // console.log(nextProps.auth.users);
 
         console.log('componentWillReceiveProps')
-        if(nextProps.auth.users === null){
-            return;
-        }
-        // console.log(nextProps.auth.users.profiles.bg_url);
-        // console.log(this.props.navigation.getParam('bg_url', 'NO-ID'));
-        if (nextProps.auth.users.profiles.bg_url !== this.props.navigation.getParam('bg_url', 'NO-ID')) {
-            // console.log('----- 09')
-            this.props.navigation.setParams({ bg_url: nextProps.auth.users.profiles.bg_url });
-        }
+        // if(nextProps.auth.users === null){
+        //     return;
+        // }
+        // // console.log(nextProps.auth.users.profiles.bg_url);
+        // // console.log(this.props.navigation.getParam('bg_url', 'NO-ID'));
+        // if (nextProps.auth.users.profiles.bg_url !== this.props.navigation.getParam('bg_url', 'NO-ID')) {
+        //     // console.log('----- 09')
+        //     this.props.navigation.setParams({ bg_url: nextProps.auth.users.profiles.bg_url });
+        // }
     }
 
     onLayout(e) {
@@ -425,19 +423,14 @@ class home extends Component {
     }
 
     render() {
-        let {renderContent, isOpenMenu} = this.state;
-
+        let {renderContent} = this.state;
         let {isConnected} = this.props
-        // console.log(isConnected)
-        let menuView
-        if (isOpenMenu) {
-            menuView = this.renderViewMenu()
-        }
 
         if(!renderContent){
             return(<View style={{flex:1}}></View>)
         }
 
+        console.log("home > render()")
         return (
             <View style={{backgroundColor:'white', flex:1}} onLayout={this.onLayout.bind(this)} >
                 {/* {menuView} */}
@@ -460,16 +453,25 @@ class home extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     console.log(state)
     if(!state._persist.rehydrated){
         return {}
     }
+
+    if(!state.auth.isLogin){
+        return;
+    }
     
     return{
-        auth:state.auth,
-        isConnected:state.offline.online
+        // auth:state.auth,
+        // isConnected:state.offline.online,
+
+
+        isConnected: makeIsConnectedState(state, ownProps),
     }
 }
+
+
 
 export default connect(mapStateToProps, actions)(home);

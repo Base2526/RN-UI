@@ -3177,7 +3177,7 @@ function login(){
   if (!check_header()) {
     # code...
     $result['result']   = FALSE;
-    $result['message']  = "check_header()";
+    // $result['message']  = "check_header()";
     // $result['param']    = json_decode(file_get_contents('php://input'), true);
     // $result['hd']       = $getallheaders = nginx_getallheaders();
     return $result;
@@ -3187,7 +3187,7 @@ function login(){
 
   if (empty($param['name']) || empty($param['pass'])) {
     $result['result'] = FALSE;
-    $result['message']  = "function : login, parameter";
+    // $result['message']  = "function : login, parameter";
     $result['param']  = $param;
     return $result;
   }
@@ -3314,11 +3314,20 @@ function onLoadDataUser($user){
 
     $result['time'] = 'processing = '. $time . ' seconds';
 
-    $result['user']             = (object)$user;
+    // $result['user']             = (object)$user;
     $result['user_profile']     = (object)$user_profile['data'];
 
     $result['users']   = (object) array_merge((array) $user, (array) $user_profile['data']);
     // $result['friend_profiles']  = (object)$friend_profiles;
+
+
+    $result['user']    = (object)array('session'=>$user,
+                                       'profile'=>$user_profile['data']['profiles'],
+                                       'groups' =>$user_profile['data']['groups'],
+                                       'friends'=>$user_profile['data']['friends'],
+                                       'classs' =>$user_profile['data']['classs'], //
+                                       'my_applications'=>$user_profile['data']['my_applications'],
+                                      );
     /*
     $result['data'] = array('user'           =>(object)$user, 
                             'profiles'       =>(object)$profiles,
@@ -3363,6 +3372,7 @@ function onLoadProfile($uid, $mode){
         
         // badges
         $badges = array();
+        /*
         if(isset($profile->field_profile_badges[LANGUAGE_NONE])){
           foreach ($profile->field_profile_badges[LANGUAGE_NONE] as $k_badges => $v_badges) {
             $item_badges = field_collection_item_load($v_badges['value']);
@@ -3383,11 +3393,14 @@ function onLoadProfile($uid, $mode){
                           "recent"  => '0',
                           "setting" => '0');
         }
+        */
         
         $profile_line_id = "";
+        /*
         if(isset($profile->field_profile_line_id[LANGUAGE_NONE])){
           $profile_line_id = $profile->field_profile_line_id[LANGUAGE_NONE][0]['value'];
         }
+        */
 
         // เสียงรอสาย
         $sound_call_waitings = array();
@@ -3424,6 +3437,7 @@ function onLoadProfile($uid, $mode){
 
         // Emails
         $emails = array();
+        /*
         if(isset($profile->field_profile_multi_email[LANGUAGE_NONE])){
           foreach ($profile->field_profile_multi_email[LANGUAGE_NONE] as $k_email => $v_email) {
               $data_item_email = field_collection_item_load($v_email['value']);
@@ -3433,9 +3447,11 @@ function onLoadProfile($uid, $mode){
               $emails[$v_email['value']] = array('name'=>$data_item_email_email, 'enabled'=>$data_item_email_enabled);
           }
         }
+        */
 
         // my_id
         $my_id = array();
+        /*
         if(isset($profile->field_profile_my_id[LANGUAGE_NONE])){
           foreach ($profile->field_profile_my_id[LANGUAGE_NONE] as $k_my_id => $v_my_id) {
               $data_my_id = field_collection_item_load($v_my_id['value']);
@@ -3445,6 +3461,7 @@ function onLoadProfile($uid, $mode){
               $my_id[$v_my_id['value']] = array('enabled'=>'1', 'is_edit'=>$my_id_is_edit, 'value'=>$my_id_value);
           }
         }
+        */
 
         // image_url
         $profile_image_url;
@@ -3466,6 +3483,7 @@ function onLoadProfile($uid, $mode){
 
         // device_access
         $device_access = array();
+        /*
         if(isset($profile->field_device_access[LANGUAGE_NONE])){
           foreach ($profile->field_device_access[LANGUAGE_NONE] as $k_device_access => $v_device_access) {
               $data_item_device_access = field_collection_item_load($v_device_access['value']);
@@ -3504,20 +3522,21 @@ function onLoadProfile($uid, $mode){
                                                                 'version'     =>$data_item_device_access_version);
           }
         }
+        */
         
         $friends = array();
         if(isset($profile->field_profile_friends[LANGUAGE_NONE])){
           foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $k_friends => $v_friends) {
               $item_friends = field_collection_item_load($v_friends['value']);
 
-              $item_friends_block    = '0';
+              $item_friends_block    = FALSE;
               if (isset($item_friends->field_profile_friends_is_block[LANGUAGE_NONE])) {
-                $item_friends_block    =  $item_friends->field_profile_friends_is_block[LANGUAGE_NONE][0]['value'];
+                $item_friends_block    =  strcmp($item_friends->field_profile_friends_is_block[LANGUAGE_NONE][0]['value'], '0') == 0 ? FALSE: TRUE;
               }
 
-              $item_friends_hide    = '0';
+              $item_friends_hide    = FALSE;
               if (isset($item_friends->field_profile_friends_is_hide[LANGUAGE_NONE])) {
-                $item_friends_hide    =  $item_friends->field_profile_friends_is_hide[LANGUAGE_NONE][0]['value'];
+                $item_friends_hide    =  strcmp($item_friends->field_profile_friends_is_hide[LANGUAGE_NONE][0]['value'], '0') == 0 ? FALSE: TRUE;
               }
 
               $item_friends_change_friends_name    = '';
@@ -3532,9 +3551,9 @@ function onLoadProfile($uid, $mode){
                 $item_friends_class   = $item_friends->field_profile_friend_classs[LANGUAGE_NONE][0]['value'];
               }
 
-              $item_friends_favorite = '0';
+              $item_friends_favorite = FALSE;
               if (isset($item_friends->field_profile_friends_favorite[LANGUAGE_NONE])) {
-                $item_friends_favorite = $item_friends->field_profile_friends_favorite[LANGUAGE_NONE][0]['value'];
+                $item_friends_favorite = strcmp($item_friends->field_profile_friends_favorite[LANGUAGE_NONE][0]['value'], '0') == 0 ? FALSE: TRUE;
               }
 
 
@@ -3598,6 +3617,7 @@ function onLoadProfile($uid, $mode){
         }
 
         $followings = array();
+        /*
         if (isset($profile->field_following[LANGUAGE_NONE])) {
           foreach ($profile->field_following[LANGUAGE_NONE] as $k_following => $v_following) {
             $item_following = field_collection_item_load($v_following['value']);
@@ -3635,9 +3655,9 @@ function onLoadProfile($uid, $mode){
             }            
           }
         }
+        */
 
         $groups        = array();
-        // $groups_detail = array();
         if (isset($profile->field_chat_group[LANGUAGE_NONE])) {
           foreach ($profile->field_chat_group[LANGUAGE_NONE] as $k_groups => $v_groups) {
             $item_groups = field_collection_item_load($v_groups['value']);
@@ -4047,8 +4067,8 @@ function onLoadProfile($uid, $mode){
                                            "owner_id"   => $my_app_owner_id,
                                            "category"   => $my_app_category,
                                            "subcategory"=> $my_app_subcategoty,
-                                           'mails'      => (object)$my_app_emails,
-                                           'phones'     => (object)$my_app_phones,
+                                          //  'mails'      => (object)$my_app_emails,
+                                          //  'phones'     => (object)$my_app_phones,
                                            "posts"      => (object)$my_app_posts,
                                            'follow'     => (object)$my_app_following);
           }
@@ -4063,7 +4083,7 @@ function onLoadProfile($uid, $mode){
                           //  "my_id"          => (object)$my_id,
                            "image_url"      => $profile_image_url,
                            "bg_url"         => $profile_bg_url,
-                           "badges"         => (object)$badges,
+                          //  "badges"         => (object)$badges,
                            "device_access"  => (object)$device_access,
                            "line_id"        => $profile_line_id);
 
@@ -4077,6 +4097,7 @@ function onLoadProfile($uid, $mode){
                                                ->execute();
 
         $slide_stores = array();
+        /*
         if (!empty($slide_store_output['node'])) {
           $slide_store_output_nids = array_keys($slide_store_output['node']);
           foreach ($slide_store_output_nids as $slide_store_output_k => $slide_store_output_nid) {
@@ -4095,6 +4116,7 @@ function onLoadProfile($uid, $mode){
           }
         }
 
+        */
         ///////////////////////////////////// slide_store //////////////////////////////////////
 
         ///////////////////////////////////// center //////////////////////////////////////
@@ -4106,6 +4128,7 @@ function onLoadProfile($uid, $mode){
           ->execute();
 
         $centers = array();
+        /*
         if (!empty($center_result['node'])) {
           $center_nids = array_keys($center_result['node']);
   
@@ -4144,21 +4167,22 @@ function onLoadProfile($uid, $mode){
                           
           }
         }
+        */
 
         ///////////////////////////////////// center //////////////////////////////////////
 
         $result['result'] = TRUE;
         $result['data']   = array('profiles'       =>(object)$profiles,
-                                'device_access'  => (object)$device_access,
-                                'my_applications'=>(object)$my_applications,
-                                'friends'        =>(object)$friends,
-                                'groups'         =>(object)$groups,
-                                'classs'         =>(object)$classs,
-                                'followings'     =>(object)$followings,
-                                'center_chats'   =>(object)$center_chats,
-                                'slide_stores'   =>(object)$slide_stores,
-                                'centers'        =>(object)$centers,
-                                'conversations' =>(object)$conversations);
+                                  'device_access'  => (object)$device_access,
+                                  'my_applications'=>(object)$my_applications,
+                                  'friends'        =>(object)$friends,
+                                  'groups'         =>(object)$groups,
+                                  'classs'         =>(object)$classs,
+                                  'followings'     =>(object)$followings,
+                                  'center_chats'   =>(object)$center_chats,
+                                  'slide_stores'   =>(object)$slide_stores,
+                                  'centers'        =>(object)$centers,
+                                  'conversations'  =>(object)$conversations);
 
       }
       break;
@@ -4185,6 +4209,7 @@ function onLoadProfile($uid, $mode){
         
         // badges
         $badges = array();
+        /*
         if(isset($profile->field_profile_badges[LANGUAGE_NONE])){
           foreach ($profile->field_profile_badges[LANGUAGE_NONE] as $k_badges => $v_badges) {
             $item_badges = field_collection_item_load($v_badges['value']);
@@ -4205,14 +4230,16 @@ function onLoadProfile($uid, $mode){
                           "recent"  => '0',
                           "setting" => '0');
         }
+        */
         
         $profile_line_id = "";
-        if(isset($profile->field_profile_line_id[LANGUAGE_NONE])){
-          $profile_line_id = $profile->field_profile_line_id[LANGUAGE_NONE][0]['value'];
-        }
+        // if(isset($profile->field_profile_line_id[LANGUAGE_NONE])){
+        //   $profile_line_id = $profile->field_profile_line_id[LANGUAGE_NONE][0]['value'];
+        // }
 
         // เสียงรอสาย
         $sound_call_waitings = array();
+        /*
         if(isset($profile->field_sound_call_waiting[LANGUAGE_NONE])){
           foreach ($profile->field_sound_call_waiting[LANGUAGE_NONE] as $k_call_waiting => $v_call_waiting) {
             $data_call_waiting = field_collection_item_load($v_call_waiting['value']);
@@ -4227,9 +4254,11 @@ function onLoadProfile($uid, $mode){
                                                                  "title"     => $data_call_waiting_title);
           }
         }
+        */
 
         // Phones
         $phones = array();
+        /*
         if(isset($profile->field_profile_multi_phone[LANGUAGE_NONE])){
           foreach ($profile->field_profile_multi_phone[LANGUAGE_NONE] as $k_phone => $v_phone) {
               $data_item_phone = field_collection_item_load($v_phone['value']);
@@ -4238,10 +4267,11 @@ function onLoadProfile($uid, $mode){
               $data_item_phone_enabled =  $data_item_phone->field_enable[LANGUAGE_NONE][0]['value'];
               $phones[$v_phone['value']] = array('name'=>$data_item_phone_phone, 'enabled'=>$data_item_phone_enabled);
           }
-        }
+        }*/
 
         // Emails
         $emails = array();
+        /*
         if(isset($profile->field_profile_multi_email[LANGUAGE_NONE])){
           foreach ($profile->field_profile_multi_email[LANGUAGE_NONE] as $k_email => $v_email) {
               $data_item_email = field_collection_item_load($v_email['value']);
@@ -4259,9 +4289,11 @@ function onLoadProfile($uid, $mode){
               $emails[$v_email['value']] = array('name'=>$data_item_email_email, 'enabled'=>$data_item_email_enabled);
           }
         }
+        */
 
         // my_id
         $my_id = array();
+        /*
         if(isset($profile->field_profile_my_id[LANGUAGE_NONE])){
           foreach ($profile->field_profile_my_id[LANGUAGE_NONE] as $k_my_id => $v_my_id) {
               $data_my_id = field_collection_item_load($v_my_id['value']);
@@ -4271,6 +4303,7 @@ function onLoadProfile($uid, $mode){
               $my_id[$v_my_id['value']] = array('enabled'=>true, 'is_edit'=>$my_id_is_edit, 'value'=>$my_id_value);
           }
         }
+        */
 
         // image_url
         $profile_image_url;
@@ -4292,6 +4325,7 @@ function onLoadProfile($uid, $mode){
 
         // device_access
         $device_access = array();
+        /*
         if(isset($profile->field_device_access[LANGUAGE_NONE])){
           foreach ($profile->field_device_access[LANGUAGE_NONE] as $k_device_access => $v_device_access) {
               $data_item_device_access = field_collection_item_load($v_device_access['value']);
@@ -4330,6 +4364,7 @@ function onLoadProfile($uid, $mode){
                                                                 'version'     =>$data_item_device_access_version);
           }
         }
+        */
 
         $profiles = array( "name"           => $profile_name,
                            "status_message" => $profile_status_message,

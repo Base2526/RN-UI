@@ -6,11 +6,21 @@ import {
     AsyncStorage
 } from 'react-native';
 import { connect } from 'react-redux';
-// import * as actions from '../Actions';
+
 
 import firebase from 'react-native-firebase';
 
-import {watchTaskEvent} from '../Actions'
+// import {watchTaskEvent, trackProfilesPhone} from '../Actions'
+// import console = require('console');
+import * as actions from '../Actions';
+import {makeUidState, 
+        makePhonesState, 
+        makeWebsitesState,
+        makeEmailsState,
+        makeMyIdsState,
+        makeMyAppicationsState,
+        makeClasssState,
+        makeGroupsState,} from '../Reselect'
 
 class AuthLoadingScreen extends React.Component {
     static navigationOptions = {
@@ -91,12 +101,23 @@ class AuthLoadingScreen extends React.Component {
         if(this.props.auth === undefined){
             this.props.navigation.navigate('Auth');
         }else if(this.props.auth.isLogin){
-            // console.log(this.props.uid)
+            console.log(this.props.phones)
 
+            this.props.trackProfilesPhones(this.props.uid, this.props.phones)
+            this.props.trackProfileWebsites(this.props.uid, this.props.websites)
+            this.props.trackProfileEmails(this.props.uid, this.props.emails)
+            this.props.trackProfileMyIds(this.props.uid, this.props.myIds)
+
+            this.props.trackMyApplications(this.props.uid, this.props.my_applications)
+
+            this.props.trackClasss(this.props.uid, this.props.classs)
+
+            this.props.trackGroups(this.props.uid, this.props.groups)
+            
             AsyncStorage.getItem('fcmToken', null).then((fcmToken) => {
                 // console.log('fcmToken: ',fcmToken);
 
-                this.props.watchTaskEvent(this.props.uid, fcmToken,this.props.dispatch)
+                this.props.watchTaskEvent(this.props.uid, fcmToken)
                 this.props.navigation.navigate('App');
             });
             
@@ -125,7 +146,7 @@ const styles = StyleSheet.create({
     },
 });
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     // console.log(state)
     if(!state._persist.rehydrated){
         return {}
@@ -134,7 +155,16 @@ const mapStateToProps = (state) => {
     if(state.auth.users !== null){
         return {
             auth:state.auth,
-            uid:state.auth.users.user.uid
+            // uid:state.auth.users.user.uid
+            uid: makeUidState(state, ownProps),
+            phones: makePhonesState(state, ownProps),
+            websites: makeWebsitesState(state, ownProps),
+            emails:makeEmailsState(state, ownProps),
+            myIds:makeMyIdsState(state, ownProps),
+            my_applications:makeMyAppicationsState(state, ownProps),
+
+            classs:makeClasssState(state, ownProps),
+            groups:makeGroupsState(state, ownProps),
         }
     }else{
         return {
@@ -143,8 +173,8 @@ const mapStateToProps = (state) => {
     }
 }
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-    return { dispatch, watchTaskEvent }
-}
+// const mapDispatchToProps = (dispatch, ownProps) => {
+//     return { dispatch, watchTaskEvent, trackProfilesPhone }
+// }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AuthLoadingScreen);
+export default connect(mapStateToProps, actions)(AuthLoadingScreen);
