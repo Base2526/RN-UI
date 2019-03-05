@@ -7,11 +7,8 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 
-
 import firebase from 'react-native-firebase';
 
-// import {watchTaskEvent, trackProfilesPhone} from '../Actions'
-// import console = require('console');
 import * as actions from '../Actions';
 import {makeUidState, 
         makePhonesState, 
@@ -20,7 +17,9 @@ import {makeUidState,
         makeMyIdsState,
         makeMyAppicationsState,
         makeClasssState,
-        makeGroupsState,} from '../Reselect'
+        makeGroupsState,
+        makeFriendsState,
+        makeFriendProfilesState,} from '../Reselect'
 
 class AuthLoadingScreen extends React.Component {
     static navigationOptions = {
@@ -32,6 +31,7 @@ class AuthLoadingScreen extends React.Component {
     }
 
     componentDidMount() {
+        console.log('AuthLoadingScreen', this.props.is_login)
         this._bootstrapAsync();
 
         // this._testCrashlytics();
@@ -97,32 +97,35 @@ class AuthLoadingScreen extends React.Component {
     }
 
     _bootstrapAsync = () => {
+        let {is_login} = this.props
 
-        if(this.props.auth === undefined){
+        if(!is_login){
             this.props.navigation.navigate('Auth');
-        }else if(this.props.auth.isLogin){
-            console.log(this.props.phones)
+        }else{
+            let {uid, 
+                phones,
+                friends, 
+                websites,
+                emails,
+                myIds,
+                my_applications,
+                classs,
+                groups,
+                friend_profiles} = this.props
 
-            this.props.trackProfilesPhones(this.props.uid, this.props.phones)
-            this.props.trackProfileWebsites(this.props.uid, this.props.websites)
-            this.props.trackProfileEmails(this.props.uid, this.props.emails)
-            this.props.trackProfileMyIds(this.props.uid, this.props.myIds)
-
-            this.props.trackMyApplications(this.props.uid, this.props.my_applications)
-
-            this.props.trackClasss(this.props.uid, this.props.classs)
-
-            this.props.trackGroups(this.props.uid, this.props.groups)
+            this.props.trackProfilesPhones(uid, phones)
+            this.props.trackProfileWebsites(uid, websites)
+            this.props.trackProfileEmails(uid, emails)
+            this.props.trackProfileMyIds(uid, myIds)
+            this.props.trackMyApplications(uid, my_applications)
+            this.props.trackClasss(uid, classs)
+            this.props.trackGroups(uid, groups)
+            this.props.trackFriends(uid, friends, friend_profiles)
             
             AsyncStorage.getItem('fcmToken', null).then((fcmToken) => {
-                // console.log('fcmToken: ',fcmToken);
-
-                this.props.watchTaskEvent(this.props.uid, fcmToken)
+                this.props.watchTaskEvent(uid, fcmToken)
                 this.props.navigation.navigate('App');
             });
-            
-        }else{
-            this.props.navigation.navigate('Auth');
         }
     }
 
@@ -152,23 +155,23 @@ const mapStateToProps = (state, ownProps) => {
         return {}
     }
 
-    if(state.auth.users !== null){
+    if(!state.auth.isLogin){
         return {
-            auth:state.auth,
-            // uid:state.auth.users.user.uid
+            is_login:false,
+        }
+    }else{
+        return {
+            is_login:true,
             uid: makeUidState(state, ownProps),
             phones: makePhonesState(state, ownProps),
             websites: makeWebsitesState(state, ownProps),
             emails:makeEmailsState(state, ownProps),
             myIds:makeMyIdsState(state, ownProps),
             my_applications:makeMyAppicationsState(state, ownProps),
-
             classs:makeClasssState(state, ownProps),
             groups:makeGroupsState(state, ownProps),
-        }
-    }else{
-        return {
-            auth:state.auth
+            friends:makeFriendsState(state, ownProps),
+            friend_profiles:makeFriendProfilesState(state, ownProps),
         }
     }
 }

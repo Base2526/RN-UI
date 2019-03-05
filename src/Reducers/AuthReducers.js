@@ -70,6 +70,10 @@ import {USER_LOGIN_SUCCESS,
         EDIT_EMAIL_FRIEND,
         REMOVE_EMAIL_FRIEND,
 
+        ADD_MY_ID_FRIEND, 
+        EDIT_MY_ID_FRIEND, 
+        REMOVE_MY_ID_FRIEND,
+
         ADDRESS_PROFILE,
 
         ADD_WEBSITE_PROFILE,
@@ -861,71 +865,67 @@ export default (state= INITIAL_STATE, action)=>{
         }
 
         case ADD_PHONE_FRIEND :{
-            if(state.users === null){
+            if(state.user === null){
                 return state
             }
 
-            let friends = state.users.friends
+            let friend_phones = state.user.friend_phones
+            let friend_phone  = _.find(friend_phones,  function(v, k) { 
+                                    return k == action.friend_id
+                                })
 
-            let friend = _.find(friends,  function(v, k) { 
-                return k == action.friend_id
-            })
+            console.log('phones > added', friend_phone )
+            if(friend_phone === undefined){
+                let fphones = {[action.friend_phone_id]:action.friend_phone_data}
 
-            if(friend === undefined){
-                return state
-            }
-
-            if(friend.profile.phones === undefined){
-                let {profile} = friend
-
-                let newProfile = {...profile, phones:{[action.phone_key]: action.phone_data}}
-
-                let newFriend = {...friend, 
-                                    profile:{
-                                        ...friend.profile, ...newProfile
-                                    }
-                                }
-  
                 let v = {...state,
-                            users : {
-                                ...state.users,
-                                friends : {
-                                    ...state.users.friends,
-                                    [action.friend_id]:newFriend
+                            user: {
+                                ...state.user,
+                                friend_phones: {
+                                    ...state.user.friend_phones,
+                                    [action.friend_id]:fphones
                                 }
                             }
                         }
+                console.log('phones > added', v )
                 return v
             }else{
+                let find_phone =_.find(friend_phone, (fv, fk)=>{
+                                    return fk == action.friend_phone_id
+                                })
                 
-                let phones = friend.profile.phones
-
-                let phone = _.find(phones,  function(v, k) { 
-                    return k == action.phone_key && _.isEqual(v, action.phone_data)
-                })
-
-                if(phone === undefined){
-                    let newPhones = {...phones, [action.phone_key]: action.phone_data}
-                    let {profile} = friend
-                    let newProfile = {...profile, phones:newPhones}
-                    let newFriend = {...friend, 
-                        profile:{
-                            ...friend.profile, ...newProfile
-                        }
-                    }
-    
-                    let v = {...state,
-                                users : {
-                                    ...state.users,
-                                    friends : {
-                                        ...state.users.friends,
-                                        [action.friend_id]:newFriend
+                let fphones = {...friend_phone, [action.friend_phone_id]:action.friend_phone_data}
+                if(find_phone === undefined){
+                    let newState = {...state,
+                                        user: {
+                                            ...state.user,
+                                            friend_phones: {
+                                                ...state.user.friend_phones,
+                                                [action.friend_id]:fphones
+                                            }
+                                        }
                                     }
-                                }
-                            }
-                    return v
+
+                    console.log('phones > added', newState )
+                    return newState
+                }else{
+                    if(!_.isEqual(find_phone, action.friend_phone_data)){
+                        let newState = {...state,
+                                            user: {
+                                                ...state.user,
+                                                friend_phones: {
+                                                    ...state.user.friend_phones,
+                                                    [action.friend_id]:fphones
+                                                }
+                                            }
+                                        }
+
+                        console.log('phones > added', newState )
+                        return newState
+                    } 
                 }
             }
+
             return state
         }
 
@@ -949,72 +949,58 @@ export default (state= INITIAL_STATE, action)=>{
         // EDIT_WEBSITE_FRIEND,
         // REMOVE_WEBSITE_FRIEND,
         case ADD_WEBSITE_FRIEND:{
-            if(state.users === null){
+            if(state.user === null){
                 return state
             }
 
-            // websites
-            let friends = state.users.friends
+            let friend_websites = state.user.friend_websites
+            let friend_website  = _.find(friend_websites,  function(v, k) { 
+                                    return k == action.friend_id
+                                })
 
-            let friend = _.find(friends,  function(v, k) { 
-                return k == action.friend_id
-            })
+            if(friend_website === undefined){
+                let fwebsites = {[action.friend_website_id]:action.friend_website_data}
 
-            if(friend === undefined){
-                return state
-            }
-
-            if(friend.profile.websites === undefined){
-                let {profile} = friend
-
-                let newProfile = {...profile, websites:{[action.website_key]: action.website_data}}
-
-                let newFriend = {...friend, 
-                                    profile:{
-                                        ...friend.profile, ...newProfile
-                                    }
-                                }
-  
                 let v = {...state,
-                            users : {
-                                ...state.users,
-                                friends : {
-                                    ...state.users.friends,
-                                    [action.friend_id]:newFriend
+                            user: {
+                                ...state.user,
+                                friend_websites: {
+                                    ...state.user.friend_websites,
+                                    [action.friend_id]:fwebsites
                                 }
                             }
                         }
-                // console.log(v)
                 return v
             }else{
+                let find_website =_.find(friend_website, (fv, fk)=>{
+                                    return fk == action.friend_website_id
+                                })
                 
-                let websites = friend.profile.websites
-
-                let website = _.find(websites,  function(v, k) { 
-                    return k == action.website_key && _.isEqual(v, action.website_data)
-                })
-
-                if(website === undefined){
-                    let newWebsites = {...websites, [action.website_key]: action.website_data}
-                    let {profile} = friend
-                    let newProfile = {...profile, websites:newWebsites}
-                    let newFriend = {...friend, 
-                                        profile:{
-                                            ...friend.profile, ...newProfile
+                let fwebsites = {...friend_website, [action.friend_website_id]:action.friend_website_data}
+                if(find_website === undefined){
+                    let newState = {...state,
+                                        user: {
+                                            ...state.user,
+                                            friend_websites: {
+                                                ...state.user.friend_websites,
+                                                [action.friend_id]:fwebsites
+                                            }
                                         }
                                     }
-    
-                    let v = {...state,
-                                users : {
-                                    ...state.users,
-                                    friends : {
-                                        ...state.users.friends,
-                                        [action.friend_id]:newFriend
-                                    }
-                                }
-                            }
-                    // console.log(v)
-                    return v
+                    return newState
+                }else{
+                    if(!_.isEqual(find_website, action.friend_website_data)){
+                        let newState = {...state,
+                                            user: {
+                                                ...state.user,
+                                                friend_websites: {
+                                                    ...state.user.friend_websites,
+                                                    [action.friend_id]:fwebsites
+                                                }
+                                            }
+                                        }
+                        return newState
+                    } 
                 }
             }
             return state
@@ -1043,79 +1029,67 @@ export default (state= INITIAL_STATE, action)=>{
 
         // emails
         case ADD_EMAIL_FRIEND:{
-            if(state.users === null){
+            if(state.user === null){
                 return state
             }
 
-            // websites
-            let friends = state.users.friends
+            // email
+            let friend_emails = state.user.friend_emails
+            let friend_email  = _.find(friend_emails,  function(v, k) { 
+                                    return k == action.friend_id
+                                })
 
-            let friend = _.find(friends,  function(v, k) { 
-                return k == action.friend_id
-            })
+            if(friend_email === undefined){
+                let femails = {[action.friend_email_id]:action.friend_email_data}
 
-            if(friend === undefined){
-                return state
-            }
-
-            if(friend.profile.emails === undefined){
-                let {profile} = friend
-
-                let newProfile = {...profile, emails:{[action.email_key]: action.email_data}}
-
-                let newFriend = {...friend, 
-                                    profile:{
-                                        ...friend.profile, ...newProfile
-                                    }
-                                }
-  
                 let v = {...state,
-                            users : {
-                                ...state.users,
-                                friends : {
-                                    ...state.users.friends,
-                                    [action.friend_id]:newFriend
+                            user: {
+                                ...state.user,
+                                friend_emails: {
+                                    ...state.user.friend_emails,
+                                    [action.friend_id]:femails
                                 }
                             }
                         }
-                // console.log(v)
                 return v
             }else{
+                let find_email =_.find(friend_email, (fv, fk)=>{
+                                    return fk == action.friend_email_id
+                                })
                 
-                let emails = friend.profile.emails
-
-                let email = _.find(emails,  function(v, k) { 
-                    return k == action.email_key && _.isEqual(v, action.email_data)
-                })
-
-                if(email === undefined){
-                    let newEmails = {...emails, [action.email_key]: action.email_data}
-                    let {profile} = friend
-                    let newProfile = {...profile, emails:newEmails}
-                    let newFriend = {...friend, 
-                                        profile:{
-                                            ...friend.profile, ...newProfile
+                let femails = {...friend_email, [action.friend_email_id]:action.friend_email_data}
+                if(find_email === undefined){
+                    let newState = {...state,
+                                        user: {
+                                            ...state.user,
+                                            friend_emails: {
+                                                ...state.user.friend_emails,
+                                                [action.friend_id]:femails
+                                            }
                                         }
                                     }
-    
-                    let v = {...state,
-                                users : {
-                                    ...state.users,
-                                    friends : {
-                                        ...state.users.friends,
-                                        [action.friend_id]:newFriend
-                                    }
-                                }
-                            }
-                    // console.log(v)
-                    return v
+                    return newState
+                }else{
+                    if(!_.isEqual(find_email, action.friend_email_data)){
+                        let newState = {...state,
+                                            user: {
+                                                ...state.user,
+                                                friend_emails: {
+                                                    ...state.user.friend_emails,
+                                                    [action.friend_id]:femails
+                                                }
+                                            }
+                                        }
+                        return newState
+                    } 
                 }
             }
+
             return state
         }
 
-        case ADD_EMAIL_FRIEND:{
-            if(state.users === null){
+        case EDIT_EMAIL_FRIEND:{
+            if(state.user === null){
                 return state
             }
 
@@ -1123,12 +1097,92 @@ export default (state= INITIAL_STATE, action)=>{
         }
 
         case REMOVE_EMAIL_FRIEND:{
-            if(state.users === null){
+            if(state.user === null){
                 return state
             }
 
             return state
         }
+
+        // ADD_MY_ID_FRIEND, 
+        // EDIT_MY_ID_FRIEND, 
+        // REMOVE_MY_ID_FRIEND
+        case ADD_MY_ID_FRIEND:{
+            if(state.user === null){
+                return state
+            }
+
+            // my_id
+            let friend_my_ids = state.user.friend_my_ids
+            let friend_my_id  = _.find(friend_my_ids,  function(v, k) { 
+                                    return k == action.friend_id
+                                })
+
+            if(friend_my_id === undefined){
+                let fmy_ids = {[action.friend_my_id_id]:action.friend_my_id_data}
+
+                let v = {...state,
+                            user: {
+                                ...state.user,
+                                friend_my_ids: {
+                                    ...state.user.friend_my_ids,
+                                    [action.friend_id]:fmy_ids
+                                }
+                            }
+                        }
+                return v
+            }else{
+                let find_friend_my_id = _.find(friend_my_id, (fv, fk)=>{
+                                            return fk == action.friend_my_id_id
+                                        })
+                
+                let fmy_ids = {...friend_my_id, [action.friend_my_id_id]:action.friend_my_id_data}
+                if(find_friend_my_id === undefined){
+                    let newState = {...state,
+                                        user: {
+                                            ...state.user,
+                                            friend_my_ids: {
+                                                ...state.user.friend_my_ids,
+                                                [action.friend_id]:fmy_ids
+                                            }
+                                        }
+                                    }
+                    return newState
+                }else{
+                    if(!_.isEqual(find_friend_my_id, action.friend_my_id_data)){
+                        let newState = {...state,
+                                            user: {
+                                                ...state.user,
+                                                friend_my_ids: {
+                                                    ...state.user.friend_my_ids,
+                                                    [action.friend_id]:fmy_ids
+                                                }
+                                            }
+                                        }
+                        return newState
+                    } 
+                }
+            }
+
+            return state
+        }
+
+        case EDIT_MY_ID_FRIEND:{
+            if(state.user === null){
+                return state
+            }
+
+            return state
+        }
+
+        case REMOVE_MY_ID_FRIEND:{
+            if(state.user === null){
+                return state
+            }
+
+            return state
+        }
+
 
         case ADDRESS_PROFILE : {
             if(state.users === null){
@@ -1310,26 +1364,21 @@ export default (state= INITIAL_STATE, action)=>{
         }
 
         case ADD_FRIEND:{
-            if(state.users === null){
+            if(state.user === null){
                 return state
             }
 
-            let friends = state.users.friends
+            let friends = state.user.friends
             let friend = _.find(friends,  function(v, k) { 
                 return k == action.friend_id
             })
 
-            // console.log('users>friends', action.friend_data, friend)
-
-            
-            // console.log('users>friends', action.friend_data, friend, newFriend)
-            
             if(friend === undefined){
                 let newState = {...state,
-                                    users: {
-                                        ...state.users,
+                                    user: {
+                                        ...state.user,
                                         friends : {
-                                            ...state.users.friends,
+                                            ...state.user.friends,
                                             [action.friend_id]:action.friend_data
                                         }
                                     }
@@ -1342,96 +1391,21 @@ export default (state= INITIAL_STATE, action)=>{
                 let newFriend = {...friend, ...action.friend_data}
                 if(!_.isEqual(friend, newFriend)){
                     let newState = {...state,
-                        users : {
-                            ...state.users,
-                            friends : {
-                                ...state.users.friends,
-                                [action.friend_id]:newFriend
-                            }
-                        }
-                    }
+                                        user: {
+                                            ...state.user,
+                                            friends : {
+                                                ...state.user.friends,
+                                                [action.friend_id]:newFriend
+                                            }
+                                        }
+                                    }
 
                     console.log('ADD_FRIEND', newFriend, friend, newState)
                     return newState;
                 }
             }
 
-            return state
-
-            /*
-            if(friend === undefined){
-                let newState = {
-                    ...state,
-                    users : {
-                        ...state.users,
-                        friends : {
-                            ...state.users.friends,
-                            [action.friend_id]:{...action.data, ...{profile: action.profile}}
-                        }
-                    }
-                }
-                console.log('ADD_FRIEND', friend)
-                return newState;
-            }else{
-                let newFriend = {...action.data, ...{profile: action.profile}}
-                if(!_.isEqual(friend, newFriend)){
-
-                    console.log('ADD_FRIEND', friend, newFriend)
-                    let newState = {...state,
-                                        users : {
-                                            ...state.users,
-                                            friends : {
-                                                ...state.users.friends,
-                                                [action.friend_id]:newFriend
-                                            }
-                                        }
-                                    }
-                    return newState;
-                }
-            }
-            */
-
-            /*
-            let key = 0
-            let value = null
-            _.each(friends, function(_v, _k) { 
-                if(_k === action.friend_id){
-                    key = _k
-                    value = _v
-                }
-            });
-
-            if(key == 0){
-                let v = {
-                    ...state,
-                    users : {
-                        ...state.users,
-                        friends : {
-                            ...state.users.friends,
-                            [action.friend_id]:{...action.data, ...{profile: action.profile}}
-                        }
-                    }
-                }
-                return v;
-            }else{
-
-                let newValue = {...action.data, ...{profile: action.profile}}
-                if(!isEquivalent2Object(value, newValue)){
-                    let v = {
-                        ...state,
-                        users : {
-                            ...state.users,
-                            friends : {
-                                ...state.users.friends,
-                                [action.friend_id]:newValue
-                            }
-                        }
-                    }
-                    return v;
-                }
-            }
-            */
-            
+            return state            
         }
 
         case MODIFIED_FRIEND:{
@@ -1481,7 +1455,6 @@ export default (state= INITIAL_STATE, action)=>{
             }
 
             let friend_profiles = state.user.friend_profiles
-
             let friend_profile = _.find(friend_profiles,  function(v, k) { 
                 return k == action.friend_id
             })
@@ -1502,14 +1475,14 @@ export default (state= INITIAL_STATE, action)=>{
             }else{
                 if(!_.isEqual(friend_profile, action.friend_profile)){
                     let newState = {...state,
-                        user: {
-                            ...state.user,
-                            friend_profiles : {
-                                ...state.user.friend_profiles,
-                                [action.friend_id]:action.friend_profile
-                            }
-                        }
-                    }
+                                        user: {
+                                            ...state.user,
+                                            friend_profiles : {
+                                                ...state.user.friend_profiles,
+                                                [action.friend_id]:action.friend_profile
+                                            }
+                                        }
+                                    }
 
                     console.log('ADDED_FRIEND_PROFILE', friend_profile, action.friend_profile, newState)
                     return newState;

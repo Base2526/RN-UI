@@ -93,6 +93,11 @@ export const ADD_EMAIL_FRIEND               = 'add_email_friend'
 export const EDIT_EMAIL_FRIEND              = 'edit_email_friend'
 export const REMOVE_EMAIL_FRIEND            = 'remove_email_friend'
 
+// 
+export const ADD_MY_ID_FRIEND               = 'add_my_id_friend'
+export const EDIT_MY_ID_FRIEND              = 'edit_my_id_friend'
+export const REMOVE_MY_ID_FRIEND            = 'remove_my_id_friend'
+
 export const ADDRESS_PROFILE                = 'address_profile'
 
 export const ADD_WEBSITE_PROFILE            = 'add_website_profile'

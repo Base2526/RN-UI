@@ -27,6 +27,9 @@ import MyIcon from '../../config/icon-font.js';
 import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
+import {makeUidState,
+        makeMyAppicationsState} from '../../Reselect'
+
 class ListMyAppPage extends React.Component{
     constructor(props) {
       super(props);
@@ -61,9 +64,9 @@ class ListMyAppPage extends React.Component{
         refreshing: false
       });
 
-      let {my_applications} = this.props.auth.users
+      let my_applications = this.props.my_applications
 
-      console.log(my_applications)
+      // console.log(my_applications)
 
       let newValue = []
       Object.entries(my_applications).forEach(([key, value]) => {
@@ -102,7 +105,7 @@ class ListMyAppPage extends React.Component{
     };
 
     loadData=()=>{
-      let {my_applications} = this.props.auth.users
+      let my_applications = this.props.my_applications
 
       let publishedMember = []
       let unPublishedMember = []
@@ -411,7 +414,7 @@ class ListMyAppPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
@@ -425,8 +428,8 @@ const mapStateToProps = (state) => {
   }
 
   return{
-    uid:getUid(state),
-    auth:state.auth
+    uid: makeUidState(state, ownProps),
+    my_applications: makeMyAppicationsState(state, ownProps),
   }
 }
 

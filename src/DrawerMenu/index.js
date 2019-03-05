@@ -97,34 +97,15 @@ class DrawerMenu extends React.Component{
     }
 
     componentDidMount(){
-        console.log('DrawerMenu>componentDidMount')
-        // 
-        
-        // // let {my_applications} = this.props.auth.users
-        // // this.onLoadDataMyApplication(my_applications)
-
-        // console.log(this.props)
-
-        // this.navigateToScreen = this.navigateToScreen.bind(this)
-
         this.loadData(this.props)
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log('DrawerMenu>componentWillReceiveProps')
-
-        // let {my_applications} = nextProps.auth.users
-        // this.onLoadDataMyApplication(my_applications)
-
-        // if(!nextProps.navigation.state.isDrawerOpen){
-        //     return;
-        // }
-
         this.loadData(this.props)
     }
 
     componentWillUnmount(){
-        console.log('DrawerMenu>componentWillUnmount')
+        // console.log('DrawerMenu>componentWillUnmount')
     }
 
     loadData = (props) =>{
@@ -132,7 +113,6 @@ class DrawerMenu extends React.Component{
         if(!props.navigation.state.isDrawerOpen){
             return;
         }
-        console.log('DrawerMenu>loadData')
     }
 
     navigateToScreen = (route) => {
@@ -357,38 +337,15 @@ class DrawerMenu extends React.Component{
 
     render(){
         let props = this.props
-        console.log('DrawerMenu> render', props.navigation.state)
         if(!this.state.renderContent){
             return(<View style={{flex:1}}></View>)
         }
-
-        /*
-        if(this.state.x === 100){
-            menu = <DrawerItems {...props} />
-            collapse = require('../Images/collapse_down.png')
-            other_user =<View style={{ position:'absolute', right: 0}}>
-                            <TouchableOpacity>
-                                <Image 
-                                    style={{height:40,
-                                                width:40,
-                                                borderRadius: 20}} 
-                                    source={{ uri: 'http://www.free-avatars.com/data/media/37/cat_avatar_0597.jpg' }} />
-                            </TouchableOpacity> 
-                            <Text style={{ color: 'black', fontSize: 10, justifyContent:'flex-end', paddingTop:10, paddingLeft:10 }}>
-                                Somkid Sim 2,
-                            </Text> 
-                        </View>
-        }else{
-            menu = this.renderManageAccounts()
-            collapse = require('../Images/collapse_up.png')
-        }
-        */
         
         let {profiles} = this.props
         if(profiles === undefined){
             return(<View style={{flex:1}}></View>)
         }
-        console.log('DrawerMenu>' , profiles)
+
         return(
             <View style={{flex:1}}>
                  <View style={{flex:1}}>

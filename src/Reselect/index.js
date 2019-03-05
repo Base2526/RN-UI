@@ -1,8 +1,7 @@
 import React from 'react'
 import { createSelector } from 'reselect'
 
-// import console = require('console');
-// import {getUid} from '../Utils/Helpers'
+var _ = require('lodash');
 
 const getUid = (state, props) => {
     if(!state._persist.rehydrated){
@@ -43,8 +42,52 @@ const getFriends = (state, props) => {
 }
 
 const getFriendProfiles = (state, props) => {
-    return state.auth.user.friend_profiles
+    let friend_profiles = state.auth.user.friend_profiles
+    let new_friend_profiles = {...friend_profiles}
+
+    _.each(friend_profiles, (v,k)=>{
+        let {friend_phones, 
+            friend_websites, 
+            friend_emails, 
+            friend_my_ids} = state.auth.user
+
+        let phones = _.find(friend_phones, (phone_v, phone_k)=>{
+            return k == phone_k
+        })
+
+        let websites = _.find(friend_websites, (phone_v, phone_k)=>{
+            return k == phone_k
+        })
+
+        let emails =_.find(friend_emails, (email_v, email_k)=>{
+            return k == email_k
+        })
+
+        let my_ids =_.find(friend_my_ids, (my_id_v, my_id_k)=>{
+            return k == my_id_k
+        })
+
+        if(phones !== undefined){
+            v = {...v, phones}
+        }
+        if(websites !== undefined){
+            v = {...v, websites}
+        }
+        if(emails !== undefined){
+            v = {...v, emails}
+        }
+        if(my_ids !== undefined){
+            v = {...v, my_ids}
+        }
+        new_friend_profiles = {...new_friend_profiles, [k]:v}
+    })
+
+    return new_friend_profiles
 }
+
+// const getFriendPhones = (state, props) => {
+//     return state.auth.user.friend_profiles
+// }
 
 const getPresences = (state, props) => {
     // console.log('getPresences', state.presence.user_presences)
@@ -123,6 +166,11 @@ export const makeFriendProfilesState = createSelector(
     [ getFriendProfiles ],
     (friend_profiles) => friend_profiles
 )
+
+// export const makeFriendPhonesState = createSelector(
+//     [ getFriendPhones ],
+//     (friend_phones) => friend_phones
+// )
 
 // presences
 export const makePresencesState = createSelector(

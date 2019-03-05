@@ -275,8 +275,7 @@ class home extends Component {
 
     componentWillReceiveProps(nextProps) {
         // console.log(nextProps.auth.users);
-
-        console.log('componentWillReceiveProps')
+        // console.log('componentWillReceiveProps')
         // if(nextProps.auth.users === null){
         //     return;
         // }

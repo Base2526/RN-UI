@@ -134,9 +134,8 @@ class FriendsPage extends React.Component{
               }
             } 
             
-            console.log('XX', friend, friend_profile, friend.hide, friend.block)
+            // console.log('XX', friend, friend_profile, friend.hide, friend.block)
             if(isAdd){
-
               // check online/offline
               let presence =_.find(presences, (presences_v, presences_k)=>{
                               return presences_k == key
@@ -205,7 +204,7 @@ class FriendsPage extends React.Component{
       }
         
       let data = [profile, favorites, friendRequests, friendRequestSents, _friends];
-      console.log(data)
+      // console.log(data)
       this.setState({data})
       // if(_.isEqual(data, this.state.data)){
       //   console.log('FriendsPage > loadData : equal')
@@ -654,7 +653,7 @@ class FriendsPage extends React.Component{
         return <View style={{flex: 1}}></View>
       }
 
-      console.log('FriendsPage > --reder--', data)
+      console.log('FriendsPage > render()')
 
       return (
           <View style={{flex: 1}}>
