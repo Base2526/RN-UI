@@ -436,6 +436,25 @@ export const scan_qrcode = (uid, qe) => {
         });
 }
 
+export const friend_profile_99 = (uid, friend_id) => {
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({
+            'uid':uid,
+            'friend_id':friend_id
+        }),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.FRIEND_PROFILE_99, data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+        });
+}
+
 export const update_class_picture_profile = (uid, class_id, image_uri) =>{
     var data = new FormData();
     data.append('idna', {

@@ -24,6 +24,8 @@ import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
+import {makeUidState,} from '../../Reselect'
+
 class AddFriendsPage extends React.Component{
 
   static navigationOptions = ({ navigation }) => ({
@@ -326,10 +328,20 @@ class AddFriendsPage extends React.Component{
   }
 }
 
-const mapStateToProps = (state) => {
-  console.log(state)
+const mapStateToProps = (state, ownProps) => {
+  // console.log(state)
+
+  if(!state._persist.rehydrated){
+    return {}
+  }
+
+  if(!state.auth.isLogin){
+      return;
+  }
+
   return({
-      uid:getUid(state)
+      // uid:getUid(state)
+      uid:makeUidState(state, ownProps),
   })
 }
 

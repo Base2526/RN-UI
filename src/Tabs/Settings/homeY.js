@@ -34,6 +34,13 @@ import MyIcon from '../../config/icon-font.js';
 
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
+import {makeUidState, 
+        makeProfileState, 
+        makeFriendsState, 
+        makeFriendProfilesState, 
+        makePresencesState,
+        makeClasssState} from '../../Reselect'
+
 class homeY extends React.Component {
 
   static navigationOptions = ({ navigation }) => ({
@@ -74,16 +81,16 @@ class homeY extends React.Component {
 
   onLogout = () =>{
     // let {uid, presences} = this.props
-    let {provider, users} = this.props.auth
+    // let {provider, users} = this.props.auth
 
     this.setState({loading:true})
-    this.props.updateIsLogin(users, v=>{
-      // console.log(v)
-    })
+    // this.props.updateIsLogin(users, v=>{
+    //   // console.log(v)
+    // })
     
-    if(provider == Constant.PROVIDERS.USER){
-      console.log("Logout User")
-    }
+    // if(provider == Constant.PROVIDERS.USER){
+    //   console.log("Logout User")
+    // }
     // else if(provider == Constant.PROVIDERS.TWITTER){
     //   console.log("Logout Twitter")
     //   RNTwitterSignIn.init(Constant.TWITTER_COMSUMER_KEY, Constant.TWITTER_CONSUMER_SECRET)
@@ -114,9 +121,9 @@ class homeY extends React.Component {
 
     let {loading} = this.state
 
-    if(!this.props.hasOwnProperty('auth')){
-      return <View style={{flex: 1}}></View>
-    }
+    // if(!this.props.hasOwnProperty('auth')){
+    //   return <View style={{flex: 1}}></View>
+    // }
 
     return (
       <ScrollView contentContainerStyle={styles.stage}>
@@ -294,7 +301,7 @@ const styles = StyleSheet.create({
 });
 
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   console.log(state)
 
   if(!state._persist.rehydrated){
@@ -302,8 +309,9 @@ const mapStateToProps = (state) => {
   }
   
   return{
-    uid:getUid(state),
-    auth:state.auth,
+    // uid:getUid(state),
+    uid:makeUidState(state, ownProps),
+    // auth:state.auth,
     // presences:state.presence.user_presences
   }
 }

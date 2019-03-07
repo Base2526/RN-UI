@@ -36,6 +36,11 @@ module.exports = {
     CHECK_MY_ID: API_URL + END_POINT + '/check_my_id',
 
     SCAN_QRCODE: API_URL + END_POINT + '/scan_qrcode',
+
+    // Get friend profile กรณียังไม่ได้เป้นเพือนกัน FRIEND_STATUS_FRIEND_99
+    FRIEND_PROFILE_99: API_URL + END_POINT + '/friend_profile_99',
+
+
     // 'Content-Type': 'multipart/form-data'
     FETCH_HEADERS: {
         'Accept': 'application/json',

@@ -11,6 +11,8 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import * as actions from '../../Actions'
 import {getUid} from '../../Utils/Helpers'
 
+import {makeUidState} from '../../Reselect'
+
 class ChangeFriendsName extends React.Component{
 
     static navigationOptions = ({ navigation }) => {
@@ -117,9 +119,17 @@ class ChangeFriendsName extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
+    if(!state._persist.rehydrated){
+        return {}
+    }
+  
+    if(!state.auth.isLogin){
+        return;
+    }
+
     return({
-        uid:getUid(state)
+        uid:makeUidState(state, ownProps)
     })
 }
   

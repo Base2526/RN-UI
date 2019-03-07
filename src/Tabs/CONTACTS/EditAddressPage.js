@@ -11,6 +11,9 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import * as actions from '../../Actions'
 import {getUid} from '../../Utils/Helpers'
 
+import {makeUidState, 
+        makeProfileState, } from '../../Reselect'
+
 class EditAddressPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => {
@@ -51,7 +54,14 @@ class EditAddressPage extends React.Component{
   
     componentDidMount() {
         this.props.navigation.setParams({handleSave: this.handleSave })
-        this.setState({text:this.props.profiles.address === undefined ?'':this.props.profiles.address})
+
+        // mode
+
+        this.setState({text:this.props.profile.address === undefined ?'':this.props.profile.address})
+    }
+
+    componentWillReceiveProps(nextProps) {
+        //   console.log(nextProps)
     }
 
     handleSave = () => {
@@ -68,6 +78,7 @@ class EditAddressPage extends React.Component{
 
         // export const actionAddressProfile = (uid, address, callback) => dispatch =>{
 
+        this.setState({loading:true})
         this.props.actionAddressProfile(this.props.uid, this.state.text, (result) => {
             console.log(result)
 
@@ -78,9 +89,7 @@ class EditAddressPage extends React.Component{
         })
     }
 
-    componentWillReceiveProps(nextProps) {
-    //   console.log(nextProps)
-    }
+    
       
     render() {
         return (<KeyboardAwareScrollView><View style={{margin:10}}>
@@ -114,19 +123,26 @@ class EditAddressPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
-  console.log(state)
+const mapStateToProps = (state, ownProps) => {
+    console.log(state)
 
-  // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
-  //_persist.rehydrated parameter is initially set to false
-  if(!state._persist.rehydrated){
-    return {}
-  }
+    // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
+    //_persist.rehydrated parameter is initially set to false
+    if(!state._persist.rehydrated){
+        return {}
+    }
 
-  return{
-    uid:getUid(state),
-    profiles:state.auth.users.profiles
-  }
+    if(!state.auth.isLogin){
+        return;
+    }
+
+    return{
+        // uid:getUid(state),
+        // profiles:state.auth.users.profiles
+
+        uid: makeUidState(state, ownProps),
+        profile: makeProfileState(state, ownProps),
+    }
 }
 
 export default connect(mapStateToProps, actions)(EditAddressPage);

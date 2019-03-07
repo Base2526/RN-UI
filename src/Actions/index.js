@@ -120,7 +120,8 @@ import {login,
         update_group_picture_profile,
         update_class_picture_profile,
         check_my_id,
-        scan_qrcode,} from '../Utils/Services'
+        scan_qrcode,
+        friend_profile_99} from '../Utils/Services'
 
 export const actionApplicationCategory = () =>dispatch =>{
     return application_category().then(data=>{
@@ -855,26 +856,6 @@ export const actionChangeFriendsName = (uid, friend_id, name, callback) => dispa
 
 // friend hide
 export const actionFriendHide = (uid, friend_id, hide, callback) => dispatch=> {
-    /*
-    var hideRef =  firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
-    firebase.firestore().runTransaction(t => {
-        return t.get(hideRef)
-        .then(doc => {
-            if(doc.data().hide === undefined){
-                t.set(hideRef, {
-                    hide: true,
-                }, { merge: true});
-            }else{
-                t.update(hideRef, {hide: !doc.data().hide});
-            }
-        });
-    }).then(result => {
-        console.log('Transaction success!');
-    }).catch(err => {
-        console.log('Transaction failure:', err);
-    });
-    */
-
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         hide,
     }, { merge: true}).then(()=> {
@@ -887,24 +868,6 @@ export const actionFriendHide = (uid, friend_id, hide, callback) => dispatch=> {
 
 // friend block
 export const actionFriendBlock = (uid, friend_id, block, callback) => dispatch=> {
-    // var blockRef =  firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
-    // firebase.firestore().runTransaction(t => {
-    //     return t.get(blockRef)
-    //     .then(doc => {
-    //         if(doc.data().block === undefined){
-    //             t.set(blockRef, {
-    //                 block: true,
-    //             }, { merge: true});
-    //         }else{
-    //             t.update(blockRef, {block: !doc.data().block});
-    //         }
-    //     });
-    // }).then(result => {
-    //     console.log('Transaction success!');
-    // }).catch(err => {
-    //     console.log('Transaction failure:', err);
-    // });
-
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         block,
     }, { merge: true}).then(()=> {
@@ -955,7 +918,7 @@ export const actionUpdatePictureProfile = (uid, image_uri, callback) => dispatch
             return {'status':false, 'message': data}
         }else{
             if(!data.result){
-                return {'status':false, 'message': data}
+                return {'status':false, 'message': data.message}
             }else{
                 dispatch({ type: UPDATE_PICTURE_PROFILE, image_url:data.image_url});
                 return {'status':true}
@@ -971,8 +934,9 @@ export const actionUpdatePictureBGProfile = (uid, image_uri, callback) => dispat
             return {'status':false, 'message': data}
         }else{
             if(!data.result){
-                return {'status':false, 'message': data}
+                return {'status':false, 'message': data.message}
             }else{
+                console.log(data)
                 dispatch({ type: UPDATE_PICTURE_BG_PROFILE, bg_url:data.bg_url});
                 return {'status':true}
             }
@@ -1015,25 +979,23 @@ export const actionEditStatusMessageProfile = (uid, status_message, callback) =>
 
 // Gender
 export const actionGenderProfile = (uid, gender_id, callback) => dispatch =>{
+    // console.log('gender_id', gender_id)
     firebase.firestore().collection('profiles').doc(uid).set({
         gender:gender_id,
     }, { merge: true});
 
-    dispatch({ type: GENDER_PROFILE, gender:gender_id});
+    dispatch({ type: GENDER_PROFILE, gender_id:gender_id});
 
     callback({'status':true})
 }
 
 // InteresteIn
 export const actionInteresteInProfile = (uid, intereste_in, callback) => dispatch =>{
-
-    console.log(intereste_in)
-    dispatch({ type: INTERESTE_IN_PROFILE, intereste_in});
-
     firebase.firestore().collection('profiles').doc(uid).set({
         intereste_in
     }, { merge: true});
 
+    dispatch({ type: INTERESTE_IN_PROFILE, intereste_in});
     callback({'status':true})
 }
 
@@ -1072,10 +1034,11 @@ export const actionEditPhoneProfile = (uid, phone_key , newValue, callback) => d
     firebase.firestore().collection('profiles').doc(uid).collection('phones').where("phone_number", "==", newValue.phone_number).get().then(snapshot => {
         if(snapshot.size == 0){
             firebase.firestore().collection('profiles').doc(uid).collection('phones').doc(phone_key).set({
-                newValue,
+                is_verify:newValue.is_verify, 
+                phone_number:newValue.phone_number,
             }, { merge: true});
         
-            dispatch({ type: EDIT_PHONE_PROFILE, phone_key, newValue});
+            dispatch({ type: EDIT_PHONE_PROFILE, phone_key, phone_data:newValue});
 
             callback({'status':true})
         }else{
@@ -1097,7 +1060,6 @@ export const actionAddressProfile = (uid, address, callback) => dispatch =>{
     }, { merge: true});
 
     dispatch({ type: ADDRESS_PROFILE, address});
-
     callback({'status':true})
 }
 
@@ -1180,7 +1142,7 @@ export const actionEditEmailProfile = (uid, email_key, email, callback) => dispa
                 email,
             }, { merge: true});
         
-            dispatch({ type: EDIT_EMAIL_PROFILE, email_key, email});
+            dispatch({ type: EDIT_EMAIL_PROFILE, email_key, email_data:{email} });
 
             callback({'status':true})
         }else{
@@ -1228,7 +1190,7 @@ export const actionRemoveMyIDProfile = (uid, key, callback) => dispatch =>{
     callback({'status':true})
 }
 
-export const actionSelectMyIDProfile = (uid, id, callback) => dispatch =>{
+export const actionSelectMyIDProfile = (uid, id, data, callback) => dispatch =>{
     if(id == 0){
         firebase.firestore().collection('profiles').doc(uid).collection('my_ids').where('enable', '==', true).get().then(snapshot => {
             snapshot.docs.forEach(doc => {
@@ -1242,8 +1204,6 @@ export const actionSelectMyIDProfile = (uid, id, callback) => dispatch =>{
         dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:0});
         callback({'status':true})
     }else{
-        dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:id});
-
         firebase.firestore().collection('profiles').doc(uid).collection('my_ids').where('enable', '==', true).get().then(snapshot => {
             snapshot.docs.forEach(doc => {
                 // console.log(doc.id)  
@@ -1258,20 +1218,7 @@ export const actionSelectMyIDProfile = (uid, id, callback) => dispatch =>{
             enable:true
         }, { merge: true})
 
-        // firebase.firestore().collection('profiles').doc(uid).collection('my_ids').get().then(snapshot => {
-        //     snapshot.docs.forEach(doc => {
-        //         if(doc.id == id){
-        //             firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(doc.id).set({
-        //                 enable:true
-        //             }, { merge: true})
-        //         }else{
-        //             firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(doc.id).set({
-        //                 enable:false
-        //             }, { merge: true})
-        //         }
-        //     });
-        // })
-        
+        dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:id, my_id_data:data});
         callback({'status':true})
     }
 }
@@ -1313,6 +1260,47 @@ export const actionScanQRcode= (uid, qe) => dispatch=>{
             if(!data.result){
                 return {'status':false, 'message': data.message}
             }else{
+                return {'status':true, data}
+            }
+        }
+    })
+}
+
+export const actionFriendProfile99= (uid, friend_id) => dispatch=>{
+    return friend_profile_99(uid, friend_id).then(data => {
+        if((data instanceof Array)){
+            return {'status':false, 'message': data.message}
+        }else{
+            if(!data.result){
+                return {'status':false, 'message': data.message}
+            }else{
+                let v = data.data
+                let friend_emails   = v.friend_emails
+                let friend_my_ids   = v.friend_my_ids
+                let friend_phones   = v.friend_phones
+                let friend_profile  = v.friend_profile
+                let friend_websites = v.friend_websites
+
+                let friend_data = {'status':Constant.FRIEND_STATUS_FRIEND_99, }
+                dispatch({type: ADD_FRIEND, friend_id, friend_data});
+                dispatch({ type: ADDED_FRIEND_PROFILE, friend_id, friend_profile});
+
+                _.each(friend_emails, (ev, ek)=>{
+                    dispatch({ type: ADD_EMAIL_FRIEND, friend_id, friend_email_id:ek, friend_email_data:ev})
+                })
+
+                _.each(friend_my_ids, (mv, mk)=>{
+                    dispatch({ type: ADD_MY_ID_FRIEND, friend_id, friend_my_id_id:mk, friend_my_id_data:mv})
+                })
+
+                _.each(friend_phones, (pv, pk)=>{
+                    dispatch({ type: ADD_PHONE_FRIEND, friend_id, friend_phone_id:pk, friend_phone_data:pv})
+                })
+
+                _.each(friend_websites, (wv, wk)=>{
+                    dispatch({ type: ADD_WEBSITE_FRIEND, friend_id, friend_website_id:wk, friend_website_data:wv})
+                })
+                
                 return {'status':true, data}
             }
         }
@@ -1822,6 +1810,29 @@ export const watchTaskEvent=(uid, fcmToken) => dispatch => {
     });
 }
 
+// track profiles
+export const trackProfiles=(uid, profiles)=> dispatch =>{
+    firebase.firestore().collection('profiles').doc(uid).onSnapshot((docSnapshot) => {
+        // if(docSnapshot.data() === undefined){
+        //     actionLogout(dispatch, ()=>{
+        //         // console.log(this)                
+        //         this.navigation.navigate("AuthLoading")
+        //     })
+        // }
+        if(docSnapshot.data() !== undefined){
+            // console.log('trackProfiles', profiles, docSnapshot.data())
+            
+            if(!_.isEqual(profiles, docSnapshot.data())){
+                dispatch({ type: UPDATE_PROFILE, profile_data:docSnapshot.data()});
+            }
+        }
+        
+    }, (error) => {
+        //...
+        console.log(error)
+    })
+}
+
 // track phones
 export const trackProfilesPhones=(uid, phones)=> dispatch =>{
     /*
@@ -2273,7 +2284,9 @@ export const trackFriends=(uid, friends, friend_profiles)=> dispatch =>{
                     return change.doc.id == k
                 })
 
-                if(friend === undefined){
+                console.log('trackFriends > added', friend, friend_data)
+                // if(friend === undefined){
+                if(!_.isEqual(friend, friend_data)){
                     console.log('trackFriends > added', friend)
                     dispatch({ type: ADD_FRIEND, friend_id, friend_data});
                 }
@@ -2581,7 +2594,7 @@ export const trackFriends=(uid, friends, friend_profiles)=> dispatch =>{
                 */
             }
             if (change.type === 'modified') {
-                dispatch({ type: MODIFIED_FRIEND, friend_id:change.doc.id, data:change.doc.data() });
+                dispatch({ type: MODIFIED_FRIEND, friend_id:change.doc.id, friend_data:change.doc.data() });
             }
         })
     })

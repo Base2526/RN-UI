@@ -23,6 +23,10 @@ import Constant from '../../Utils/Constant'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
+import {makeUidState, 
+        makeFriendsState,
+        makeFriendProfilesState} from '../../Reselect'
+
 class SettingListBlock extends React.Component{
     static navigationOptions = ({ navigation }) => ({
       title: "Friend block",
@@ -51,55 +55,68 @@ class SettingListBlock extends React.Component{
             data:[]
         })
 
-        this.loadData()
-    }
-
-    loadData = () =>{
-        let friend_member = []
-        for (var key in this.props.auth.users.friends) {
-            let friend =  this.props.auth.users.friends[key]
-            switch(friend.status){
-              case Constant.FRIEND_STATUS_FRIEND:{
-  
-                if(friend.block){
-                    friend_member.push({...friend, friend_id:key});
-                }
-                break
-              }            
-            }
-        }
-
-        this.setState({
-            data:friend_member
-        })
+        this.loadData(this.props)
     }
 
     componentWillReceiveProps(nextProps) {
-        // console.log(nextProps)
+      // console.log(nextProps)
 
-        if(nextProps.auth === undefined){
-            return;
-        }
+      this.loadData(nextProps)
 
-        let friend_member = []
-        for (var key in nextProps.auth.users.friends) {
-            let friend =  nextProps.auth.users.friends[key]
-            switch(friend.status){
-              case Constant.FRIEND_STATUS_FRIEND:{
-  
-                if(friend.block){
-                    friend_member.push({...friend, friend_id:key});
-                }
-                break
-              }            
-            }
-        }
+      /*
+      if(nextProps.auth === undefined){
+          return;
+      }
 
-        this.setState({
-            data:friend_member
-        })
+      let friend_member = []
+      for (var key in nextProps.auth.users.friends) {
+          let friend =  nextProps.auth.users.friends[key]
+          switch(friend.status){
+            case Constant.FRIEND_STATUS_FRIEND:{
+
+              if(friend.block){
+                  friend_member.push({...friend, friend_id:key});
+              }
+              break
+            }            
+          }
+      }
+
+      this.setState({
+          data:friend_member
+      })
+      */
     }
 
+    loadData = (props) =>{
+      let {friends, friend_profiles} = props
+
+      let friend_member = []
+      for (var key in friends) {
+        let friend =  friends[key]
+        switch(friend.status){
+          case Constant.FRIEND_STATUS_FRIEND:{
+
+            if(friend.block){
+
+              let friend_profile =_.find(friend_profiles, (v, k)=>{
+                return k == key
+              })
+
+              friend_member.push({...friend, friend_id:key, profile:friend_profile});
+                // friend_member.push({...friend, friend_id:key});
+            }
+            break
+          }            
+        }
+      }
+
+      this.setState({
+          data:friend_member
+      })
+    }
+
+  
     showMenu = (item)=>{
       return( <View style={{flex:1,
                             position:'absolute', 
@@ -262,8 +279,8 @@ class SettingListBlock extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
-    console.log(state)
+const mapStateToProps = (state, ownProps) => {
+    // console.log(state)
   
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
     //_persist.rehydrated parameter is initially set to false
@@ -272,8 +289,13 @@ const mapStateToProps = (state) => {
     }
   
     return{
-      uid:getUid(state),
-      auth:state.auth
+      // uid:getUid(state),
+      // auth:state.auth
+
+      uid: makeUidState(state, ownProps),
+      friends: makeFriendsState(state, ownProps),
+
+      friend_profiles:makeFriendProfilesState(state, ownProps),
     }
 }
   

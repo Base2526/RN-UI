@@ -17,6 +17,8 @@ import {
   MenuOption,
 } from 'react-native-popup-menu';
 
+var _ = require('lodash');
+
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
 // import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
@@ -24,7 +26,8 @@ import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState, 
-        makeFriendsState} from '../../Reselect'
+        makeFriendsState,
+        makeFriendProfilesState} from '../../Reselect'
 
 class SettingListHide extends React.Component{
 
@@ -59,7 +62,7 @@ class SettingListHide extends React.Component{
     }
 
     loadData = (props) =>{
-      let {friends} = props
+      let {friends, friend_profiles} = props
 
       let friend_member = []
       for (var key in friends) {
@@ -68,7 +71,12 @@ class SettingListHide extends React.Component{
             case Constant.FRIEND_STATUS_FRIEND:{
 
               if(friend.hide){
-                  friend_member.push({...friend, friend_id:key});
+
+                let friend_profile =_.find(friend_profiles, (v, k)=>{
+                                        return k == key
+                                    })
+
+                friend_member.push({...friend, friend_id:key, profile:friend_profile});
               }
               break
             }            
@@ -303,6 +311,8 @@ const mapStateToProps = (state,ownProps) => {
 
       uid: makeUidState(state, ownProps),
       friends: makeFriendsState(state, ownProps),
+
+      friend_profiles:makeFriendProfilesState(state, ownProps),
     }
 }
   

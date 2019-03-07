@@ -216,93 +216,99 @@ export default (state= INITIAL_STATE, action)=>{
             return state
         }
 
-        /*
         case UPDATE_PROFILE:{
             if(state.user === null){
                 return state
             }
 
-            let profiles = state.users.profiles;
+            let profile = state.user.profile;
 
-            if(!isEquivalent2Object(profiles, action.data)){
-                let v = {
-                    ...state,
-                    users : {
-                        ...state.users,
-                        profiles : {
-                            ...state.users.profiles,
-                            ...action.data
-                        }
-                    }
-                }
-                // console.log(v)
-                return v
+            if(!_.isEqual(profile, action.profile_data)){
+                let newState = {...state,
+                                    user : {
+                                        ...state.user,
+                                        profile: action.profile_data
+                                    }
+                                }
+                // console.log('trackProfiles', newState)
+                return newState
             }
             return state
         }
-        */
 
         case UPDATE_PICTURE_PROFILE:{
-            if(state.users === null){
+            if(state.user === null){
                 return state
             }
 
-            // let profiles = state.users.profiles;
+            let profile = state.user.profile;
 
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    profiles : {
-                        ...state.users.profiles,
-                        image_url:action.image_url
-                    }
-                }
+            if(profile === undefined){
+                return state
             }
 
-            // console.log(v)
-            return v
+            if(profile.image_url != action.image_url){
+                let newState = {...state,
+                                    user: {
+                                        ...state.user,
+                                        profile: {
+                                            ...state.user.profile,
+                                            image_url:action.image_url
+                                        }
+                                    }
+                                }
+                return newState
+            }
+            return state
         }
 
         case UPDATE_PICTURE_BG_PROFILE:{
-            if(state.users === null){
+            if(state.user === null){
                 return state
             }
 
-            // let profiles = state.users.profiles;
-
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    profiles : {
-                        ...state.users.profiles,
-                        bg_url:action.bg_url
-                    }
-                }
+            let profile = state.user.profile;
+            if(profile === undefined){
+                return state
             }
 
-            return v
+            if(profile.bg_url != action.bg_url){
+                let newState = {...state,
+                                    user: {
+                                        ...state.user,
+                                        profile: {
+                                            ...state.user.profile,
+                                            bg_url:action.bg_url
+                                        }
+                                    }
+                                }
+                return newState
+            }
+            return state
         }
 
         case EDIT_DISPLAY_NAME_PROFILE:{
-            if(state.users === null){
+            if(state.user === null){
                 return state
             }
 
-            let name = state.users.profiles.name
-            if(name !== action.profile_name){
-                let v = {
-                    ...state,
-                    users : {
-                        ...state.users,
-                        profiles : {
-                            ...state.users.profiles,
-                            name:action.profile_name
-                        }
-                    }
-                }
-                return v
+            let profile = state.user.profile
+            if(profile === undefined){
+                return state
+            }
+
+            let name = state.user.profile.name
+            if(name != action.profile_name){
+                let newState = {...state,
+                                    user: {
+                                        ...state.user,
+                                        profile: {
+                                            ...state.user.profile,
+                                            name:action.profile_name
+                                        }
+                                    }
+                                }
+                return newState
             }
             return state
         }
@@ -344,70 +350,83 @@ export default (state= INITIAL_STATE, action)=>{
         //     return v
         // }
 
-        // dispatch({ type: GENDER_PROFILE, gender:gender_id});
-
         case GENDER_PROFILE: {
-            if(state.users === null){
+            if(state.user === null){
                 return state
             }
 
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    profiles : {
-                        ...state.users.profiles,
-                        gender:action.gender_id
+            let profile = state.user.profile
+            if(profile === undefined){
+                return state
+            }
+
+            if(profile.gender != action.gender_id){
+                let v = {...state,
+                    user: {
+                        ...state.user,
+                        profile: {
+                            ...state.user.profile,
+                            gender:action.gender_id
+                        }
                     }
                 }
+                console.log('GENDER_PROFILE', profile.gender, action.gender_id)
+                return v
             }
-            return v
+            return state
         }
 
-        case BIRTHDAY_PROFILE : {
-            if(state.users === null){
+        case BIRTHDAY_PROFILE: {
+            if(state.user === null){
                 return state
             }
 
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    profiles : {
-                        ...state.users.profiles,
-                        birthday:action.birthday
-                    }
-                }
+            let profile = state.user.profile
+            if(profile === undefined){
+                return state
             }
-            return v
+
+            if(profile.birthday != action.birthday){
+                let v = {...state,
+                            user: {
+                                ...state.user,
+                                profile: {
+                                    ...state.user.profile,
+                                    birthday:action.birthday
+                                }
+                            }
+                        }
+                return v
+            }
+            return state
         }
 
         // INTERESTE_IN_PROFILE
         case INTERESTE_IN_PROFILE :{
-            if(state.users === null){
+            if(state.user === null){
                 return state
             }
 
-            let intereste_in = state.users.profiles.intereste_in
+            let intereste_in = state.user.profile.intereste_in
 
             if(intereste_in === undefined){
                 return state
             }
 
-            console.log(intereste_in)
-            console.log(action.intereste_in)
+            // console.log(intereste_in)
+            // console.log(action.intereste_in)
             let v = {...state,
-                        users : {
-                            ...state.users,
-                            profiles : {
-                                ...state.users.profiles,
+                        user: {
+                            ...state.user,
+                            profile: {
+                                ...state.user.profile,
                                 // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
                                 intereste_in: action.intereste_in
                             }
                         }
                     }
 
-            console.log(v)
+            // console.log(v)
             return v
         }
 
@@ -415,10 +434,7 @@ export default (state= INITIAL_STATE, action)=>{
             if(state.user === null){
                 return state
             }
-
             let phones = state.user.phones
-            // console.log(phones, action)
-
             if(phones === undefined){
                 console.log('ADD_PHONE_PROFILE')
                 // let newPhone =  {phone_number: action.phone_number, is_verify:action.is_verify}
@@ -514,7 +530,7 @@ export default (state= INITIAL_STATE, action)=>{
                         // }
                     }
                 }
-                // console.log('EDIT_PHONE_PROFILE', action, newState)
+                console.log('EDIT_PHONE_PROFILE', action.phone_data, newState)
                 return newState
             }
             return state
@@ -734,9 +750,9 @@ export default (state= INITIAL_STATE, action)=>{
             let newEmail =  action.email_data
             if(email === undefined){
                 let newState = {...state,
-                                    user : {
+                                    user: {
                                         ...state.user,
-                                        emails : {
+                                        emails: {
                                             ...state.user.emails,
                                             [action.email_key]:newEmail
                                         }
@@ -747,9 +763,9 @@ export default (state= INITIAL_STATE, action)=>{
             }else{
                 if(!_.isEqual(email, newEmail)){
                     let newState = {...state,
-                                        user : {
+                                        user: {
                                             ...state.user,
-                                            emails : {
+                                            emails: {
                                                 ...state.user.emails,
                                                 [action.email_key]:newEmail
                                             }
@@ -770,40 +786,7 @@ export default (state= INITIAL_STATE, action)=>{
             if(emails === undefined){
                 return state
             }
-
-            /*
-            if(Object.keys(emails).length == 0){
-                return state
-            }
-
-            let value = null
-            _.each(emails, function(_v, _k) { 
-                if(_k === action.email_key){
-                    value = _v
-                }
-            });
-
-            if(value !== null){
-                let newEmails = {...emails, [action.email_key]:{email: action.email}}
-
-                let v = {
-                    ...state,
-                    users : {
-                        ...state.users,
-                        profiles : {
-                            ...state.users.profiles,
-                            // ...{intereste_in:{[randomKey()]:{id: action.interestein_id, enable: true}}}
-                            emails : {
-                                ...state.users.profiles.emails, ...newEmails
-                            }
-                        }
-                    }
-                }
-                return v
-            }
-            return state
-            */
-            
+    
             let email = _.find(emails,  function(v, k) { 
                             return k == action.email_key
                         })
@@ -812,7 +795,7 @@ export default (state= INITIAL_STATE, action)=>{
                 return state
             }
 
-            let newEmail =  action.email_data
+            let newEmail = action.email_data
             if(!_.isEqual(email, newEmail)){
                 // let newWebsites = {...websites, [action.website_key]:{url: action.url}}
                 let newState = {...state,
@@ -1185,21 +1168,30 @@ export default (state= INITIAL_STATE, action)=>{
 
 
         case ADDRESS_PROFILE : {
-            if(state.users === null){
+            if(state.user === null){
                 return state
             }
 
-            let v = {
-                ...state,
-                users : {
-                    ...state.users,
-                    profiles : {
-                        ...state.users.profiles,
-                        address:action.address
-                    }
-                }
+            let profile = state.user.profile
+
+            if(profile === undefined){
+                return state
             }
-            return v
+
+            if(profile.address != action.address){
+                let newState = {...state,
+                                    users: {
+                                        ...state.user,
+                                        profile: {
+                                            ...state.user.profile,
+                                            address:action.address
+                                        }
+                                    }
+                                }
+
+                return newState
+            }
+            return state
         }
 
         case ADD_MY_ID_PROFILE:{
@@ -1265,73 +1257,68 @@ export default (state= INITIAL_STATE, action)=>{
             })
 
             if(my_id === undefined){
+                if(action.my_id_key == 0){
+                    // reset all enable = false
+                    _.each(my_ids, (v,k)=>{
+                        my_ids = {...my_ids, [k]:{...v, enable:false}}
+                    })
+                    
+                    let newState = {...state,
+                                        user: { ...state.user,
+                                            my_ids
+                                        }
+                                    }
+                    console.log('EDIT_MY_ID_PROFILE', newState)
+                    return newState
+                }
                 return state
             }
 
-            let newMy_id =  action.my_id_data
-            if(!_.isEqual(my_id, newMy_id)){
-                let newState = {...state,
-                    user: {
-                        ...state.user,
-                        // profiles: {
-                            // ...state.users.profiles,
-                            my_ids: {
-                                ...state.user.my_ids,
-                                [action.my_id_key]:newMy_id
-                            }
-                        // }
-                    }
+            // let newMy_id =  action.my_id_data
+            // // if(!_.isEqual(my_id, newMy_id)){
+            //     let newState = {...state,
+            //                         user: {
+            //                             ...state.user,
+            //                                 my_ids: {
+            //                                     ...state.user.my_ids,
+            //                                     [action.my_id_key]:action.my_id_data
+            //                                 }
+            //                         }
+            //                     }
+
+            //     console.log('EDIT_MY_ID_PROFILE', newState, newMy_id)
+            //     return newState
+            // // }
+
+            if(action.my_id_data.enable){
+                // เช็ดว่า equal กันหรือเปล่าเพราะเราจะไม่ update ซํ้า
+                let f = _.find(my_ids, (fv, fk)=>{
+                            return fk == action.my_id_key
+                        })
+                if(_.isEqual(f, action.my_id_data)){
+                    return state 
                 }
 
-                console.log('EDIT_MY_ID_PROFILE', my_id, newMy_id, newState)
+                _.each(my_ids, (v,k)=>{
+
+                    if(k == action.my_id_key){
+                        my_ids = {...my_ids, [k]:{...v, enable:true}}
+                    }else{
+                        my_ids = {...my_ids, [k]:{...v, enable:false}}
+                    }
+                })
+
+                let newState = {...state,
+                                    user: { ...state.user,
+                                        my_ids
+                                    }
+                                }
+
+                // console.log('EDIT_MY_ID_PROFILE', my_ids)
                 return newState
             }
+
             return state
-
-            /*
-            if(action.my_id_key == 0){
-                let newMyIDs = {}
-                _.each(my_ids, function(_v, _k) { 
-                    newMyIDs = {...newMyIDs, 
-                                    [_k]:{..._v, enable:false}
-                                }
-                });
-
-                let v = {
-                    ...state,
-                    users : {
-                        ...state.users,
-                        profiles : {
-                            ...state.users.profiles,
-                            my_ids : newMyIDs
-                        }
-                    }
-                }
-                return v
-            }
-
-            let newMyIds = {}
-            _.each(my_ids, function(_v, _k) { 
-                if(_k === action.my_id_key){
-                    newMyIds = {...newMyIds, [_k]:{..._v, enable:true}}
-                }else{
-                    newMyIds = {...newMyIds, [_k]:{..._v, enable:false}}
-                }
-            });
-
-            let v = {...state,
-                        users : {
-                            ...state.users,
-                            profiles : {
-                                ...state.users.profiles,
-                                my_ids : newMyIds
-                            }
-                        }
-                    }
-            console.log(action.my_id_key)
-            console.log(v)
-            return v
-            */
         }
 
         case REMOVE_MY_ID_PROFILE:{
@@ -1409,43 +1396,33 @@ export default (state= INITIAL_STATE, action)=>{
         }
 
         case MODIFIED_FRIEND:{
-
-            if(state.users === null){
+            if(state.user === null){
                 return state
             }
 
-            let friends = state.users.friends
+            let friends = state.user.friends
+            let friend = _.find(friends,  function(v, k) { 
+                return k == action.friend_id
+            })
 
-            let key = 0
-            let value = null
-            _.each(friends, function(_v, _k) { 
-                if(_k === action.friend_id){
-                    key = _k
-                    value = _v
-                }
-            });
-
-            if(key != 0){
-
-
-                if(!_.isEqual(value, action.data)){
-                    // console.log('Not Equal')
-                    let v = {
-                        ...state,
-                        users : {
-                            ...state.users,
-                            friends : {
-                                ...state.users.friends,
-                                [action.friend_id]:{...value, ...action.data}
-                            }
-                        }
-                    }
-                    return v;
-                }else{
-                    // console.log('Equal')
-                }
+            if(friend === undefined){
+                return state
             }
 
+            if(!_.isEqual(friend, action.friend_data)){
+                let v = {
+                    ...state,
+                    user: {
+                        ...state.user,
+                        friends: {
+                            ...state.user.friends,
+                            [action.friend_id]:action.friend_data
+                        }
+                    }
+                }
+                // console.log('MODIFIED_FRIEND', v, action)
+                return v;
+            }
             return state;
         }
 
@@ -1543,11 +1520,11 @@ export default (state= INITIAL_STATE, action)=>{
         }
         
         case CHANGE_FRIEND_NAME:{
-            if(state.users === null){
+            if(state.user === null){
                 return state
             }
 
-            let friends = state.users.friends
+            let friends = state.user.friends
             let friend = _.find(friends,  function(v, k) { 
                 return k == action.friend_id
             })
@@ -1561,14 +1538,15 @@ export default (state= INITIAL_STATE, action)=>{
 
                 let v = {
                     ...state,
-                    users : {
-                        ...state.users,
-                        friends : {
-                            ...state.users.friends,
+                    user: {
+                        ...state.user,
+                        friends: {
+                            ...state.user.friends,
                             [action.friend_id]: friend
                         }
                     }
                 }
+                console.log('CHANGE_FRIEND_NAME', friend, v)
                 return v
             }else{
                 if(friend.change_friend_name !== action.change_friend_name){
@@ -1576,14 +1554,16 @@ export default (state= INITIAL_STATE, action)=>{
 
                     let v = {
                         ...state,
-                        users : {
-                            ...state.users,
-                            friends : {
-                                ...state.users.friends,
+                        user: {
+                            ...state.user,
+                            friends: {
+                                ...state.user.friends,
                                 [action.friend_id]: friend
                             }
                         }
                     }
+
+                    console.log('CHANGE_FRIEND_NAME', friend, v)
                     return v
                 }
             }
@@ -2734,10 +2714,6 @@ export default (state= INITIAL_STATE, action)=>{
                                             }
                                         }
                                     }
-
-                    // console.log(action)
-                    // console.log(state)
-                    // console.log(newStatus)
                     return newStatus
                 }
             }
@@ -2785,8 +2761,10 @@ export default (state= INITIAL_STATE, action)=>{
             })
 
             if(friend !== undefined){
-                if(friend.is_favorite != action.is_favorite){
-                    friend = {...friend, block:action.is_favorite}
+                // friend_id, favorite_status
+                console.log('FRIEND_FAVORITE', friend, action)
+                if(friend.is_favorite != action.favorite_status){
+                    friend = {...friend, is_favorite:action.favorite_status}
                     let newStatus = {...state,
                                         user : {
                                             ...state.user,
@@ -2796,6 +2774,8 @@ export default (state= INITIAL_STATE, action)=>{
                                             }
                                         }
                                     }
+
+                    console.log('FRIEND_FAVORITE', friend, newStatus, )
                     return newStatus
                 }
             }

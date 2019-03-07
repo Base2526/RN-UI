@@ -36,6 +36,13 @@ let shareOptions = {
     subject: "Share Link" //  for email
 };
 
+import {makeUidState, 
+        makeProfileState, 
+        makeFriendsState, 
+        makeFriendProfilesState, 
+        makePresencesState,
+        makeClasssState} from '../../Reselect'
+
 class FriendProfilePage extends React.Component{
     static navigationOptions = ({ navigation}) => {
         const { params = {} } = navigation.state
@@ -96,98 +103,91 @@ class FriendProfilePage extends React.Component{
         const { navigation } = this.props;
         const friend_id = navigation.getParam('friend_id', null);
 
-        this.setState({friend_id}, ()=>{
-            this.loadData(this.props)
+        let {uid, friend_profiles}   = this.props
+
+        let friend_profile =_.find(friend_profiles, (v,k)=>{
+            return k == friend_id
         })
 
-        /*
-        let friends = this.props.auth.users.friends;
+        if(friend_profile === undefined){
+            this.setState({loading:true})
+            this.props.actionFriendProfile99(uid, friend_id).then((result) => {
+                console.log(result)
 
-        let friend = null
-        _.each(friends, function(_v, _k) { 
-            if(friend_id === _k){
-                friend = {..._v, friend_id:friend_id}
-            }
-        });
-
-        this.setState({
-            friend
-        })
-
-        let is_favorite = false
-        if(friend.is_favorite !== undefined){
-            is_favorite = friend.is_favorite
+                this.setState({friend_id, loading:false}, ()=>{
+                    this.loadData(this.props)
+                })
+            })
+        }else{
+            this.setState({friend_id}, ()=>{
+                this.loadData(this.props)
+            })
         }
-
-        this.props.navigation.setParams({is_favorite: is_favorite});
-        */
     }
 
     componentWillReceiveProps(nextProps) {
         this.loadData(nextProps)
-
-        /*
-        const { navigation } = this.props;
-        const friend_id = navigation.getParam('friend_id', null);
-
-        let friends = nextProps.auth.users.friends;
-        let friend = {}
-        _.each(friends, function(_v, _k) { 
-            // console.log(_v," | ",_k)
-            if(friend_id === _k){
-                friend = {..._v, friend_id:friend_id}
-            }
-        });
-
-        if(friend.hasOwnProperty('profile')){
-            this.setState({
-                friend
-            })
-        }
-
-        if (friend.is_favorite != this.state.friend.is_favorite) {
-            this.props.navigation.setParams({is_favorite: friend.is_favorite});
-        }
-        */
     }
 
     loadData = (props) =>{
         let {friend_id, friend} = this.state
-        let {uid, friends}   = props
+        let {uid, friends, friend_profiles}   = props
 
         let newFriend = _.find(friends, (v, k)=>{
                             return friend_id == k
                         })
 
-        console.log(newFriend)
-        if(newFriend === undefined){
-            this.setState({loading:true})
+        let friend_profile =_.find(friend_profiles, (v,k)=>{
+                                return k == friend_id
+                            })
 
+        if(friend_profile === undefined){
+
+            // actionFriendProfile99
+
+            
+            /*
+            this.setState({loading:true})
             let flag = 0
             let pfriendRef = firebase.firestore().collection('profiles').doc(friend_id);
             pfriendRef.get().then(doc => {
-                                this.setState({loading:false})
-                                if (!doc.exists) {
-                                    console.log('No such document!');
-                                    if(flag == 0){
-                                        flag =1
-                                        this.props.navigation.goBack(null)
-                                    }
-                                } else {
-                                    let v = {friend_id, 'status':Constant.FRIEND_STATUS_FRIEND_99, profile:doc.data()}
-
-                                    // this.setState({friend:v})
-                                    // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
-                                    //     console.log(result)
-                                    // })
+                            this.setState({loading:false})
+                            if (!doc.exists) {
+                                console.log('No such document!');
+                                if(flag == 0){
+                                    flag =1
+                                    this.props.navigation.goBack(null)
                                 }
-                            })
-                            .catch(err => {
-                                console.log('Error getting document', err);
-                            });
+                            } else {
+                                let v = {friend_id, 'status':Constant.FRIEND_STATUS_FRIEND_99, profile:doc.data()}
 
+                                newFriend = {...newFriend, friend_id, profile:doc.data()}
+
+                                if(!_.isEqual(newFriend, friend)){
+                                    // console.log('--+--', newFriend, friend)
+
+                                    let is_favorite = false;
+                                    if(newFriend.is_favorite !== undefined){
+                                        is_favorite = newFriend.is_favorite;
+                                    }
+
+                                    this.props.navigation.setParams({is_favorite});
+                                }
+                                this.setState({friend:newFriend})
+                            }
+                        })
+                        .catch(err => {
+                            console.log('Error getting document', err);
+
+                            if(flag == 0){
+                                flag =1
+                                this.props.navigation.goBack(null)
+                            }
+                        });
+
+                        */
         }else{
-            newFriend = {...newFriend, friend_id:friend_id}
+            newFriend = {...newFriend, friend_id, profile:friend_profile}
 
             if(!_.isEqual(newFriend, friend)){
                 // console.log('--+--', newFriend, friend)
@@ -196,27 +196,11 @@ class FriendProfilePage extends React.Component{
                 if(newFriend.is_favorite !== undefined){
                     is_favorite = newFriend.is_favorite;
                 }
+
                 this.props.navigation.setParams({is_favorite});
             }
             this.setState({friend:newFriend})
         }
-
-
-        /*
-        if(friend === null){
-            this.props.navigation.setParams({is_favorite: false});
-            return;
-        }
-
-        console.log(newFriend)
-        console.log(friend)
-        if (newFriend.is_favorite != is_favorite) {
-            console.log('--+--')
-
-
-            this.props.navigation.setParams({is_favorite: friend.is_favorite});
-        }
-        */
     }
 
     // https://github.com/react-navigation/react-navigation/blob/master/examples/NavigationPlayground/js/StackWithTranslucentHeader.js
@@ -322,7 +306,7 @@ class FriendProfilePage extends React.Component{
     }
 
     getHeightListClasss(){
-        let classs = this.props.auth.users.classs
+        let classs = this.props.classs
 
         /*
         80 : ความสูงของ item
@@ -359,7 +343,7 @@ class FriendProfilePage extends React.Component{
     renderListClasss() {
         var list = [];
 
-        let classs = this.props.auth.users.classs
+        let classs = this.props.classs
 
         let {friend} = this.state
 
@@ -429,7 +413,7 @@ class FriendProfilePage extends React.Component{
 
     getClasssName=()=>{
 
-        let classs = this.props.auth.users.classs
+        let classs = this.props.classs
 
         let {friend_id} = this.state.friend
 
@@ -1044,20 +1028,28 @@ class FriendProfilePage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     console.log(state)
   
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
     //_persist.rehydrated parameter is initially set to false
     if(!state._persist.rehydrated){
-      return {}
+        return {}
+    }
+
+    if(!state.auth.isLogin){
+        return;
     }
   
     return{
-        uid:getUid(state),
-        auth:state.auth,
+        // uid:getUid(state),
+        // auth:state.auth,
+        // friends:state.auth.users.friends,
 
-        friends:state.auth.users.friends,
+        uid:makeUidState(state, ownProps),
+        friends:makeFriendsState(state, ownProps),
+        friend_profiles:makeFriendProfilesState(state, ownProps),
+        classs:makeClasssState(state, ownProps),
     }
 }
 // nextProps.auth.users.friends;

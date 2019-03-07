@@ -1,15 +1,15 @@
 import React from 'react'
-
 import {View, 
         Text, 
         TouchableOpacity,
         TextInput} from 'react-native';
 import { connect } from 'react-redux';
-
 import Spinner from 'react-native-loading-spinner-overlay';
 
 import * as actions from '../../Actions'
 import {getUid, validateURL} from '../../Utils/Helpers'
+
+import {makeUidState} from '../../Reselect'
 
 class AddAnotherWebsite extends React.Component{
 
@@ -82,7 +82,6 @@ class AddAnotherWebsite extends React.Component{
             // const { navigation } = this.props;
             // navigation.goBack();
             // navigation.state.params.onAddAnotherWebsite({value: {name: this.state.text, isVerify:false}, mode:this.state.mode, key:this.state.key });
-
 
             if(this.state.mode === 'add'){
                 
@@ -161,10 +160,20 @@ class AddAnotherWebsite extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     console.log(state)
+
+    if(!state._persist.rehydrated){
+        return {}
+    }
+
+    if(!state.auth.isLogin){
+        return;
+    }
+
     return({
-        uid:getUid(state)
+        // uid:getUid(state)
+        uid: makeUidState(state, ownProps),
     })
 }
   

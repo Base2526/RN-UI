@@ -616,9 +616,9 @@ function me_user_insert(&$edit, $account, $category) {
                           "image_url"       => getDefualtProfilePicture(),
                           "bg_url"          => getDefualtBackgroundCardPicture(),
                           // "my_id"           => $mid_value,
-                          "sound_call_waiting"  => $sound_call_waiting_value,
-                          "badge"           => '0',
-                          "badges"          => array($badges_item_id=>$badges),
+                          // "sound_call_waiting"  => $sound_call_waiting_value,
+                          // "badge"           => '0',
+                          // "badges"          => array($badges_item_id=>$badges),
                           "status_message"  => $status_message,
                         );
           
@@ -756,9 +756,9 @@ function me_user_insert(&$edit, $account, $category) {
                         "image_url"       => getDefualtProfilePicture(),
                         "bg_url"          => getDefualtBackgroundCardPicture(),
                         // "my_id"           => $mid_value,
-                        "sound_call_waiting"  => $sound_call_waiting_value,
-                        "badge"           => '0',
-                        "badges"          => array($badges_item_id=>$badges),
+                        // "sound_call_waiting"  => $sound_call_waiting_value,
+                        // "badge"           => '0',
+                        // "badges"          => array($badges_item_id=>$badges),
                         "status_message"  => $status_message
                         );
             
@@ -2735,6 +2735,27 @@ function me_services_resources()
       ),
     ),
 
+    'friend_profile_99'=>array(
+      'create' =>array(
+        'help'=>'Services แก้ไข friend profile 99',
+        'callback'=>'friend_profile_99',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+        /* กรณีที่เราต้องการ pass parameter */
+        'args' => array(
+          array(
+           'name' => 'parameters',
+           'type' => 'array',
+           'description' => '',
+           'source' => 'param',
+           'optional' => TRUE,
+           'default value' => array(),
+          ),
+        ),
+      ),
+    ),
+
     'user_for_friend_delete'=>array(
       'create' =>array(
         'help'=>'Services ลบ friend ของ user : param uid, friend_id',
@@ -4077,15 +4098,16 @@ function onLoadProfile($uid, $mode){
         $profiles = array( "name"           => $profile_name,
                            "status_message" => $profile_status_message,
                            "url_my_qrcode"  => $profile_url_my_qrcode,
-                           "sound_call_waiting" => (object)$sound_call_waitings,
-                           "mails"          => (object)$emails,
-                           "phones"         => (object)$phones,
+                          //  "sound_call_waiting" => (object)$sound_call_waitings,
+                          //  "mails"          => (object)$emails,
+                          //  "phones"         => (object)$phones,
                           //  "my_id"          => (object)$my_id,
                            "image_url"      => $profile_image_url,
                            "bg_url"         => $profile_bg_url,
                           //  "badges"         => (object)$badges,
-                           "device_access"  => (object)$device_access,
-                           "line_id"        => $profile_line_id);
+                          //  "device_access"  => (object)$device_access,
+                          //  "line_id"        => $profile_line_id
+                          );
 
 
         ////////////////////////////////////// slide_store //////////////////////////////////////
@@ -4369,15 +4391,16 @@ function onLoadProfile($uid, $mode){
         $profiles = array( "name"           => $profile_name,
                            "status_message" => $profile_status_message,
                            "url_my_qrcode"  => $profile_url_my_qrcode,
-                           "sound_call_waiting" => (object)$sound_call_waitings,
-                           "mails"          => (object)$emails,
-                           "phones"         => (object)$phones,
+                          //  "sound_call_waiting" => (object)$sound_call_waitings,
+                          //  "mails"          => (object)$emails,
+                          //  "phones"         => (object)$phones,
                           //  "my_id"          => (object)$my_id,
                            "image_url"      => $profile_image_url,
                            "bg_url"         => $profile_bg_url,
-                           "badges"         => (object)$badges,
-                           "device_access"  => (object)$device_access,
-                           "line_id"        => $profile_line_id);
+                          //  "badges"         => (object)$badges,
+                          //  "device_access"  => (object)$device_access,
+                          //  "line_id"        => $profile_line_id
+                        );
 
         $result['result'] = TRUE;
         $result['data']   = array('profiles'  =>(object)$profiles);
@@ -10258,21 +10281,20 @@ function update_picture_bg_profile(){
     // $image_url['uri']
     //   // dpm(image_style_url('medium',$uri));
     // $url = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
-    $url = file_create_url(image_style_url('medium', $image_url['uri']));
+    $bg_url = file_create_url(image_style_url('medium', $image_url['uri']));
     // $url = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
   
     // Firebase : update image url profile
     $data_update = array(
-        "bg_url"  =>$url
+        "bg_url"  =>$bg_url
     );
     
     // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/profiles/", $data_update);
     
     firestore_db()->collection(FIRESTORE_PROFILES)->document($uid)->set($data_update, ['merge' => true]);
   
-
     $result['result'] = TRUE;  
-    $result['url']    = $url;
+    $result['bg_url'] = $bg_url;
     // $result['uri']    = $uri;
     return $result;
   // }else{

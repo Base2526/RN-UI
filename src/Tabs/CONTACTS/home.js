@@ -164,14 +164,24 @@ class home extends Component {
         
         return {
             // title: "Contacts",
-            tabBarVisible: false,
-            headerBackground: (
-                <Image
-                  style={StyleSheet.absoluteFill}
-                  source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/3/36/Hopetoun_falls.jpg' }}
-                />
-              ),
-            // header: (props) => <ImageHeader {...props} {...navigation}/>,
+            // tabBarVisible: false,
+            // headerBackground: (
+            //     <Image
+            //       style={StyleSheet.absoluteFill}
+            //       source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/3/36/Hopetoun_falls.jpg' }}
+            //     />
+            //   ),
+
+            headerTintColor: '#C7D8DD',
+            headerStyle: {
+                backgroundColor: 'rgba(186, 53, 100, 1.0)',
+                // ios navigationoptions underline hide
+                borderBottomWidth: 0,
+    
+                // android navigationoptions underline hide
+                elevation: 0,
+                shadowOpacity: 0
+            },
             headerLeft: (
                 <TouchableOpacity
                     style={{marginBottom:10}}

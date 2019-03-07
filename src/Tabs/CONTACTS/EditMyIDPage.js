@@ -17,6 +17,9 @@ import {getUid, randomKey} from '../../Utils/Helpers'
 
 import MyIcon from '../../config/icon-font.js';
 
+
+import {makeUidState, makeMyIdsState} from '../../Reselect'
+
 class EditMyIDPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => {
@@ -59,26 +62,22 @@ class EditMyIDPage extends React.Component{
   
     componentDidMount() {
         this.props.navigation.setParams({handleSave: this.handleSave })
-        let {my_ids} = this.props
+        this.loadData(this.props)
+    }
 
-        // console.log(my_ids)
-        // let data = []
-        // _.each(my_ids, function(_v, _k) { 
-        //     data.push({key:_k, id:_v.id, enable:_v.enable})
-        // });
+    componentWillReceiveProps(nextProps) {
+        this.loadData(nextProps)
+    }
 
-        // let find = data.find(k => k.enable==true)
-
-        // let newData = [...[{key: '0'}], ...data]
-        // console.log(newData)
-        // this.setState({data:newData})
+    loadData = (props) =>{
+        let my_ids = props.myIds
 
         let newMyIds = _.map(my_ids, (value, key) => {
             return {...value, key}
         })
 
         newMyIds.splice(0, 0, {key: '0'});
-        // console.log(newMyIds)
+        console.log(my_ids, newMyIds)
         this.setState({data:newMyIds})
     }
 
@@ -99,7 +98,6 @@ class EditMyIDPage extends React.Component{
                 this.setState({loading: false})
                 if(result.status){
                     // this.props.navigation.goBack()
-
                     this.setState({text:''})
                 }else{
                     setTimeout(() => {
@@ -113,20 +111,16 @@ class EditMyIDPage extends React.Component{
         }
     }
 
-    componentWillReceiveProps(nextProps) {
-        let {my_ids} = nextProps
-        let newMyIds = _.map(my_ids, (value, key) => {
-            return {...value, key}
-        })
-
-        newMyIds.splice(0, 0, {key: '0'});
-        // console.log(newMyIds)
-        this.setState({data:newMyIds})
-    }
-
     onSeleted = (key) =>{
+        let my_ids      = this.props.myIds
+        let my_id_data  =_.find(my_ids, (v, k)=>{
+                            return k == key
+                        })
+        
+        my_id_data = {...my_id_data, enable:true}
+
         this.setState({loading:true})
-        this.props.actionSelectMyIDProfile(this.props.uid, key, (result) => {
+        this.props.actionSelectMyIDProfile(this.props.uid, key, my_id_data, (result) => {
             this.setState({loading:false})
         })
     }
@@ -323,7 +317,7 @@ class EditMyIDPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   // console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
@@ -333,8 +327,11 @@ const mapStateToProps = (state) => {
   }
 
   return{
-    uid:getUid(state),
-    my_ids:state.auth.users.profiles.my_ids
+    // uid:getUid(state),
+    // my_ids:state.auth.users.profiles.my_ids
+
+    uid: makeUidState(state, ownProps),
+    myIds: makeMyIdsState(state, ownProps),
   }
 }
 

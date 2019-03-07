@@ -9,6 +9,8 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import * as actions from '../../Actions'
 import {getUid} from '../../Utils/Helpers'
 
+import {makeUidState, makeProfileState} from '../../Reselect'
+
 class EditDisplayNamePage extends React.Component{
 
     static navigationOptions = ({ navigation }) => {
@@ -51,25 +53,30 @@ class EditDisplayNamePage extends React.Component{
     componentDidMount() {
         this.props.navigation.setParams({handleSave: this.handleSave })
 
-        this.setState({text:this.props.profiles.name})
+        this.setState({text:this.props.profile.name})
     }
 
     handleSave = () => {
         if(this.state.text.length == 0){
             alert('Name is empty?')
         }else{
-            if(this.props.profiles.name === this.state.text){
+            if(this.props.profile.name === this.state.text){
                 const { navigation } = this.props;
                 navigation.goBack();
             }else{
                 this.setState({loading:true})
                 this.props.actionEditDisplayNameProfile(this.props.uid, this.state.text, (result) => {
-                    console.log(result)
+                    // console.log(result)
 
                     this.setState({loading:false})
-
+                    // if(!result.status){
+                    //     setTimeout(() => {
+                    //         Alert.alert('Oops!', result.message);
+                    //     }, 100);
+                    // }else{
                     const { navigation } = this.props;
                     navigation.goBack();
+                    // }
                 })
             }
         }
@@ -101,7 +108,7 @@ class EditDisplayNamePage extends React.Component{
 }
 
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
 //   console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
@@ -111,8 +118,11 @@ const mapStateToProps = (state) => {
   }
 
   return{
-    uid:getUid(state),
-    profiles:state.auth.users.profiles
+    // uid:getUid(state),
+    // profiles:state.auth.users.profiles
+
+    uid: makeUidState(state, ownProps),
+    profile: makeProfileState(state, ownProps),
   }
 }
 

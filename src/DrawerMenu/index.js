@@ -18,7 +18,7 @@ import { ifIphoneX } from 'react-native-iphone-x-helper'
 import { connect } from 'react-redux';
 import * as actions from '../Actions'
 
-import {makeProfilesState} from '../Reselect'
+import {makeProfileState} from '../Reselect'
 
 const formatData = (data, numColumns) => {
     // เป้นการ ลบ item ที่มี ​field ออกทั้งหมด เพราะว่าเรารองรับการ orientation srceen ด้วย
@@ -432,7 +432,7 @@ const mapStateToProps = (state, ownProps) => {
     }
 
     return{
-        profiles:makeProfilesState(state, ownProps),
+        profiles:makeProfileState(state, ownProps),
     }
 }
 

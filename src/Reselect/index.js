@@ -117,9 +117,9 @@ export const makeUidState = createSelector(
 )
 
 // profiles
-export const makeProfilesState = createSelector(
+export const makeProfileState = createSelector(
     [ getProfile ],
-    (profiles) => profiles
+    (profile) => profile
 )
 
 // phones

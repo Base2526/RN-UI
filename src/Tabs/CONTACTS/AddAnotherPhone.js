@@ -10,6 +10,8 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import * as actions from '../../Actions'
 import {validateMobile, getUid} from '../../Utils/Helpers'
 
+import {makeUidState} from '../../Reselect'
+
 class AddAnotherPhone extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
@@ -87,9 +89,11 @@ class AddAnotherPhone extends React.Component{
             navigation.state.params.onAddAnotherPhone({value: {phone_number: this.state.text, isVerify:false}, mode:this.state.mode, key:this.state.key });
             */
 
-           if(this.state.mode === 'add'){
+            let {mode, text} = this.state
+
+            if(mode === 'add'){
                 this.setState({loading: true})
-                this.props.actionAddPhoneProfile(this.props.uid, this.state.text, (result) => {
+                this.props.actionAddPhoneProfile(this.props.uid, text, (result) => {
                     console.log(result)
                     
                     this.setState({loading:false})
@@ -107,10 +111,10 @@ class AddAnotherPhone extends React.Component{
                         })
                     }
                 })
-           }else if(this.state.mode === 'edit'){
+           }else if(mode === 'edit'){
                 this.setState({loading: true})
 
-                let newValue = {...this.state.value, phone_number:this.state.text}
+                let newValue = {...this.state.value, phone_number:text}
 
                 this.props.actionEditPhoneProfile(this.props.uid, this.state.key, newValue, (result) => {
                     this.setState({loading:false})
@@ -156,16 +160,22 @@ class AddAnotherPhone extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     console.log(state)
 
     if(!state._persist.rehydrated){
         return {}
     }
+
+    if(!state.auth.isLogin){
+        return;
+    }
       
     return({
-        uid:getUid(state),
-        auth:state.auth
+        // uid:getUid(state),
+        // auth:state.auth
+
+        uid: makeUidState(state, ownProps),
     })
 }
   

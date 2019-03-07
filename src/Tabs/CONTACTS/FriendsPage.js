@@ -30,10 +30,8 @@ import Constant from '../../Utils/Constant'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
-// import { makeGetBarState } from '../selectors'
-
 import {makeUidState, 
-        makeProfilesState, 
+        makeProfileState, 
         makeFriendsState, 
         makeFriendProfilesState, 
         makePresencesState} from '../../Reselect'
@@ -291,11 +289,6 @@ class FriendsPage extends React.Component{
                               style: 'cancel'},
                               {text: 'OK', 
                               onPress: () => {
-                                // let block = false;
-                                // if(rowItem.block !== undefined){
-                                //   block = !rowItem.block
-                                // }
-
                                 this.setState({loading:true})
                                 this.props.actionFriendBlock(this.props.uid, rowItem.friend_id, true,(result)=>{
                                   // console.log(result)
@@ -654,7 +647,6 @@ class FriendsPage extends React.Component{
       }
 
       console.log('FriendsPage > render()')
-
       return (
           <View style={{flex: 1}}>
           <Spinner
@@ -680,7 +672,6 @@ class FriendsPage extends React.Component{
               // onScroll={this.props.handleScroll}
             />
           }
-
             <ActionButton 
               buttonColor="rgba(231,76,60,1)"
               offsetX={10} 
@@ -723,7 +714,7 @@ const mapStateToProps = (state, ownProps) => {
     uid: makeUidState(state, ownProps),
     friends:makeFriendsState(state, ownProps),
     friend_profiles:makeFriendProfilesState(state, ownProps),
-    profiles:makeProfilesState(state, ownProps),
+    profiles:makeProfileState(state, ownProps),
     presences:makePresencesState(state, ownProps),
   }
 }

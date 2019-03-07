@@ -32,6 +32,12 @@ let shareOptions = {
     subject: "Share Link" //  for email
 };
 
+import {makeProfileState, 
+        makeMyIdsState,
+        makePhonesState, 
+        makeWebsitesState, 
+        makeEmailsState } from '../../Reselect'
+
 class MyProfilePage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
         headerTransparent: true,
@@ -110,43 +116,46 @@ class MyProfilePage extends React.Component{
         this.props.navigation.navigate("EditMyProfilePage")
     }
 
-    phonesList(){
-
-        console.log(this.props.auth.users.profiles.phones)
-        return Object.entries(this.props.auth.users.profiles.phones).map(([key, value]) => {
-            return(<Cell
-                key={key}
-                cellStyle="Subtitle"
-                titleTextColor="#007AFF"
-                hideSeparator={false} 
-                cellContentView={
-                <View style={{flexDirection:'row'}}>
-                    <View style={{flex:1, flexDirection:'row'}}>
-                        <Text style={{fontSize: 22,  }}>
-                            {value.phone_number} 
-                        </Text>
-                        <TouchableOpacity
-                            style={{alignSelf:'flex-end'}}
-                            onPress={()=>{
-                                alert('Verify')
-                            }}>
-                            <Text style={{fontSize: 16, color:'blue', marginLeft:10, textAlignVertical:'bottom'}}>
-                                {value.is_verify ? '': ''}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            }
-        />)
-        })
-    }
-
-    emailsList(){
-        if(this.props.auth.users.profiles.emails === undefined){
+    phonesList(phones){
+        if(phones === undefined){
             return;
         }
 
-        return Object.entries(this.props.auth.users.profiles.emails).map(([key, value]) => {
+        return Object.entries(phones).map(([key, value]) => {
+            return(<Cell
+                    key={key}
+                    cellStyle="Subtitle"
+                    titleTextColor="#007AFF"
+                    hideSeparator={false} 
+                    cellContentView={
+                        <View style={{flexDirection:'row'}}>
+                            <View style={{flex:1, flexDirection:'row'}}>
+                                <Text style={{fontSize: 22,  }}>
+                                    {value.phone_number} 
+                                </Text>
+                                <TouchableOpacity
+                                    style={{alignSelf:'flex-end'}}
+                                    onPress={()=>{
+                                        alert('Verify')
+                                    }}>
+                                    <Text style={{fontSize: 16, color:'blue', marginLeft:10, textAlignVertical:'bottom'}}>
+                                        {value.is_verify ? '': ''}
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    }/>)
+        })
+    }
+
+    emailsList(emails){
+        if(emails === undefined){
+            return;
+        }
+
+        console.log('emailsList', emails)
+
+        return Object.entries(emails).map(([key, value]) => {
             return(<Cell
                     key={key}
                     cellStyle="Subtitle"
@@ -164,18 +173,16 @@ class MyProfilePage extends React.Component{
                     }
                     onPress={()=>{
                         Linking.openURL('mailto:' + value.email)
-                    }}
-                    />)
+                    }}/>)
         })
     }
 
-    websitesList(){
-        
-        if(this.props.auth.users.profiles.websites === undefined){
+    websitesList(websites){
+        if(websites === undefined){
             return;
         }
 
-        return Object.entries(this.props.auth.users.profiles.websites).map(([key, value]) => {
+        return Object.entries(websites).map(([key, value]) => {
             return(<Cell
                     key={key}
                     cellStyle="Subtitle"
@@ -193,88 +200,114 @@ class MyProfilePage extends React.Component{
                     }
                     onPress={()=>{
                         Linking.openURL(value.url)
-                    }}
-                />)
+                    }}/>)
         })
     }
 
     render() {
-        let {name, image_url, bg_url, status_message, gender, my_ids} = this.props.auth.users.profiles
-        // let{name, image_url} = this.props.auth.users.profiles;
+        let {name, 
+            image_url, 
+            bg_url, 
+            status_message, 
+            address,
+            gender, 
+            // my_ids,
+            birthday,
+            intereste_in,
+            // phones,
+            // websites,
+            // emails
+        } = this.props.profile
 
-        // My ID
-        // if(my_id === undefined || my_id == ''){
-        //     my_id = "Not set"
-        // } 
+        let my_ids =  this.props.myIds
+        let phones =  this.props.phones
+        let websites =  this.props.websites
+        let emails =  this.props.emails
 
-        // let {my_ids} = this.state.profiles
-        let find_my_id = _.find(my_ids,  function(v, k) { 
-            return v.enable
-        })
-        
-        let my_id = ''
-        if(find_my_id === undefined){
-            my_id = "Not set"
-        }else{
-            my_id = find_my_id.id
+        // Status message
+        let textStatusMessage = <Text style={{ fontSize:18 }}>Not set</Text>
+        if(status_message.trim() != ""){
+            textStatusMessage = <Text style={{ fontSize:18 }}>{status_message}</Text>
         }
 
-        // console.log(my_id)
+        // MyId
+        let textMyId = <Text style={{ fontSize:18 }}>Not set</Text>
+        if(my_ids !== undefined){
+            let __ =_.find(my_ids,  function(v, k) { 
+                return v.enable
+            })
 
+            if(__ !== undefined){
+                textMyId = <Text style={{ fontSize:18 }}>{__.id}</Text>
+            }
+        }
+        
         // Gender
-        let text_gender = 'Not set'
-        if(gender !== undefined){  
-            console.log(gender)      
+        let textGender = <Text style={{ fontSize:18 }}>Not set</Text>
+        if(gender !== undefined){       
             let __ = Constant.gender.filter(function(item){
                 return item.id == gender;
             })
             
             if(__.length > 0){
-                text_gender = __[0].name
+                textGender = <Text style={{ fontSize:18 }}>{__[0].name}</Text>
             }
         }
 
-        let birthday = ''
-        if(this.props.auth.users.profiles.birthday !== undefined){
-            birthday = this.props.auth.users.profiles.birthday
-
+        // Birthday
+        let textBirthday = <Text style={{ fontSize:18 }}>Not set</Text>
+        if(birthday !== undefined){
+           textBirthday =   <Text style={{ fontSize:18 }}>
+                                {Moment(new Date(birthday)).format('MMMM DD, YYYY')}
+                            </Text>
         }
 
-        // intereste_in
-        // let intereste_in = []
-        // if(this.props.auth.users.profiles.intereste_in !== undefined){
-        //     _.each(this.props.auth.users.profiles.intereste_in,  function(v, k) { 
-        //         if(v.enable){
-        //             let f = Constant.intereste_in.find(k => k.id==v.id)
-        //             intereste_in.push(f.name)
-        //         }
-        //     })
-        // }
-
-
-        // intereste_in
-        let intereste_in = []
-        if(this.props.auth.users.profiles.intereste_in !== undefined){
-            this.props.auth.users.profiles.intereste_in.forEach(function(key, v, arr){
+        // InteresteIn
+        let textInteresteIn = <Text style={{ fontSize:18 }}>Not set</Text>
+        console.log('intereste_in', intereste_in)
+        if(intereste_in !== undefined){
+            let resteIn = []
+            intereste_in.forEach(function(key, v, arr){
                 let f = Constant.intereste_in.find(k => k.id==key)
-                intereste_in.push(f.name)
+                resteIn.push(f.name)
             });
+
+            if(resteIn.length > 0){
+                textInteresteIn =   <Text style={{ fontSize:18 }}>
+                                        {resteIn.join(", ")}
+                                    </Text>
+            }
         }
 
-        // value={this.props.auth.users.profiles.address}
-        let address = 'Not set'
-        if(this.props.auth.users.profiles.address !== undefined){
-            address = this.props.auth.users.profiles.address
+        // Address
+        let textAddress = <Text style={{fontSize:18}}>Not set</Text>
+        if(address !== undefined){
+            textAddress = <Text style={{fontSize:18}}>{address}</Text>
         }
 
-        // isIphoneX() ? 25 : 0
+        // {/* {Object.keys(this.props.profiles.phones).length == 0 ? <Text style={{flex:1, fontSize:18}}>Not set</Text> :<View />} */}
+        let textMobilephones = <Text style={{flex:1, fontSize:18}}>Not set</Text>
+        if(phones !== undefined){
+            textMobilephones =  <View />
+        }
+
+        // {this.props.profiles.websites === undefined ? <Text style={{flex:1, fontSize:18}}>Not set</Text> :<View />}
+        let textWebsites = <Text style={{flex:1, fontSize:18}}>Not set</Text>
+        if(websites !== undefined){
+            textWebsites =  <View />
+        }
+
+        // {this.props.profiles.emails === undefined ? <Text style={{flex:1, fontSize:18}}>Not set</Text> :<View />}
+        let textEmails = <Text style={{flex:1, fontSize:18}}>Not set</Text>
+        if(emails !== undefined){
+            textEmails =  <View />
+        }
+
         return (<ScrollView style={{ flex: 1, marginBottom:isIphoneX() ? 50 : 0 }}>
                 <View style={{flex:1, backgroundColor:'gray'}}>
-                    {/* <BackgroundImage style={{paddingTop:this.getHeaderInset()}} auth={this.props.auth} /> */}
                     <View style={{flex:1, paddingTop: this.getHeaderInset(), flexDirection:'row'}}>
                         <FastImage
                             style={StyleSheet.absoluteFill}
-                            // source={require('../../Images/boxpink.png')}
                             source={{
                                 uri: bg_url,
                                 headers:{ Authorization: 'someAuthToken' },
@@ -287,10 +320,7 @@ class MyProfilePage extends React.Component{
                             <FastImage
                                 style={{width: 80, 
                                         height: 80, 
-                                        borderRadius: 10, 
-                                        // borderWidth:.5, 
-                                        // borderColor:'gray'
-                                    }}
+                                        borderRadius: 10}}
                                 source={{
                                 uri: image_url,
                                 headers:{ Authorization: 'someAuthToken' },
@@ -325,30 +355,13 @@ class MyProfilePage extends React.Component{
                                 titleTextColor="#007AFF"
                                 cellContentView={
                                     <View style={{flex:1, flexDirection:'row'}}>
-                                        <Text
-                                        style={{flex:1, fontSize: 18,  }}>
-                                        Basic Info
+                                        <Text style={{flex:1, fontSize: 18,  }}>
+                                            Basic Info
                                         </Text>
                                     </View>
                                 }
                             />
-                            {/* <Cell
-                                cellStyle="Basic"
-                                contentContainerStyle={{ padding:10 }} 
-                                hideSeparator={true} 
-                                cellContentView={
-                                    <View style={{flex:1}}>
-                                        <View >
-                                            <Text style={{ }}>
-                                            Name Subname
-                                            </Text>
-                                            <Text style={{ fontSize:18 }}>
-                                                {name}
-                                            </Text>
-                                        </View>
-                                    </View>
-                                }
-                            /> */}
+                            
                             <Cell
                                 cellStyle="Basic"
                                 contentContainerStyle={{ padding:10 }} 
@@ -359,9 +372,7 @@ class MyProfilePage extends React.Component{
                                             <Text style={{ }}>
                                                 Status message
                                             </Text>
-                                            <Text style={{ fontSize:18 }}>
-                                                {status_message == "" ? "Not set" : status_message}
-                                            </Text>
+                                            {textStatusMessage}
                                         </View>
                                     </View>
                                 }
@@ -394,9 +405,7 @@ class MyProfilePage extends React.Component{
                                             <Text style={{ }}>
                                                 My ID
                                             </Text>
-                                            <Text style={{ fontSize:18 }}>
-                                                {my_id}
-                                            </Text>
+                                            {textMyId}
                                         </View>
                                         
                                     </View>
@@ -412,9 +421,7 @@ class MyProfilePage extends React.Component{
                                             <Text style={{ }}>
                                                 Gender
                                             </Text>
-                                            <Text style={{ fontSize:18 }}>
-                                                {text_gender}
-                                            </Text>
+                                            {textGender}
                                         </View>
                                     </View>
                                 }
@@ -429,10 +436,7 @@ class MyProfilePage extends React.Component{
                                             <Text style={{ }}>
                                                 Birthday
                                             </Text>
-                                            <Text style={{ fontSize:18 }}>
-                                                {birthday != ''? Moment(new Date(birthday)).format('MMMM DD, YYYY'):'Not set'}
-                                                {/*  */}
-                                            </Text>
+                                            {textBirthday}
                                         </View>
                                     </View>
                                 }
@@ -447,9 +451,7 @@ class MyProfilePage extends React.Component{
                                             <Text style={{ }}>
                                                 Interested In
                                             </Text>
-                                            <Text style={{ fontSize:18 }}>
-                                                {intereste_in.length == 0 ? "Not set": intereste_in.join(", ")}
-                                            </Text>
+                                            {textInteresteIn}
                                         </View>
                                     </View>
                                 }
@@ -466,8 +468,7 @@ class MyProfilePage extends React.Component{
                                 hideSeparator={false}
                                 cellContentView={
                                     <View style={{flex:1, flexDirection:'row'}}>
-                                        <Text
-                                        style={{flex:1, fontSize: 18,  }}>
+                                        <Text style={{flex:1, fontSize: 18,  }}>
                                         Contact Info
                                         </Text>
                                     </View>
@@ -483,11 +484,11 @@ class MyProfilePage extends React.Component{
                                         <Text style={{flex:1,}}>
                                         Mobile phones
                                         </Text>
-                                        {Object.keys(this.props.auth.users.profiles.phones).length == 0 ? <Text style={{flex:1, fontSize:18}}>Not set</Text> :<View />}
+                                        {textMobilephones}
                                     </View>
                                 }
                             />
-                            {this.phonesList()}
+                            {this.phonesList(phones)}
                             <Cell
                                 cellStyle="Basic"
                                 contentContainerStyle={{ padding:10 }} 
@@ -498,9 +499,7 @@ class MyProfilePage extends React.Component{
                                             <Text style={{ }}>
                                             Address
                                             </Text>
-                                            <Text style={{fontSize:18}}>
-                                            {address}
-                                            </Text>
+                                            {textAddress}
                                         </View>
                                     </View>
                                 }
@@ -515,12 +514,12 @@ class MyProfilePage extends React.Component{
                                             <Text style={{ }}>
                                             Website
                                             </Text>
-                                           {this.props.auth.users.profiles.websites === undefined ? <Text style={{flex:1, fontSize:18}}>Not set</Text> :<View />}
+                                            {textWebsites}
                                         </View>
                                     </View>
                                 }
                             />
-                            {this.websitesList()}
+                            {this.websitesList(websites)}
                             <Cell
                                 cellStyle="Basic"
                                 contentContainerStyle={{ padding:10 }} 
@@ -531,12 +530,12 @@ class MyProfilePage extends React.Component{
                                             <Text style={{ }}>
                                                 Email
                                             </Text>
-                                            {this.props.auth.users.profiles.emails === undefined ? <Text style={{flex:1, fontSize:18}}>Not set</Text> :<View />}
+                                            {textEmails}
                                         </View>
                                     </View>
                                 }
                             />
-                            {this.emailsList()}
+                            {this.emailsList(emails)}
                         </Section>
                     </TableView>
                     </View>
@@ -546,8 +545,8 @@ class MyProfilePage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
-    console.log(state)
+const mapStateToProps = (state, ownProps) => {
+    // console.log(state)
   
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
     //_persist.rehydrated parameter is initially set to false
@@ -555,9 +554,19 @@ const mapStateToProps = (state) => {
       return {}
     }
 
+    if(!state.auth.isLogin){
+        return;
+    }
+
     return{
-      auth:state.auth
+        profile: makeProfileState(state, ownProps),
+        myIds: makeMyIdsState(state, ownProps),
+        phones: makePhonesState(state, ownProps),
+        websites: makeWebsitesState(state, ownProps),
+        emails: makeEmailsState(state, ownProps),
     }
 }
+
+
 
 export default connect(mapStateToProps, actions)(MyProfilePage);

@@ -20,11 +20,27 @@ var _ = require('lodash');
 import Spinner from 'react-native-loading-spinner-overlay';
 import Modal from 'react-native-modalbox';
 
+import {
+    MenuProvider,
+    Menu,
+    MenuContext,
+    MenuTrigger,
+    MenuOptions,
+    MenuOption,
+  } from 'react-native-popup-menu';
+
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
 import MyModal from '../../Utils/MyModal'
 import MyIcon from '../../config/icon-font.js';
-import {getUid, randomKey} from '../../Utils/Helpers'
+import {randomKey, getHeaderInset} from '../../Utils/Helpers'
+
+import {makeUidState, 
+        makeProfileState, 
+        makeMyIdsState,
+        makePhonesState,
+        makeWebsitesState,
+        makeEmailsState} from '../../Reselect'
 
 class EditMyProfilePage extends React.Component{
     static navigationOptions = ({ navigation }) => {
@@ -64,6 +80,13 @@ class EditMyProfilePage extends React.Component{
 
         Moment.locale('en');
         this.state ={
+            profile: null,
+            myIds: null,
+            phones: null,
+            websites: null,
+            emails: null,
+            renderContent: false,
+
             profiles: {},
             profile_picture: '',
             background_picture: '',
@@ -79,13 +102,18 @@ class EditMyProfilePage extends React.Component{
     componentDidMount() {
         this.props.navigation.setParams({handleCancel: this.handleCancel })
         
-        let {profiles} = this.props
-        this.setState({profiles})
+        this.loadData(this.props)
     }
 
     componentWillReceiveProps(nextProps) {
-        let {profiles} = nextProps 
-        this.setState({profiles})
+
+        this.loadData(nextProps)
+    }
+
+    loadData = (props) =>{
+        let {profile, myIds, phones, websites, emails} = props
+
+        this.setState({profile, myIds, phones, websites, emails,  renderContent:true})
     }
 
     handleCancel = () => {
@@ -94,12 +122,10 @@ class EditMyProfilePage extends React.Component{
 
     openModalGender(){
         this.refs.modalGender.open()
-        // this.setState({is_open_modal_gender: true})
     }
 
     openModalInteresteIn(){
         this.refs.modalInteresteIn.open()
-        // this.setState({is_open_modal_InteresteIn: true})
     }
 
     getHeightInteresteIn(){
@@ -149,46 +175,61 @@ class EditMyProfilePage extends React.Component{
         return height;
     }
 
-    renderInteresteIn(){
-        
-        return this.state.intereste_in.map((data) => {
+    renderInteresteIn(intereste_in){
+        return Constant.intereste_in.map((data) => {
             let __check = null
-            if(this.state.profiles.intereste_in !== undefined){
-                let intereste_in = this.state.profiles.intereste_in
-                let f = intereste_in.find(v=>{ 
+            if(intereste_in !== undefined){
+                let f = _.find(intereste_in, (v, k)=>{ 
                     return v == data.id
                 })
 
                 if(f !== undefined){
-                    __check = <Icon name="check" size={25} color="#900" />
+                    __check = <MyIcon
+                                name={'check-ok'}
+                                size={25}
+                                color={'#900'} />
                 }
             }
             
             return(<TouchableOpacity key={data.id} 
                         onPress={() => {
-                           let intereste_in = this.state.profiles.intereste_in;
+                        //    let intereste_in = intereste_in;
                            if(intereste_in !== undefined){
                                 
-                                let _find = intereste_in.find(v=>{
+                                // let _find = intereste_in.find(v=>{
+                                let _find = _.find(intereste_in, (v, k)=>{ 
                                     return v == data.id;
                                 })
 
                                 let newValue = null
                                 if(_find === undefined){
                                     newValue = [...intereste_in, data.id]
+
+                                    // console.log('intereste_in', newValue)
                                 }else{
-                                    newValue = intereste_in.filter(function(v) { 
+                                    newValue = intereste_in.filter(function(v, k) { 
+                                    // newValue = _.find(intereste_in, (v, k)=>{ 
                                         return v != data.id 
                                     })
+
+                                    // console.log('intereste_in', intereste_in)
+                                    // console.log('intereste_in', newValue)
                                 }
 
+                                // console.log('intereste_in', data.id, intereste_in, newValue)
+
+                                this.setState({loading:true})
                                 this.props.actionInteresteInProfile(this.props.uid, newValue, (result) => {
                                     console.log(result)
+
+                                    this.setState({loading:false})
                                 })
                             }else{
-                                let intereste_in = [data.id]
-                                this.props.actionInteresteInProfile(this.props.uid, intereste_in, (result) => {
+                                this.setState({loading:true})
+                                this.props.actionInteresteInProfile(this.props.uid, [data.id], (result) => {
                                     console.log(result)
+
+                                    this.setState({loading:false})
                                 })
                             }
                         }}>
@@ -225,20 +266,24 @@ class EditMyProfilePage extends React.Component{
         })
     }
 
-    renderGender() {
-        return this.state.gender.map((data) => {
+    renderGender(gender) {
+        return Constant.gender.map((data) => {
             let __check = null
-            if(this.state.profiles.gender !== undefined){
-                if(this.state.profiles.gender == data.id){
-                    __check = <Icon name="check" size={25} color="#900" />
+            if(gender !== undefined){
+                console.log('renderGender', gender, data.id)
+                if(gender == data.id){
+                    __check = <MyIcon
+                                name={'check-ok'}
+                                size={25}
+                                color={'#900'} />// <Icon name="check" size={25} color="#900" />
                 }
             }
 
             return (
                 <TouchableOpacity key={data.id} 
                     onPress={() => {
-                        if(this.state.profiles.gender !== undefined){
-                            if(this.state.profiles.gender != data.id){
+                        if(gender !== undefined){
+                            if(gender != data.id){
                                 this.props.actionGenderProfile(this.props.uid, data.id, (result) => {
                                     console.log(result)
                                 })
@@ -284,12 +329,55 @@ class EditMyProfilePage extends React.Component{
         })
     }
 
-    phonesList(){
-        if(this.state.profiles.phones === undefined){
+    menuPhone = (key, value) =>{
+        return(<View style={{flex:1,position:'absolute', right:0, top:0, marginRight:5}}>
+                    <Menu>
+                    <MenuTrigger>
+                        <MyIcon 
+                            style={{padding:5}}
+                            name={'dot-horizontal'}
+                            size={15}
+                            color={'gray'} />  
+                    </MenuTrigger>
+                    <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
+                        <MenuOption onSelect={() => {
+                                this.props.navigation.navigate("AddAnotherPhone", {title:'Edit phone', mode: 'edit', key, value, onAddAnotherPhone: this.onAddAnotherPhone})
+                            }}>
+                            <Text style={{padding:10, fontSize:18}}>Edit</Text>
+                        </MenuOption>
+                        <MenuOption onSelect={() => {
+                            Alert.alert(
+                                'Delete',
+                                'Are sure delete phone ?',
+                                [
+                                //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                                    {text: 'Cancel', onPress: () => {
+
+                                    }, style: 'cancel'},
+                                    {text: 'Delete', onPress: () => {
+                                    this.setState({loading:true})
+                                    this.props.actionRemovePhoneProfile(this.props.uid, key, (result) => {
+                                        console.log(result)
+
+                                        this.setState({loading:false})
+                                    })
+                                    }},
+                                ],
+                                { cancelable: false }
+                            )
+                        }}>
+                            <Text style={{padding:10, fontSize:18}}>Delete</Text>
+                        </MenuOption>
+                    </MenuOptions>
+                </Menu>
+                </View>)
+    }
+
+    phonesList(phones){
+        if(phones === undefined){
             return;
         }
-
-        return Object.entries(this.state.profiles.phones).map(([key, value]) => {
+        return Object.entries(phones).map(([key, value]) => {
             return(<Cell
                 key={key}
                 cellStyle="Subtitle"
@@ -311,38 +399,39 @@ class EditMyProfilePage extends React.Component{
                             </Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={{flex:1, 
-                                flexDirection:'row', 
-                                position:'absolute', 
-                                right:0,
-                                bottom:0,
-                                padding:5}}>
-                        <TouchableOpacity 
-                            style={{justifyContent: 'center', 
-                                    alignItems: 'center',
-                                    zIndex: 10,
-                                    marginRight:10}}
-                            onPress={()=>{
-                                this.props.navigation.navigate("AddAnotherPhone", {title:'Edit phone', mode: 'edit', key, value, onAddAnotherPhone: this.onAddAnotherPhone})
+                    {this.menuPhone(key, value)}
+                </View>
+            }
+        />)
+        })
+    }
+
+    menuEmail = (key, value) =>{
+        return(<View style={{flex:1,position:'absolute', right:0, top:0, marginRight:5}}>
+                    <Menu>
+                    <MenuTrigger>
+                        <MyIcon 
+                            style={{padding:5}}
+                            name={'dot-horizontal'}
+                            size={15}
+                            color={'gray'} />  
+                    </MenuTrigger>
+                    <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
+                        <MenuOption onSelect={() => {
+                                this.props.navigation.navigate("AddAnotherEmail", {'title':"Edit email", 'mode': 'edit', key, value, onAddAnotherEmail: this.onAddAnotherEmail}) 
                             }}>
-                            <Text style={{color:'gray', fontSize:16}}>Edit</Text>
-                        </TouchableOpacity> 
-                        <TouchableOpacity 
-                            style={{justifyContent: 'center', 
-                                    alignItems: 'center',
-                                    zIndex: 10,}}
-                            onPress={()=>{
+                            <Text style={{padding:10, fontSize:18}}>Edit</Text>
+                        </MenuOption>
+                        <MenuOption onSelect={() => {
                                 Alert.alert(
                                     'Delete',
                                     'Are sure delete phone ?',
                                     [
                                     //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-                                      {text: 'Cancel', onPress: () => {
-
-                                      }, style: 'cancel'},
+                                      {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
                                       {text: 'Delete', onPress: () => {
                                         this.setState({loading:true})
-                                        this.props.actionRemovePhoneProfile(this.props.uid, key, (result) => {
+                                        this.props.actionRemoveEmailProfile(this.props.uid, key, (result) => {
                                             console.log(result)
 
                                             this.setState({loading:false})
@@ -350,28 +439,26 @@ class EditMyProfilePage extends React.Component{
                                       }},
                                     ],
                                     { cancelable: false }
-                                  )
+                                )
                             }}>
-                            <Text style={{color:'red', fontSize:16}}>Delete</Text>
-                        </TouchableOpacity> 
-                    </View>
-                </View>
-            }
-        />)
-        })
+                            <Text style={{padding:10, fontSize:18}}>Delete</Text>
+                        </MenuOption>
+                    </MenuOptions>
+                </Menu>
+                </View>)
     }
 
-    emailsList(){
-        if(this.state.profiles.emails === undefined){
+    emailsList(emails){
+        if(emails === undefined){
             return;
         }
 
-        return Object.entries(this.state.profiles.emails).map(([key, value]) => {
+        return Object.entries(emails).map(([key, value]) => {
             return(<Cell
                     key={key}
                     cellStyle="Subtitle"
                     titleTextColor="#007AFF"
-                    hideSeparator={false} 
+                    hideSeparator={true} 
                     cellContentView={
                     <View style={{flex:1,}}>
                         <View style={{flex:1, padding:5}}>
@@ -379,103 +466,30 @@ class EditMyProfilePage extends React.Component{
                                 {value.email}
                             </Text>
                         </View>
-                        <View style={{flex:1, 
-                                    flexDirection:'row',
-                                    justifyContent:'flex-end',
-                                    padding:5}}>
-                            <TouchableOpacity 
-                                style={{justifyContent: 'center', 
-                                        alignItems: 'center',
-                                        zIndex: 10,
-                                        marginRight:10}}
-                                onPress={()=>{
-                                    // this.props.navigation.navigate("AddAnotherPhone", {title:'Edit phone', mode: 'edit', key, value, onAddAnotherPhone: this.onAddAnotherPhone})
-                                   
-                                    this.props.navigation.navigate("AddAnotherEmail", {'title':"Edit email", 'mode': 'edit', key, value, onAddAnotherEmail: this.onAddAnotherEmail}) 
-                                }}>
-                                <Text style={{color:'gray', fontSize:16}}>Edit</Text>
-                            </TouchableOpacity> 
-                            <TouchableOpacity 
-                                style={{justifyContent: 'center', 
-                                        alignItems: 'center',
-                                        zIndex: 10,}}
-                                onPress={()=>{
-                                    Alert.alert(
-                                        'Delete',
-                                        'Are sure delete phone ?',
-                                        [
-                                        //   {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-                                          {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-                                          {text: 'Delete', onPress: () => {
-                                            // let mails = this.state.profiles.mails
-
-                                            // var newMails = _.filter(mails, function(v, k) {
-                                            //     return k != key;
-                                            // });
-    
-                                            // let p = {...this.state.profiles, mails:newMails }
-                                            // // console.log(p)
-                                            // this.setState({profiles:p})
-
-                                            this.setState({loading:true})
-                                            this.props.actionRemoveEmailProfile(this.props.uid, key, (result) => {
-                                                console.log(result)
-
-                                                this.setState({loading:false})
-                                            })
-                                          }},
-                                        ],
-                                        { cancelable: false }
-                                      )
-                                }}>
-                                <Text style={{color:'red', fontSize:16}}>Delete</Text>
-                            </TouchableOpacity> 
-                        </View>
+                        {this.menuEmail(key, value)}
                     </View>
                 }
             />)
         })
     }
 
-    websitesList(){
-        // return(<View><Text>test</Text></View>)
-        if(this.state.profiles.websites === undefined){
-            return;
-        }
-
-        return Object.entries(this.state.profiles.websites).map(([key, value]) => {
-            return(<Cell
-                key={key}
-                cellStyle="Subtitle"
-                titleTextColor="#007AFF"
-                hideSeparator={false} 
-                // accessory="DisclosureIndicator"
-                cellContentView={
-                <View style={{flex:1}}>
-                    <View style={{flex:1, padding:5}}>
-                        <Text style={{fontSize: 22, color:'gray' }}>
-                            {value.url}
-                        </Text>
-                    </View>
-                    <View style={{flex:1, 
-                                flexDirection:'row',
-                                justifyContent:'flex-end',
-                                padding:5}}>
-                        <TouchableOpacity 
-                            style={{justifyContent: 'center', 
-                                    alignItems: 'center',
-                                    zIndex: 10,
-                                    marginRight:10}}
-                            onPress={()=>{
+    menuWebsite = (key, value) =>{
+        return(<View style={{flex:1,position:'absolute', right:0, top:0, marginRight:5}}>
+                    <Menu>
+                    <MenuTrigger>
+                        <MyIcon 
+                            style={{padding:5}}
+                            name={'dot-horizontal'}
+                            size={15}
+                            color={'gray'} />  
+                    </MenuTrigger>
+                    <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
+                        <MenuOption onSelect={() => {
                                 this.props.navigation.navigate("AddAnotherWebsite", {'title':"Edit website", 'mode': 'edit', key, value, onAddAnotherWebsite: this.onAddAnotherWebsite}) 
                             }}>
-                            <Text style={{color:'gray', fontSize:16}}>Edit</Text>
-                        </TouchableOpacity> 
-                        <TouchableOpacity 
-                            style={{justifyContent: 'center', 
-                                    alignItems: 'center',
-                                    zIndex: 10,}}
-                            onPress={()=>{
+                            <Text style={{padding:10, fontSize:18}}>Edit</Text>
+                        </MenuOption>
+                        <MenuOption onSelect={() => {
                                 Alert.alert(
                                     'Delete',
                                     'Are sure delete phone ?',
@@ -492,11 +506,35 @@ class EditMyProfilePage extends React.Component{
                                       }},
                                     ],
                                     { cancelable: false }
-                                  )
+                                )
                             }}>
-                            <Text style={{color:'red', fontSize:16}}>Delete</Text>
-                        </TouchableOpacity> 
+                            <Text style={{padding:10, fontSize:18}}>Delete</Text>
+                        </MenuOption>
+                    </MenuOptions>
+                </Menu>
+            </View>)
+    }
+
+    websitesList(websites){
+        if(websites === undefined){
+            return;
+        }
+
+        return Object.entries(websites).map(([key, value]) => {
+            return(<Cell
+                key={key}
+                cellStyle="Subtitle"
+                titleTextColor="#007AFF"
+                hideSeparator={true} 
+                // accessory="DisclosureIndicator"
+                cellContentView={
+                <View style={{flex:1}}>
+                    <View style={{flex:1, padding:5}}>
+                        <Text style={{fontSize: 22, color:'gray' }}>
+                            {value.url}
+                        </Text>
                     </View>
+                    {this.menuWebsite(key, value)}
                 </View>
                 }
             />)
@@ -530,8 +568,12 @@ class EditMyProfilePage extends React.Component{
                 this.setState({loading:true})
                 this.props.actionUpdatePictureProfile(this.props.uid, response.uri).then((result) => {
                     console.log(result)
-
                     this.setState({loading:false})
+                    if(!result.status){
+                        setTimeout(() => {
+                            Alert.alert('Oops!', result.message);
+                        }, 100);
+                    }
                 })
             }
         });
@@ -555,17 +597,21 @@ class EditMyProfilePage extends React.Component{
             console.log('Response = ', response);
 
             if (response.didCancel) {
-            console.log('User cancelled image picker');
+                console.log('User cancelled image picker');
             } else if (response.error) {
-            console.log('ImagePicker Error: ', response.error);
+                console.log('ImagePicker Error: ', response.error);
             } else if (response.customButton) {
-            console.log('User tapped custom button: ', response.customButton);
+                console.log('User tapped custom button: ', response.customButton);
             } else {
                 this.setState({loading:true})
                 this.props.actionUpdatePictureBGProfile(this.props.uid, response.uri).then((result) => {
                     console.log(result)
-
                     this.setState({loading:false})
+                    if(!result.status){
+                        setTimeout(() => {
+                            Alert.alert('Oops!', result.message);
+                        }, 100);
+                    }
                 })
             }
         });
@@ -614,39 +660,40 @@ class EditMyProfilePage extends React.Component{
     }
 
     onAddAnotherEmail = (result) =>{
-        console.log(result)
+        let {emails} = this.props.profile
+        console.log(result, emails)
 
-        if(Object.keys(this.state.profiles.mails).length == 0){
+        if(Object.keys(emails).length == 0){
             // กรณียังไม่เคยมี
-            let p = {...this.state.profiles, mails:{[randomKey()]:result.value} }
+            // let p = {...this.state.profiles, mails:{[randomKey()]:result.value} }
 
-            this.setState({profiles:p})
+            // this.setState({profiles:p})
         }else{
             if(result.mode == 'add'){  
-                let p = {...this.state.profiles, mails:{...this.state.profiles.mails, [randomKey()]:result.value} }
+                // let p = {...this.state.profiles, mails:{...this.state.profiles.mails, [randomKey()]:result.value} }
                 
-                // console.log(p)
-                this.setState({profiles:p})
+                // // console.log(p)
+                // this.setState({profiles:p})
             }else if(result.mode == 'edit'){
 
                 // console.log('edit')
                 // console.log(this.state.profiles.mails)
 
-                let mails = this.state.profiles.mails
+                // let mails = this.state.profiles.mails
 
-                let value = null
-                _.each(mails, function(_v, _k) { 
-                    if(_k === result.key){
-                        value = _v
-                    }
-                });
+                // let value = null
+                // _.each(mails, function(_v, _k) { 
+                //     if(_k === result.key){
+                //         value = _v
+                //     }
+                // });
 
-                if(value !== null){
-                    let p = {...this.state.profiles, mails:{...mails, [result.key]:result.value} }
-                    this.setState({profiles:p})
+                // if(value !== null){
+                //     let p = {...this.state.profiles, mails:{...mails, [result.key]:result.value} }
+                //     this.setState({profiles:p})
 
-                    console.log(p)
-                }
+                //     console.log(p)
+                // }
             }
         }
     }
@@ -691,69 +738,279 @@ class EditMyProfilePage extends React.Component{
     }
 
     handleName = (name) => {
-        let p = {...this.state.profiles, name }
-        this.setState({profiles:p})
+        // let p = {...this.state.profiles, name }
+        // this.setState({profiles:p})
     }
 
     handleStatusMessage = (message) => {
-        let p = {...this.state.profiles, status_message:message }
-        this.setState({profiles:p})
+        // let p = {...this.state.profiles, status_message:message }
+        // this.setState({profiles:p})
     }
 
     handleAddress = (address) => {
-        let p = {...this.state.profiles, address }
-        this.setState({profiles:p})
+        // let p = {...this.state.profiles, address }
+        // this.setState({profiles:p})
     }
 
-    // onRequestClose = () =>{
-    //     console.log('onRequestClose')
-    // }
-    
     render(){
-        if (Object.keys(this.state.profiles).length == 0) {
-            return(<View style={{flex:1, backgroundColor:'white'}}></View>)
+
+        let {renderContent} = this.state
+
+        if(!renderContent){
+            return(<View style={{flex:1}}></View>)
         }
 
-        // ส่วนของ my id
-        // let my_id = ''
-        // if(this.state.profiles.my_id !== undefined){
-        //     my_id = this.state.profiles.my_id
-        // }
-        let {my_ids} = this.state.profiles
-        let find_my_id = _.find(my_ids,  function(v, k) { 
-            return v.enable
-        })
+        let {name, 
+            image_url, 
+            bg_url, 
+            status_message, 
+            address,
+            gender, 
+            // my_ids,
+            birthday,
+            intereste_in,
+            // phones,
+            // websites,
+            // emails
+             } = this.state.profile 
+
+        let {phones, websites, emails} = this.state
+
+        let my_ids = this.state.myIds
+        
         let my_id = ''
-        if(find_my_id === undefined){
-            my_id = "Not set"
-        }else{
-            my_id = find_my_id.id
+        if(my_ids !== undefined){
+            let __ =_.find(my_ids,  function(v, k) { 
+                return v.enable
+            })
+
+            if(__ !== undefined){
+                my_id = __.id
+            }
         }
 
+       
         // gender
-        let gender = 'None'
-        if(this.state.profiles.gender !== undefined){
-            let value = this.state.gender.filter(item => item.id === this.state.profiles.gender)
-            if(value.length > 0){
-                gender = value[0].name
+        let cellGender =    <Cell cellStyle="RightDetail"
+                                // titleTextColor="#007AFF"
+                                hideSeparator={true} 
+                                accessory="DisclosureIndicator"
+                                title="Gender"
+                                detail={'None'}
+                                onPress={()=>{
+                                    this.openModalGender()
+                                }}/>
+
+        console.log('renderGender', gender, this.state.profile)
+        
+        if(gender !== undefined){       
+            let __ = Constant.gender.filter(function(item){
+               return item.id == gender;
+            })
+           
+            if(__.length > 0){
+                // gender = __[0].name
+                cellGender =    <Cell cellStyle="RightDetail"
+                                // titleTextColor="#007AFF"
+                                hideSeparator={true} 
+                                accessory="DisclosureIndicator"
+                                title="Gender"
+                                detail={__[0].name}
+                                onPress={()=>{
+                                    this.openModalGender()
+                                }}/>
             }
         }
 
         // intereste_in
-        let intereste_in = []
-        if(this.state.profiles.intereste_in !== undefined){
-            this.state.profiles.intereste_in.forEach(function(key, v, arr){
+        let cellInteresteIn =   <Cell
+                                    cellStyle="RightDetail"
+                                    // titleTextColor="#007AFF"
+                                    hideSeparator={true} 
+                                    accessory="DisclosureIndicator"
+                                    title="Intereste In"
+                                    detail={"None"}
+                                    onPress={()=>{
+                                        this.openModalInteresteIn()
+                                    }}
+                                />
+        if(intereste_in !== undefined){
+            let resteIn = []
+            
+            intereste_in.forEach(function(key, v, arr){
                 let f = Constant.intereste_in.find(k => k.id==key)
-                intereste_in.push(f.name)
+                resteIn.push(f.name)
             });
+
+            if(resteIn.length > 0){
+                cellInteresteIn =   <Cell cellStyle="RightDetail"
+                                        // titleTextColor="#007AFF"
+                                        hideSeparator={true} 
+                                        accessory="DisclosureIndicator"
+                                        title="Intereste In"
+                                        detail={resteIn.join(", ")}
+                                        onPress={()=>{
+                                            this.openModalInteresteIn()
+                                        }}
+                                    />
+            }
         }
 
-        let birthday = 'Not set'
-        if(this.state.profiles.birthday !== undefined){
-            birthday = this.state.profiles.birthday
+        // let birthday = 'Not set'
+        // if(this.state.profiles.birthday !== undefined){
+        //     birthday = this.state.profiles.birthday
+        // }
+        let cellBirthday = <Cell cellStyle="Subtitle"
+                                titleTextColor="#007AFF"
+                                hideSeparator={true} 
+                                accessory="DisclosureIndicator"
+                                // title="Birthday"
+                                cellContentView={
+                                    <View style={{flex:1, flexDirection:'row'}}>
+                                        <View style={{flex: 1,
+                                            justifyContent: 'center'}}>
+                                            <Text style={{fontSize: 16 }}>
+                                                Birthday
+                                            </Text>
+                                        </View>
+                                        <View style={{position:'absolute', right:0, alignSelf: 'center',}}>
+                                            <Text style={{fontSize:16, color:'gray'}}>Not set</Text>
+                                        </View>
+                                        <View style={{flex: 1, }}>
+                                                <DatePicker
+                                                    ref={(ref)=>this.datePickerRef=ref}
+                                                    style={{width: 200}}
+                                                    date={Moment(birthday).format('YYYY-MM-DD')}
+                                                    mode="date"
+                                                    placeholder="select date"
+                                                    format="YYYY-MM-DD"
+                                                    minDate="1920-01-01"
+                                                    maxDate={this.state.date}
+                                                    confirmBtnText="Confirm"
+                                                    cancelBtnText="Cancel"
+                                                    hideText={true}
+                                                    customStyles={{
+                                                    dateIcon: {
+                                                        position: 'absolute',
+                                                        width:0,
+                                                        height:0,
+                                                    },
+                                                    dateInput: {
+                                                        marginLeft: 36
+                                                    }
+                                                    // ... You can check the source to find the other keys.
+                                                    }}
+                                                    onDateChange={(date) => {
+                                                        this.props.actionBirthdayProfile(this.props.uid, Moment(date).format('MMMM DD, YYYY'), (result) => {
+                                                            console.log(result)
+                                                        })
+                                                    }}
+                                                />
+                                        </View>
+                                    </View>
+                                }
+                                onPress={()=>{
+                                    this.datePickerRef.onPressDate()
+                                }}
+                            />
+
+        if(birthday !== undefined){
+            cellBirthday = <Cell
+                                cellStyle="Subtitle"
+                                titleTextColor="#007AFF"
+                                hideSeparator={true} 
+                                accessory="DisclosureIndicator"
+                                // title="Birthday"
+                                cellContentView={
+                                    <View style={{flex:1, flexDirection:'row'}}>
+                                                <View style={{flex: 1,
+                                                    justifyContent: 'center'}}>
+                                                    <Text style={{fontSize: 16 }}>
+                                                        Birthday
+                                                    </Text>
+                                                </View>
+                                                <View style={{position:'absolute', right:0, alignSelf: 'center',}}>
+                                                    <Text style={{fontSize:16, color:'gray'}}>{birthday}</Text>
+                                                </View>
+                                                <View style={{flex: 1, }}>
+                                                        <DatePicker
+                                                            ref={(ref)=>this.datePickerRef=ref}
+                                                            style={{width: 200}}
+                                                            date={Moment(birthday).format('YYYY-MM-DD')}
+                                                            mode="date"
+                                                            placeholder="select date"
+                                                            format="YYYY-MM-DD"
+                                                            minDate="1920-01-01"
+                                                            maxDate={this.state.date}
+                                                            confirmBtnText="Confirm"
+                                                            cancelBtnText="Cancel"
+                                                            hideText={true}
+                                                            customStyles={{
+                                                            dateIcon: {
+                                                                position: 'absolute',
+                                                                width:0,
+                                                                height:0,
+                                                            },
+                                                            dateInput: {
+                                                                marginLeft: 36
+                                                            }
+                                                            // ... You can check the source to find the other keys.
+                                                            }}
+                                                            onDateChange={(date) => {
+                                                                this.props.actionBirthdayProfile(this.props.uid, Moment(date).format('MMMM DD, YYYY'), (result) => {
+                                                                    console.log(result)
+                                                                })
+                                                            }}
+                                                        />
+                                                </View>
+                                            </View>
+                        
+                                }
+                                onPress={()=>{
+                                    this.datePickerRef.onPressDate()
+                                }}
+                            />
         }
+
+        let cellAddress =   <Cell
+                                accessory="DisclosureIndicator"
+                                cellContentView={
+                                    <TextInput
+                                            style={{ fontSize: 22, flex: 1, color :"gray", marginBottom:10}}
+                                            placeholder="None"
+                                            value={'Not set'}
+                                            editable={false} 
+                                            multiline = {true}
+                                            pointerEvents="none"
+                                        />
+                                }
+                                onPress={()=>{
+                                    this.props.navigation.navigate("EditAddressPage", {'title':"Add Address", 'mode': 'add'})
+                                }}/>
+        if(address !== undefined) {
+            cellAddress =   <Cell
+                                accessory="DisclosureIndicator"
+                                cellContentView={
+                                    <TextInput
+                                        style={{ fontSize: 22, flex: 1, color :"gray", marginBottom:10}}
+                                        placeholder="None"
+                                        value={address}
+                                        editable={false} 
+                                        multiline = {true}
+                                        pointerEvents="none"
+                                    />
+                                }
+                                onPress={()=>{
+                                    this.props.navigation.navigate("EditAddressPage", {'title':"Add Address", 'mode': 'edit'})
+                                }}
+                            />
+        }
+
+        // console.log(this.props.profile)
+        // return(<View><Text>this.props.profile</Text></View>)
 
         return(
+            <MenuContext>
         <SafeAreaView style={{flex:1}}>
             <Spinner
                 visible={this.state.loading}
@@ -774,7 +1031,7 @@ class EditMyProfilePage extends React.Component{
                 <ScrollView>
                     <View
                         style={{marginLeft:10, marginRight:10, marginBottom:20, marginTop:5, flex:1}}>
-                        {this.renderGender()}
+                        {this.renderGender(gender)}
                     </View>
                 </ScrollView>
             </Modal>
@@ -791,7 +1048,7 @@ class EditMyProfilePage extends React.Component{
                 <ScrollView>
                     <View
                         style={{marginLeft:10, marginRight:10, marginBottom:20, marginTop:5, flex:1}}>
-                        {this.renderInteresteIn()}
+                        {this.renderInteresteIn(intereste_in)}
                     </View>
                 </ScrollView>
             </Modal>
@@ -806,17 +1063,10 @@ class EditMyProfilePage extends React.Component{
                     sectionPaddingBottom={0}
                     separatorInsetLeft={0}>
                     <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
-                        hideSeparator={true} 
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <Text style={{flex:1, fontSize: 16,  }}>
-                                    Profile Picture
-                                </Text>
-                            </View>
-                        }
-                    />
+                        cellStyle="Basic"
+                        title="Profile Picture"
+                        titleTextStyle={fontSize= 16}
+                        hideSeparator={false}/>
                     <Cell
                         cellStyle="Basic"
                         titleTextColor="#007AFF"
@@ -827,7 +1077,7 @@ class EditMyProfilePage extends React.Component{
                                 flexDirection:'row', 
                                 height: 150,
                                 width: 150,
-                                marginBottom:10}}>
+                                margin: 10}}>
                             <TouchableOpacity
                                 onPress={()=>{
                                     this.profilePicture()
@@ -835,7 +1085,7 @@ class EditMyProfilePage extends React.Component{
                                 <FastImage
                                     style={{width: 150, height: 150}}
                                     source={{
-                                        uri: this.state.profiles.image_url == "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.profiles.image_url,
+                                        uri: image_url,
                                         headers:{ Authorization: 'someAuthToken' },
                                         priority: FastImage.priority.normal,
                                     }}
@@ -859,17 +1109,10 @@ class EditMyProfilePage extends React.Component{
                     sectionPaddingBottom={0}
                     separatorInsetLeft={0}>
                     <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
-                        hideSeparator={true} 
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <Text style={{flex:1, fontSize: 16,  }}>
-                                Background Picture
-                                </Text>
-                            </View>
-                        }
-                    />
+                        cellStyle="Basic"
+                        title="Background Picture"
+                        titleTextStyle={fontSize= 16}
+                        hideSeparator={false}/>
                     <Cell
                         cellStyle="Basic"
                         titleTextColor="#007AFF"
@@ -879,7 +1122,7 @@ class EditMyProfilePage extends React.Component{
                                     flexDirection:'row', 
                                     height: 150,
                                     width: 150,
-                                    marginBottom:10}}>
+                                    margin: 10}}>
                             <TouchableOpacity
                                 onPress={()=>{
                                     this.backgroundPicture()
@@ -888,7 +1131,7 @@ class EditMyProfilePage extends React.Component{
                                 <FastImage
                                     style={{width: 150, height: 150}}
                                     source={{
-                                        uri: this.state.profiles.bg_url == "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.profiles.bg_url,
+                                        uri: bg_url,
                                         headers:{ Authorization: 'someAuthToken' },
                                         priority: FastImage.priority.normal,
                                     }}
@@ -914,41 +1157,26 @@ class EditMyProfilePage extends React.Component{
                     sectionPaddingBottom={0}
                     separatorInsetLeft={0}>
                     <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
-                        cellContentView={
-                        <View style={{flex:1, flexDirection:'row'}}>
-                            <Text
-                            style={{flex:1, fontSize: 18,  }}>
-                            Basic Info
-                            </Text>
-                        </View>
-                    }
-                    />
+                        cellStyle="Basic"
+                        title="Basic Info"
+                        titleTextStyle={fontSize= 18}
+                        hideSeparator={false}/>
                     <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
-                        hideSeparator={true} 
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <Text style={{flex:1, fontSize: 16,  }}>
-                                Display name
-                                </Text>
-                            </View>
-                        }
-                    />
+                        cellStyle="Basic"
+                        title="Display name"
+                        titleTextStyle={fontSize= 16}
+                        hideSeparator={true}/>
                     <Cell
                         accessory="DisclosureIndicator"
+                        hideSeparator={true}
                         cellContentView={
                             <TextInput
                                 style={{ fontSize: 22, flex: 1, color:'gray' }}
                                 placeholder="None"
-                                // value={this.state.profiles.name}
                                 ref= {(el) => { this.name = el; }}
                                 onChangeText = {this.handleName}
-                                value={this.state.profiles.name}
+                                value={name}
                                 multiline={true}
-
                                 editable={false}
                                 pointerEvents="none"
                             />
@@ -958,28 +1186,21 @@ class EditMyProfilePage extends React.Component{
                         }}
                         />
                     <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
-                        hideSeparator={true} 
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <Text style={{flex:1, fontSize: 16,  }}>
-                                Status messsage
-                                </Text>
-                            </View>
-                        }
-                    />
+                        cellStyle="Basic"
+                        title="Status messsage"
+                        titleTextStyle={fontSize= 16}
+                        hideSeparator={true}/>
                     <Cell
                         accessory="DisclosureIndicator"
+                        hideSeparator={true}
                         cellContentView={
                             <TextInput
                                 style={{ fontSize: 22, flex: 1, marginBottom:10, color:'gray'}}
                                 placeholder="Not set"
-                                // value={this.state.profiles.status_message}
                                 multiline={true}
                                 ref= {(el) => { this.message = el; }}
                                 onChangeText = {this.handleStatusMessage}
-                                value={this.state.profiles.status_message}
+                                value={status_message}
 
                                 editable={false}
                                 pointerEvents="none"
@@ -989,19 +1210,13 @@ class EditMyProfilePage extends React.Component{
                             this.props.navigation.navigate("EditStatusMessagePage")
                         }}/>
                     <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
-                        
-                        hideSeparator={true} 
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <Text style={{flex:1, fontSize: 16,  }}>
-                                My ID
-                                </Text>
-                            </View>
-                        }/>
+                        cellStyle="Basic"
+                        title="My ID"
+                        titleTextStyle={fontSize= 16}
+                        hideSeparator={true}/>
                     <Cell
                         accessory="DisclosureIndicator"
+                        hideSeparator={true}
                         cellContentView={
                             <TextInput
                                 style={{ fontSize: 22, flex: 1, color : "gray"}}
@@ -1013,307 +1228,107 @@ class EditMyProfilePage extends React.Component{
                         }
                         onPress={()=>{
                             this.props.navigation.navigate("EditMyIDPage")
-                        }}
-                        />
-                    <Cell
-                        cellStyle="RightDetail"
-                        // titleTextColor="#007AFF"
-                        hideSeparator={true} 
-                        accessory="DisclosureIndicator"
-                        title="Gender"
-                        detail={gender}
-                        onPress={()=>{
-                            this.openModalGender()
-                        }}
-                    />
-                    <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
-                        hideSeparator={true} 
-                        accessory="DisclosureIndicator"
-                        // title="Birthday"
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <View style={{flex: 1,
-                                    justifyContent: 'center'}}>
-                                    <Text style={{fontSize: 16 }}>
-                                        Birthday
-                                    </Text>
-                                </View>
-                                <View style={{position:'absolute', right:0, alignSelf: 'center',}}>
-                                    <Text style={{fontSize:16, color:'gray'}}>{birthday}</Text>
-                                </View>
+                        }}/>
 
-                                {/* Moment(new Date(birthday)).format('MMMM DD, YYYY') */}
-                                <View style={{flex: 1, }}>
-                                    {/* <DatePicker
-                                        ref={(ref)=>this.datePickerRef=ref}
-                                        style={{width: 200, color:'gray' }}
-                                        date={birthday}
-                                        mode="date"
-                                        // placeholder="placeholder"
-                                        format="MMMM DD, YYYY"
-                                        minDate="1920-01-01"
-                                        maxDate={this.state.date}
-                                        confirmBtnText="Confirm"
-                                        cancelBtnText="Cancel"
-                                        // customArrowIcon={null} 
-
-                                        hideText={true}
-                                        // iconSource={require('../../Images/google_calendar.png')}
-                                        customStyles={{
-                                            dateIcon: {
-                                                width:0,
-                                                height:0,
-                                                position:'absolute'
-                                            },
-                                            dateText: {
-                                                fontSize:16
-                                            }
-                                            // ... You can check the source to find the other keys.
-                                        }}
-                                        onDateChange={(date) => {
-                                            // this.setState({date: date})
-                                            this.props.actionBirthdayProfile(this.props.uid, date, (result) => {
-                                                console.log(result)
-                    
-                                                // this.setState({loading:false})
-                                            })
-                                        }}
-                                        />  */}
-
-
-                                        <DatePicker
-                                            ref={(ref)=>this.datePickerRef=ref}
-                                            style={{width: 200}}
-                                            date={Moment(birthday).format('YYYY-MM-DD')}
-                                            mode="date"
-                                            placeholder="select date"
-                                            format="YYYY-MM-DD"
-                                            minDate="1920-01-01"
-                                            maxDate={this.state.date}
-                                            confirmBtnText="Confirm"
-                                            cancelBtnText="Cancel"
-                                            hideText={true}
-                                            customStyles={{
-                                            dateIcon: {
-                                                position: 'absolute',
-                                                width:0,
-                                                height:0,
-                                            },
-                                            dateInput: {
-                                                marginLeft: 36
-                                            }
-                                            // ... You can check the source to find the other keys.
-                                            }}
-                                            onDateChange={(date) => {
-                                                // this.setState({date: date})
-
-                                                // console.log(Moment(date).format('MMMM DD, YYYY'))
-                                                // format="MMMM DD, YYYY"
-                                                this.props.actionBirthdayProfile(this.props.uid, Moment(date).format('MMMM DD, YYYY'), (result) => {
-                                                    console.log(result)
-                                                    // this.setState({loading:false})
-                                                })
-                                            }}
-                                        />
-                                </View>
-                            </View>
-                        }
-                        onPress={()=>{
-                            this.datePickerRef.onPressDate()
-                        }}
-                    />
-
-                    <Cell
-                        cellStyle="RightDetail"
-                        // titleTextColor="#007AFF"
-                        hideSeparator={true} 
-                        accessory="DisclosureIndicator"
-                        title="Intereste In"
-                        detail={intereste_in.length == 0 ? "None": intereste_in.join(", ")}
-                        onPress={()=>{
-                            this.openModalInteresteIn()
-                        }}
-                    />
+                    {cellGender}
+                    {cellBirthday}
+                    {cellInteresteIn}
                 </Section>
-            
-            
                 <Section
                     sectionPaddingTop={5}
                     sectionPaddingBottom={0}
                     separatorInsetLeft={0}>
                     <Cell
                         cellStyle="Basic"
-                        // title="MY INFO"
-                        contentContainerStyle={{ }} 
+                        title="Contact Info"
+                        titleTextStyle={{ fontSize: 18}} 
                         hideSeparator={false}
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <Text
-                                // allowFontScaling
-                                // numberOfLines={1}
-                                style={{flex:1, fontSize: 18,  }}>
-                                Contact Info
-                                </Text>
-                            </View>
-                        }
                     />
                     <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
+                        cellStyle="Basic"
+                        title="Mobile phones"
+                        titleTextStyle={{ fontSize: 16}} 
                         hideSeparator={true} 
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <Text style={{flex:1, fontSize: 16,  }}>
-                                Mobile phones
-                                </Text>
-                            </View>
-                        }
                     />
-                    {this.phonesList()}
+                    {this.phonesList(phones)}
                     <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
+                        cellStyle="Basic"
+                        title="Add another phone"
+                        titleTextStyle={{ fontSize: 16}} 
                         hideSeparator={true} 
                         accessory="DisclosureIndicator"
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <Text style={{flex:1, fontSize: 16,  }}>
-                                Add another phone
-                                </Text>
-                            </View>
-                        }
                         onPress={()=>{
                             this.props.navigation.navigate("AddAnotherPhone", {'title':"Add phone", 'mode': 'add', onAddAnotherPhone: this.onAddAnotherPhone})
                         }}
                     />
-                </Section>
-
-                <Section
-                    sectionPaddingTop={5}
-                    sectionPaddingBottom={0}
-                    separatorInsetLeft={0}>
                     <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
-                        hideSeparator={true} 
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <Text style={{flex:1, fontSize: 16,  }}>
-                                Address
-                                </Text>
-                            </View>
-                        }
+                        cellStyle="Basic"
+                        title="Address"
+                        titleTextStyle={{ fontSize: 16}} 
+                        hideSeparator={true}/>
+                    {cellAddress}
+                    <Cell
+                        cellStyle="Basic"
+                        title="Website"
+                        titleTextStyle={fontSize= 16}
+                        hideSeparator={true}
                     />
+                    {this.websitesList(websites)}
                     <Cell
-                        accessory="DisclosureIndicator"
-                        cellContentView={
-                            <TextInput
-                                style={{ fontSize: 22, flex: 1, color :"gray", marginBottom:10}}
-                                placeholder="None"
-                                value={this.state.profiles.address}
-                                editable={false} 
-                                multiline = {true}
-                                pointerEvents="none"
-                            />
-                        }
-                        onPress={()=>{
-                            // EditAddressPage
-                            this.props.navigation.navigate("EditAddressPage", {'title':"Add Address", 'mode': 'add'})
-                        }}
-                    />
-                </Section>
-
-                <Section
-                    sectionPaddingTop={5}
-                    sectionPaddingBottom={0}
-                    separatorInsetLeft={0}>
-                    <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
-                        hideSeparator={true} 
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <Text style={{flex:1, fontSize: 16,  }}>
-                                Website
-                                </Text>
-                            </View>
-                        }
-                    />
-                    {this.websitesList()}
-                    <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
+                        cellStyle="Basic"
+                        title="Add another website"
+                        titleTextStyle={fontSize= 16}
                         hideSeparator={true} 
                         accessory="DisclosureIndicator"
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <Text style={{flex:1, fontSize: 16,  }}>
-                                Add another website
-                                </Text>
-                            </View>
-                        }
                         onPress={()=>{
                             this.props.navigation.navigate("AddAnotherWebsite", {'title':"Add website", 'mode': 'add', onAddAnotherWebsite: this.onAddAnotherWebsite})
-                        }}
-                    />
-                </Section>
+                        }}/>
 
-                <Section
-                    sectionPaddingTop={5}
-                    sectionPaddingBottom={0}
-                    separatorInsetLeft={0}>
                     <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
-                        hideSeparator={true} 
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <Text style={{flex:1, fontSize: 16,  }}>
-                                Email
-                                </Text>
-                            </View>
-                        }
-                    />
-                    {this.emailsList()}
+                        cellStyle="Basic"
+                        title="Email"
+                        titleTextStyle={fontSize= 16}
+                        hideSeparator={true} />
+                    {this.emailsList(emails)}
                     <Cell
-                        cellStyle="Subtitle"
-                        titleTextColor="#007AFF"
+                        cellStyle="Basic"
+                        title="Add another email"
                         hideSeparator={true} 
+                        titleTextStyle={fontSize= 16}
                         accessory="DisclosureIndicator"
-                        cellContentView={
-                            <View style={{flex:1, flexDirection:'row'}}>
-                                <Text style={{flex:1, fontSize: 16,  }}>
-                                Add another email
-                                </Text>
-                            </View>
-                        }
-                        onPress={()=>{
-                            // this.props.navigation.navigate("AddAnotherEmail")   
+                        onPress={()=>{  
                             this.props.navigation.navigate("AddAnotherEmail", {'title':"Add email", 'mode': 'add', onAddAnotherEmail: this.onAddAnotherEmail}) 
                         }}
                     />
                 </Section>
-           
             </TableView>
           </View>
           </KeyboardAwareScrollView>
         </SafeAreaView>
+        </MenuContext>
         )
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     // console.log(state)
     if(!state._persist.rehydrated){
       return {}
     }
+
+    if(!state.auth.isLogin){
+        return;
+    }
   
     return{
-        uid:getUid(state),
-        auth:state.auth,
-        profiles:state.auth.users.profiles
+        uid: makeUidState(state, ownProps),
+        profile: makeProfileState(state, ownProps),
+        myIds: makeMyIdsState(state, ownProps),
+
+        // myIds: makeMyIdsState(state, ownProps),
+        phones: makePhonesState(state, ownProps),
+        websites: makeWebsitesState(state, ownProps),
+        emails: makeEmailsState(state, ownProps),
     }
 }
 

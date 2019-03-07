@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import Spinner from 'react-native-loading-spinner-overlay';
 
 import * as actions from '../../Actions'
-import {getUid} from '../../Utils/Helpers'
+import {makeUidState, makeProfileState} from '../../Reselect'
 
 class EditStatusMessagePage extends React.Component{
 
@@ -52,7 +52,7 @@ class EditStatusMessagePage extends React.Component{
     componentDidMount() {
         this.props.navigation.setParams({handleSave: this.handleSave })
 
-        this.setState({text:this.props.profiles.status_message})
+        this.setState({text:this.props.profile.status_message})
     }
 
     handleSave = () => {
@@ -98,29 +98,14 @@ class EditStatusMessagePage extends React.Component{
                             multiline = {true}
                             placeholder= {this.state.text}
                         />
-
-                        {/* <TextInput
-                            style={{fontSize: 22, 
-                                    padding:10, 
-                                    borderColor:'gray', 
-                                    borderWidth:.5,
-                                    minHeight:150,
-                                    textAlignVertical: 'top'}}
-                            onChangeText={(text) => this.setState({text})}
-                            value={this.state.text}
-                            clearButtonMode='while-editing'
-                            maxLength={500}
-                            multiline = {true}
-                            placeholder= {this.state.text}
-                        /> */}
                     </View>
                 </View>)
     }
 }
 
 
-const mapStateToProps = (state) => {
-  console.log(state)
+const mapStateToProps = (state, ownProps) => {
+//   console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
   //_persist.rehydrated parameter is initially set to false
@@ -129,8 +114,11 @@ const mapStateToProps = (state) => {
   }
 
   return{
-    uid:getUid(state),
-    profiles:state.auth.users.profiles
+    // uid:getUid(state),
+    // profiles:state.auth.users.profiles
+
+    uid: makeUidState(state, ownProps),
+    profile: makeProfileState(state, ownProps),
   }
 }
 

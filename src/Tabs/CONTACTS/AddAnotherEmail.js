@@ -1,13 +1,13 @@
 import React from 'react'
-
 import {View, 
         Text, 
         TouchableOpacity,
         TextInput} from 'react-native';
 import { connect } from 'react-redux';
-
+import Spinner from 'react-native-loading-spinner-overlay';
 import * as actions from '../../Actions'
 import {getUid, validateEmail} from '../../Utils/Helpers'
+import {makeUidState} from '../../Reselect'
 
 class AddAnotherEmail extends React.Component{
     static navigationOptions = ({ navigation }) => ({
@@ -115,6 +115,12 @@ class AddAnotherEmail extends React.Component{
 
     render(){
         return( <View style={{flex:1}}>
+                    <Spinner
+                        visible={this.state.loading}
+                        textContent={'Wait...'}
+                        textStyle={{color: '#FFF'}}
+                        overlayColor={'rgba(0,0,0,0.5)'}
+                    />
                     <View style={{margin:20}}>
                         <TextInput
                             style={{ fontSize: 22, padding:10, borderColor:'gray', borderWidth:.5}}
@@ -138,10 +144,19 @@ class AddAnotherEmail extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     // console.log(state)
+    if(!state._persist.rehydrated){
+        return {}
+    }
+
+    if(!state.auth.isLogin){
+        return;
+    }
+
     return({
-        uid:getUid(state)
+        // uid:getUid(state)
+        uid: makeUidState(state, ownProps),
     })
 }
   

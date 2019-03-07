@@ -11,6 +11,7 @@ import firebase from 'react-native-firebase';
 
 import * as actions from '../Actions';
 import {makeUidState, 
+        makeProfileState,
         makePhonesState, 
         makeWebsitesState,
         makeEmailsState,
@@ -31,7 +32,7 @@ class AuthLoadingScreen extends React.Component {
     }
 
     componentDidMount() {
-        console.log('AuthLoadingScreen', this.props.is_login)
+        // console.log('AuthLoadingScreen', this.props.is_login)
         this._bootstrapAsync();
 
         // this._testCrashlytics();
@@ -58,7 +59,6 @@ class AuthLoadingScreen extends React.Component {
         });
     }
 
-
     requestPermission() {
         firebase.messaging().requestPermission().then(() => {
             // User has authorised  
@@ -83,14 +83,6 @@ class AuthLoadingScreen extends React.Component {
         // console.log(fcmToken)
     }
 
-
-    // ry {
-//     await firebase.messaging().requestPermission();
-//     // User has authorised
-// } catch (error) {
-//     // User has rejected permissions
-// }
-
     _testCrashlytics = () =>{
         firebase.crashlytics().log('TEST CRASH LOG');
         firebase.crashlytics().crash();
@@ -103,6 +95,7 @@ class AuthLoadingScreen extends React.Component {
             this.props.navigation.navigate('Auth');
         }else{
             let {uid, 
+                profiles,
                 phones,
                 friends, 
                 websites,
@@ -113,6 +106,7 @@ class AuthLoadingScreen extends React.Component {
                 groups,
                 friend_profiles} = this.props
 
+            this.props.trackProfiles(uid, profiles)
             this.props.trackProfilesPhones(uid, phones)
             this.props.trackProfileWebsites(uid, websites)
             this.props.trackProfileEmails(uid, emails)
@@ -163,6 +157,7 @@ const mapStateToProps = (state, ownProps) => {
         return {
             is_login:true,
             uid: makeUidState(state, ownProps),
+            profiles: makeProfileState(state, ownProps),
             phones: makePhonesState(state, ownProps),
             websites: makeWebsitesState(state, ownProps),
             emails:makeEmailsState(state, ownProps),
