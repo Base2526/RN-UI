@@ -58,6 +58,10 @@ import {USER_LOGIN_SUCCESS,
         REMOVED_MY_APPLICATION,
         UPDATE_STATUS_MY_APPLICATION,
         ADD_APPLICATION_CATEGORY,
+
+        ADDED_MY_APPLICATIONS_POSTS,
+        ADDED_MY_APPLICATIONS_POSTS_IMAGES,
+
         UPDATE_PICTURE_PROFILE,
         UPDATE_PICTURE_BG_PROFILE,
         EDIT_DISPLAY_NAME_PROFILE,
@@ -103,10 +107,13 @@ import {USER_LOGIN_SUCCESS,
         REMOVE_MY_ID_PROFILE,
         FRIEND_FAVORITE,
     
+
+        ADDED_FEELINGS_AND_PRIVACY,
     
         ADDED_PRESENCE,
         CHANGED_PRESENCE,
-        REMOVED_PRESENCE} from './types'
+        REMOVED_PRESENCE,
+        } from './types'
 
 import {randomKey} from '../Utils/Helpers'
 import Constant from '../Utils/Constant'
@@ -117,6 +124,7 @@ import {login,
         create_group,
         create_class,
         application_category,
+        get_post_feelings_and_privacy,
         create_my_application,
         update_picture_profile,
         update_picture_bg_profile,
@@ -124,12 +132,25 @@ import {login,
         update_class_picture_profile,
         check_my_id,
         scan_qrcode,
-        friend_profile_99} from '../Utils/Services'
+        friend_profile_99,
+        add_new_post} from '../Utils/Services'
 
 export const actionApplicationCategory = () =>dispatch =>{
     return application_category().then(data=>{
         if(data.result){
             dispatch({ type: ADD_APPLICATION_CATEGORY, data_category: data.data});
+            return {'status':true, 'data': data.data}
+        }
+
+        return {'status':false}
+    })
+}
+
+export const actionGetPostFeelingsAndPrivacy = () =>dispatch =>{
+    return get_post_feelings_and_privacy().then(data=>{
+        console.log(data)
+        if(data.result){
+            dispatch({ type: ADDED_FEELINGS_AND_PRIVACY, post_feelings: data.data.post_feelings, post_privacys: data.data.post_privacys});
             return {'status':true, 'data': data.data}
         }
 
@@ -758,7 +779,6 @@ export const actionDeleteClassMember = (uid, class_id, member_key, callback) => 
 }
 
 export const actionUpdateClassPictureProfile = (uid, class_id, image_uri) => dispatch =>{
-
     return update_class_picture_profile(uid, class_id, image_uri).then(data => {
         console.log(data)
         if((data instanceof Array)){
@@ -770,6 +790,35 @@ export const actionUpdateClassPictureProfile = (uid, class_id, image_uri) => dis
                 // dispatch({ type: UPDATE_GROUP_PICTURE_PROFILE, group_id, image_url:data.image_url});
                 
                 dispatch({ type: UPDATE_CLASS_PICTURE_PROFILE, class_id, image_url:data.image_url});
+                return {'status':true, data}
+            }
+        }
+    })
+}
+
+// export const add_new_post = (uid, app_id, feelings, privacy, images, text) 
+export const actionAddNewPost = (uid, app_id, feelings, privacy, images, text, location) => dispatch =>{
+    return add_new_post(uid, app_id, feelings, privacy, images, text, location).then(data => {
+        console.log(data)
+        if((data instanceof Array)){
+            return {'status':false, 'message': data}
+        }else{
+            if(!data.result){
+                return {'status':false, 'message': data}
+            }else{
+                // dispatch({ type: UPDATE_GROUP_PICTURE_PROFILE, group_id, image_url:data.image_url});
+                
+                // dispatch({ type: UPDATE_CLASS_PICTURE_PROFILE, class_id, image_url:data.image_url});
+                
+                /* 
+                        ADDED_MY_APPLICATIONS_POSTS,
+        ADDED_MY_APPLICATIONS_POSTS_IMAGES,
+                */
+
+                dispatch({type:ADDED_MY_APPLICATIONS_POSTS, app_id:data.app_id, post_id:data.post_id, my_applications_posts_data:data.my_applications_posts_data})
+
+                dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:data.post_id, my_applications_posts_images_data:data.my_applications_posts_images_data})
+                
                 return {'status':true, data}
             }
         }

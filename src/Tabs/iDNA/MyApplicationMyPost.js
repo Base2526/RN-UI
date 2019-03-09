@@ -15,8 +15,13 @@ import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Modalbox from 'react-native-modalbox';
+import Spinner from 'react-native-loading-spinner-overlay';
+
+var _ = require('lodash');
 
 import * as actions from '../../Actions'
+import {makeUidState, 
+        makeMyAppicationsState,} from '../../Reselect'
 
 
 const images = [{
@@ -55,7 +60,7 @@ class MyApplicationMyPost extends Component {
                     const { params = {} } = navigation.state
                     params.handleAddpost()
                 }}>
-                <Text style={{fontSize:18, fontWeight:'600', color:'white'}}>Add post</Text>
+                <Text style={{fontSize:18, fontWeight:'600', color:'white'}}>Add new post</Text>
             </TouchableOpacity>
           ),
     })
@@ -64,26 +69,30 @@ class MyApplicationMyPost extends Component {
         super(props);
     
         this.state = {
-          renderContent: false,
-          loading: false,
-          data: [],
-          page: 1,
-          seed: 1,
-          error: null,
-          refreshing: false,
-          category_select: null,
+            renderContent: false,
+            loading: false,
+            data: [],
+            page: 1,
+            seed: 1,
+            error: null,
+            refreshing: false,
+            category_select: null,
 
-          modalVisible: false,
+            modalVisible: false,
             index: 0,
             modalAction:false,
             sliderValue: 0.3,
+
+
+            my_app_id:0,
+            posts:[]
         };
     }
 
     componentDidMount() {
         this.props.navigation.setParams({ handleAddpost: this.handleAddpost })
 
-        setTimeout(() => {this.setState({renderContent: true})}, 0);
+        // setTimeout(() => {this.setState({renderContent: true})}, 0);
 
         this.setState({
             data: [],
@@ -92,41 +101,43 @@ class MyApplicationMyPost extends Component {
             refreshing: false
         });
 
-      // category_select
-      const { navigation } = this.props;
-      const category_select = navigation.getParam('category_select', null);
+        const { navigation } = this.props;
+        const my_app_id = navigation.getParam('my_app_id', null);
       
-      // กรณีสร้าง application ใหม่
-      let {application_category} = this.props.auth
-      if(application_category != null){
+        this.setState({my_app_id}, ()=>{
+            this.loadData(this.props)
+        })
+    }
 
-        let newData = []
-        Object.entries(application_category).forEach(([key, value]) => {
-          newData.push(value)
-        })
+    componentWillReceiveProps(nextProps) {
+        this.loadData(nextProps)
+    }
 
-        this.setState({
-          data: newData,
-          category_select
-        })
-      }else{
-        this.props.actionApplicationCategory().then((result) => {
-  
-          let newData = []
-          Object.entries(result.data).forEach(([key, value]) => {
-            newData.push(value)
-          })
-  
-          this.setState({
-            data: newData,
-            category_select
-          })
-        })
-      }
+    loadData(props){
+        let {my_app_id} = this.state
+
+        let my_app  = _.find(props.my_applications, (v, k)=>{
+                        return k == my_app_id
+                      })
+
+        console.log('my_app', my_app)
+
+        if(!my_app){
+            this.props.navigation.goBack(null)
+        }
+        let {posts} = my_app
+
+        let arrayPost = _.map(posts, (v, k)=>{
+                            return v
+                        })
+
+        // console.log('my_app', my_app, posts, arrayPost)
+
+        this.setState({posts:arrayPost, renderContent: true})
     }
 
     handleAddpost = () =>{
-        this.props.navigation.navigate("MyApplicationAddPost")
+        this.props.navigation.navigate("MyApplicationAddPost", {'app_id': this.state.my_app_id})
     }
 
     renderSeparator = () => {
@@ -157,7 +168,7 @@ class MyApplicationMyPost extends Component {
     };
 
     renderItem = ({ item, index }) => {
-        return( <View style={{flex:1, padding:10, backgroundColor:'white'}}>
+        return( <View style={{flex:1, padding:10, backgroundColor:'white'}} key={index}>
         <View style={{flexDirection:'row', paddingBottom:5}}>
             <TouchableOpacity
                 style={{width:40, height:40, borderRadius:20}}
@@ -291,142 +302,162 @@ Credit: Yeshwanth's Kitchen (bit.ly/2R9Mw3Y)</Text>
         </View>)
     }
     
-  render() {
-    let {data} = this.state;
-    return (
-      <View style={{flex:1, backgroundColor: 'white'}}>
-        <FlatList
-          data={data}
-          renderItem={this.renderItem}
-          keyExtractor={item => item.name}
-          ItemSeparatorComponent={this.renderSeparator}
-          ListFooterComponent={this.renderFooter}
-          onEndReachedThreshold={50}
-          extraData={this.state}
-        />
+    render() {
+        let {renderContent, posts} = this.state
 
-        <Modal visible={this.state.modalVisible} transparent={true}>
-                <ImageViewer 
-                    imageUrls={images}
-                    enableSwipeDown={true}
-                    enablePreload={true}
-                    // onClose={this.closeViewer.bind(this)}
-                    index={0}
-        
-                    onClick={(e, currentShowIndex)=>{
-                        console.log(e)
-                        console.log(currentShowIndex)
-                        // alert(currentShowIndex)
-
-                    }}
-                    onSwipeDown={() => {
-                        // console.log('onSwipeDown');
-                        this.setState({ modalVisible: false })
-                    }}
-                    renderHeader={(currentIndex)=>
-                        {
-                        return(<View style={{padding: 30, position:'absolute', top:0, right:0, zIndex: 50}}>
-                                    <TouchableOpacity
-                                        onPress={()=>this.setState({ modalVisible: false })} >
-                                        <Icon 
-                                            
-                                            name="times" 
-                                            color='white' 
-                                            size={30} />
-                                    </TouchableOpacity>
-                                </View>)
-                        }
-                    }
-                    renderFooter={(currentIndex)=>
-                        {
-                        return(
-                                <View style={{paddingBottom:30}}>
-                                    <View>
-                                        <Text style={{color:'white', fontSize:16}}>No mixing bowl necessary. Just a jar, a spoon, and a can-do attitude.
-
-Make Tastemade UK's Nutella Cookies 👉 https://bit.ly/2DPZWiS</Text>
-                                    </View>
-                                    <View >
-                                   
-                                    <View style={{flex:1, flexDirection:'row', justifyContent:'center'}}>
-                                        <View style={{padding:5}}>
-                                            <TouchableOpacity
-                                                style={{width:25, height:25}}
-                                                onPress={()=> {
-                                                    alert('Like')
-                                                }}>
-                                                <Icon name="thumbs-up" size={25} color='white' />
-                                            </TouchableOpacity>
-                                        </View>
-                                        <View style={{padding:5}}>
-                                            <TouchableOpacity
-                                                style={{width:25, height:25}}
-                                                onPress={()=>{
-                                                    alert('Comment')
-                                                }}>
-                                                <Icon name="comment" size={25} color='white' />
-                                            </TouchableOpacity>
-                                        </View>
-                                        <View style={{padding:5}}>
-                                            <TouchableOpacity
-                                                style={{width:25, height:25}}
-                                                onPress={()=>{
-                                                    alert('Share')
-                                                }}>
-                                                <Icon name="share" size={25} color='white' />
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                </View>
-                                </View>
-                                )
-                                
-                        }
-                    }
-                />
-            </Modal>
-
-            <SafeAreaView style={{flex:1}}>
-            <Modalbox style={{height:240, bottom:0, backgroundColor:'rgba(52,52,52,alpha)'}} position={"bottom"} ref={"modalBox"} coverScreen={true} onLayout={(event) => {
-                var {x, y, width, height} = event.nativeEvent.layout;
-                console.log("------> Modalbox")
-            }}>
-                {/* <View style={{alignItems:'center', height: 10}}>
-                    <Image
-                        style={{width: 150, borderRadius:5, backgroundColor:'white'}}
-                        source={{uri: 'https://facebook.github.io/react-native/docs/assets/favicon.png'}}
+        if(!renderContent){
+            return( <View style={{flex:1}}>
+                     <Spinner
+                        visible={true}
+                        textContent={'Wait...'}
+                        textStyle={{color: '#FFF'}}
+                        overlayColor={'rgba(0,0,0,0.5)'}
                         />
-                </View> */}
-                <View style={{height:60, backgroundColor:'white', justifyContent:'center'}}>
-                    <TouchableOpacity
-                        style={{padding:5}}>
-                        <Text style={{color: "black", fontSize: 22}}>test 1</Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={{height:60, backgroundColor:'white', justifyContent:'center'}}>
-                    <TouchableOpacity
-                        style={{padding:5}}>
-                        <Text style={{color: "black", fontSize: 22}}>test 2</Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={{height:60, backgroundColor:'white', justifyContent:'center'}}>
-                    <TouchableOpacity>
-                        <Text style={{color: "black", fontSize: 22}}>test 3</Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={{height:60, backgroundColor:'white', justifyContent:'center'}}>
-                    <TouchableOpacity>
-                        <Text style={{color: "black", fontSize: 22}}>test 4</Text>
-                    </TouchableOpacity>
-                </View>
-            </Modalbox>
-            </SafeAreaView>
-      </View>
-    );
-  }
+                    </View>)
+        }
+
+        if(posts.length == 0){
+            return( <View style={{flex:1}}>
+                        <Text>Empty post</Text>
+                    </View>)
+        }
+
+        return (<View style={{flex:1, backgroundColor: 'white'}}>
+                    <Spinner
+                        visible={this.state.loading}
+                        textContent={'Wait...'}
+                        textStyle={{color: '#FFF'}}
+                        overlayColor={'rgba(0,0,0,0.5)'}/>
+                        <FlatList
+                            data={posts}
+                            renderItem={this.renderItem}
+                            // keyExtractor={item => item.name}
+                            keyExtractor = { (item, index) => index.toString() } 
+                            ItemSeparatorComponent={this.renderSeparator}
+                            ListFooterComponent={this.renderFooter}
+                            onEndReachedThreshold={50}
+                            extraData={this.state}/>
+                        <Modal visible={this.state.modalVisible} transparent={true}>
+                                <ImageViewer 
+                                    imageUrls={images}
+                                    enableSwipeDown={true}
+                                    enablePreload={true}
+                                    // onClose={this.closeViewer.bind(this)}
+                                    index={0}
+                        
+                                    onClick={(e, currentShowIndex)=>{
+                                        console.log(e)
+                                        console.log(currentShowIndex)
+                                        // alert(currentShowIndex)
+
+                                    }}
+                                    onSwipeDown={() => {
+                                        // console.log('onSwipeDown');
+                                        this.setState({ modalVisible: false })
+                                    }}
+                                    renderHeader={(currentIndex)=>
+                                        {
+                                        return(<View style={{padding: 30, position:'absolute', top:0, right:0, zIndex: 50}}>
+                                                    <TouchableOpacity
+                                                        onPress={()=>this.setState({ modalVisible: false })} >
+                                                        <Icon 
+                                                            
+                                                            name="times" 
+                                                            color='white' 
+                                                            size={30} />
+                                                    </TouchableOpacity>
+                                                </View>)
+                                        }
+                                    }
+                                    renderFooter={(currentIndex)=>
+                                        {
+                                        return(
+                                                <View style={{paddingBottom:30}}>
+                                                    <View>
+                                                        <Text style={{color:'white', fontSize:16}}>No mixing bowl necessary. Just a jar, a spoon, and a can-do attitude.
+
+                Make Tastemade UK's Nutella Cookies 👉 https://bit.ly/2DPZWiS</Text>
+                                                    </View>
+                                                    <View >
+                                                
+                                                    <View style={{flex:1, flexDirection:'row', justifyContent:'center'}}>
+                                                        <View style={{padding:5}}>
+                                                            <TouchableOpacity
+                                                                style={{width:25, height:25}}
+                                                                onPress={()=> {
+                                                                    alert('Like')
+                                                                }}>
+                                                                <Icon name="thumbs-up" size={25} color='white' />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        <View style={{padding:5}}>
+                                                            <TouchableOpacity
+                                                                style={{width:25, height:25}}
+                                                                onPress={()=>{
+                                                                    alert('Comment')
+                                                                }}>
+                                                                <Icon name="comment" size={25} color='white' />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        <View style={{padding:5}}>
+                                                            <TouchableOpacity
+                                                                style={{width:25, height:25}}
+                                                                onPress={()=>{
+                                                                    alert('Share')
+                                                                }}>
+                                                                <Icon name="share" size={25} color='white' />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                    </View>
+                                                </View>
+                                                </View>
+                                                )
+                                                
+                                        }
+                                    }
+                                />
+                            </Modal>
+                            <SafeAreaView style={{flex:1}}>
+                            <Modalbox style={{height:240, bottom:0, backgroundColor:'rgba(52,52,52,alpha)'}} position={"bottom"} ref={"modalBox"} coverScreen={true} onLayout={(event) => {
+                                var {x, y, width, height} = event.nativeEvent.layout;
+                                console.log("------> Modalbox")
+                            }}>
+                                {/* <View style={{alignItems:'center', height: 10}}>
+                                    <Image
+                                        style={{width: 150, borderRadius:5, backgroundColor:'white'}}
+                                        source={{uri: 'https://facebook.github.io/react-native/docs/assets/favicon.png'}}
+                                        />
+                                </View> */}
+                                <View style={{height:60, backgroundColor:'white', justifyContent:'center'}}>
+                                    <TouchableOpacity
+                                        style={{padding:5}}>
+                                        <Text style={{color: "black", fontSize: 22}}>test 1</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{height:60, backgroundColor:'white', justifyContent:'center'}}>
+                                    <TouchableOpacity
+                                        style={{padding:5}}>
+                                        <Text style={{color: "black", fontSize: 22}}>test 2</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{height:60, backgroundColor:'white', justifyContent:'center'}}>
+                                    <TouchableOpacity>
+                                        <Text style={{color: "black", fontSize: 22}}>test 3</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{height:60, backgroundColor:'white', justifyContent:'center'}}>
+                                    <TouchableOpacity>
+                                        <Text style={{color: "black", fontSize: 22}}>test 4</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </Modalbox>
+                            </SafeAreaView>
+                    
+                </View>);
+    }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
@@ -437,7 +468,10 @@ const mapStateToProps = (state) => {
 
   return{
     // uid:getUid(state),
-    auth:state.auth
+    auth:state.auth,
+
+    uid:makeUidState(state, ownProps),
+    my_applications:makeMyAppicationsState(state, ownProps),
   }
 }
 

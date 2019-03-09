@@ -327,6 +327,26 @@ export const application_category = () =>{
         });
 }
 
+export const get_post_feelings_and_privacy = () =>{
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({
+            // 'uid': '1',
+        }),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.GET_POST_FEELINGS_AND_PRIVACY, data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            // console.log(responseJson)
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+            return error
+        });
+}
+
 export const update_picture_profile  = (uid, image_uri) =>{
     var data = new FormData();
     data.append('idna', {
@@ -466,6 +486,39 @@ export const update_class_picture_profile = (uid, class_id, image_uri) =>{
     data.append("class_id", class_id)
 
     return fetch(Constant.UPDATE_CLASS_PICTURE_PROFILE, {
+        headers: Constant.FETCH_HEADERS,
+        method: 'POST',
+        body: data
+    }).then((response) => {
+        return response.json()
+    }).then((responseJson) => {
+        return responseJson;
+    }).catch((error) => {
+        return {'status': false, 'message': error}
+    })
+}
+
+export const add_new_post = (uid, app_id, feelings, privacy, images, text, location) =>{
+    var data = new FormData();
+
+    images.forEach((element, i) => {
+        console.log(element)
+        const newFile = {
+          uri: element, 
+          name: 'imageName.png',
+          type: 'image/png'
+        }
+        data.append('idna-'+i, newFile)
+    });
+
+    data.append("uid", uid)
+    data.append("app_id", app_id)
+    data.append("text", text)
+    data.append("location", location)
+    data.append("feelings", feelings)
+    data.append("privacy", privacy)
+
+    return fetch(Constant.ADD_NEW_POST, {
         headers: Constant.FETCH_HEADERS,
         method: 'POST',
         body: data

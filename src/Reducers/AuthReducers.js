@@ -54,6 +54,10 @@ import {USER_LOGIN_SUCCESS,
         REMOVED_MY_APPLICATION,
         UPDATE_STATUS_MY_APPLICATION,
         ADD_APPLICATION_CATEGORY,
+
+        ADDED_MY_APPLICATIONS_POSTS,
+        ADDED_MY_APPLICATIONS_POSTS_IMAGES,
+
         UPDATE_PICTURE_PROFILE,
         UPDATE_PICTURE_BG_PROFILE,
         EDIT_DISPLAY_NAME_PROFILE,
@@ -96,7 +100,10 @@ import {USER_LOGIN_SUCCESS,
     
         ADD_MY_ID_PROFILE,
         EDIT_MY_ID_PROFILE,
-        REMOVE_MY_ID_PROFILE}  from '../Actions/types'
+        REMOVE_MY_ID_PROFILE,
+    
+    
+        ADDED_FEELINGS_AND_PRIVACY}  from '../Actions/types'
 
 const INITIAL_STATE = {users:null,
                        user:null,
@@ -156,7 +163,9 @@ export default (state= INITIAL_STATE, action)=>{
                     isLogin : action.payload.auth.isLogin,
                     provider: action.payload.auth.provider,
                     online  : action.payload.auth.online,
-                    application_category: action.payload.auth.application_category,}
+                    application_category: action.payload.auth.application_category,
+                    post_feelings:  action.payload.auth.post_feelings,
+                    post_privacys:  action.payload.auth.post_privacys}
 
             console.log(state, action)
             return state
@@ -2976,6 +2985,141 @@ export default (state= INITIAL_STATE, action)=>{
             return state
         }
 
+        case ADDED_MY_APPLICATIONS_POSTS:{
+            if(state.user === null){
+                return state
+            }
+
+            let my_applications_posts = state.user.my_applications_posts
+            let my_applications_post =  _.find(my_applications_posts,  function(v, k) { 
+                                            return k == action.app_id
+                                        })
+
+            if(!my_applications_post){
+                let newPost = {[action.post_id]:action.my_applications_posts_data}
+                let newState = {...state,
+                                    user: {
+                                        ...state.user,
+                                        my_applications_posts: {
+                                            ...state.user.my_applications_posts,
+                                            [action.app_id]:newPost
+                                        }
+                                    }
+                                }
+
+                return newState
+            }else{
+                let post =  _.find(my_applications_post, (v, k)=>{
+                                return action.post_id == k
+                            })
+                
+                if(!post){
+                    let newPost = {...my_applications_post, [action.post_id]:action.my_applications_posts_data}
+                
+                    let newState = {...state,
+                                        user: {
+                                            ...state.user,
+                                            my_applications_posts: {
+                                                ...state.user.my_applications_posts,
+                                                [action.app_id]:newPost
+                                            }
+                                        }
+                                    }
+                    return newState
+                }
+            }
+
+            /*
+            let friend_profiles = state.user.friend_profiles
+            let friend_profile = _.find(friend_profiles,  function(v, k) { 
+                return k == action.friend_id
+            })
+
+            if(friend_profile === undefined){
+                let newState = {...state,
+                                    user: {
+                                        ...state.user,
+                                        friend_profiles : {
+                                            ...state.user.friend_profiles,
+                                            [action.friend_id]:action.friend_profile
+                                        }
+                                    }
+                                }
+                
+                console.log('ADDED_FRIEND_PROFILE', action.friend_profile, newState)
+                return newState;
+            }else{
+                if(!_.isEqual(friend_profile, action.friend_profile)){
+                    let newState = {...state,
+                                        user: {
+                                            ...state.user,
+                                            friend_profiles : {
+                                                ...state.user.friend_profiles,
+                                                [action.friend_id]:action.friend_profile
+                                            }
+                                        }
+                                    }
+
+                    console.log('ADDED_FRIEND_PROFILE', friend_profile, action.friend_profile, newState)
+                    return newState;
+                }
+            }
+            */
+
+            return state
+        }
+
+        // my_applications_posts_images_data
+        case ADDED_MY_APPLICATIONS_POSTS_IMAGES:{
+            if(state.user === null){
+                return state
+            }
+
+            let my_applications_posts_images    = state.user.my_applications_posts_images
+            let my_applications_posts_image     = _.find(my_applications_posts_images,  function(v, k) { 
+                                                    return k == action.post_id
+                                                  })
+
+            if(!my_applications_posts_image){
+                let newState = {...state,
+                                    user: {
+                                        ...state.user,
+                                        my_applications_posts_images: {
+                                            ...state.user.my_applications_posts_images,
+                                            [action.post_id]:action.my_applications_posts_images_data
+                                        }
+                                    }
+                                }
+
+                return newState
+            }else{
+
+
+                /*
+                let post =  _.find(my_applications_post, (v, k)=>{
+                                return action.post_id == k
+                            })
+                
+                if(!post){
+                    let newPost = {...my_applications_post, [action.post_id]:action.my_applications_posts_data}
+                
+                    let newState = {...state,
+                                        user: {
+                                            ...state.user,
+                                            my_applications_posts: {
+                                                ...state.user.my_applications_posts,
+                                                [action.app_id]:newPost
+                                            }
+                                        }
+                                    }
+                    return newState
+                }
+                */
+            }
+
+            return state
+        }
+
         case UPDATE_STATUS_MY_APPLICATION:{
             if(state.users === null){
                 return state
@@ -3009,6 +3153,16 @@ export default (state= INITIAL_STATE, action)=>{
             let v = {
                 ...state,
                 application_category: action.data_category
+            }
+            return v
+        }
+
+
+        // dispatch({ type: ADDED_FEELINGS_AND_PRIVACY, post_feelings: data.data.post_feelings, post_privacys: data.data.post_privacys});
+        case ADDED_FEELINGS_AND_PRIVACY:{
+            // application_category
+            let v = {
+                ...state, ...{post_feelings: action.post_feelings, post_privacys:action.post_privacys}
             }
             return v
         }

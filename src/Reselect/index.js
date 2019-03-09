@@ -34,7 +34,32 @@ const getMyIds= (state, props) => {
 }
 
 const getMyAppications= (state, props) => {
-    return state.auth.user.my_applications
+    let my_applications = state.auth.user.my_applications
+    let new_my_applications = {...my_applications}
+
+    // my_applications_posts
+    _.each(my_applications, (v,k)=>{
+        let {my_applications_posts, 
+            my_applications_posts_images} = state.auth.user
+
+        let posts = _.find(my_applications_posts, (posts_v, posts_k)=>{
+                        return k == posts_k
+                    })
+        if(posts){
+            _.each(posts, (post_v,post_k)=>{
+                let images   =  _.find(my_applications_posts_images, (image_v, image_k)=>{
+                                    return post_k == image_k
+                                })
+                if(images){
+                    posts = {...posts, [post_k]:{...post_v, images}}
+                }
+            })
+            v = {...v, posts}
+        }
+        new_my_applications = {...new_my_applications, [k]:v}
+    })
+
+    return new_my_applications
 }
 
 const getFriends = (state, props) => {

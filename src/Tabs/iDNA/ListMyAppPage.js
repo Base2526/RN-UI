@@ -149,6 +149,7 @@ class ListMyAppPage extends React.Component{
     }
 
     showMenu = (rowItem)=>{
+      console.log('rowItem', rowItem)
       return( <View style={{flex:1,
                             position:'absolute', 
                             top:0,
@@ -166,7 +167,7 @@ class ListMyAppPage extends React.Component{
                       <MenuOption onSelect={() => {
                           // this.props.navigation.navigate("FriendProfilePage",{'friend_id': item.friend_id})
 
-                          this.props.params.navigation.navigate("MyApplicationMyPost")
+                          this.props.params.navigation.navigate("MyApplicationMyPost", {'my_app_id': rowItem.item_id})
                       }}>
                           <Text style={{padding:10, fontSize:18}}>All post</Text>
                       </MenuOption>

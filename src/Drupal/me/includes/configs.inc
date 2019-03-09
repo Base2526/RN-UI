@@ -195,6 +195,8 @@ function me_init(){
 	define("FIRESTORE_DEVICE_ACCESS", "device_access");
 
 	define("FIRESTORE_MY_APPLIPATIONS", 'my_applications');
+	define("FIRESTORE_MY_APPLIPATIONS_POSTS", 'my_applications_posts');
+	define("FIRESTORE_MY_APPLIPATIONS_POSTS_IMAGES", 'my_applications_posts_images');
 	define("FIRESTORE_CLASSS", "classs");
 	define("FIRESTORE_FRIENDS", "friends");
 	define("FIRESTORE_GROUPS", "groups");

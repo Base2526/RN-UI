@@ -25,6 +25,8 @@ module.exports = {
     
     CREATE_MY_APPLICATION: API_URL + END_POINT + '/create_my_application',
     APPLICATION_CATEGORY: API_URL + END_POINT + '/application_category',
+
+    GET_POST_FEELINGS_AND_PRIVACY: API_URL + END_POINT + '/get_post_feelings_and_privacy',
     
     UPDATE_PICTURE_PROFILE: API_URL + END_POINT + '/update_picture_profile',
     UPDATE_PICTURE_BG_PROFILE: API_URL + END_POINT + '/update_picture_bg_profile',
@@ -40,6 +42,8 @@ module.exports = {
     // Get friend profile กรณียังไม่ได้เป้นเพือนกัน FRIEND_STATUS_FRIEND_99
     FRIEND_PROFILE_99: API_URL + END_POINT + '/friend_profile_99',
 
+
+    ADD_NEW_POST: API_URL + END_POINT + '/add_new_post',
 
     // 'Content-Type': 'multipart/form-data'
     FETCH_HEADERS: {

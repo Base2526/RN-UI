@@ -76,6 +76,9 @@ export const UPDATE_STATUS_MY_APPLICATION = "update_status_my_application"
 
 export const ADD_APPLICATION_CATEGORY= "add_application_category"
 
+export const ADDED_MY_APPLICATIONS_POSTS   = "added_my_applications_posts"
+export const ADDED_MY_APPLICATIONS_POSTS_IMAGES   = "added_my_applications_posts_images"
+
 export const UPDATE_PICTURE_PROFILE         = 'update_picture_profile'
 export const UPDATE_PICTURE_BG_PROFILE      = 'update_picture_bg_profile'
 export const EDIT_DISPLAY_NAME_PROFILE      = 'edit_display_name_profile'
@@ -124,3 +127,6 @@ export const REMOVE_MY_ID_PROFILE           = 'remove_my_id_profile'
 export const ADDED_PRESENCE                 = 'added_presence'
 export const CHANGED_PRESENCE               = 'changed_presence'
 export const REMOVED_PRESENCE               = 'removed_presence'
+
+
+export const ADDED_FEELINGS_AND_PRIVACY     = 'added_feelings_and_privacy'

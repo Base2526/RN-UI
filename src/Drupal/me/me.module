@@ -1491,6 +1491,17 @@ function me_services_resources()
         'access arguments append' => FALSE,
       ),
     ),
+
+    'get_post_feelings_and_privacy'=>array(
+      'create' =>array(
+        'help'=>'Services ดึง feelings and privacy ของ Post',
+        'callback'=>'get_post_feelings_and_privacy',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+      ),
+    ),
+
     'get_gender'=>array(
       'create' =>array(
         'help'=>'Services ดึง Category ของ Gender',
@@ -2016,6 +2027,27 @@ function me_services_resources()
       'create' =>array(
         'help'=>'Update class picture profile',
         'callback'=>'update_class_picture_profile',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+        /* กรณีที่เราต้องการ pass parameter */
+        'args' => array(
+          array(
+           'name' => 'parameters',
+           'type' => 'array',
+           'description' => '',
+           'source' => 'param',
+           'optional' => TRUE,
+           'default value' => array(),
+          ),
+        ),
+      ),
+    ),
+
+    'add_new_post'=>array(
+      'create' =>array(
+        'help'=>'Add new post',
+        'callback'=>'add_new_post',
         'access callback' => 'user_access',
         'access arguments' => array('access content'),
         'access arguments append' => FALSE,
@@ -4804,6 +4836,29 @@ function application_category(){
   $result['result']  = TRUE;
   // taxonomy_get_tree_nested($vid, $parent = 0, $max_depth = NULL, $load_entities = FALSE, $image_styles = NULL)
   $result['data']    = taxonomy_get_tree_nested(taxonomy_vocabulary_machine_name_load("tags_category_application")->vid, 0, NULL, FALSE, 'thumbnail');
+
+  return $result;
+}
+
+function get_post_feelings_and_privacy(){
+  $result = array();
+
+  if (!check_header()) {
+    $result['result']   = FALSE;
+    $result['message']  = "check_header()";
+    return $result;
+  }
+  $time_start = microtime(true);
+
+  $post_privacys = taxonomy_get_tree_nested(taxonomy_vocabulary_machine_name_load("post_privacy")->vid, 0, NULL, FALSE, 'thumbnail');
+  $post_feelings = taxonomy_get_tree_nested(taxonomy_vocabulary_machine_name_load("post_feel")->vid, 0, NULL, FALSE, 'thumbnail');
+
+  $time_end = microtime(true);
+  $execution_times = number_format(($time_end - $time_start), 2);
+  $result['execution_times'] = $execution_times;
+
+  $result['result']  = TRUE;
+  $result['data']    = array('post_privacys'=>$post_privacys, 'post_feelings'=>$post_feelings);
 
   return $result;
 }
@@ -10434,6 +10489,121 @@ function update_class_picture_profile(){
     $result['message']    = $e->getMessage();
     return $result;
   }
+}
+
+function add_new_post(){
+  $result = array();
+
+  if (!check_header()) {
+    $result['result']   = FALSE;
+    return $result;
+  }
+
+  $uid    =   $_REQUEST['uid'];
+  $app_id =   $_REQUEST['app_id'];
+
+  if (empty($uid) || empty($app_id)) {
+    $result['result'] = FALSE;
+    return $result;
+  }
+
+  $text     =   $_REQUEST['text'];
+  $location =   $_REQUEST['location'];
+  $feelings =   $_REQUEST['feelings'];
+  $privacy  =   $_REQUEST['privacy'];
+
+  $time_start = microtime(true);
+  
+  // 1. Load data node by nid 
+  $node = node_load($app_id);
+
+  $post_value = array();
+  $firestore_value = array();
+  $post_value['field_name'] = 'field_my_app_update'; 
+
+  if(!empty($text)){
+    $post_value['field_my_app_message_update'][LANGUAGE_NONE][0]['value'] = $text;
+
+
+    $firestore_value['message']= $text;
+  }
+
+  if(!empty($location)){
+    $post_value['field_my_app_location'][LANGUAGE_NONE][0]['value'] = $location;
+
+    $firestore_value['location']= $location;
+  }
+
+  if(!empty($feelings)){
+    $post_value['field_feelings'][LANGUAGE_NONE][0]['tid'] = $feelings;
+
+    $firestore_value['feelings']= $feelings;
+  }
+
+  if(!empty($privacy)){
+    $post_value['field_privacy'][LANGUAGE_NONE][0]['tid'] = $privacy;
+
+    $firestore_value['privacy']= $privacy;
+  }
+
+  $field_entity = entity_create('field_collection_item', $post_value);
+  $field_entity->uid = $uid;
+  $field_entity->setHostEntity("node", $node);
+  $field_entity->save(); 
+
+  $batch = firestore_db()->batch();
+
+  $postRef = firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_MY_APPLIPATIONS)->document($app_id)->collection(FIRESTORE_MY_APPLIPATIONS_POSTS)->document($field_entity->item_id);
+  $batch->set($postRef, $firestore_value, ['merge' => true]);  
+
+  $my_applications_posts_images = array();
+  if(count($_FILES) > 0){
+    foreach ($_FILES as $value) {
+      // $result['$_FILES'][] = $value["tmp_name"];
+
+      $files_val = array();
+      $files_val['field_name'] = 'field_multi_image';
+
+      $binary =  file_get_contents($value["tmp_name"]);
+
+      //Create the directory if it does not already exist, otherwise check the permissions
+      $directory = 'public://';
+      file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+
+      $currentDate = date("Ymd");
+      $file_name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
+      
+      //Saves a file to the specified destination and creates a database entry.
+      $image_url =  (array)klovers_file_save_data($uid, $binary, $directory. '/' . $file_name, FILE_EXISTS_RENAME);
+
+      $files_val['field_image'][LANGUAGE_NONE][0] = $image_url;
+
+      $multi_image_field_entity = entity_create('field_collection_item', $files_val);
+      $multi_image_field_entity->setHostEntity('field_multi_image', field_collection_item_load($field_entity->item_id));
+      $multi_image_field_entity->save();
+    
+      $imagesRef = firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_MY_APPLIPATIONS)->document($app_id)->collection(FIRESTORE_MY_APPLIPATIONS_POSTS)->document($field_entity->item_id)->collection(FIRESTORE_MY_APPLIPATIONS_POSTS_IMAGES)->document($multi_image_field_entity->item_id);
+      $batch->set($imagesRef, ['image_url'=>file_create_url(image_style_url('medium', $image_url['uri']))], ['merge' => true]);  
+    
+      $my_applications_posts_images[$multi_image_field_entity->item_id] = array('image_url'=>file_create_url(image_style_url('medium', $image_url['uri'])));
+    }
+  }
+
+
+  # Commit the batch
+  $batch->commit();
+
+  $time_end = microtime(true);
+  $execution_times = number_format(($time_end - $time_start), 2);
+  $result['execution_times'] = $execution_times;
+
+  $result['result']         = TRUE; 
+  $result['app_id']         = $app_id;
+  $result['post_id']        = $field_entity->item_id;
+  $result['my_applications_posts_data'] = $firestore_value;
+  $result['my_applications_posts_images_data'] = $my_applications_posts_images;
+
+  return $result;
 }
 
 /*

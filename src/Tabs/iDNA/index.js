@@ -20,10 +20,13 @@ import ManageMyApplicationPage from './ManageMyApplicationPage'
 
 import MyApplicationMyPost from './MyApplicationMyPost'
 import MyApplicationAddPost from './MyApplicationAddPost'
+import MyApplicationAddFeelings from './MyApplicationAddFeelings'
+import MyApplicationAddPrivacy from './MyApplicationAddPrivacy'
 
 import ManagePhonesPage from './ManagePhonesPage'
 import ManageEmailsPage from './ManageEmailsPage'
 import EditNameMyApplicationPage from './EditNameMyApplicationPage'
+
 
 const index = createStackNavigator({
     'Home': {
@@ -113,7 +116,8 @@ const index = createStackNavigator({
 const MyApplicationAddPostNavigator = createStackNavigator(
   {
     'MyApplicationAddPost': {screen: MyApplicationAddPost},
-    // 'EditGroupNamePage': {screen: EditGroupNamePage}
+    'MyApplicationAddFeelings': {screen: MyApplicationAddFeelings},
+    'MyApplicationAddPrivacy': {screen: MyApplicationAddPrivacy}
   },
   {
     // headerMode: 'none',
@@ -182,9 +186,12 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
         routeName === 'CenterSearch'||
         routeName === 'ManageMyApplicationPage' ||
         routeName === 'MyApplicationMyPost' ||
-        routeName === 'MyApplicationAddPost') {
+        routeName === 'MyApplicationAddPost' ||
+        routeName === 'MyApplicationAddFeelings' ||
+        routeName === 'MyApplicationAddPrivacy') {
         //  routeName === 'MyProfileEditBasicInfoPage' ||
         //  routeName === 'MyProfileEditContactInfoPage'
+
         
         navigationOptions.tabBarVisible = false;
         return navigationOptions;
