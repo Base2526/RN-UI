@@ -25,7 +25,8 @@ import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState, 
-        makeGroupsState} from '../../Reselect'
+        makeGroupsState,
+        makeGroupProfilesState} from '../../Reselect'
 
 class GroupsPage extends React.Component{
     constructor(props) {
@@ -51,12 +52,6 @@ class GroupsPage extends React.Component{
 
     // invited you to group
     componentDidMount() {
-      // setTimeout(() => {this.setState({renderContent: true})}, 0);
-
-      // alert('GroupsPage')
-
-      // this.props.watchTaskGroupEvent(this.props.uid)
-
       this.setState({
         error: null,
         loading: false,
@@ -71,30 +66,41 @@ class GroupsPage extends React.Component{
 
     loadData=(props)=>{
       // console.log(groups)
-      let {groups} = props
+      let {groups, group_profiles} = props
 
-      console.log(groups)
+      console.log(groups, group_profiles)
 
       let group_invited = []
       let group_joined = []
       let group_favorites = []
       for (var key in groups) {
         let group = groups[key]
+
+        let group_profile = _.find(group_profiles, (v, k)=>{
+                              return k == key
+                            })
+
+        if(!group_profile){
+          continue
+        }
+
         switch(group.status){ // GROUP_STATUS_MEMBER_INVITED
           case Constant.GROUP_STATUS_MEMBER_INVITED:{
-            group_invited.push({...group, group_id:key})
+            group_invited.push({...group, group_id:key, profile:group_profile})
             break;
           }
           case Constant.GROUP_STATUS_MEMBER_JOINED:{
-            group_joined.push({...group, group_id:key})
+            group_joined.push({...group, group_id:key, profile:group_profile})
 
             if(group.is_favorites !== undefined && group.is_favorites){
-              group_favorites.push({...group, group_id:key})
+              group_favorites.push({...group, group_id:key, profile:group_profile})
             }
             break;
           }
         }
       }
+
+      // console.log('GroupsPage', group_invited, group_joined, group_favorites)
 
       this.setState({
         favorites: {
@@ -119,19 +125,6 @@ class GroupsPage extends React.Component{
               })).length
     }
 
-    /* 
-    
-    let is_favorites = true;
-    if(group.is_favorites !== undefined){
-        is_favorites = !group.is_favorites
-    }
-    this.setState({loading:true})
-    this.props.actionFavoritesGroup(this.props.uid, group_id, is_favorites, (result) => {
-        // console.log(result)
-        this.setState({loading:false})
-    })
-    */
-
     favorites = (group_id, status) =>{
       this.setState({loading:true})
       this.props.actionFavoritesGroup(this.props.uid, group_id, status, (result) => {
@@ -141,13 +134,13 @@ class GroupsPage extends React.Component{
 
     showMenuInvited = (rowItem)=>{
       let {uid} = this.props
-      let {members, group_id} = rowItem
+      let {profile, group_id} = rowItem
 
-      let member_key = _.findKey(members,  function(v, k) { 
+      let member_key = _.findKey(profile.members,  function(v, k) { 
         return v.friend_id == uid
       })
 
-      return( <View style={{flex:1,position:'absolute', right:0, marginRight:10}}>
+      return(<View style={{flex:1,position:'absolute', right:0, marginRight:10}}>
                 <Menu>
                   <MenuTrigger>
                       <MyIcon 
@@ -193,13 +186,7 @@ class GroupsPage extends React.Component{
     }
 
     showMenuGroup = (rowItem)=>{
-      let {members, group_id, item_id} = rowItem
-      let {uid} = this.props
-
-      var member = _.find(members, function(item, key) {
-        return item.friend_id == uid
-      })
-
+      let {group_id} = rowItem
       return( <View style={{flex:1,
                             position:'absolute', 
                             top:0,
@@ -215,19 +202,6 @@ class GroupsPage extends React.Component{
                   </MenuTrigger>
                   <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
                       <MenuOption onSelect={() => {
-                        // if(member !== undefined){
-                        //   // console.log(rowItem, member)
-                        //   this.setState({loading:true})
-                        //   this.props.actionMemberLeaveGroup(uid, group_id, item_id, (result) => {
-                        //     console.log(result)
-                        //     setTimeout(() => {
-                        //       this.setState({loading:false})
-                        //     }, 200);
-                        //   })
-                        // }else{
-                        //   console.log(member)
-                        // }
-
                         this.props.params.navigation.navigate("ChatPage")
                       }}>
                           <Text style={{padding:10, fontSize:18}}>Group Chat</Text>
@@ -322,7 +296,7 @@ class GroupsPage extends React.Component{
     }
 
     _renderRow = (rowItem, rowId, sectionId) => {
-      // console.log(rowItem)
+      console.log(rowItem)
       switch(sectionId){
         // favorites
         case 0:{
@@ -343,14 +317,13 @@ class GroupsPage extends React.Component{
                         flexDirection: 'row',
                       }}>
                         <TouchableOpacity
-                          // style={{width: 80, height: 80, borderRadius: 40}}
                           onPress={() => {
                             this.props.params.navigation.navigate("ManageGroupPage", {'group_id': rowItem.group_id}) 
                           }}>
                           <FastImage
                               style={{width: 50, height: 50, borderRadius: 25, borderWidth:.5, borderColor:'gray'}}
                               source={{
-                                uri: rowItem.group_profile.image_url,
+                                uri: rowItem.profile.image_url,
                                 headers:{ Authorization: 'someAuthToken' },
                                 priority: FastImage.priority.normal,
                               }}
@@ -362,7 +335,7 @@ class GroupsPage extends React.Component{
                                         fontWeight: '600', 
                                         paddingBottom:5
                                       }}>
-                              {rowItem.group_profile.name} { rowItem.group_profile.members === undefined ? '' : "(" + Object.keys(rowItem.group_profile.members).length +")" }
+                              {rowItem.profile.name} { rowItem.profile.members === undefined ? '' : "(" + Object.keys(rowItem.profile.members).length +")" }
                           </Text>
                         </View>
                         {this.showMenuInvited(rowItem)} 
@@ -398,7 +371,7 @@ class GroupsPage extends React.Component{
                   <FastImage
                       style={{width: 50, height: 50, borderRadius: 25, borderWidth:.5, borderColor:'gray'}}
                       source={{
-                        uri: rowItem.group_profile.image_url,
+                        uri: rowItem.profile.image_url,
                         headers:{ Authorization: 'someAuthToken' },
                         priority: FastImage.priority.normal,
                       }}
@@ -410,7 +383,7 @@ class GroupsPage extends React.Component{
                                 fontWeight: '600', 
                                 paddingBottom:5
                               }}>
-                      {rowItem.group_profile.name} { rowItem.members === undefined ? '' : "(" + this.countMembers(rowItem.members) /*Object.keys(rowItem.members).length*/ +")" }
+                      {rowItem.profile.name} { rowItem.profile.members === undefined ? '' : "(" + this.countMembers(rowItem.profile.members) /*Object.keys(rowItem.members).length*/ +")" }
                   </Text>
                 </View>
                 {this.showMenuGroup(rowItem)} 
@@ -433,8 +406,6 @@ class GroupsPage extends React.Component{
                 </View>
       }
 
-      let data = [favorites, invited, groups]
-      console.log(data)
       return (
         <MenuContext>
         <View style={{flex:1}}>
@@ -444,22 +415,18 @@ class GroupsPage extends React.Component{
           textStyle={{color: '#FFF'}}
           overlayColor={'rgba(0,0,0,0.5)'}
         />
-        {
-          <ExpandableList
-              ref={instance => this.ExpandableList = instance}
-              dataSource={data}
-              headerKey="title"
-              memberKey="member"
-              renderRow={this._renderRow}
-              headerOnPress={(i, state) => {
-                // console.log(i, state)
-                // alert('headerOnPress')
-              } }
-              renderSectionHeaderX={this._renderSection}
-              openOptions={[0, 1, 2, 3]}
-              // onScroll={this.props.handleScroll}
-            />
-        }
+        <ExpandableList
+            ref={instance => this.ExpandableList = instance}
+            dataSource={[favorites, invited, groups]}
+            headerKey="title"
+            memberKey="member"
+            renderRow={this._renderRow}
+            headerOnPress={(i, state) => {
+              // console.log(i, state)
+              // alert('headerOnPress')
+            } }
+            renderSectionHeaderX={this._renderSection}
+            openOptions={[0, 1, 2, 3]}/>
         {this.actionAddGroup()}
         </View>
         </MenuContext>
@@ -486,6 +453,7 @@ const mapStateToProps = (state, ownProps) => {
 
     uid:makeUidState(state, ownProps),
     groups:makeGroupsState(state, ownProps),
+    group_profiles:makeGroupProfilesState(state, ownProps),
   }
 }
 

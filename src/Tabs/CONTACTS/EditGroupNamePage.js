@@ -6,9 +6,12 @@ import {View,
 
 import { connect } from 'react-redux';
 import Spinner from 'react-native-loading-spinner-overlay';
+var _ = require('lodash');
 
 import * as actions from '../../Actions'
 import {getUid} from '../../Utils/Helpers'
+
+import {makeUidState, makeGroupsState} from '../../Reselect'
 
 class EditGroupNamePage extends React.Component{
 
@@ -41,40 +44,56 @@ class EditGroupNamePage extends React.Component{
     }
 
     constructor(props) {
-      super(props);
+        super(props);
+        this.state = {
+            group_id:0,
 
-      this.state = {
-          data:{},
-          text:'',
-          loading:false
-      }
+            data:{},
+            text:'',
+            loading:false
+        }
     }
   
     componentDidMount() {
         this.props.navigation.setParams({handleSave: this.handleSave })
 
         const { navigation } = this.props;
-        const group = navigation.getParam('group', null);
-        console.log(group)
+        // const group = navigation.getParam('group', null);
+        // this.setState({data:group, text:group.group_profile.name})
+
+        const group_id = navigation.getParam('group_id', null);
+
+        this.setState({group_id}, ()=>{
+            this.loadData(this.props)
+        })
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.loadData(nextProps)
+    }
+
+    loadData = (props) =>{
+        let {group_id} = this.state
+        let {groups} = props
+        let group =  _.find(groups, (v, k)=>{
+            return k == group_id
+        })
 
         this.setState({data:group, text:group.group_profile.name})
     }
 
     handleSave = () => {
-        if(this.state.text.length == 0){
+
+        let {text, data} = this.state
+        if(text.length == 0){
             alert('Group name is empty?')
         }else{
-            console.log(this.state.data.group_profile.name)
-            console.log(this.state.text)
-            if(this.state.data.group_profile.name === this.state.text){
+            if(data.group_profile.name === text){
                 const { navigation } = this.props;
                 navigation.goBack();
             }else{
-                // console.log('process', this.state.data.group_id)
                 this.setState({loading:true})
                 this.props.actionEditGroupNameProfile(this.props.uid, this.state.data.group_id, this.state.text, (result) => {
-                    console.log(result)
-
                     this.setState({loading:false})
 
                     const { navigation } = this.props;
@@ -94,9 +113,6 @@ class EditGroupNamePage extends React.Component{
 
     render() {
         let {text} = this.state
-        // if( text == ''){
-        //     return(<View style={{flex:1, backgroundColor:'white'}}></View>)
-        // }
 
         return (<View style={{margin:10}}>
                     <Spinner
@@ -124,19 +140,23 @@ class EditGroupNamePage extends React.Component{
 }
 
 
-const mapStateToProps = (state) => {
-  console.log(state)
+const mapStateToProps = (state, ownProps) => {
+    // console.log(state)
 
-  // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
-  //_persist.rehydrated parameter is initially set to false
-  if(!state._persist.rehydrated){
-    return {}
-  }
+    // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
+    // _persist.rehydrated parameter is initially set to false
+    if(!state._persist.rehydrated){
+        return {}
+    }
 
-  return{
-    uid:getUid(state),
-    profiles:state.auth.users.profiles
-  }
+    if(!state.auth.isLogin){
+        return;
+    }
+
+    return{
+        uid: makeUidState(state, ownProps),
+        groups: makeGroupsState(state, ownProps),
+    }
 }
 
 export default connect(mapStateToProps, actions)(EditGroupNamePage);

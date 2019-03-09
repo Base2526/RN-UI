@@ -17,6 +17,9 @@ import MyIcon from '../../config/icon-font.js';
 import Constant from '../../Utils/Constant'
 import {getUid} from '../../Utils/Helpers'
 
+import {makeUidState,
+        makeGroupsState,} from '../../Reselect'
+
 class GroupSettingsPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
@@ -57,54 +60,23 @@ class GroupSettingsPage extends React.Component{
             data:{},
             group_id:0,
             loading:false,
+
+            renderContent: false,
         }
     }
 
     componentDidMount(){
         this.props.navigation.setParams({handleCancel: this.handleCancel })
-    
         const { navigation } = this.props;
         const group_id = navigation.getParam('group_id', null);
-        console.log(group_id)
 
         this.setState({group_id}, ()=>{
             this.loadData(this.props)
         })
-
-        /*
-        this.setState({ data: group,
-                        group_id: group.group_id,
-                        name: group.group_profile.name,
-                        image_url: group.group_profile.image_url})                
-        */
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log(nextProps);
-        // console.log(state)
-
         this.loadData(nextProps)
-
-        // let groups = nextProps.auth.users.groups
-        // let group_id = this.state.group_id
-        // console.log(groups)
-        // console.log(group_id)
-
-        // let key = 0
-        // let group = null
-        // _.each(groups, function(_v, _k) { 
-        //     if(_k === group_id){
-        //         key = _k
-        //         group = {..._v, group_id:_k}
-        //     }
-        // });
-        
-        // console.log(group)
-        // if(group !== null){
-        //     this.setState({ data: group,
-        //         name: group.group_profile.name,
-        //         image_url: group.group_profile.image_url})
-        // }
     }
 
     loadData = (props) =>{
@@ -115,13 +87,11 @@ class GroupSettingsPage extends React.Component{
             return k == group_id
         })
 
-        if(group === undefined){
+        if(!group){
             this.handleCancel()
         }
 
-        this.setState({data: group})
-
-        console.log(group)
+        this.setState({data: group, renderContent:true})
     }
 
     handleCancel = () => {
@@ -160,24 +130,23 @@ class GroupSettingsPage extends React.Component{
                     console.log(result)
 
                     this.setState({loading:false})
-
-                    // setTimeout(() => {
-                    //     Alert.alert('Oops!');
-                    //   }, 100);
                 })
             }
         });
     }
 
     render(){
-        let {group_profile} = this.state.data
+        // let {group_profile} = this.state.data
 
+        // renderContent
+        let {data, renderContent, group_id} = this.state
+
+        // group_profile
         // console.log(group_profile)
-        if(group_profile === undefined){
+        if(!renderContent){
             return(<View style={{flex:1, backgroundColor:'white'}}></View>)
         }
 
-        // console.log(group_id)
         return(
         <KeyboardAwareScrollView>
         <View style={{flex:1}}>
@@ -222,7 +191,7 @@ class GroupSettingsPage extends React.Component{
                                 <FastImage
                                     style={{width: 150, height: 150}}
                                     source={{
-                                        uri: group_profile.image_url,
+                                        uri: data.group_profile.image_url,
                                         headers:{ Authorization: 'someAuthToken' },
                                         priority: FastImage.priority.normal,
                                     }}
@@ -264,18 +233,16 @@ class GroupSettingsPage extends React.Component{
                         <TextInput
                             style={{ fontSize: 22, flex: 1 }}
                             placeholder="None"
-                            value={group_profile.name}
+                            value={data.group_profile.name}
                             ref= {(el) => { this.name = el; }}
                             onChangeText = {this.handleGroupName}
-                            // value={this.state.profiles.name}
                             multiline={true}
-
                             editable={false}
                             pointerEvents="none"
                         />
                         }
                         onPress={()=>{
-                            this.props.navigation.navigate("EditGroupNamePage", {group:this.state.data})
+                            this.props.navigation.navigate("EditGroupNamePage", {group_id})
                         }}
                         />
                 </Section>
@@ -285,17 +252,24 @@ class GroupSettingsPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     console.log(state)
 
     if(!state._persist.rehydrated){
-      return {}
+        return {}
+    }
+
+    if(!state.auth.isLogin){
+        return;
     }
   
     return{
-        uid:getUid(state),
-        auth:state.auth,
-        groups:state.auth.users.groups,
+        // uid:getUid(state),
+        // auth:state.auth,
+        // groups:state.auth.users.groups,
+
+        uid: makeUidState(state, ownProps),
+        groups: makeGroupsState(state, ownProps),
     }
 }
 

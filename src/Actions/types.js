@@ -23,6 +23,11 @@ export const CHANGE_FRIEND_NAME     = "change_friend_name"
 export const ADD_GROUP              = "add_group" 
 export const MODIFIED_GROUP         = "modified_group" 
 export const DELETE_GROUP           = "delete_group"
+
+export const ADDED_GROUP_PROFILE    = "added_group_profile"
+export const MODIFIED_GROUP_PROFILE = "modified_group_profile"
+export const REMOVED_GROUP_PROFILE  = "removed_group_profile"
+
 // actionUpdateGroupPictureProfile
 export const UPDATE_GROUP_PICTURE_PROFILE   = "update_group_picture_profile"
 export const FAVORITES_GROUP        = "favorites_group"
@@ -30,6 +35,9 @@ export const MEMBER_JOIN_GROUP      = "member_join_group" // Join Group
 export const MEMBER_DECLINE_GROUP   = "member_decline_group"
 export const MEMBER_LEAVE_GROUP     = "member_leave_group"
 export const MEMBER_INVITE_AGAIN_GROUP = "member_invite_again_group"
+
+
+
 
 // actionMemberLeaveGroup
 export const ADDED_GROUP_MEMBER     = "added_group_member"

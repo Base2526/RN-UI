@@ -196,7 +196,7 @@ class home extends Component {
                 </TouchableOpacity>
             ),
             headerRight: (
-                <View style={{flexDirection:'row'}}>
+                <View style={{flexDirection:'row', paddingRight:10}}>
                     <TouchableOpacity
                         style={{height: 25,
                                 width: 25,
@@ -214,7 +214,7 @@ class home extends Component {
                     <Menu style={{ zIndex: 10 }}>
                         <MenuTrigger>
                             <MyIcon
-                                style={{marginRight:10}}
+                                // style={{paddingRight:10}}
                                 name={'dot-vertical'}
                                 size={25}
                                 color={'#C7D8DD'} />

@@ -234,65 +234,14 @@ class AddFriendsPage extends React.Component{
             resizeMode={FastImage.resizeMode.normal}/>
         </View>
         <View style={{flex:3}}>
-          <TouchableOpacity 
-                onPress={
-                  ()=>this.props.navigation.navigate("FriendProfilePage")
-                }>
-            <Text style={{
-                        fontSize: 18, 
-                        fontWeight: 'bold',
-                        paddingLeft: 5}}>
-                {item.name}
-            </Text>
-          </TouchableOpacity>
+          <Text style={{
+                      fontSize: 18, 
+                      fontWeight: 'bold',
+                      paddingLeft: 5}}>
+              {item.name}
+          </Text>
         </View>
         {this.showMenu(item, index)}
-        { /*
-        <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
-          <View style={{borderColor:'green', borderWidth:1, borderRadius:10, padding:5}}>
-            <TouchableOpacity
-            onPress={()=>{
-
-              let uid = this.props.uid
-              let friend_id = item.uid
-
-              this.setState({loading:true})
-              this.props.actionInviteFriend(uid, friend_id).then((result) => {
-                console.log(result)
-
-                console.log('uid : ' + uid)
-                console.log('friend_id : ' + friend_id)
-
-                this.setState({loading:false})
-                // this.setState({loading: false})
-                if(result.status){
-                  // this.props.navigation.navigate("App") 
-                  // this.setState({data:result.data.data});
-
-                  switch(result.data.friend_status){
-                    case 99:{
-                      
-                    }
-                    case -1:{
-
-                    }
-                  }
-                }else{
-          
-                }
-              })
-            }}>
-              <Text style={{color:'green', fontSize:14}}>Add friend</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{borderColor:'red', borderWidth:1, borderRadius:10, padding:5, marginLeft:5}}>
-            <TouchableOpacity
-            onPress={()=>alert('Cancel')}>
-              <Text style={{color:'red', fontSize:14}}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        */ }
       </View>)
   }
   
@@ -340,7 +289,6 @@ const mapStateToProps = (state, ownProps) => {
   }
 
   return({
-      // uid:getUid(state)
       uid:makeUidState(state, ownProps),
   })
 }

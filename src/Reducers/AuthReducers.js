@@ -14,6 +14,15 @@ import {USER_LOGIN_SUCCESS,
         ADD_GROUP,
         MODIFIED_GROUP,
         DELETE_GROUP,
+
+
+        ADDED_GROUP_PROFILE,
+        MODIFIED_GROUP_PROFILE,
+        REMOVED_GROUP_PROFILE,
+
+
+        MODIFIED_GROUP_PROFILE_NAME,
+
         UPDATE_GROUP_PICTURE_PROFILE,
         FAVORITES_GROUP,
         MEMBER_JOIN_GROUP,
@@ -1685,6 +1694,147 @@ export default (state= INITIAL_STATE, action)=>{
             return state
         }
 
+
+        // ADDED_GROUP_PROFILE,
+        // MODIFIED_GROUP_PROFILE,
+        // DELETE_GROUP_PROFILE,
+
+        case ADDED_GROUP_PROFILE:{
+            if(state.user === null){
+                return state
+            }
+
+            let group_profiles = state.user.group_profiles
+            let group_profile = _.find(group_profiles, (v, k)=>{
+                                    return k == action.group_id
+                                })
+
+            if(!group_profile){
+                let newState = {...state,
+                                    user: {
+                                        ...state.user,
+                                        group_profiles : {
+                                            ...state.user.group_profiles,
+                                            [action.group_id]:action.group_profile_data
+                                        }
+                                    }
+                                }
+                
+                console.log('ADDED_GROUP_PROFILE', action.group_profile_data, newState)
+                return newState;
+            }else{
+                if(!_.isEqual(group_profile, action.group_profile)){
+                    let newState = {...state,
+                                        user: {
+                                            ...state.user,
+                                            group_profiles : {
+                                                ...state.user.group_profiles,
+                                                [action.group_id]:action.group_profile_data
+                                            }
+                                        }
+                                    }
+
+                    console.log('ADDED_GROUP_PROFILE', friend_profile, action.group_profile_data, newState)
+                    return newState;
+                }
+            }
+
+            return state
+        }
+
+        case MODIFIED_GROUP_PROFILE:{
+            if(state.user === null){
+                return state
+            }
+            
+            let group_profiles = state.user.group_profiles
+            let group_profile = _.find(group_profiles, (v, k)=>{
+                                    return k == action.group_id
+                                })
+
+            if(!group_profile){
+                if(!_.isEqual(group_profile, action.group_profile_data)){
+                    let newState = {...state,
+                                        user: {
+                                            ...state.user,
+                                            group_profiles : {
+                                                ...state.user.group_profiles,
+                                                [action.group_id]:action.group_profile_data
+                                            }
+                                        }
+                                    }
+
+                    console.log('ADDED_GROUP_PROFILE', friend_profile, action.group_profile_data, newState)
+                    return newState;
+                }
+            }
+            return state
+        }
+
+        case REMOVED_GROUP_PROFILE:{
+            if(state.user === null){
+                return state
+            }
+            
+            let group_profiles= state.user.group_profiles
+            let group_profile = _.find(group_profiles, (v, k)=>{
+                                    return k == action.group_id
+                                })
+
+            if(!group_profile){
+                let new_group_profiles = _.omit(group_profiles, action.group_id)
+
+                let newState = {...state,
+                                    users : {
+                                        ...state.users,
+                                        group_profiles: new_group_profiles
+                                    }
+                                }
+                return newState
+            }
+
+            return state
+        }
+
+        case MODIFIED_GROUP_PROFILE_NAME:{
+
+            if(state.user === null){
+                return state
+            }
+
+            let groups = state.user.groups
+
+            let key = 0
+            let value = null
+            _.each(groups, function(_v, _k) { 
+                if(_k === action.group_id){
+                    key = _k
+                    value = _v
+                }
+            });
+
+            let newValue = {...value, 
+                                group_profile: {
+                                    ...value.group_profile,
+                                    image_url:action.image_url
+                                }
+                            }
+
+            let v = {
+                ...state,
+                users : {
+                    ...state.users,
+                    groups : {
+                        ...state.users.groups,
+                        [action.group_id]: newValue
+                    }
+                }
+            }
+
+            // console.log(v)
+            return v
+        }
+
         case UPDATE_GROUP_PICTURE_PROFILE:{
 
             if(state.users === null){
@@ -1993,67 +2143,58 @@ export default (state= INITIAL_STATE, action)=>{
         }
 
         case ADDED_GROUP_MEMBER:{
-            if(state.user === null){
+            if(!state.user){
                 return state
             }
 
-            let groups = state.user.groups
-            let group = _.find(groups,  function(v, k) { 
-                return k == action.group_id
-            })
+            let group_members = state.user.group_members
+            let group_member  = _.find(group_members,  function(v, k) { 
+                                    return k == action.group_id
+                                })
 
-            if(group === undefined){
-                // console.log(value)
-                return state
-            }
-
-            if(group.members === undefined){
-                // console.log(group)
-                let newGroup = {...group, 
-                                    members: {
-                                        ...group.members,
-                                        [action.member_key]:action.member_data
-                                    }
-                                }
-
-                let v = {...state,
-                            user: {
-                                ...state.user,
-                                groups: {
-                                    ...state.user.groups,
-                                    [action.group_id]: newGroup
-                                }
-                            }
-                        }
-                return v
-            }else{
-                console.log(group)
-
-                let oldMember = _.find(group.members,  function(v, k) { 
-                    return k == action.member_key
-                })
-
-                if(!_.isEqual(oldMember, action.member_data)){
-                    console.log('Not equal')
-                    let newGroup = {...group, 
-                                        members: {
-                                            ...group.members,
-                                            [action.member_key]:action.member_data
+            if(!group_member){
+                let newGroupMembers = {[action.member_key]:action.member_data}
+                let newState = {...state,
+                                    user: {
+                                        ...state.user,
+                                        group_members: {
+                                            ...state.user.group_members,
+                                            [action.group_id]:newGroupMembers
                                         }
                                     }
-
-                    let v = {...state,
-                                user: {
-                                    ...state.user,
-                                    groups: {
-                                        ...state.user.groups,
-                                        [action.group_id]: newGroup
-                                    }
                                 }
-                            }
-                    return v
+                return newState
+            }else{
+                let find_member =_.find(group_member, (fv, fk)=>{
+                                    return fk == action.member_key
+                                })
+                
+                let newGroupMembers = {...group_member, [action.member_key]:action.member_data}
+                if(!find_member){
+                    let newState = {...state,
+                                        user: {
+                                            ...state.user,
+                                            group_members: {
+                                                ...state.user.group_members,
+                                                [action.group_id]:newGroupMembers
+                                            }
+                                        }
+                                    }
+                    return newState
                 }else{
-                    console.log('equal')
+                    if(!_.isEqual(find_member, action.member_data)){
+                        let newState = {...state,
+                                            user: {
+                                                ...state.user,
+                                                group_members: {
+                                                    ...state.user.group_members,
+                                                    [action.group_id]:newGroupMembers
+                                                }
+                                            }
+                                        }
+
+                        return newState
+                    } 
                 }
             }
             return state
@@ -2766,9 +2907,9 @@ export default (state= INITIAL_STATE, action)=>{
                 if(friend.is_favorite != action.favorite_status){
                     friend = {...friend, is_favorite:action.favorite_status}
                     let newStatus = {...state,
-                                        user : {
+                                        user: {
                                             ...state.user,
-                                            friends : {
+                                            friends: {
                                                 ...state.user.friends,
                                                 [action.friend_id]: friend
                                             }
@@ -2796,9 +2937,9 @@ export default (state= INITIAL_STATE, action)=>{
             if(my_application === undefined){
                 let v = {
                     ...state,
-                    user : {
+                    user: {
                         ...state.user,
-                        my_applications : {
+                        my_applications: {
                             ...state.user.my_applications,
                             [action.my_application_id]:{...action.my_application_data}
                         }

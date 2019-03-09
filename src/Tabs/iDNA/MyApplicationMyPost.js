@@ -133,10 +133,10 @@ class MyApplicationMyPost extends Component {
       return (
         <View
           style={{
-            height: 1,
-            width: "86%",
+            height: .5,
+            width: "100%",
             backgroundColor: "#CED0CE",
-            marginLeft: "14%"
+            // marginLeft: "14%"
           }}
         />
       );
@@ -305,7 +305,7 @@ Credit: Yeshwanth's Kitchen (bit.ly/2R9Mw3Y)</Text>
           extraData={this.state}
         />
 
-<Modal visible={this.state.modalVisible} transparent={true}>
+        <Modal visible={this.state.modalVisible} transparent={true}>
                 <ImageViewer 
                     imageUrls={images}
                     enableSwipeDown={true}

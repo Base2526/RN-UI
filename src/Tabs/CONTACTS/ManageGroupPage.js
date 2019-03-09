@@ -15,19 +15,59 @@ import Spinner from 'react-native-loading-spinner-overlay';
 
 import {getHeaderInset} from '../../Utils/Helpers'
 import * as actions from '../../Actions'
-import {getUid, checkInternetConnectionDialog} from '../../Utils/Helpers'
+import {checkInternetConnectionDialog} from '../../Utils/Helpers'
 
 import MyIcon from '../../config/icon-font.js';
-
 import Constant from '../../Utils/Constant'
+
+import {makeUidState,
+        makeProfileState, 
+        makeGroupsState,
+        makeGroupProfilesState,
+        makeFriendsState,
+        makeFriendProfilesState,
+        makeIsConnectedState,} from '../../Reselect'
 
 class ManageGroupPage extends React.Component{
 
-    static navigationOptions = ({ navigation }) => ({
-        headerTransparent: true,
-        headerTitleStyle:{color:'white'},
-        headerTintColor: 'white',
-    });
+    static navigationOptions = ({ navigation }) => {
+
+        let menuHeaderRight = <View style={{flexDirection:'row', flex:1, marginRight:10}}>
+                                <TouchableOpacity style={{paddingRight:10}}
+                                    onPress={()=>{
+                                        const { params = {} } = navigation.state
+                                        if(Object.keys(params).length !== 0){
+                                            params.handleChat()
+                                        }
+                                    }}>
+                                    <MyIcon
+                                        name={'friend-chat'}
+                                        size={25}
+                                        color={'#C7D8DD'} />
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{paddingRight:10}}
+                                    onPress={()=>{
+                                        const { params = {} } = navigation.state
+                                        if(Object.keys(params).length !== 0){
+                                            params.handleSettings()
+                                        }
+                                    }}>
+                                    <MyIcon
+                                        name={'settings'}
+                                        size={25}
+                                        color={'#C7D8DD'} />
+                                </TouchableOpacity>
+                            </View>
+
+        return {
+            headerTransparent: true,
+            headerTitleStyle:{color:'white'},
+            headerTintColor: 'white',
+            headerRight: (
+                menuHeaderRight
+            ),
+        }
+    };
 
     constructor(){
         super();
@@ -40,6 +80,9 @@ class ManageGroupPage extends React.Component{
     }
 
     componentDidMount() {
+
+        this.props.navigation.setParams({handleChat: this.handleChat})
+        this.props.navigation.setParams({handleSettings: this.handleSettings})
         setTimeout(() => {this.setState({renderContent: true})}, 0);
 
         const { navigation } = this.props;
@@ -56,7 +99,7 @@ class ManageGroupPage extends React.Component{
     }
 
     loadData = (props) =>{
-        let {groups, friends, uid, friend_profiles} = props
+        let {groups, friends, uid, friend_profiles, group_profiles} = props
         let {group_id} = this.state
 
         let group  = _.find(groups, (v, k)=>{
@@ -66,11 +109,16 @@ class ManageGroupPage extends React.Component{
         if(group === undefined){
             this.props.navigation.goBack(null)
         }
+       
 
-        // console.log(group)
+        let group_profile = _.find(group_profiles, (v, k)=>{
+                                return group_id == k
+                            })
+
+        console.log(group, group_profile)
 
         let members = {}
-        _.each(group.members, (v, k)=>{
+        _.each(group_profile.members, (v, k)=>{
             if(v.status === Constant.GROUP_STATUS_MEMBER_JOINED){
                 members = {...members, [k]:v}
             }
@@ -84,20 +132,17 @@ class ManageGroupPage extends React.Component{
         let keys = Object.keys(members);
         for (let i = 0; i < count; i++) {
             let {friend_id}= members[keys[i]]
-            // var friend_profile = _.find(friends, function(v, k) {
-            //     // console.log(k, friend_id)
-            //     return k == friend_id;
-            // });
-
+        
             let friend_profile =_.find(friend_profiles, (fv, fk)=>{
                 return fk == friend_id
             })
             console.log(friend_profile)
 
-            if(friend_profile === undefined && uid !== friend_id){
+            if(!friend_profile){
                 if(uid === friend_id){
-
+                    console.log('my profile')
                 }else{
+                    /*
                     console.log(this.props.uid, friend_id)
                     // กรณีไม่ใช่ friend เราจะดึงจาก firestore โดยตรงแล้ว insert เข้าไเก้บใน friend
                     let pfriendRef = firebase.firestore().collection('profiles').doc(friend_id);
@@ -126,18 +171,36 @@ class ManageGroupPage extends React.Component{
                     .catch(err => {
                         console.log('Error getting document', err);
                     });
+                    */
+
+
+                    this.props.actionFriendProfile99(uid, friend_id).then((result) => {
+                        // this.setState({friend_id, loading:false}, ()=>{
+                        //     // this.loadData(this.props)
+                        // })
+
+                        console.log(result)
+                    })
                 }
             }else{
                 members = {...members, [keys[i]]:{...members[keys[i]], friend:friend_profile}}
             }
         }
 
-        let newGroup = {...group, members}
+        let newGroup = {...group, profile:group_profile, members}
 
         console.log(friends)
         console.log(newGroup)
 
         this.setState({group: newGroup})
+    }
+
+    handleChat = () => {
+        this.props.navigation.navigate("ChatPage")
+    }
+
+    handleSettings = () => {
+        this.props.navigation.navigate('GroupSettingsPage', {group_id:this.state.group_id})
     }
 
     itemMembers = (group) =>{
@@ -150,7 +213,7 @@ class ManageGroupPage extends React.Component{
 
             let {friend, friend_id} = members[key]
             if(friend_id === this.props.uid){
-                let {profiles} = this.props
+                let {profile} = this.props
                 return(<TouchableOpacity key={friend_id} 
                             style={{marginRight:5}}
                             onPress={()=>{
@@ -159,7 +222,7 @@ class ManageGroupPage extends React.Component{
                             <FastImage
                                 style={{width: 36, height: 36, borderRadius: 18}}
                                 source={{
-                                uri: profiles.image_url,
+                                uri: profile.image_url,
                                 headers:{ Authorization: 'someAuthToken' },
                                 priority: FastImage.priority.normal,
                                 }}
@@ -218,7 +281,7 @@ class ManageGroupPage extends React.Component{
 
         let {isConnected} = this.props
 
-        // console.log(group)
+        console.log(group)
         // return(<View style={{flex:1, backgroundColor:'#DF2D6C'}}></View>)
         return (
                 <View style={{flex:1, backgroundColor:'#DF2D6C', paddingTop:getHeaderInset()}}>
@@ -234,7 +297,7 @@ class ManageGroupPage extends React.Component{
                             <FastImage
                                 style={{width: 120, height: 120, borderRadius: 60, borderWidth:4, borderColor:'#BCD1D5'}}
                                 source={{
-                                uri: group.group_profile.image_url,
+                                uri: group.profile.image_url,
                                 headers:{ Authorization: 'someAuthToken' },
                                 priority: FastImage.priority.normal,
                                 }}
@@ -266,7 +329,7 @@ class ManageGroupPage extends React.Component{
                                     color={'#C7D8DD'} />
                             </TouchableOpacity>
                             <View style={{paddingLeft:5}}>
-                                <Text style={{fontSize:26, fontWeight:'bold', textAlignVertical: 'bottom', color:'#BCD1D5'}}>{group.group_profile.name}</Text>
+                                <Text style={{fontSize:26, fontWeight:'bold', textAlignVertical: 'bottom', color:'#BCD1D5'}}>{group.profile.name}</Text>
                             </View>
                         </View>
                         <View style={{padding:5, flexDirection:'row'}}>
@@ -292,7 +355,7 @@ class ManageGroupPage extends React.Component{
                                 }, {
                                     marginBottom: 20,
                                 })}}>
-                        <TouchableOpacity style={{alignItems:'center'}}
+                        {/* <TouchableOpacity style={{alignItems:'center'}}
                             onPress={()=>{
                                 this.props.navigation.navigate("ChatPage")
                             }}>
@@ -310,29 +373,41 @@ class ManageGroupPage extends React.Component{
                                 name={'settings'}
                                 size={40}
                                 color={'#C7D8DD'} />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </View>
             );
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     console.log(state)
   
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
     //_persist.rehydrated parameter is initially set to false
     if(!state._persist.rehydrated){
-      return {}
+        return {}
     }
-  
+
+    if(!state.auth.isLogin){
+        return;
+    }
+    
     return{
-        uid:getUid(state),
-        profiles:state.auth.users.profiles,
-        groups:state.auth.users.groups,
-        friends:state.auth.users.friends,
-        friend_profiles:state.auth.users.friend_profiles,
-        isConnected:state.offline.online,
+        // uid:getUid(state),
+        // profiles:state.auth.users.profiles,
+        // groups:state.auth.users.groups,
+        // friends:state.auth.users.friends,
+        // friend_profiles:state.auth.users.friend_profiles,
+        // isConnected:state.offline.online,
+
+        uid: makeUidState(state, ownProps),
+        profile: makeProfileState(state, ownProps),
+        groups: makeGroupsState(state, ownProps),
+        group_profiles:makeGroupProfilesState(state, ownProps),
+        friends: makeFriendsState(state, ownProps),
+        friend_profiles: makeFriendProfilesState(state, ownProps),
+        isConnected: makeIsConnectedState(state, ownProps),
     }
 }
 export default connect(mapStateToProps, actions)(ManageGroupPage);

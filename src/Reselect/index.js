@@ -103,6 +103,26 @@ const getGroups = (state, props) => {
     return state.auth.user.groups
 }
 
+const getGroupProfiles = (state, props) => {
+    let group_profiles = state.auth.user.group_profiles
+    let new_group_profiles = {...group_profiles}
+
+    _.each(group_profiles, (v,k)=>{
+        let {group_members} = state.auth.user
+        let members = _.find(group_members, (mv, mk)=>{
+            return k == mk
+        })
+
+        if(members !== undefined){
+            v = {...v, members}
+        }
+
+        new_group_profiles = {...new_group_profiles, [k]:v}
+    })
+
+    return new_group_profiles
+}
+
 const getClasss = (state, props) => {
     return state.auth.user.classs
 }
@@ -183,6 +203,12 @@ export const makeGroupsState = createSelector(
     [ getGroups ],
     (groups) => groups
 )
+
+export const makeGroupProfilesState = createSelector(
+    [ getGroupProfiles ],
+    (group_profiles) => group_profiles
+)
+
 
 // classs
 export const makeClasssState = createSelector(

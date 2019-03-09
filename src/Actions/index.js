@@ -33,6 +33,9 @@ import {USER_LOGIN_SUCCESS,
         //  เป็นการ cancel การ invite โดยผู้เชิญ(admin)
         CANCELED_GROUP_MEMBER,
 
+
+        ADDED_GROUP_PROFILE,
+
         FAVORITES_GROUP,
         MEMBER_JOIN_GROUP,
         MEMBER_DECLINE_GROUP,
@@ -445,11 +448,7 @@ export const actionEditGroupNameProfile = (uid, group_id, group_name, callback) 
 
 // favorites group
 export const actionFavoritesGroup = (uid, group_id, favorite_status, callback) => dispatch => {
-    
     dispatch({ type: FAVORITES_GROUP, group_id, favorite_status});
-
-    // console.log(uid, group_id, favorite_status)
-    // dispatch({ type: INTERESTE_IN_PROFILE, interestein_key, interestein_id, interestein_status});
     firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).set({
         is_favorites: favorite_status,
     }, { merge: true});
@@ -809,10 +808,25 @@ export const actionUpdateStatusFriend = (uid, friend_id, status, callback) => di
 }
 
 // key, this.props.uid, friend.friend_id
-export const actionSelectClass = (class_id, uid, friend_id, callback) => dispatch=> {
+export const actionSelectClassMember = (uid, friend_id, class_id, member_key, status,callback) => dispatch=> {
+    if(!member_key){
+        member_key = randomKey()
+    }
 
+    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(member_key).set({
+        friend_id, status
+    }, { merge: true}).then(result => {
+        // dispatch({ type: CHANGE_FRIEND_NAME, friend_id, change_friend_name:name});
+        callback({'status':true})
+    })
+    .catch(error => {
+        callback({'status':false, 'message': error})
+    })  
+
+    dispatch({type: ADDED_CLASS_MEMBER, class_id, class_member_id:member_key, class_member_data:{friend_id, status} })
+
+    /*
     firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').where('friend_id', '==', friend_id).get().then(snapshot => {
-        
         if(snapshot.size == 0){
             firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').add({
                 friend_id,
@@ -839,6 +853,7 @@ export const actionSelectClass = (class_id, uid, friend_id, callback) => dispatc
     })
 
     callback({'status':true, 'uid':uid, 'friend_id': friend_id, 'class_id': class_id})
+    */
 }
 
 // Change friend's name
@@ -1301,7 +1316,7 @@ export const actionFriendProfile99= (uid, friend_id) => dispatch=>{
                     dispatch({ type: ADD_WEBSITE_FRIEND, friend_id, friend_website_id:wk, friend_website_data:wv})
                 })
                 
-                return {'status':true, data}
+                return {'status':true, friend_profile: v.friend_profile}
             }
         }
     })
@@ -2115,7 +2130,7 @@ export const trackClasss=(uid, classs)=> dispatch =>{
 }
 
 // track groups
-export const trackGroups=(uid, groups)=> dispatch =>{
+export const trackGroups=(uid, groups, group_profiles)=> dispatch =>{
     // console.log("trackGroups", groups)
     firebase.firestore().collection('users').doc(uid).collection('groups').onSnapshot((querySnapshot) => {
         querySnapshot.docChanges.forEach(function(change) {
@@ -2123,6 +2138,15 @@ export const trackGroups=(uid, groups)=> dispatch =>{
 
             switch(change.type){
                 case 'added':{
+
+                    let group = _.find(groups, (v, k)=>{
+                                    return change.doc.id == k
+                                })
+                        
+                    if(!group){
+                        console.log("trackGroups > added", change.doc.data(), group)
+                        dispatch({ type: ADD_GROUP, group_id:change.doc.id, group_data:change.doc.data()});
+                    }
 
                     // track group profile
                     firebase.firestore().collection('groups').doc(change.doc.id).onSnapshot((docSnapshot) => {
@@ -2132,15 +2156,25 @@ export const trackGroups=(uid, groups)=> dispatch =>{
                         if(docSnapshot.data() !== undefined){
                             // console.log(doc.id, " => ", doc.data());
                             
-                            let newGroup = {...change.doc.data(), group_profile:docSnapshot.data()}
+                            // let newGroup = {...change.doc.data(), group_profile:docSnapshot.data()}
                             
-                            let group = _.find(groups, (v, k)=>{
-                                return change.doc.id == k
-                            })
+                            // let group = _.find(groups, (v, k)=>{
+                            //     return change.doc.id == k
+                            // })
                             
-                            if(group === undefined){
-                                console.log("trackGroups > added", newGroup, group)
-                                dispatch({ type: ADD_GROUP, group_id:change.doc.id, group_data:newGroup});
+                            // if(group === undefined){
+                            //     console.log("trackGroups > added", newGroup, group)
+                            //     dispatch({ type: ADD_GROUP, group_id:change.doc.id, group_data:newGroup});
+                            // }
+
+                            // ADDED_GROUP_PROFILE
+
+                            let group_profile = _.find(group_profiles, (v, k)=>{
+                                                    return change.doc.id == k
+                                                })
+
+                            if(!group_profile){
+                                dispatch({ type: ADDED_GROUP_PROFILE, group_id:change.doc.id, group_profile_data:docSnapshot.data()});
                             }
                         }
                     })
@@ -2154,22 +2188,18 @@ export const trackGroups=(uid, groups)=> dispatch =>{
                                 let member_key   = members_change.doc.id
                                 let member_data  = members_change.doc.data()
 
-                                let group = _.find(groups, (gv, gk)=>{
-                                    return change.doc.id == gk
+                                let group_profile  = _.find(group_profiles, (fpv, fpk)=>{
+                                    return group_id == fpk
                                 })
-
-                                if(group !== undefined){
-                                    if(group.members !== undefined){
-                                        let member =_.find(group.members,  function(gmv, gmk) { 
-                                                        return gmk == member_key
-                                                    })
-
-                                        if(member !== undefined){
-                                            return;
-                                        }
+    
+                                if(group_profile !== undefined){
+                                    let member =_.find(group_profile.members,  function(fpv, fpk) { 
+                                                    return fpk == member_key
+                                                })
+                                    if(member){
+                                        return;
                                     }
 
-                                    console.log("trackGroups > added > members")
                                     dispatch({ type: ADDED_GROUP_MEMBER, group_id, member_key, member_data});
                                 }
                             }
@@ -2181,7 +2211,7 @@ export const trackGroups=(uid, groups)=> dispatch =>{
                                 let data = members_change.doc.data()
                                 // MODIFIED_GROUP_MEMBER
 
-                                dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, member_key, data});
+                                // dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, member_key, data});
                             }
                             if (members_change.type === 'removed') {
                                 console.log('removed: ', change.doc.id, members_change.doc.id, members_change.doc.data());
@@ -2191,7 +2221,7 @@ export const trackGroups=(uid, groups)=> dispatch =>{
                                 let data = members_change.doc.data()
                                 // REMOVED_GROUP_MEMBER
 
-                                dispatch({ type: REMOVED_GROUP_MEMBER, group_id, item_id});
+                                // dispatch({ type: REMOVED_GROUP_MEMBER, group_id, item_id});
                             }
                         })
                     })
@@ -2255,12 +2285,12 @@ export const trackGroups=(uid, groups)=> dispatch =>{
                     // dispatch({type: MODIFIED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
                     
                     // MODIFIED_GROUP
-                    dispatch({ type: MODIFIED_GROUP, group_id:change.doc.id, data:change.doc.data() });
+                    // dispatch({ type: MODIFIED_GROUP, group_id:change.doc.id, data:change.doc.data() });
                     break;
                 }
                 case 'removed':{
                     // dispatch({type: REMOVED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
-                    dispatch({ type: DELETE_GROUP, group_id:change.doc.id});
+                    // dispatch({ type: DELETE_GROUP, group_id:change.doc.id});
                     break;
                 }
             }

@@ -3341,12 +3341,13 @@ function onLoadDataUser($user){
     $result['users']   = (object) array_merge((array) $user, (array) $user_profile['data']);
     // $result['friend_profiles']  = (object)$friend_profiles;
 
-
-    $result['user']    = (object)array('session'=>$user,
-                                       'profile'=>$user_profile['data']['profiles'],
-                                       'groups' =>$user_profile['data']['groups'],
-                                       'friends'=>$user_profile['data']['friends'],
-                                       'classs' =>$user_profile['data']['classs'], //
+    $result['user']    = (object)array('session'        =>$user,
+                                       'profile'        =>$user_profile['data']['profiles'],
+                                       'groups'         =>$user_profile['data']['groups'],
+                                       'group_profiles' =>$user_profile['data']['group_profiles'],
+                                       'group_members'  =>$user_profile['data']['group_members'],
+                                       'friends'        =>$user_profile['data']['friends'],
+                                       'classs'         =>$user_profile['data']['classs'], //
                                        'my_applications'=>$user_profile['data']['my_applications'],
                                       );
     /*
@@ -3685,8 +3686,8 @@ function onLoadProfile($uid, $mode){
 
 
             $group_id = $item_groups->field_group_id[LANGUAGE_NONE][0]['value'];
-            $groups[$group_id] = array("item_id"  =>$v_groups['value'],
-                                       "status"   =>$item_groups->field_mg_status[LANGUAGE_NONE][0]['tid']);
+            $groups['groups'][$group_id] = array("item_id"  =>$v_groups['value'],
+                                                 "status"   =>$item_groups->field_mg_status[LANGUAGE_NONE][0]['tid']);
 
             $groups_detail_node     = node_load($group_id); 
             if (!$groups_detail_node) {
@@ -3711,17 +3712,33 @@ function onLoadProfile($uid, $mode){
                 $item_members_group_friend_id = $item_members_group->field_members_group_friend_id[LANGUAGE_NONE][0]['value'];
                 $item_members_group_status    = $item_members_group->field_mg_status[LANGUAGE_NONE][0]['tid'];
 
-                $groups_detail_node_members_group[$item_members_group_friend_id] = array('item_id'=>$v_members_group['value'], 
-                                                                                         'status'   =>$item_members_group_status);
+                $item_members_group_object_id              = $item_members_group->field_object_id[LANGUAGE_NONE][0]['value'];
+
+
+                $item_members_group_invitor  = $item_members_group->field_members_group_invitor[LANGUAGE_NONE][0]['value'];
+
+
+                if(!IsNullOrEmptyString($item_members_group_object_id)){
+                  $groups_detail_node_members_group[$item_members_group_object_id] = array('friend_id'=>$item_members_group_friend_id, 
+                                                                                         'status'   =>$item_members_group_status,
+                                                                                          'invitor' =>$item_members_group_invitor);
+                }
               }
             }
 
-            $groups[$group_id]['group_profile'] = array("chat_id"    => $groups_detail_node_chat_id,
-                                                 "name"       => $groups_detail_node_name,
-                                                 "creator_id" => $groups_detail_node->uid,
-                                                 "members"    => $groups_detail_node_members_group,
-                                                 "image_url"  => $groups_detail_node_image_url);
+            // $groups[$group_id]['group_profile'] = array("chat_id"    => $groups_detail_node_chat_id,
+            //                                      "name"       => $groups_detail_node_name,
+            //                                      "creator_id" => $groups_detail_node->uid,
+            //                                      "members"    => $groups_detail_node_members_group,
+            //                                      "image_url"  => $groups_detail_node_image_url);
 
+            $groups['group_profiles'][$group_id] = array( "chat_id"    => $groups_detail_node_chat_id,
+                                                          "name"       => $groups_detail_node_name,
+                                                          "creator_id" => $groups_detail_node->uid,
+                                                          // "members"    => $groups_detail_node_members_group,
+                                                          "image_url"  => $groups_detail_node_image_url);
+
+            $groups['group_members'][$group_id] = $groups_detail_node_members_group;
             /*
             $item_groups_chat_id    = $item_groups->field_object_id[LANGUAGE_NONE][0]['value'];
             $item_groups_image_url  = '';
@@ -4198,7 +4215,9 @@ function onLoadProfile($uid, $mode){
                                   'device_access'  => (object)$device_access,
                                   'my_applications'=>(object)$my_applications,
                                   'friends'        =>(object)$friends,
-                                  'groups'         =>(object)$groups,
+                                  'groups'         =>(object)$groups['groups'],
+                                  'group_profiles' =>(object)$groups['group_profiles'],
+                                  'group_members'  =>(object)$groups['group_members'],
                                   'classs'         =>(object)$classs,
                                   'followings'     =>(object)$followings,
                                   'center_chats'   =>(object)$center_chats,

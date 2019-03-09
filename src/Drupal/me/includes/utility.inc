@@ -2,7 +2,6 @@
 
 // require_once ( dirname(__FILE__) . '/configs.inc');
 
-
 /*
   เป้นการเช็ด  BundleIdentifier ที่ยอมให้มีการ login เข้าใช้งานระบบเท่านั้น
   BundleIdentifier : จะถูกส่งเข้ามาทุกครั้งทีมีการ login
@@ -426,7 +425,6 @@ function ffmpeg_thumbnail_extract_frame($file, \FFMpeg\Coordinate\TimeCode $at =
 }
 
 function IsNullOrEmptyString($text){
-
     return (!isset($text) || trim($text)==='');
 }
 

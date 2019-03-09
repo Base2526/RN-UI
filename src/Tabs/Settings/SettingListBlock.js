@@ -16,6 +16,7 @@ import {
   MenuOptions,
   MenuOption,
 } from 'react-native-popup-menu';
+var _ = require('lodash');
 
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
