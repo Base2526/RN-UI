@@ -20,6 +20,7 @@ import ManageMyApplicationPage from './ManageMyApplicationPage'
 
 import MyApplicationMyPost from './MyApplicationMyPost'
 import MyApplicationAddPost from './MyApplicationAddPost'
+import MyApplicationReport  from './MyApplicationReport'
 import MyApplicationAddFeelings from './MyApplicationAddFeelings'
 import MyApplicationAddPrivacy from './MyApplicationAddPrivacy'
 
@@ -116,8 +117,18 @@ const index = createStackNavigator({
 const MyApplicationAddPostNavigator = createStackNavigator(
   {
     'MyApplicationAddPost': {screen: MyApplicationAddPost},
+    // 'MyApplicationReport' : {screen: MyApplicationReport},
     'MyApplicationAddFeelings': {screen: MyApplicationAddFeelings},
     'MyApplicationAddPrivacy': {screen: MyApplicationAddPrivacy}
+  },
+  {
+    // headerMode: 'none',
+  },
+);
+
+const MyApplicationReportNavigator = createStackNavigator(
+  {
+    'MyApplicationReport' : {screen: MyApplicationReport}
   },
   {
     // headerMode: 'none',
@@ -129,7 +140,7 @@ const MainModalNavigator = createStackNavigator(
   {
     'index': { screen: index },
     'MyApplicationAddPostNavigator': { screen: MyApplicationAddPostNavigator },
-    // 'ListGroupMemberNavigator': { screen: ListGroupMemberNavigator,},
+    'MyApplicationReportNavigator': { screen: MyApplicationReportNavigator,},
     // // 'ListClassUserPageX': {
     // //   screen: ListClassUserPage,
       
@@ -187,6 +198,7 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
         routeName === 'ManageMyApplicationPage' ||
         routeName === 'MyApplicationMyPost' ||
         routeName === 'MyApplicationAddPost' ||
+        routeName === 'MyApplicationReport'  ||
         routeName === 'MyApplicationAddFeelings' ||
         routeName === 'MyApplicationAddPrivacy') {
         //  routeName === 'MyProfileEditBasicInfoPage' ||

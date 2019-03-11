@@ -62,6 +62,10 @@ import {USER_LOGIN_SUCCESS,
         ADDED_MY_APPLICATIONS_POSTS,
         ADDED_MY_APPLICATIONS_POSTS_IMAGES,
 
+        ADDED_MY_APPLICATIONS_POSTS_LIKES,
+        MODIFIED_MY_APPLICATIONS_POSTS_LIKES,
+        REMOVED_MY_APPLICATIONS_POSTS_LIKES,
+
         UPDATE_PICTURE_PROFILE,
         UPDATE_PICTURE_BG_PROFILE,
         EDIT_DISPLAY_NAME_PROFILE,
@@ -134,6 +138,11 @@ import {login,
         scan_qrcode,
         friend_profile_99,
         add_new_post} from '../Utils/Services'
+
+import {makeMyAppicationsPostsState} from '../Reselect'
+
+import configureStore from '../configureStore'
+const { persistor, store } = configureStore()
 
 export const actionApplicationCategory = () =>dispatch =>{
     return application_category().then(data=>{
@@ -815,14 +824,32 @@ export const actionAddNewPost = (uid, app_id, feelings, privacy, images, text, l
         ADDED_MY_APPLICATIONS_POSTS_IMAGES,
                 */
 
-                dispatch({type:ADDED_MY_APPLICATIONS_POSTS, app_id:data.app_id, post_id:data.post_id, my_applications_posts_data:data.my_applications_posts_data})
+                // dispatch({type:ADDED_MY_APPLICATIONS_POSTS, app_id:data.app_id, post_id:data.post_id, my_applications_posts_data:data.my_applications_posts_data})
 
-                dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:data.post_id, my_applications_posts_images_data:data.my_applications_posts_images_data})
+                // dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:data.post_id, my_applications_posts_images_data:data.my_applications_posts_images_data})
                 
                 return {'status':true, data}
             }
         }
     })
+}
+
+export const actionLikePost = (creator, uid, app_id, post_id, status, callback) => dispatch =>{
+    // firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).set({
+    //     name,
+    // }, { merge: true});
+
+    // /users/549099/my_applications/1286/my_applications_posts/1124656
+
+    // if(!like_key){
+    //     like_key = randomKey()
+    // }
+
+    firebase.firestore().collection('users').doc(creator).collection('my_applications').doc(app_id).collection('my_applications_posts').doc(post_id).collection('my_applications_posts_likes').doc(uid).set({
+        status,
+    }, { merge: true});
+
+    callback({'status':true})
 }
 
 export const actionEditClassNameProfile = (uid, class_id, name, callback) => dispatch =>{
@@ -2058,7 +2085,8 @@ export const trackProfileMyIds=(uid, myIds)=> dispatch =>{
 }
 
 // trach my application
-export const trackMyApplications=(uid, my_applications)=> dispatch =>{
+export const trackMyApplications=(uid, my_applications, my_applications_posts)=> dispatch =>{
+    console.log('trackMyApplications', my_applications, my_applications_posts)
     firebase.firestore().collection('users').doc(uid).collection('my_applications').onSnapshot((qSnapshot) => {
         qSnapshot.docChanges.forEach(function(change) {
             // console.log(change.type, change.doc.id, change.doc.data());
@@ -2076,6 +2104,147 @@ export const trackMyApplications=(uid, my_applications)=> dispatch =>{
                         // console.log('my_application > ', my_applications, my_application, doc_id )
                         dispatch({type: ADDED_MY_APPLICATION, my_application_id:doc_id, my_application_data:doc_data})
                     }
+
+                    // /users/549099/my_applications/1363/my_applications_posts/1124668
+                    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(doc_id).collection('my_applications_posts').onSnapshot((postsSnapshot) => {
+                        postsSnapshot.docChanges.forEach(function(postsChange) {
+                            let posts_doc_id   = postsChange.doc.id
+                            let posts_doc_data = postsChange.doc.data()
+                            switch(postsChange.type){
+                                case 'added':{
+                                    // console.log('trackMyApplications > my_applications > my_applications_posts : added ', doc_id, posts_doc_id, posts_doc_data)
+                                   
+                                    let my_applications_post =  _.find(my_applications_posts, (v, k)=>{
+                                                                    return doc_id == k
+                                                                })
+                                    if(my_applications_post){
+                                        let post =  _.find(my_applications_post, (post_v, post_k)=>{
+                                                        return posts_doc_id == post_k
+                                                    })
+
+                                        if(!post){
+                                            dispatch({type:ADDED_MY_APPLICATIONS_POSTS, app_id:doc_id, post_id:posts_doc_id, my_applications_posts_data:posts_doc_data})
+                                        }
+                                    }else{
+                                        dispatch({type:ADDED_MY_APPLICATIONS_POSTS, app_id:doc_id, post_id:posts_doc_id, my_applications_posts_data:posts_doc_data})
+                                    }
+
+                                    // /users/549099/my_applications/1363/my_applications_posts/1124668/my_applications_posts_images/1124669
+                                    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(doc_id).collection('my_applications_posts').doc(posts_doc_id).collection('my_applications_posts_images').onSnapshot((imagesSnapshot) => {
+                                        imagesSnapshot.docChanges.forEach(function(imagesChange) {
+                                            let image_doc_id   = imagesChange.doc.id
+                                            let image_doc_data = imagesChange.doc.data()
+                                            switch(imagesChange.type){
+                                                case 'added':{
+                                                    let posts   =_.find(my_applications_posts, (v, k)=>{
+                                                                    return doc_id == k
+                                                                })
+
+                                                    let post    =_.find(posts,(v, k)=>{
+                                                                    return posts_doc_id == k
+                                                                })
+
+                                                    if(!post){
+                                                        dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:posts_doc_id, image_doc_id, image_doc_data})
+                                                        return;
+                                                    }else{
+                                                        // if (!post.hasOwnProperty("images")){
+                                                        //     dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:posts_doc_id, image_doc_id, image_doc_data})
+                                                        // }else{
+                                                        // console.log('images----->', post)
+                                                        let {images} = post
+
+                                                        
+
+                                                        let image = _.find(images,(v, k)=>{
+                                                                        return image_doc_id == k
+                                                                    })
+
+                                                        if(!image){
+                                                            dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:posts_doc_id, image_doc_id, image_doc_data})
+                                                        }
+                                                    }
+                                                    break;
+                                                }
+                                                case 'modified':{
+                                                    
+                                                    break;
+                                                }
+                                                case 'removed':{
+                                                    
+                                                    break;
+                                                }
+                                            }
+                                        })
+                                    })
+
+                                    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(doc_id).collection('my_applications_posts').doc(posts_doc_id).collection('my_applications_posts_likes').onSnapshot((likesSnapshot) => {
+                                        likesSnapshot.docChanges.forEach(function(likesChange) {
+                                            let like_doc_id   = likesChange.doc.id
+                                            let like_doc_data = likesChange.doc.data()
+                                            switch(likesChange.type){
+                                                case 'added':{
+                                                    // console.log('my_applications_posts_likes', like_doc_id, like_doc_data)
+                                                    
+                                                    let posts   =_.find(my_applications_posts, (v, k)=>{
+                                                                    return doc_id == k
+                                                                })
+
+                                                    let post    =_.find(posts,(v, k)=>{
+                                                                    return posts_doc_id == k
+                                                                })
+
+                                                    if(!post){
+                                                        // console.log('ADDED_MY_APPLICATIONS_POSTS_LIKES', like_doc_id, like_doc_data)
+                                                        dispatch({type:ADDED_MY_APPLICATIONS_POSTS_LIKES, post_id:posts_doc_id, like_doc_id, like_doc_data})
+                                                        return;
+                                                    }else{
+                                                        // if (!post.hasOwnProperty("images")){
+                                                        //     dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:posts_doc_id, image_doc_id, image_doc_data})
+                                                        // }else{
+                                                        // console.log('likes----->', post)
+                                                        let {likes} = post
+
+                                                        let like = _.find(likes,(v, k)=>{
+                                                                        return like_doc_id == k
+                                                                    })
+
+                                                        if(!like){
+                                                            console.log('ADDED_MY_APPLICATIONS_POSTS_LIKES', like_doc_id, like_doc_data)
+                                                            dispatch({type:ADDED_MY_APPLICATIONS_POSTS_LIKES, post_id:posts_doc_id, like_doc_id, like_doc_data})
+                                                        }
+                                                    }
+                                                
+                                                    break;
+                                                }
+                                                case 'modified':{
+                                                    // var newState =store.getState();
+                                                    dispatch({type:MODIFIED_MY_APPLICATIONS_POSTS_LIKES, post_id:posts_doc_id, like_doc_id, like_doc_data})
+                                                    break;
+                                                }
+                                                case 'removed':{
+                                                    dispatch({type:REMOVED_MY_APPLICATIONS_POSTS_LIKES, post_id:posts_doc_id, like_doc_id})
+                                                    break;
+                                                }
+                                            }
+                                        })
+                                    })
+
+
+                                    break;
+                                }
+                                case 'modified':{
+                                    
+                                    break;
+                                }
+                                case 'removed':{
+                                    
+                                    break;
+                                }
+                            }
+                        })
+                    })
+
                     break;
                 }
                 case 'modified':{

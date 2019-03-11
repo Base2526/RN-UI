@@ -76,8 +76,11 @@ export const UPDATE_STATUS_MY_APPLICATION = "update_status_my_application"
 
 export const ADD_APPLICATION_CATEGORY= "add_application_category"
 
-export const ADDED_MY_APPLICATIONS_POSTS   = "added_my_applications_posts"
+export const ADDED_MY_APPLICATIONS_POSTS          = "added_my_applications_posts"
 export const ADDED_MY_APPLICATIONS_POSTS_IMAGES   = "added_my_applications_posts_images"
+export const ADDED_MY_APPLICATIONS_POSTS_LIKES    = "added_my_applications_posts_likes"
+export const MODIFIED_MY_APPLICATIONS_POSTS_LIKES = "modified_my_applications_posts_likes"
+export const REMOVED_MY_APPLICATIONS_POSTS_LIKES  = "removed_my_applications_posts_likes"
 
 export const UPDATE_PICTURE_PROFILE         = 'update_picture_profile'
 export const UPDATE_PICTURE_BG_PROFILE      = 'update_picture_bg_profile'

@@ -57,6 +57,9 @@ import {USER_LOGIN_SUCCESS,
 
         ADDED_MY_APPLICATIONS_POSTS,
         ADDED_MY_APPLICATIONS_POSTS_IMAGES,
+        ADDED_MY_APPLICATIONS_POSTS_LIKES,
+        MODIFIED_MY_APPLICATIONS_POSTS_LIKES,
+        REMOVED_MY_APPLICATIONS_POSTS_LIKES,
 
         UPDATE_PICTURE_PROFILE,
         UPDATE_PICTURE_BG_PROFILE,
@@ -2995,6 +2998,7 @@ export default (state= INITIAL_STATE, action)=>{
                                             return k == action.app_id
                                         })
 
+            // dispatch({type:ADDED_MY_APPLICATIONS_POSTS, app_id:doc_id, post_id:posts_doc_id, my_applications_posts_data:posts_doc_data})
             if(!my_applications_post){
                 let newPost = {[action.post_id]:action.my_applications_posts_data}
                 let newState = {...state,
@@ -3025,47 +3029,10 @@ export default (state= INITIAL_STATE, action)=>{
                                             }
                                         }
                                     }
+                    console.log('ADDED_MY_APPLICATIONS_POSTS', newPost)
                     return newState
                 }
             }
-
-            /*
-            let friend_profiles = state.user.friend_profiles
-            let friend_profile = _.find(friend_profiles,  function(v, k) { 
-                return k == action.friend_id
-            })
-
-            if(friend_profile === undefined){
-                let newState = {...state,
-                                    user: {
-                                        ...state.user,
-                                        friend_profiles : {
-                                            ...state.user.friend_profiles,
-                                            [action.friend_id]:action.friend_profile
-                                        }
-                                    }
-                                }
-                
-                console.log('ADDED_FRIEND_PROFILE', action.friend_profile, newState)
-                return newState;
-            }else{
-                if(!_.isEqual(friend_profile, action.friend_profile)){
-                    let newState = {...state,
-                                        user: {
-                                            ...state.user,
-                                            friend_profiles : {
-                                                ...state.user.friend_profiles,
-                                                [action.friend_id]:action.friend_profile
-                                            }
-                                        }
-                                    }
-
-                    console.log('ADDED_FRIEND_PROFILE', friend_profile, action.friend_profile, newState)
-                    return newState;
-                }
-            }
-            */
-
             return state
         }
 
@@ -3075,10 +3042,10 @@ export default (state= INITIAL_STATE, action)=>{
                 return state
             }
 
-            let my_applications_posts_images    = state.user.my_applications_posts_images
-            let my_applications_posts_image     = _.find(my_applications_posts_images,  function(v, k) { 
-                                                    return k == action.post_id
-                                                  })
+            let my_applications_posts_images= state.user.my_applications_posts_images
+            let my_applications_posts_image = _.find(my_applications_posts_images,  function(v, k) { 
+                                                return k == action.post_id
+                                              })
 
             if(!my_applications_posts_image){
                 let newState = {...state,
@@ -3086,35 +3053,147 @@ export default (state= INITIAL_STATE, action)=>{
                                         ...state.user,
                                         my_applications_posts_images: {
                                             ...state.user.my_applications_posts_images,
-                                            [action.post_id]:action.my_applications_posts_images_data
+                                            [action.post_id]:{[action.image_doc_id]:action.image_doc_data}
                                         }
                                     }
                                 }
-
                 return newState
             }else{
-
-
-                /*
-                let post =  _.find(my_applications_post, (v, k)=>{
-                                return action.post_id == k
+                let image = _.find(my_applications_posts_image, (v, k)=>{
+                                return action.image_doc_id == k
                             })
-                
-                if(!post){
-                    let newPost = {...my_applications_post, [action.post_id]:action.my_applications_posts_data}
-                
-                    let newState = {...state,
+
+                if(image){
+                    
+                    return state
+                }
+
+                let newImages   =   {...my_applications_posts_image, [action.image_doc_id]:action.image_doc_data }
+                let newState    =   {...state,
                                         user: {
                                             ...state.user,
-                                            my_applications_posts: {
-                                                ...state.user.my_applications_posts,
-                                                [action.app_id]:newPost
+                                            my_applications_posts_images: {
+                                                ...state.user.my_applications_posts_images,
+                                                [action.post_id]:newImages
                                             }
                                         }
                                     }
+                return newState
+            }
+            return state
+        }
+
+        case ADDED_MY_APPLICATIONS_POSTS_LIKES:{
+            if(state.user === null){
+                return state
+            }
+
+            // dispatch({type:ADDED_MY_APPLICATIONS_POSTS_LIKES, post_id:posts_doc_id, like_doc_id, like_doc_data})
+            let my_applications_posts_likes = state.user.my_applications_posts_likes
+            let my_applications_posts_like = _.find(my_applications_posts_likes,  function(v, k) { 
+                                                return k == action.post_id
+                                            })
+
+            if(!my_applications_posts_like){
+                let newState = {...state,
+                                    user: {
+                                        ...state.user,
+                                        my_applications_posts_likes: {
+                                            ...state.user.my_applications_posts_likes,
+                                            [action.post_id]:{[action.like_doc_id]:action.like_doc_data}
+                                        }
+                                    }
+                                }
+                return newState
+            }else{
+                let like = _.find(my_applications_posts_like, (v, k)=>{
+                                return action.like_doc_id == k
+                            })
+
+                if(like){
+                    return state
+                }
+
+                let newLikes   =   {...my_applications_posts_like, [action.like_doc_id]:action.like_doc_data }
+                let newState    =   {...state,
+                                        user: {
+                                            ...state.user,
+                                            my_applications_posts_likes: {
+                                                ...state.user.my_applications_posts_likes,
+                                                [action.post_id]:newLikes
+                                            }
+                                        }
+                                    }
+                return newState
+            }
+            return state
+        }
+
+        case MODIFIED_MY_APPLICATIONS_POSTS_LIKES:{
+            if(state.user === null){
+                return state
+            }
+            let my_applications_posts_likes = state.user.my_applications_posts_likes
+            let my_applications_posts_like = _.find(my_applications_posts_likes,  function(v, k) { 
+                                                return k == action.post_id
+                                            })
+            if(my_applications_posts_like){
+                let like = _.find(my_applications_posts_like, (v, k)=>{
+                    return action.like_doc_id == k
+                })
+
+                if(like){
+                    // console.log('MODIFIED_MY_APPLICATIONS_POSTS_LIKES', like, action.like_doc_data)
+                    if(!_.isEqual(like, action.like_doc_data)){
+                        let update_likes=   {...my_applications_posts_like, [action.like_doc_id]:action.like_doc_data }
+                        let newState    =   {...state,
+                                                user: {
+                                                    ...state.user,
+                                                    my_applications_posts_likes: {
+                                                        ...state.user.my_applications_posts_likes,
+                                                        [action.post_id]:update_likes
+                                                    }
+                                                }
+                                            }
+
+                        // console.log('MODIFIED_MY_APPLICATIONS_POSTS_LIKES', newState)
+                        return newState
+                    }
+                }
+            }
+
+            return state
+        }
+
+        case REMOVED_MY_APPLICATIONS_POSTS_LIKES:{
+            if(state.user === null){
+                return state
+            }
+
+            let my_applications_posts_likes = state.user.my_applications_posts_likes
+            let my_applications_posts_like  = _.find(my_applications_posts_likes,  function(v, k) { 
+                                                return k == action.post_id
+                                              })
+            if(my_applications_posts_like){
+                let like = _.find(my_applications_posts_like, (v, k)=>{
+                    return action.like_doc_id == k
+                })
+
+                if(like){
+                    let update_likes= _.omit(my_applications_posts_like, action.like_doc_id)
+                    let newState    =   {...state,
+                                            user: {
+                                                ...state.user,
+                                                my_applications_posts_likes: {
+                                                    ...state.user.my_applications_posts_likes,
+                                                    [action.post_id]:update_likes
+                                                }
+                                            }
+                                        }
+
+                    // console.log('REMOVED_MY_APPLICATIONS_POSTS_LIKES', newState)
                     return newState
                 }
-                */
             }
 
             return state

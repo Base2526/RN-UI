@@ -35,8 +35,9 @@ const getMyIds= (state, props) => {
 
 const getMyAppications= (state, props) => {
     let my_applications = state.auth.user.my_applications
+    return my_applications
+    /*
     let new_my_applications = {...my_applications}
-
     // my_applications_posts
     _.each(my_applications, (v,k)=>{
         let {my_applications_posts, 
@@ -60,6 +61,52 @@ const getMyAppications= (state, props) => {
     })
 
     return new_my_applications
+    */
+}
+
+const getMyAppicationsPosts = (state, props) => {
+    let {my_applications_posts, 
+        my_applications_posts_images,
+        my_applications_posts_likes} = state.auth.user
+    let new_my_applications_posts = {...my_applications_posts}
+    _.each(my_applications_posts, (post_v,post_k)=>{
+        let newPostV = {...post_v}
+        _.each(post_v, (pv, pk)=>{
+            let images  =  _.find(my_applications_posts_images, (image_v, image_k)=>{
+                            return pk == image_k
+                        })
+
+            let likes  =  _.find(my_applications_posts_likes, (like_v, like_k)=>{
+                            return pk == like_k
+                          })
+            
+            if(images){
+                pv = {...pv, images}
+                newPostV = {...newPostV, [pk]:pv}
+            }else{
+                pv = {...pv, images:{}}
+                newPostV = {...newPostV, [pk]:pv}
+            }
+
+            if(likes){
+                console.log('likes>>> ?', likes, my_applications_posts_likes)
+                pv = {...pv, likes}
+                newPostV = {...newPostV, [pk]:pv}
+            }else{
+                pv = {...pv, likes:{}}
+                newPostV = {...newPostV, [pk]:pv}
+            }
+        })
+        new_my_applications_posts = {...new_my_applications_posts, [post_k]:newPostV}
+    })
+    // console.log('new_my_applications_posts', new_my_applications_posts, my_applications_posts)
+    return new_my_applications_posts
+}
+
+const getMyAppicationsPostsLikes = (state, props) => {
+    let {my_applications_posts_likes} = state.auth.user
+
+    return my_applications_posts_likes
 }
 
 const getFriends = (state, props) => {
@@ -193,6 +240,22 @@ export const makeMyAppicationsState = createSelector(
     [ getMyAppications ],
     (my_applications) => my_applications
 )
+
+export const makeMyAppicationsPostsState = createSelector(
+    [ getMyAppicationsPosts ],
+    (my_applications_posts) => my_applications_posts
+)
+
+export const makeMyAppicationsPostsLikesState = createSelector(
+    [ getMyAppicationsPostsLikes ],
+    (my_applications_posts_likes) => my_applications_posts_likes
+)
+
+/*
+
+let {my_applications_posts, 
+            my_applications_posts_images} = state.auth.user
+*/
 
 
 // 

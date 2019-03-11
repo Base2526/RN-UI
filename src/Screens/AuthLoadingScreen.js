@@ -17,6 +17,7 @@ import {makeUidState,
         makeEmailsState,
         makeMyIdsState,
         makeMyAppicationsState,
+        makeMyAppicationsPostsState,
         makeClasssState,
         makeGroupsState,
         makeGroupProfilesState,
@@ -104,6 +105,7 @@ class AuthLoadingScreen extends React.Component {
                 emails,
                 myIds,
                 my_applications,
+                my_applications_posts,
                 classs,
                 groups,
                 group_profiles,
@@ -114,7 +116,7 @@ class AuthLoadingScreen extends React.Component {
             this.props.trackProfileWebsites(uid, websites)
             this.props.trackProfileEmails(uid, emails)
             this.props.trackProfileMyIds(uid, myIds)
-            this.props.trackMyApplications(uid, my_applications)
+            this.props.trackMyApplications(uid, my_applications, my_applications_posts)
             this.props.trackClasss(uid, classs)
             this.props.trackGroups(uid, groups, group_profiles)
             this.props.trackFriends(uid, friends, friend_profiles)
@@ -166,6 +168,7 @@ const mapStateToProps = (state, ownProps) => {
             emails:makeEmailsState(state, ownProps),
             myIds:makeMyIdsState(state, ownProps),
             my_applications:makeMyAppicationsState(state, ownProps),
+            my_applications_posts:makeMyAppicationsPostsState(state, ownProps),
             classs:makeClasssState(state, ownProps),
             groups:makeGroupsState(state, ownProps),
             group_profiles:makeGroupProfilesState(state, ownProps),
@@ -174,9 +177,5 @@ const mapStateToProps = (state, ownProps) => {
         }
     }
 }
-
-// const mapDispatchToProps = (dispatch, ownProps) => {
-//     return { dispatch, watchTaskEvent, trackProfilesPhone }
-// }
 
 export default connect(mapStateToProps, actions)(AuthLoadingScreen);

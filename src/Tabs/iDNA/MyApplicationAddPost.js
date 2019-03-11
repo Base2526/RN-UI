@@ -62,6 +62,8 @@ class MyApplicationAddPost extends React.Component{
             loading: false,
             renderContent: false,
             app_id:0,
+            mode:'',
+            data:{},
 
             text:'',
 
@@ -76,10 +78,18 @@ class MyApplicationAddPost extends React.Component{
         this.props.navigation.setParams({handleCancel: this.handleCancel })
         this.props.navigation.setParams({handleNewPost: this.handleNewPost })
         
-        const { navigation } = this.props;
-        const app_id = navigation.getParam('app_id', null);
-      
-        this.setState({app_id})
+        const { navigation } = this.props
+        const app_id = navigation.getParam('app_id', null)
+        const mode = navigation.getParam('mode', null)
+
+        if(mode == 'add'){
+            this.setState({app_id, mode})
+        }else if(mode == 'edit'){
+
+            const data = navigation.getParam('data', null)
+            console.log('data', data)
+            this.setState({app_id, mode, data})
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -105,16 +115,12 @@ class MyApplicationAddPost extends React.Component{
         if(isEmpty(text) && isEmpty(images)){
 
         }else{
-
-            // console.log(uid, app_id, feelings, privacy, images, text, location)
             this.setState({loading:true})
             this.props.actionAddNewPost(uid, app_id, feelings, privacy, images, text, location).then((result) => {
-                // this.setState({friend_id, loading:false}, ()=>{
-                //     this.loadData(this.props)
-                // })
-
-                this.setState({loading:false})
-                console.log(result)
+                setTimeout(() => {
+                    this.setState({loading:false})
+                    this.props.navigation.goBack(null)
+                }, 200);
             })
         }
     }
@@ -247,8 +253,6 @@ const mapStateToProps = (state, ownProps) => {
     }
   
     return{
-        // auth:state.auth
-
         uid:makeUidState(state, ownProps),
     }
 }

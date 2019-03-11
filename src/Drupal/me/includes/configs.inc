@@ -11,6 +11,8 @@ require_once ( dirname(__FILE__) . '/../libraries/ApnsPHP/Autoload.php');
 
 // -------- Firebase Firestore
 use Google\Cloud\Firestore\FirestoreClient;
+use Google\Cloud\Core\Timestamp;
+use DateTime;
 
 /*
 * hook_init()

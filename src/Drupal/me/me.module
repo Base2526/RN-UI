@@ -1,5 +1,6 @@
 <?php
 require_once ( dirname(__FILE__) . '/includes/functions.inc');
+// require_once ( dirname(__FILE__) . '/includes/configs.inc');
 
 $debug;
 $firebase;
@@ -10525,7 +10526,7 @@ function add_new_post(){
     $post_value['field_my_app_message_update'][LANGUAGE_NONE][0]['value'] = $text;
 
 
-    $firestore_value['message']= $text;
+    $firestore_value['text']= $text;
   }
 
   if(!empty($location)){
@@ -10550,6 +10551,9 @@ function add_new_post(){
   $field_entity->uid = $uid;
   $field_entity->setHostEntity("node", $node);
   $field_entity->save(); 
+
+  $firestore_value['createdAt'] = time(); //new Google\Cloud\Core\Timestamp(new DateTime());
+  $firestore_value['creator']= $uid;
 
   $batch = firestore_db()->batch();
 
