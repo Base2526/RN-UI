@@ -60,6 +60,9 @@ import {USER_LOGIN_SUCCESS,
         ADD_APPLICATION_CATEGORY,
 
         ADDED_MY_APPLICATIONS_POSTS,
+        MODIFIED_MY_APPLICATIONS_POSTS,
+        REMOVED_MY_APPLICATIONS_POSTS,
+        
         ADDED_MY_APPLICATIONS_POSTS_IMAGES,
 
         ADDED_MY_APPLICATIONS_POSTS_LIKES,
@@ -815,23 +818,35 @@ export const actionAddNewPost = (uid, app_id, feelings, privacy, images, text, l
             if(!data.result){
                 return {'status':false, 'message': data}
             }else{
-                // dispatch({ type: UPDATE_GROUP_PICTURE_PROFILE, group_id, image_url:data.image_url});
-                
-                // dispatch({ type: UPDATE_CLASS_PICTURE_PROFILE, class_id, image_url:data.image_url});
-                
-                /* 
-                        ADDED_MY_APPLICATIONS_POSTS,
-        ADDED_MY_APPLICATIONS_POSTS_IMAGES,
-                */
-
                 // dispatch({type:ADDED_MY_APPLICATIONS_POSTS, app_id:data.app_id, post_id:data.post_id, my_applications_posts_data:data.my_applications_posts_data})
-
                 // dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:data.post_id, my_applications_posts_images_data:data.my_applications_posts_images_data})
                 
                 return {'status':true, data}
             }
         }
     })
+}
+
+export const actionDeletePost = (uid, app_id, post_id, callback) => dispatch =>{
+    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(app_id).collection('my_applications_posts').doc(post_id).delete()
+    callback({'status':true})
+    /*
+    return add_new_post(uid, app_id, feelings, privacy, images, text, location).then(data => {
+        console.log(data)
+        if((data instanceof Array)){
+            return {'status':false, 'message': data}
+        }else{
+            if(!data.result){
+                return {'status':false, 'message': data}
+            }else{
+                // dispatch({type:ADDED_MY_APPLICATIONS_POSTS, app_id:data.app_id, post_id:data.post_id, my_applications_posts_data:data.my_applications_posts_data})
+                // dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:data.post_id, my_applications_posts_images_data:data.my_applications_posts_images_data})
+                
+                return {'status':true, data}
+            }
+        }
+    })
+    */
 }
 
 export const actionLikePost = (creator, uid, app_id, post_id, status, callback) => dispatch =>{
@@ -2230,7 +2245,6 @@ export const trackMyApplications=(uid, my_applications, my_applications_posts)=>
                                         })
                                     })
 
-
                                     break;
                                 }
                                 case 'modified':{
@@ -2238,7 +2252,7 @@ export const trackMyApplications=(uid, my_applications, my_applications_posts)=>
                                     break;
                                 }
                                 case 'removed':{
-                                    
+                                    dispatch({type:REMOVED_MY_APPLICATIONS_POSTS, app_id:doc_id, post_id:posts_doc_id})
                                     break;
                                 }
                             }

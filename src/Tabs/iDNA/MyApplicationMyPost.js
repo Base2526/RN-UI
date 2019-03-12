@@ -170,6 +170,13 @@ class MyApplicationMyPost extends Component {
                             <Text style={{padding:10, fontSize:18}}>Edit</Text>
                         </MenuOption>
                         <MenuOption onSelect={() => {
+
+                            // let {uid}    = this.props
+                            let {app_id} = this.state            
+                            let {post_id, creator} = item
+
+                            // console.log('actionDeletePost', creator, app_id, post_id)
+
                             Alert.alert(
                                 'Delete post',
                                 'Are you sure delete?',
@@ -181,7 +188,12 @@ class MyApplicationMyPost extends Component {
                                         }, style: 'cancel'},
                                   {text: 'OK', 
                                   onPress: () => {
-              
+                                      // export const actionDeletePost = (uid, app_id, post_id, callback)
+                                        this.setState({loading:true})
+                                        this.props.actionDeletePost(creator, app_id, post_id, (result)=>{
+                                            // console.log(result)
+                                            this.setState({loading:false})
+                                        })
                                     }, 
                                   },
                                 ],

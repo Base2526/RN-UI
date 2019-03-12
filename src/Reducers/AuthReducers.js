@@ -56,6 +56,7 @@ import {USER_LOGIN_SUCCESS,
         ADD_APPLICATION_CATEGORY,
 
         ADDED_MY_APPLICATIONS_POSTS,
+        REMOVED_MY_APPLICATIONS_POSTS,
         ADDED_MY_APPLICATIONS_POSTS_IMAGES,
         ADDED_MY_APPLICATIONS_POSTS_LIKES,
         MODIFIED_MY_APPLICATIONS_POSTS_LIKES,
@@ -3030,6 +3031,48 @@ export default (state= INITIAL_STATE, action)=>{
                                         }
                                     }
                     console.log('ADDED_MY_APPLICATIONS_POSTS', newPost)
+                    return newState
+                }
+            }
+            return state
+        }
+
+        case REMOVED_MY_APPLICATIONS_POSTS:{
+            if(state.user === null){
+                return state
+            }
+
+            let my_applications_posts = state.user.my_applications_posts
+            let my_applications_post =  _.find(my_applications_posts,  function(v, k) { 
+                                            return k == action.app_id
+                                        })
+
+            if(my_applications_post){
+                // let new_my_applications_posts = _.omit(my_applications_posts, action.post_id)
+                // let newState = {...state,
+                //                     user: {
+                //                         ...state.user,
+                //                         my_applications_posts: new_my_applications_posts
+                //                     }
+                //                 }
+                // return newState
+
+                let post =  _.find(my_applications_post,  function(v, k) { 
+                                return k == action.post_id
+                            })
+
+                if(post){
+                    let newPost = _.omit(my_applications_post, action.post_id)
+                    let newState = {...state,
+                                        user: {
+                                            ...state.user,
+                                            my_applications_posts: {
+                                                ...state.user.my_applications_posts,
+                                                [action.app_id]:newPost
+                                            }
+                                        }
+                                    }
+
                     return newState
                 }
             }

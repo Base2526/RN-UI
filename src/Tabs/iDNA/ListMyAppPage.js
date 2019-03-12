@@ -134,8 +134,7 @@ class ListMyAppPage extends React.Component{
 
     manageMyApplicationPage = (item)=>{
       let {application_category} = this.props.auth
-
-      if(application_category != null){
+      if(application_category){
         this.props.params.navigation.navigate("ManageMyApplicationPage", {item})
       }else{
         this.setState({showSpinner: true})
@@ -430,6 +429,7 @@ const mapStateToProps = (state, ownProps) => {
 
   return{
     uid: makeUidState(state, ownProps),
+    auth:state.auth,
     my_applications: makeMyAppicationsState(state, ownProps),
   }
 }

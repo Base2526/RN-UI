@@ -8,7 +8,6 @@ import {View,
         Switch} from 'react-native';
 import FastImage from 'react-native-fast-image'
 import ImagePicker from 'react-native-image-picker';
-// import Image from 'react-native-remote-svg'
 import Spinner from 'react-native-loading-spinner-overlay';
 
 var _ = require('lodash');
@@ -19,6 +18,8 @@ import { connect } from 'react-redux';
 import * as actions from '../../Actions'
 import {getUid, isEquivalent2Object} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
+
+import {makeUidState} from '../../Reselect'
 
 // More info on all the options is below in the API Reference... just some common use cases shown here
 const options = {
@@ -93,6 +94,9 @@ class ManageMyApplicationPage extends React.Component{
         //     // if()
         // })
 
+        this.loadData(this.props)
+
+    
         let {application_category} = this.props.auth
 
         let c = item.category
@@ -127,6 +131,7 @@ class ManageMyApplicationPage extends React.Component{
                         isPublished:item.status,
                         loading: true})
 
+                    
         // this.setState({item, applicationName:item.name, applicationImage:{uri:item.image_url}})
         /*
         let {application_category} = this.props.auth
@@ -143,6 +148,16 @@ class ManageMyApplicationPage extends React.Component{
 
         console.log(this.state.applicationName)
         */
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.loadData(nextProps)
+    }
+
+    loadData = (props) =>{
+        // let {application_category} = props.auth
+
+        console.log('props', props)
     }
 
     handlePost = () =>{
@@ -467,7 +482,7 @@ class ManageMyApplicationPage extends React.Component{
       }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     console.log(state)
   
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
@@ -477,8 +492,10 @@ const mapStateToProps = (state) => {
     }
   
     return{
-      uid:getUid(state),
-      auth:state.auth
+    //   uid:getUid(state),
+
+        uid: makeUidState(state, ownProps),
+        auth:state.auth,
     }
 }
   

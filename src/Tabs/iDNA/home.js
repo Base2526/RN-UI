@@ -15,6 +15,8 @@ import * as actions from '../../Actions'
 import MyIcon from '../../config/icon-font.js';
 import OfflineNotice from '../../Utils/OfflineNotice'
 
+import {makeIsConnectedState} from '../../Reselect'
+
 class home extends Component {
     static navigationOptions = ({navigation}) => {
         const {params = {}, positionSelect} = navigation.state;
@@ -178,14 +180,20 @@ class home extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     console.log(state)
     if(!state._persist.rehydrated){
         return {}
     }
-    console.log(state.offline)
+
+    if(!state.auth.isLogin){
+        return;
+    }
+
+    // console.log(state.offline)
     return{
-        isConnected:state.offline.online
+        // isConnected:state.offline.online
+        isConnected: makeIsConnectedState(state, ownProps),
     }
 }
 
