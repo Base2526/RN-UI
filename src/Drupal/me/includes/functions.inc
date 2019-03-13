@@ -696,6 +696,149 @@ function friend_profile_99(){
 														'friend_websites'=>(object)$friend_websites);//onLoadProfile($friend_id, 'profile');
 	return $result;
 }
+
+function friend_profile($friend_id){
+	/// -------------
+	$profile  = profile2_by_uid_load($friend_id, 'main');
+	////////////////////// profiles //////////////////////////////
+	$profile_name           = $profile->field_profile_name[LANGUAGE_NONE][0]['value'];
+
+	if (isset($profile->field_profile_display_name[LANGUAGE_NONE])) {
+		$profile_name = $profile->field_profile_display_name[LANGUAGE_NONE][0]['value'];
+	}
+
+	$profile_status_message = "";
+	if(isset($profile->field_profile_status_message[LANGUAGE_NONE])){
+		$profile_status_message = $profile->field_profile_status_message[LANGUAGE_NONE][0]['value'];
+	}
+
+	$profile_url_my_qrcode = "";
+	if (isset($profile->field_profile_my_qrcode[LANGUAGE_NONE])) {
+		// $profile_url_my_qrcode  = substr(file_create_url(image_style_url('medium', $profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+		$profile_url_my_qrcode  = file_create_url(image_style_url('medium', $profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']));
+	}
+
+	$profile_image_url;
+	if(isset($profile->field_profile_image[LANGUAGE_NONE])){
+		// $profile_image_url = substr(file_create_url(image_style_url('medium', $profile->field_profile_image[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+		$profile_image_url = file_create_url(image_style_url('medium', $profile->field_profile_image[LANGUAGE_NONE][0]['uri']));
+	}else{
+		$profile_image_url =  getDefualtProfilePicture();
+	}
+
+	// bg_url
+	$profile_bg_url;
+	if(isset($profile->field_my_app_bg[LANGUAGE_NONE])){
+		// $profile_bg_url = substr(file_create_url(image_style_url('medium', $profile->field_my_app_bg[LANGUAGE_NONE][0]['uri'])), strlen($GLOBALS['base_url']));
+		$profile_bg_url = file_create_url(image_style_url('medium', $profile->field_my_app_bg[LANGUAGE_NONE][0]['uri']));
+	}else{
+		$profile_bg_url = getDefualtBackgroundCardPicture();
+	}
+
+	$friend_profile = array('name'			=>$profile_name,
+													'bg_url'		=>$profile_bg_url,
+													'image_url' =>$profile_image_url,
+													'status_message' => $profile_status_message,
+													'url_my_qrcode'  => $profile_url_my_qrcode,
+												);
+	/// -------------
+
+	// friend_emails
+	$friend_emails = array();
+	if(isset($profile->field_profile_multi_email[LANGUAGE_NONE])){
+		foreach ($profile->field_profile_multi_email[LANGUAGE_NONE] as $k_email => $v_email) {
+				$data_item_email = field_collection_item_load($v_email['value']);
+				
+				$data_item_email_email   =  '';
+				if (isset($data_item_email->field_email_text[LANGUAGE_NONE])) {
+					$data_item_email_email   =  $data_item_email->field_email_text[LANGUAGE_NONE][0]['value'];
+				}
+
+				// $data_item_email_enabled =  '0';
+				// if (isset($data_item_email->field_enable[LANGUAGE_NONE])) {
+				// 	$data_item_email_enabled =  $data_item_email->field_enable[LANGUAGE_NONE][0]['value'];
+				// }
+
+				// $emails[$v_email['value']] = array('name'=>$data_item_email_email, 'enabled'=>$data_item_email_enabled);
+				$friend_emails[$data_item_email->field_object_id[LANGUAGE_NONE][0]['value']] = array('email'=>$data_item_email_email);
+		}
+	}
+
+	// friend_my_ids
+	$friend_my_ids = array();
+	if(isset($profile->field_profile_my_id[LANGUAGE_NONE])){
+		foreach ($profile->field_profile_my_id[LANGUAGE_NONE] as $k_my_id => $v_my_id) {
+				$data_my_id = field_collection_item_load($v_my_id['value']);
+				
+				$my_id_value   =  $data_my_id->field_profile_my_id_value[LANGUAGE_NONE][0]['value'];
+				// $my_id_is_edit =  $data_my_id->field_profile_my_id_is_edit[LANGUAGE_NONE][0]['value'];
+				// $my_id[$v_my_id['value']] = array('enabled'=>true, 'is_edit'=>$my_id_is_edit, 'value'=>$my_id_value);
+				$my_id_enable = $data_my_id->field_enable[LANGUAGE_NONE][0]['value'];
+
+				$friend_my_ids[$data_my_id->field_object_id[LANGUAGE_NONE][0]['value']] = array('id'=>$my_id_value, 'enable'=>$my_id_enable);
+		}
+	}
+
+	// friend_phones
+	$friend_phones = array();
+	if(isset($profile->field_profile_multi_phone[LANGUAGE_NONE])){
+		foreach ($profile->field_profile_multi_phone[LANGUAGE_NONE] as $k_phone => $v_phone) {
+				$data_item_phone = field_collection_item_load($v_phone['value']);
+				
+				$data_item_phone_phone   =  $data_item_phone->field_phone_number[LANGUAGE_NONE][0]['value'];
+				$data_item_phone_enabled =  $data_item_phone->field_enable[LANGUAGE_NONE][0]['value'];
+				
+				$friend_phones[$data_item_phone->field_object_id[LANGUAGE_NONE][0]['value']] = array('phone_number'=>$data_item_phone_phone, 'is_verify'=>$data_item_phone_enabled);
+		}
+	}
+
+	// friend_websites
+	$friend_websites = array();
+	if(isset($profile->field_profile_multi_website[LANGUAGE_NONE])){
+		foreach ($profile->field_profile_multi_website[LANGUAGE_NONE] as $k_website => $v_website) {
+				$data_item_website = field_collection_item_load($v_website['value']);
+				
+				$data_item_website_url   =  $data_item_website->field_website_text[LANGUAGE_NONE][0]['value'];
+				// $data_item_phone_enabled =  $data_item_phone->field_enable[LANGUAGE_NONE][0]['value'];
+				
+				$friend_websites[$data_item_phone->field_object_id[LANGUAGE_NONE][0]['value']] = array('url'=>$data_item_website_url);
+		}
+	}
+	return array(	'friend_profile'=>(object)$friend_profile,
+								'friend_emails'	=>(object)$friend_emails,
+								'friend_my_ids' =>(object)$friend_my_ids,
+								'friend_phones' =>(object)$friend_phones,
+								'friend_websites'=>(object)$friend_websites);
+
+}
+
+function friend_profile_multi_99(){
+	$result = array();
+  
+	if (!check_header()) {
+	  $result['result'] = FALSE;
+	  // $result['message']= "check_header()";
+	  return $result;
+	}
+	$time_start = microtime(true);
+
+	$param_uid    = $_REQUEST['uid'];
+  $param_lost_profile= (array)json_decode($_REQUEST['lost_profile']);
+
+
+	$data = array();
+	foreach ($param_lost_profile as $friend_id){
+		$data[$friend_id] = friend_profile($friend_id);
+	}
+
+	$time_end = microtime(true);
+	$execution_times = number_format(($time_end - $time_start), 2);
+	$result['execution_times'] = $execution_times;
+
+	$result['result'] = TRUE;
+	$result['data']   = $data;
+	return $result;
+}
   
 /*
    ถุกเรียกใช้จาก firebase เท่านั้น

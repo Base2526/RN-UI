@@ -42,6 +42,8 @@ module.exports = {
     // Get friend profile กรณียังไม่ได้เป้นเพือนกัน FRIEND_STATUS_FRIEND_99
     FRIEND_PROFILE_99: API_URL + END_POINT + '/friend_profile_99',
 
+    FRIEND_PROFILE_MULTI_99: API_URL + END_POINT + '/friend_profile_multi_99',
+
 
     ADD_NEW_POST: API_URL + END_POINT + '/add_new_post',
 

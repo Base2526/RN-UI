@@ -1649,32 +1649,19 @@ export default (state= INITIAL_STATE, action)=>{
                 return state
             }
     
-            let newGroup = action.data
-            if(group.members !== undefined){
-                newGroup = {...newGroup, members:group.members}
-            }
+            if(!_.isEqual(group, action.group_data)){
+                let newState = {...state,
+                                    user: {
+                                        ...state.user,
+                                        groups: {
+                                            ...state.user.groups,
+                                            [action.group_id]: action.group_data
+                                        }
+                                    }
+                                }
 
-            if(group.group_profile !== undefined){
-                newGroup = {...newGroup, group_profile:group.group_profile}
-            }
-
-            if(!_.isEqual(group, newGroup)){
-                // console.log('Not equal')
-                let v = {
-                    ...state,
-                    user: {
-                        ...state.user,
-                        groups: {
-                            ...state.user.groups,
-                            [action.group_id]: {...group, ...action.data}
-                        }
-                    }
-                }
-                // console.log(v)
-                // console.log(newGroup)
-                return v
-            }else{
-                // console.log('Equal')
+                // console.log('trackGroups > modified', action.group_id, newState)
+                return newState
             }
 
             return state
@@ -1695,7 +1682,6 @@ export default (state= INITIAL_STATE, action)=>{
                 // https://stackoverflow.com/questions/3455405/how-do-i-remove-a-key-from-a-javascript-object
 
                 let newGroups = _.omit(groups, action.group_id)
-
                 let v = {...state,
                             user: {
                                 ...state.user,
@@ -1937,115 +1923,73 @@ export default (state= INITIAL_STATE, action)=>{
         }
 
         case MEMBER_JOIN_GROUP:{
-            if(state.users === null){
+            if(!state.user){
                 return state
             }
 
-            let groups = state.users.groups
+            let group_members   = state.user.group_members
+            let group_member    = _.find(group_members,  function(v, k) { 
+                                    return k == action.group_id
+                                })
 
-            let group = _.find(groups,  function(v, k) { 
-                return k == action.group_id
-            })
-
-            if(group === undefined){
+            if(!group_member){
                 return state
             }
 
-            if(group.members !== undefined){
-                let member_key = action.member_key
+            let member =_.find(group_member, (v, k)=>{
+                            return k == action.member_key
+                        })
 
-                let member = _.find(group.members,  function(v, k) { 
-                    return k == member_key && v.status != Constant.GROUP_STATUS_MEMBER_JOINED
-                })
+            if(!member){
+                return state
+            }
 
-                if(member !== undefined){      
-                    let newGroup = {...group, 
-                                        members: {
-                                            ...group.members,
-                                            [member_key]:{...member, status:Constant.GROUP_STATUS_MEMBER_JOINED}
-                                        }
+            let new_group_members = {...group_member, [action.member_key]:{...member, status: Constant.GROUP_STATUS_MEMBER_JOINED}}
+            let newState = {...state,
+                                user: {
+                                    ...state.user,
+                                    group_members: {
+                                        ...state.user.group_members,
+                                        [action.group_id]: new_group_members
                                     }
-
-                    let v = {
-                            ...state,
-                            users : {
-                                ...state.users,
-                                groups : {
-                                    ...state.users.groups,
-                                    [action.group_id]: newGroup
                                 }
                             }
-                        }
-
-                    return v
-                }
-            }
-            
-            return state
+            return newState
         }
 
         case CANCELED_GROUP_MEMBER:{
-
-            if(state.users === null){
+            if(!state.user){
                 return state
             }
 
-            let groups = state.users.groups
-            let group = _.find(groups,  function(v, k) { 
-                return k == action.group_id
-            })
+            let group_members   = state.user.group_members
+            let group_member    = _.find(group_members,  function(v, k) { 
+                                    return k == action.group_id
+                                })
 
-            if(group === undefined){
+            if(!group_member){
                 return state
             }
 
-            let members = group.members
-            if(members !== undefined){
-                // console.log(action, group)
-                let member_key = action.member_key
-                let member = _.find(members,  function(v, k) { 
-                    return k == member_key
-                })
+            let member =_.find(group_member, (v, k)=>{
+                            return k == action.member_key
+                        })
 
-                if(member !== undefined){
-                    let newMembers = {...members, [member_key]:{...member, status: Constant.GROUP_STATUS_MEMBER_CANCELED}}
-                    let newGroup = {...group, members: newMembers}
-                    let v = {
-                        ...state,
-                        users : {
-                            ...state.users,
-                            groups : {
-                                ...state.users.groups,
-                                [action.group_id]: newGroup
+            if(!member){
+                return state
+            }
+
+            let new_group_members = {...group_member, [action.member_key]:{...member, status: Constant.GROUP_STATUS_MEMBER_CANCELED}}
+            let newState = {...state,
+                                user: {
+                                    ...state.user,
+                                    group_members: {
+                                        ...state.user.group_members,
+                                        [action.group_id]: new_group_members
+                                    }
+                                }
                             }
-                        }
-                    }
-
-                    // console.log(v)
-
-                    return v
-                }
-                // if(member !== undefined){      
-                //     let newMembers = _.omit(members, member_key)
-                //     let newGroup = {...group, members: newMembers}
-
-                //     let v = {
-                //         ...state,
-                //         users : {
-                //             ...state.users,
-                //             groups : {
-                //                 ...state.users.groups,
-                //                 [action.group_id]: newGroup
-                //             }
-                //         }
-                //     }
-
-                //     console.log(newGroup)
-                //     // return v 
-                // }
-            }
-
-            return state
+            return newState
         }
 
         case MEMBER_LEAVE_GROUP:{
@@ -2214,10 +2158,30 @@ export default (state= INITIAL_STATE, action)=>{
         }
 
         case MODIFIED_GROUP_MEMBER:{
-            if(state.users === null){
+            if(state.user === null){
                 return state
             }
-            
+
+            let group_members = state.user.group_members
+            let group_member  = _.find(group_members,  function(v, k) { 
+                                    return k == action.group_id
+                                })
+            if(group_member){
+                let new_group_members = {...group_member, [action.member_key]:action.member_data}
+
+                let newState = {...state,
+                    user: {
+                        ...state.user,
+                        group_members: {
+                            ...state.user.group_members,
+                            [action.group_id]:new_group_members
+                        }
+                    }
+                }
+
+                return newState
+            }
+            /*
             let groups = state.users.groups
 
             let group = _.find(groups,  function(v, k) { 
@@ -2278,54 +2242,43 @@ export default (state= INITIAL_STATE, action)=>{
                     console.log('equal')
                 }
             }
+            */
             
             return state
         }
 
         case REMOVED_GROUP_MEMBER:{
-            if(state.users === null){
+            if(!state.user){
                 return state
             }
 
-            let groups = state.users.groups
+            let group_members = state.user.group_members
+            let group_member  = _.find(group_members,  function(v, k) { 
+                                    return k == action.group_id
+                                })
+            if(group_member){
 
-            // let key = 0
-            // let value = null
-            // _.each(groups, function(_v, _k) { 
-            //     if(_k === action.group_id){
-            //         key = _k
-            //         value = _v
-            //     }
-            // });
+                let member =_.find(group_member, (fv, fk)=>{
+                    return fk == action.member_key
+                })
 
-            let group = _.find(groups,  function(v, k) { 
-                return k == action.group_id
-            })
+                if(member){
+                    let new_group_member = _.omit(group_member, action.member_key)
 
-            if(group === undefined){
-                return state
-            }
+                    let newState = {...state,
+                                        user: {
+                                            ...state.user,
+                                            group_members: {
+                                                ...state.user.group_members,
+                                                [action.group_id]:new_group_member
+                                            }
+                                        }
+                                    }
 
-            if(group.members !== undefined){
-   
-                let newMembers = _.omit(group.members, action.item_id)
-
-                let newValue = {...group, 
-                    members: newMembers
+                    return newState
                 }
-
-                let v = {
-                    ...state,
-                    users : {
-                        ...state.users,
-                        groups : {
-                            ...state.users.groups,
-                            [action.group_id]: newValue
-                        }
-                    }
-                }
-                return v
             }
+            
 
             return state
         }

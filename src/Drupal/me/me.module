@@ -2789,6 +2789,27 @@ function me_services_resources()
       ),
     ),
 
+    'friend_profile_multi_99'=>array(
+      'create' =>array(
+        'help'=>'Services ดึง friend profile multi 99',
+        'callback'=>'friend_profile_multi_99',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+        /* กรณีที่เราต้องการ pass parameter */
+        'args' => array(
+          array(
+           'name' => 'parameters',
+           'type' => 'array',
+           'description' => '',
+           'source' => 'param',
+           'optional' => TRUE,
+           'default value' => array(),
+          ),
+        ),
+      ),
+    ),
+
     'user_for_friend_delete'=>array(
       'create' =>array(
         'help'=>'Services ลบ friend ของ user : param uid, friend_id',
@@ -14844,11 +14865,8 @@ function create_chat_group(){
   $time_start = microtime(true);
   $batch = firestore_db()->batch();
 
-  // global $firebase;
-
   $param_uid    = $_REQUEST['uid'];
-  $param_name   = $_REQUEST['name'];
-  $param_members= (array)json_decode($_REQUEST['members']);
+  $lost_profile= (array)json_decode($_REQUEST['lost_profile']);
 
   if (count($param_members) == 0) {
     $result['result']   = FALSE;
@@ -15123,6 +15141,7 @@ function create_chat_group(){
   $f_item = array("chat_id"    => $chat_id,
                   "name"       => $param_name,
                   "creator_id" => $param_uid,
+                  "created_at"  => time(),
                   // "members"    => $f_members,
                   // "image_url"  => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
                   "image_url"  => file_create_url(image_style_url('medium', $image_url['uri'])),
@@ -15188,8 +15207,7 @@ function delete_chat_group(){
 	$groupId      = $param['groupId'];
   $deletedValue = $_REQUEST['deletedValue'];
   
-  // ลบ node group by group_id
-  node_delete($groupId);
+
 
   $group    = node_load($groupId); 
 
@@ -15204,6 +15222,8 @@ function delete_chat_group(){
 
       // $groups_detail_node_members_group[$item_members_group_friend_id] = array('item_id'=>$v_members_group['value'], 
       firestore_db()->collection(FIRESTORE_USERS)->document($item_members_group_friend_id)->collection(FIRESTORE_GROUPS)->document($groupId)->delete();                                                                 //  'status'   =>$item_members_group_status);
+    
+      watchdog(TAG, 'delete_chat_group %friend_id', array('%friend_id'=> $item_members_group_friend_id), WATCHDOG_INFO);
     }
   }
 
@@ -15219,7 +15239,10 @@ function delete_chat_group(){
 	  foreach ($items as $key => $value) {
 			entity_delete_multiple('field_collection_item', array($value));
 	  }
-	}
+  }
+  
+  // ลบ node group by group_id
+  node_delete($groupId);
 
   $result['result'] = TRUE;
   $result['groupId'] = $groupId;

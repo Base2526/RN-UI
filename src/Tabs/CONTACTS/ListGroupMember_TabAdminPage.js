@@ -24,6 +24,13 @@ import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
+import {makeUidState, 
+        makeProfileState, 
+        makeFriendsState, 
+        makeFriendProfilesState, 
+        makeGroupsState,
+        makeGroupProfilesState} from '../../Reselect'
+
 class ListGroupMember_TabAdminPage extends React.Component{
     constructor(){
         super();
@@ -47,10 +54,13 @@ class ListGroupMember_TabAdminPage extends React.Component{
         this.loadData(nextProps)
     }
 
-    // friend_profiles:state.auth.users.friend_profiles,
     loadData = (props) =>{
         let {group_id}  = this.state
-        let {uid, groups, friends, friend_profiles}    = props
+        let {uid, 
+            friends, 
+            friend_profiles, 
+            groups, 
+            group_profiles}    = props
 
         let group = _.find(groups,  function(v, k) { 
             return k == group_id
@@ -60,48 +70,18 @@ class ListGroupMember_TabAdminPage extends React.Component{
             this.handleCancel()
         }
 
-        console.log(group)
+        let group_profile = _.find(group_profiles, (v, k)=>{
+            return k == group_id
+        })
+        
+        group = {...group, ...group_profile}
 
         let members = []
-        // _.each(group.group_admins, (v, k)=>{
-        //     let friend = _.find(friends, (fv, fk)=>{
-        //         return v.uid == fk
-        //     })
-
-        //     // console.log(friend)
-        //     if(friend === undefined){
-        //         if(v.uid == uid){
-        //             members.push({...v, group_admin_key:k})
-        //         }else{
-        //             // get from firestore
-        //             firebase.firestore().collection('profiles').doc(v.friend_id).get()
-        //             .then(doc => {
-        //                 if (!doc.exists) {
-        //                     console.log('No such document!');
-        //                 } else {
-        //                     console.log(doc.data())
-
-        //                     // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
-        //                     //     console.log(result)
-        //                     // })
-        //                 }
-        //             })
-        //             .catch(err => {
-        //                 console.log('Error getting document', err);
-        //             });
-        //         }
-        //     }else{
-        //         members.push({...v, group_admin_key:k, friend})
-        //     }
-        // })
-
+        
+        console.log(group)
         _.each(group.members, (v, k)=>{
             console.log(v.is_admin)
             if(v.is_admin){
-                // let friend = _.find(friends, (fv, fk)=>{
-                //     return v.friend_id == fk
-                // })
-
                 var friend = _.find(friends, function(fv, fk) {
                     return fk == v.friend_id;
                 });
@@ -112,7 +92,7 @@ class ListGroupMember_TabAdminPage extends React.Component{
     
                 friend = {...friend, profile:friend_profile}
 
-                if(friend === undefined){
+                if(!friend){
                     if(v.friend_id == uid){
                         members.push({...v, group_admin_key:k})
                     }else{
@@ -138,7 +118,6 @@ class ListGroupMember_TabAdminPage extends React.Component{
                 }
             }
         })
-
         this.setState({group, members})
     }
 
@@ -242,67 +221,28 @@ class ListGroupMember_TabAdminPage extends React.Component{
 
     checkInvitor = (item) =>{
 
-        let {uid} = this.props
-        let {group} = this.state
+        let {uid, friend_profiles, groups} = this.props
 
-        console.log(item, uid, group)
-        if(item.friend_id === uid){
-            if(item.friend_id === group.group_profile.creator_id){
-                return(<Text style={{fontSize:12, color:'gray'}}>Group Creator, Admin</Text>)
-            }
+        if(item.friend_id === groups.creator_id){
+            return(<Text style={{fontSize:12, color:'gray'}}>Group Creator, Admin</Text>)
         }else{
             return(<Text style={{fontSize:12, color:'gray'}}>Admin</Text>)
         }
-
-        // let {friends} = this.props
-        // // rowItem.friend_id === this.state.group_profile.creator_id?<Text style={{fontSize:12, color:'gray'}}>Group Creator</Text>:<View />
-    
-        // if(rowItem.friend_id === this.state.group_profile.creator_id){
-        //     return(<Text style={{fontSize:12, color:'gray'}}>Group Creator</Text>)
-        // }else {
-            // if(rowItem.invitor != 0){
-
-            //     if(rowItem.invitor === this.props.uid){
-            //         return(<Text style={{fontSize:12, color:'gray'}}>Added by You</Text>)
-            //     }
-
-            //     let member = _.find(this.state.group.members, (mv, mk)=>{
-            //         // return rowItem.invitor == mv.friend_id
-            //         return '1'
-            //     })
-
-            //     // console.log(member)
-
-            //     var friend_profile = _.find(friends, function(fv, fk) {
-            //         return fk == member.friend_id;
-            //     });
-
-            //     let friend_name = ''
-            //     if(friend_profile !== undefined){
-            //         friend_name = friend_profile.profile.name
-            //     }
-
-            //     return(<Text style={{fontSize:12, color:'gray'}}>Added by {friend_name}</Text>)
-            // }
-        // }
-        return(<View />)
     }
 
     renderItem = ({item, index}) => { 
-        console.log(item)
-
         let {uid} = this.props
        
         if(item.friend_id === uid){
             let {profiles} = this.props
-            return(<View style={{height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+            return(<View style={{padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                         <TouchableOpacity>
                             <FastImage
-                                style={{width: 60,  
-                                        height: 60,
+                                style={{width: 50,  
+                                        height: 50,
                                         borderRadius: 10, 
-                                        borderColor:'gray', 
-                                        borderWidth:1
+                                        // borderColor:'gray', 
+                                        // borderWidth:1
                                         }}
                                 source={{
                                     uri: profiles.image_url,
@@ -324,15 +264,15 @@ class ListGroupMember_TabAdminPage extends React.Component{
                     </View>)
         }
 
-        return(<View style={{height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+        return(<View style={{padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                     <TouchableOpacity>
                         <FastImage
-                            style={{width: 60,  
-                                    height: 60,
+                            style={{width: 50,  
+                                    height: 50,
                                     borderRadius: 10, 
-                                    borderColor:'gray', 
+                                    // borderColor:'gray', 
                                     // backgroundColor: '#FF83AF',
-                                    borderWidth:1
+                                    // borderWidth:1
                                     }}
                             source={{
                                 uri: item.friend.profile.image_url,
@@ -371,18 +311,23 @@ class ListGroupMember_TabAdminPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
-    console.log(state)
+const mapStateToProps = (state, ownProps) => {
+    // console.log(state)
     if(!state._persist.rehydrated){
       return {}
     }
+
+    if(!state.auth.isLogin){
+        return;
+    }
   
     return{
-        uid:getUid(state),
-        profiles:state.auth.users.profiles,
-        friends:state.auth.users.friends,
-        friend_profiles:state.auth.users.friend_profiles,
-        groups:state.auth.users.groups
+        uid:makeUidState(state, ownProps),
+        profiles:makeProfileState(state, ownProps),
+        friends:makeFriendsState(state, ownProps),
+        friend_profiles:makeFriendProfilesState(state, ownProps),
+        groups:makeGroupsState(state, ownProps),
+        group_profiles:makeGroupProfilesState(state, ownProps),
     }
 }
 

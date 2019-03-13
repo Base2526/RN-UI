@@ -21,6 +21,7 @@ import {makeUidState,
         makeClasssState,
         makeGroupsState,
         makeGroupProfilesState,
+        makeGroupMembersState,
         makeFriendsState,
         makeFriendProfilesState,} from '../Reselect'
 
@@ -109,6 +110,7 @@ class AuthLoadingScreen extends React.Component {
                 classs,
                 groups,
                 group_profiles,
+                group_members,
                 } = this.props
 
             this.props.trackProfiles(uid, profiles)
@@ -118,7 +120,7 @@ class AuthLoadingScreen extends React.Component {
             this.props.trackProfileMyIds(uid, myIds)
             this.props.trackMyApplications(uid, my_applications, my_applications_posts)
             this.props.trackClasss(uid, classs)
-            this.props.trackGroups(uid, groups, group_profiles)
+            this.props.trackGroups(uid, groups, group_profiles, group_members)
             this.props.trackFriends(uid, friends, friend_profiles)
             
             AsyncStorage.getItem('fcmToken', null).then((fcmToken) => {
@@ -172,6 +174,7 @@ const mapStateToProps = (state, ownProps) => {
             classs:makeClasssState(state, ownProps),
             groups:makeGroupsState(state, ownProps),
             group_profiles:makeGroupProfilesState(state, ownProps),
+            group_members:makeGroupMembersState(state, ownProps),
             friends:makeFriendsState(state, ownProps),
             friend_profiles:makeFriendProfilesState(state, ownProps),
         }

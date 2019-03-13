@@ -12,6 +12,9 @@ import MyIcon from '../../config/icon-font.js';
 
 import Constant from '../../Utils/Constant'
 
+import {makeFriendsState, 
+        makeFriendProfilesState,} from '../../Reselect'
+
 class AddGroupsSelectMemberPage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
         title: "Select member",
@@ -47,7 +50,9 @@ class AddGroupsSelectMemberPage extends React.Component{
         const { navigation, auth } = this.props;
         const data = navigation.getParam('members', null);
 
-        let friends = auth.users.friends
+        // let friends = auth.users.friends
+
+        let {friends, friend_profiles} = this.props
 
         let key = []
         _.each(data, function(_v, _k) { 
@@ -57,18 +62,21 @@ class AddGroupsSelectMemberPage extends React.Component{
         let newData = []
         _.each(friends, function(_v, _k) { 
             let find = key.find(k => k.friend_id==_k)
-            if(find === undefined){
+
+            let profile = _.find(friend_profiles, (v, k)=>{
+                return k == _k
+            })
+
+            if(!find){
                 if(_v.status == Constant.FRIEND_STATUS_FRIEND){
-                    newData.push({..._v, friend_id:_k})
+                    newData.push({..._v, friend_id:_k, profile})
                 }
             }else{
+                find = {...find, profile}
                 newData.push(find)
             }
         });
-
         this.setState({data:newData})    
-        
-        // console.log(new Date())
     }
 
     handleAddMember = () =>{
@@ -203,7 +211,7 @@ class AddGroupsSelectMemberPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     // console.log(state)
 
     if(!state._persist.rehydrated){
@@ -211,7 +219,10 @@ const mapStateToProps = (state) => {
     }
   
     return{
-      auth:state.auth
+    //   auth:state.auth
+
+        friends:makeFriendsState(state, ownProps),
+        friend_profiles:makeFriendProfilesState(state, ownProps),
     }
 }
 

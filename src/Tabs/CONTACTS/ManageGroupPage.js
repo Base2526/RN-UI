@@ -281,7 +281,7 @@ class ManageGroupPage extends React.Component{
 
         let {isConnected} = this.props
 
-        console.log(group)
+        // console.log(group)
         // return(<View style={{flex:1, backgroundColor:'#DF2D6C'}}></View>)
         return (
                 <View style={{flex:1, backgroundColor:'#DF2D6C', paddingTop:getHeaderInset()}}>
@@ -316,9 +316,10 @@ class ManageGroupPage extends React.Component{
                                         if(group.is_favorites !== undefined){
                                             is_favorites = !group.is_favorites
                                         }
+
                                         this.setState({loading:true})
                                         this.props.actionFavoritesGroup(this.props.uid, group_id, is_favorites, (result) => {
-                                            // console.log(result)
+                                            console.log(result)
                                             this.setState({loading:false})
                                         })
                                     }
@@ -355,25 +356,6 @@ class ManageGroupPage extends React.Component{
                                 }, {
                                     marginBottom: 20,
                                 })}}>
-                        {/* <TouchableOpacity style={{alignItems:'center'}}
-                            onPress={()=>{
-                                this.props.navigation.navigate("ChatPage")
-                            }}>
-                            <MyIcon
-                                name={'chat'}
-                                size={30}
-                                color={'#C7D8DD'} />
-                            <Text style={{fontWeight:'bold', color:'#BCD1D5', fontSize:16}}>CHAT</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={{marginLeft:30 ,alignItems:'center'}}
-                            onPress={()=>{
-                                this.props.navigation.navigate('GroupSettingsPage', {group_id})
-                            }}>
-                            <MyIcon
-                                name={'settings'}
-                                size={40}
-                                color={'#C7D8DD'} />
-                        </TouchableOpacity> */}
                     </View>
                 </View>
             );

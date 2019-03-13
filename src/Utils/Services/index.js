@@ -475,6 +475,41 @@ export const friend_profile_99 = (uid, friend_id) => {
         });
 }
 
+export const friend_profile_multi_99 = (uid, lost_profile) => {
+    // let data = {
+    //     method: 'POST',
+    //     body: JSON.stringify({
+    //         'uid':uid,
+    //         'friend_id':friend_id
+    //     }),
+    //     headers: Constant.FETCH_HEADERS
+    // }
+
+    // return fetch(Constant.FRIEND_PROFILE_99, data)
+    //     .then((response) => response.json())
+    //     .then((responseJson) => {
+    //         return responseJson;
+    //     }).catch((error) => {
+    //         console.error(error);
+    //     });
+
+    var data = new FormData();
+    data.append("uid", uid)
+    data.append('lost_profile', JSON.stringify(lost_profile))
+
+    return fetch(Constant.FRIEND_PROFILE_MULTI_99, {
+        headers: Constant.FETCH_HEADERS,
+        method: 'POST',
+        body: data
+      }).then((response) => {
+        return response.json()
+      }).then((responseJson) => {
+        return responseJson;
+      }).catch((error) => {
+        return {'status': false, 'message': error}
+      })
+}
+
 export const update_class_picture_profile = (uid, class_id, image_uri) =>{
     var data = new FormData();
     data.append('idna', {

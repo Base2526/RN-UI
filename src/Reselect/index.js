@@ -89,7 +89,7 @@ const getMyAppicationsPosts = (state, props) => {
             }
 
             if(likes){
-                console.log('likes>>> ?', likes, my_applications_posts_likes)
+                // console.log('likes>>> ?', likes, my_applications_posts_likes)
                 pv = {...pv, likes}
                 newPostV = {...newPostV, [pk]:pv}
             }else{
@@ -195,6 +195,10 @@ const getGroupProfiles = (state, props) => {
     return new_group_profiles
 }
 
+const getGroupMembers = (state, props) =>{
+    return state.auth.user.group_members
+}
+
 const getClasss = (state, props) => {
     return state.auth.user.classs
 }
@@ -295,6 +299,12 @@ export const makeGroupsState = createSelector(
 export const makeGroupProfilesState = createSelector(
     [ getGroupProfiles ],
     (group_profiles) => group_profiles
+)
+
+// group_members
+export const makeGroupMembersState = createSelector(
+    [ getGroupMembers ],
+    (group_members) => group_members
 )
 
 

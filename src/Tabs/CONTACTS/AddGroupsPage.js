@@ -16,11 +16,16 @@ import { connect } from 'react-redux';
 import ImagePicker from 'react-native-image-picker';
 
 import Spinner from 'react-native-loading-spinner-overlay';
+var _ = require('lodash');
 
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
 import {getUid} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
+
+import {makeUidState,  
+        makeFriendsState, 
+        makeFriendProfilesState,} from '../../Reselect'
 
 // More info on all the options is below in the API Reference... just some common use cases shown here
 const options = {
@@ -123,16 +128,8 @@ class AddGroupsPage extends React.Component{
     }
 
     componentDidMount() {
-      setTimeout(() => {this.setState({renderContent: true})}, 0);
-
       this.props.navigation.setParams({ handleCreateGroup: this.handleCreateGroup })
-
-      this.setState({
-        data: this.loadData(),
-        error: null,
-        loading: false,
-        refreshing: false
-      });
+      this.loadData(this.props)
     }
 
     onLayout(e) {
@@ -142,6 +139,33 @@ class AddGroupsPage extends React.Component{
       }else{
         this.setState({orientation:'LANDSCAPE', numColumns:6})
       }
+    }
+
+    loadData=(props)=>{
+      let friend_member = []
+      let {friends, friend_profiles} = props
+
+      // console.log(this.props.auth.users.friends)
+      for (var key in friends) {
+    
+        let friend =  friends[key]
+        // let friend_profile = friend_profiles[key]
+
+        let profile = _.find(friend_profiles, (v, k)=>{
+                        return k == key
+                      })
+
+        // console.log(friend)
+        switch(friend.status){
+          case Constant.FRIEND_STATUS_FRIEND:{
+            friend_member.push({...friend, ...{'friend_id':key}, profile});
+            break
+          }
+        }
+      }
+      // return friend_member
+
+      this.setState({data:friend_member, renderContent: true})
     }
 
     handleCreateGroup = () => {
@@ -170,10 +194,13 @@ class AddGroupsPage extends React.Component{
         this.props.actionCreateGroup(this.props.uid, groupName, seleteds, this.state.avatarSource.uri).then((result) => {
           console.log(result)
 
-          this.setState({loading:false})
           if(result.status){
-            this.props.navigation.goBack(null)
+            setTimeout(() => {
+              this.setState({loading:false})
+              this.props.navigation.goBack(null)
+            }, 200);
           }else{
+            this.setState({loading:false})
             setTimeout(() => {
               Alert.alert(result.message);
             }, 100);
@@ -206,38 +233,7 @@ class AddGroupsPage extends React.Component{
       })
     }
 
-    loadData=()=>{
-      let friend_member = []
 
-      // console.log(this.props.auth.users.friends)
-      for (var key in this.props.auth.users.friends) {
-    
-        let friend =  this.props.auth.users.friends[key]
-        // let friend_profile = friend_profiles[key]
-
-        console.log(friend)
-
-        switch(friend.status){
-          case Constant.FRIEND_STATUS_FRIEND:{
-            friend_member.push({...friend, ...{'friend_id':key}});
-            break
-          }
-
-          case Constant.FRIEND_STATUS_FRIEND_CANCEL:{
-            break
-          }
-
-          case Constant.FRIEND_STATUS_FRIEND_REQUEST:{
-            break
-          }
-
-          case Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND:{
-            break
-          }
-        }
-      }
-      return friend_member
-    }
 
     onSelectImage = () => {
       /**
@@ -281,9 +277,7 @@ class AddGroupsPage extends React.Component{
                   style={{width: calculatorWidthHeightItem(5, this.state.numColumns), 
                           height: calculatorWidthHeightItem(5, this.state.numColumns), 
                           borderRadius: calculatorWidthHeightItem(5, this.state.numColumns) /2, 
-                          // borderColor:'gray', 
                           backgroundColor: '#FF83AF',
-                          // borderWidth:1
                         }}
                   source={{
                     uri: this.state.avatarSource.uri === "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.avatarSource.uri,
@@ -314,21 +308,16 @@ class AddGroupsPage extends React.Component{
                   onChangeText = {this.handleGroupName}
                   value={this.state.groupName}/>
             </View>
-
         </View>
-        {/* <View style={{position:'absolute', bottom:0, right:0, padding:5}}>
-          <Text style={{fontSize:16, fontWeight:'bold'}}>{this.state.sections[0].data[0].list.length == 1 ? '0': this.state.sections[0].data[0].list.length - 1}/50</Text>
-        </View> */}
         <View
-              style={{
-                height: 1,
-                width: "100%",
-                backgroundColor: "#CED0CE",
-                // marginLeft: "14%"
-                position:'absolute',
-                bottom:0
-              }}
-            />
+          style={{
+            height: 1,
+            width: "100%",
+            backgroundColor: "#CED0CE",
+            // marginLeft: "14%"
+            position:'absolute',
+            bottom:0
+          }}/>
         </View>)
     };
   
@@ -495,7 +484,7 @@ class AddGroupsPage extends React.Component{
       }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
@@ -505,8 +494,12 @@ const mapStateToProps = (state) => {
   }
 
   return{
-    auth:state.auth,
-    uid:getUid(state)
+    // auth:state.auth,
+    // uid:getUid(state)
+
+    uid:makeUidState(state, ownProps),
+    friends:makeFriendsState(state, ownProps),
+    friend_profiles:makeFriendProfilesState(state, ownProps),
   }
 }
 

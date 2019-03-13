@@ -18,7 +18,8 @@ import Constant from '../../Utils/Constant'
 import {getUid} from '../../Utils/Helpers'
 
 import {makeUidState,
-        makeGroupsState,} from '../../Reselect'
+        makeGroupsState,
+        makeGroupProfilesState} from '../../Reselect'
 
 class GroupSettingsPage extends React.Component{
 
@@ -81,7 +82,7 @@ class GroupSettingsPage extends React.Component{
 
     loadData = (props) =>{
         let {group_id} = this.state
-        let {groups} = props
+        let {groups, group_profiles} = props
 
         let group =  _.find(groups, (v, k)=>{
             return k == group_id
@@ -90,6 +91,18 @@ class GroupSettingsPage extends React.Component{
         if(!group){
             this.handleCancel()
         }
+
+        let group_profile = _.find(group_profiles, (v, k)=>{
+            return group_id == k
+        })
+
+        if(!group_profile){
+            this.handleCancel()
+        }
+
+
+        group = {...group, profile:group_profile}
+        console.log('GroupSettingsPage', group)
 
         this.setState({data: group, renderContent:true})
     }
@@ -191,7 +204,7 @@ class GroupSettingsPage extends React.Component{
                                 <FastImage
                                     style={{width: 150, height: 150}}
                                     source={{
-                                        uri: data.group_profile.image_url,
+                                        uri: data.profile.image_url,
                                         headers:{ Authorization: 'someAuthToken' },
                                         priority: FastImage.priority.normal,
                                     }}
@@ -233,7 +246,7 @@ class GroupSettingsPage extends React.Component{
                         <TextInput
                             style={{ fontSize: 22, flex: 1 }}
                             placeholder="None"
-                            value={data.group_profile.name}
+                            value={data.profile.name}
                             ref= {(el) => { this.name = el; }}
                             onChangeText = {this.handleGroupName}
                             multiline={true}
@@ -270,6 +283,7 @@ const mapStateToProps = (state, ownProps) => {
 
         uid: makeUidState(state, ownProps),
         groups: makeGroupsState(state, ownProps),
+        group_profiles:makeGroupProfilesState(state, ownProps),
     }
 }
 

@@ -27,7 +27,14 @@ import ActionButton from 'react-native-action-button';
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
 import MyIcon from '../../config/icon-font.js';
-import {getUid, getHeaderInset} from '../../Utils/Helpers'
+import {getHeaderInset, isEmpty} from '../../Utils/Helpers'
+
+import {makeUidState, 
+        makeProfileState, 
+        makeFriendsState, 
+        makeFriendProfilesState, 
+        makeGroupsState,
+        makeGroupProfilesState} from '../../Reselect'
 
 class ListGroupMember_TabMembersPage extends React.Component{
 
@@ -39,29 +46,53 @@ class ListGroupMember_TabMembersPage extends React.Component{
             data:[],
             group_id :0,
             group:{}, 
-            group_profile:{}
         }
     }
 
     componentWillMount(){
-        // console.log(this.props)
         let {group_id} = this.props.params
 
-        this.setState({group_id}, ()=>{
-            this.loadData(this.props)
+        let {uid, group_profiles, friend_profiles} = this.props
+        let group_profile = _.find(group_profiles, (v, k)=>{
+            return k == group_id
         })
 
-        // console.log(getHeaderInset())
+        /// check is friend_profile ครบหรือไม่  ถ้าไม่ครบเราต้องวิ่งไปดึงจาก server
+        let lost_profile = []
+        _.each(group_profile.members, (v, k)=>{
+            var friend_profile = _.find(friend_profiles, function(fv, fk) {
+                return fk == v.friend_id;
+            });
+
+            if(!friend_profile){
+                lost_profile.push(v.friend_id)
+            }
+        })
+
+        if(!isEmpty(lost_profile)){
+            this.setState({loading:true})
+            this.props.actionFriendProfileMulti99(uid, lost_profile).then((result) => {
+                this.setState({loading:false})
+
+                this.setState({group_id}, ()=>{
+                    this.loadData(this.props)
+                })
+            })
+        }else{
+            this.setState({group_id}, ()=>{
+                this.loadData(this.props)
+            })
+        }
+        /// check is friend_profile ครบหรือไม่ 
     }
 
     componentWillReceiveProps(nextProps) {
-        // console.log(nextProps);
         this.loadData(nextProps)
     }
 
     loadData = (props) =>{
         let {group_id}  = this.state
-        let {groups, friends, uid, friend_profiles}    = props
+        let {uid, groups, group_profiles, friends, friend_profiles}    = props
 
         let group = _.find(groups,  function(v, k) { 
             return k == group_id
@@ -70,12 +101,23 @@ class ListGroupMember_TabMembersPage extends React.Component{
         if(group === undefined){
             this.handleCancel()
         }
+        
+        let group_profile = _.find(group_profiles, (v, k)=>{
+                                return k == group_id
+                            })
+                            
+        // console.log('1, ListGroupMember_TabMembersPage', group, group_profile)
 
+        group = {...group, ...group_profile}
+
+        // console.log('2, ListGroupMember_TabMembersPage', group, group_profile)
+
+        let group_members = group.members
+        
         let members  = []
         let pendings = []
         let declines = []
 
-        let group_members = group.members
         _.each(group_members, (v, k)=>{
             console.log(v, k)
             var friend = _.find(friends, function(fv, fk) {
@@ -88,97 +130,106 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                     return fk == v.friend_id;
                                 });
 
-            friend = {...friend, profile:friend_profile}
+            if(!friend_profile){
+                this.setState({loading:true})
+                this.props.actionFriendProfile99(uid, v.friend_id).then((result) => {
+                    this.setState({friend_id, loading:false}, ()=>{
+                        this.loadData(this.props)
+                    })
+                })
+            }else{
+                friend = {...friend, profile:friend_profile}
 
-            switch(v.status){
-                case Constant.GROUP_STATUS_MEMBER_INVITED:{
-                    // console.log(friend_profile)
-                    if(friend === undefined ){
-                        if(uid === v.friend_id){
-                            pendings.push({...v, member_key:k})
+                switch(v.status){
+                    case Constant.GROUP_STATUS_MEMBER_INVITED:{
+                        // console.log(friend_profile)
+                        if(friend === undefined ){
+                            if(uid === v.friend_id){
+                                pendings.push({...v, member_key:k})
+                            }else{
+                                // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
+                                firebase.firestore().collection('profiles').doc(v.friend_id).get()
+                                .then(doc => {
+                                    if (!doc.exists) {
+                                        console.log('No such document!');
+                                    } else {
+                                        console.log(doc.data())
+
+                                        // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                                        //     console.log(result)
+                                        // })
+                                    }
+                                })
+                                .catch(err => {
+                                    console.log('Error getting document', err);
+                                });
+                            }
                         }else{
-                            // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
-                            firebase.firestore().collection('profiles').doc(v.friend_id).get()
-                            .then(doc => {
-                                if (!doc.exists) {
-                                    console.log('No such document!');
-                                } else {
-                                    console.log(doc.data())
-
-                                    // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
-                                    //     console.log(result)
-                                    // })
-                                }
-                            })
-                            .catch(err => {
-                                console.log('Error getting document', err);
-                            });
+                            pendings.push({...v, member_key:k, friend})
                         }
-                    }else{
-                        pendings.push({...v, member_key:k, friend})
+                        break;
                     }
-                    break;
-                }
-                case Constant.GROUP_STATUS_MEMBER_JOINED:{
-                    if(friend === undefined ){
-                        if(uid === v.friend_id){
-                            members.push({...v, member_key:k})
+                    case Constant.GROUP_STATUS_MEMBER_JOINED:{
+                        if(friend === undefined ){
+                            if(uid === v.friend_id){
+                                members.push({...v, member_key:k})
+                            }else{
+                                // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
+                                firebase.firestore().collection('profiles').doc(v.friend_id).get()
+                                .then(doc => {
+                                    if (!doc.exists) {
+                                        console.log('No such document!');
+                                    } else {
+                                        console.log(doc.data())
+
+                                        // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                                        //     console.log(result)
+                                        // })
+                                    }
+                                })
+                                .catch(err => {
+                                    console.log('Error getting document', err);
+                                });
+                            }
                         }else{
-                            // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
-                            firebase.firestore().collection('profiles').doc(v.friend_id).get()
-                            .then(doc => {
-                                if (!doc.exists) {
-                                    console.log('No such document!');
-                                } else {
-                                    console.log(doc.data())
-
-                                    // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
-                                    //     console.log(result)
-                                    // })
-                                }
-                            })
-                            .catch(err => {
-                                console.log('Error getting document', err);
-                            });
+                            members.push({...v, member_key:k, friend})
                         }
-                    }else{
-                        members.push({...v, member_key:k, friend})
+                        break;
                     }
-                    break;
-                }
-                case Constant.GROUP_STATUS_MEMBER_DECLINE:{
-                    if(friend === undefined ){
-                        if(uid === v.friend_id){
-                            declines.push({...v, member_key:k})
+                    case Constant.GROUP_STATUS_MEMBER_DECLINE:{
+                        if(friend === undefined ){
+                            if(uid === v.friend_id){
+                                declines.push({...v, member_key:k})
+                            }else{
+                                // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
+                                firebase.firestore().collection('profiles').doc(v.friend_id).get()
+                                .then(doc => {
+                                    if (!doc.exists) {
+                                        console.log('No such document!');
+                                    } else {
+                                        console.log(doc.data())
+
+                                        // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                                        //     console.log(result)
+                                        // })
+                                    }
+                                })
+                                .catch(err => {
+                                    console.log('Error getting document', err);
+                                });
+                            }
                         }else{
-                            // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
-                            firebase.firestore().collection('profiles').doc(v.friend_id).get()
-                            .then(doc => {
-                                if (!doc.exists) {
-                                    console.log('No such document!');
-                                } else {
-                                    console.log(doc.data())
-
-                                    // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
-                                    //     console.log(result)
-                                    // })
-                                }
-                            })
-                            .catch(err => {
-                                console.log('Error getting document', err);
-                            });
+                            declines.push({...v, member_key:k, friend})
                         }
-                    }else{
-                        declines.push({...v, member_key:k, friend})
+                        break;
                     }
-                    break;
                 }
             }
         })
 
-        console.log(members)
-        console.log(pendings)
-        console.log(declines)
+        // console.log(members)
+        // console.log(pendings)
+        // console.log(declines)
 
         this.setState({
             data: [ {title: 'Members',member: members}, 
@@ -187,56 +238,6 @@ class ListGroupMember_TabMembersPage extends React.Component{
             group_profile: group.group_profile,
             group
         })
-
-        /*
-        let members = []
-        let pending = []
-        let decline = []
-        _.each(group.members,  function(_v, _k) { 
-            switch(_v.status){
-                case Constant.GROUP_STATUS_MEMBER_INVITED:{
-                    pending.push({
-                        item_id:_k,
-                        friend_id:_v.friend_id,
-                        name:_v.friend_name,
-                        status:_v.status,
-                        image_url:_v.friend_image_url,
-                        invitor:_v.invitor === undefined? 0:_v.invitor
-                    })
-                    break;
-                }
-                case Constant.GROUP_STATUS_MEMBER_JOINED:{
-                    members.push({
-                        item_id:_k,
-                        friend_id:_v.friend_id,
-                        name:_v.friend_name,
-                        status:_v.status,
-                        image_url:_v.friend_image_url,
-                        invitor:_v.invitor === undefined? 0:_v.invitor
-                    })
-                    break;
-                }
-                case Constant.GROUP_STATUS_MEMBER_DECLINE:{
-                    decline.push({
-                        item_id:_k,
-                        friend_id:_v.friend_id,
-                        name:_v.friend_name,
-                        status:_v.status,
-                        image_url:_v.friend_image_url
-                    })
-                    break;
-                }
-            }
-        });
-
-        this.setState({
-            data: [ {title: 'Members',member: members}, 
-                    {title: 'Pending', member: pending},
-                    {title: 'Decline', member: decline},],
-            group_profile: group.group_profile,
-            group
-        })
-        */
     }
 
     handleInvite = () => {
@@ -251,15 +252,17 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
     checkInvitor = (rowItem) =>{
 
-        let {friends} = this.props
+        let {uid, friend_profiles, groups} = this.props
         // rowItem.friend_id === this.state.group_profile.creator_id?<Text style={{fontSize:12, color:'gray'}}>Group Creator</Text>:<View />
     
-        if(rowItem.friend_id === this.state.group_profile.creator_id){
+        // console.log('checkInvitor', rowItem)
+        
+        if(rowItem.friend_id === groups.creator_id){
             return(<Text style={{fontSize:12, color:'gray'}}>Group Creator</Text>)
         }else {
             if(rowItem.invitor != 0){
 
-                if(rowItem.invitor === this.props.uid){
+                if(rowItem.invitor === uid){
                     return(<Text style={{fontSize:12, color:'gray'}}>Added by You</Text>)
                 }
 
@@ -270,28 +273,60 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
                 // console.log(member)
 
-                var friend_profile = _.find(friends, function(fv, fk) {
+                var friend_profile = _.find(friend_profiles, function(fv, fk) {
                     return fk == member.friend_id;
                 });
 
                 let friend_name = ''
-                if(friend_profile !== undefined){
-                    friend_name = friend_profile.profile.name
-                }
+                // if(friend_profile !== undefined){
+                //     friend_name = friend_profile.profile.name
+                // }
 
                 return(<Text style={{fontSize:12, color:'gray'}}>Added by {friend_name}</Text>)
             }
         }
+        
         return(<View />)
     }
 
     showMenuMembers = (rowItem)=>{
-        console.log(rowItem)
+        console.log('showMenuMembers', rowItem)
 
         let {uid} = this.props
         let {group_id} = this.state
-        let {friend, friend_id} = rowItem
-        // console.log(rowItem)
+        let {friend, friend_id, is_admin} = rowItem
+
+        let menu_make_admin = <View />
+        if(!is_admin){
+            menu_make_admin=<MenuOption onSelect={() => {
+                                    Alert.alert(
+                                        'Add group admin',
+                                        'As a group admin ' + friend.profile.name + ' will be able to manage the group and remove members from the conversation. They will be able to remove other admins.',
+                                        [
+                                        
+                                        // {text: 'Leave group', onPress: () => console.log('Leave group')},
+                                        {
+                                            text: 'Cancel',
+                                            onPress: () => console.log('Cancel Pressed'),
+                                            style: 'cancel',
+                                        },
+                                        {text: 'Make admin', onPress: () => {
+                                            this.setState({loading:true})
+                                            this.props.actionMakeAdminGroup(uid, group_id, friend_id, (result) => {
+                                                this.setState({loading:false})
+
+                                                console.log(result)
+                                            })
+                                        }},
+                                        ],
+                                        {cancelable: false},
+                                    );
+                                }}>
+                                <Text style={{padding:10, fontSize:18}}>Make admin</Text>
+                            </MenuOption>
+          
+        }
+
         return( <Menu>
                     <MenuTrigger>
                         <MyIcon 
@@ -301,42 +336,20 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             color={'#C7D8DD'} />  
                     </MenuTrigger>
                     <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
-                        <MenuOption onSelect={() => {
-                            Alert.alert(
-                                'Add group admin',
-                                'As a group admin ' + friend.profile.name + ' will be able to manage the group and remove members from the conversation. They will be able to remove other admins.',
-                                [
-                                
-                                // {text: 'Leave group', onPress: () => console.log('Leave group')},
-                                {
-                                    text: 'Cancel',
-                                    onPress: () => console.log('Cancel Pressed'),
-                                    style: 'cancel',
-                                },
-                                {text: 'Make admin', onPress: () => {
-                                    this.setState({loading:true})
-                                    this.props.actionMakeAdminGroup(uid, group_id, friend_id, (result) => {
-                                        this.setState({loading:false})
-        
-                                        console.log(result)
-                                    })
-                                }},
-                                ],
-                                {cancelable: false},
-                            );
-                        }}>
-                            <Text style={{padding:10, fontSize:18}}>Make admin</Text>
-                        </MenuOption>
+                        {menu_make_admin}
                         <MenuOption onSelect={() => {
 
-                            this.props.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
-                            // this.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
+                            if(uid === friend_id){
+                                this.props.props.navigation.navigate("MyProfilePage")
+                            }else{
+                                this.props.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
+                            }
                         }}>
                             <Text style={{padding:10, fontSize:18}}>View profile</Text>
                         </MenuOption>
-                        <MenuOption onSelect={() => {console.log('Remove from group')}}>
+                        {/* <MenuOption onSelect={() => {console.log('Remove from group')}}>
                             <Text style={{padding:10, fontSize:18}}>Remove from group</Text>
-                        </MenuOption>
+                        </MenuOption> */}
                     </MenuOptions>
                 </Menu>)
     }
@@ -358,7 +371,11 @@ class ListGroupMember_TabMembersPage extends React.Component{
                     </MenuTrigger>
                     <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
                         <MenuOption onSelect={() => {
-                            this.props.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
+                            if(uid === friend_id){
+                                this.props.props.navigation.navigate("MyProfilePage")
+                            }else{
+                                this.props.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
+                            }
                         }}>
                             <Text style={{padding:10, fontSize:18}}>View profile</Text>
                         </MenuOption>
@@ -372,10 +389,6 @@ class ListGroupMember_TabMembersPage extends React.Component{
                         }}>
                             <Text style={{padding:10, fontSize:18}}>Cancel</Text>
                         </MenuOption>
-                        {/*
-                        <MenuOption onSelect={() => {console.log('Navigation Home')}}>
-                            <Text style={{padding:10, fontSize:18}}>Navigation Home</Text>
-                        </MenuOption> */}
                     </MenuOptions>
                 </Menu>)
     }
@@ -404,13 +417,8 @@ class ListGroupMember_TabMembersPage extends React.Component{
     }
 
     _renderRow = (rowItem, rowId, sectionId) => {
-
-        console.log(rowItem)
-
         let {group_id} = this.state
         let {uid} = this.props
-
-        let swipeoutRight = []
         switch(rowItem.status){
             case Constant.GROUP_STATUS_MEMBER_JOINED:{
                 swipeoutRight = [
@@ -427,15 +435,15 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
                 if(rowItem.friend_id === uid){
                     let {profiles} = this.props
-                    return( <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                    return( <View style={{flex:1, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                                 <TouchableOpacity>
                                     <FastImage
-                                        style={{width: 60,  
-                                                height: 60,
+                                        style={{width: 50,  
+                                                height: 50,
                                                 borderRadius: 10, 
-                                                borderColor:'gray', 
+                                                // borderColor:'gray', 
                                                 // backgroundColor: '#FF83AF',
-                                                borderWidth:1
+                                                // borderWidth:1
                                                 }}
                                         source={{
                                             uri: profiles.image_url,
@@ -460,19 +468,15 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             </View>)
                 }
 
-                return( 
-                    // <Swipeout 
-                    //     style={{backgroundColor:'white'}} 
-                    //     right={swipeoutRight}>
-                        <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                return( <View style={{flex:1, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                             <TouchableOpacity>
                                 <FastImage
-                                    style={{width: 60,  
-                                            height: 60,
+                                    style={{width: 50,  
+                                            height: 50,
                                             borderRadius: 10, 
-                                            borderColor:'gray', 
+                                            // borderColor:'gray', 
                                             // backgroundColor: '#FF83AF',
-                                            borderWidth:1
+                                            // borderWidth:1
                                             }}
                                     source={{
                                         uri: rowItem.friend.profile.image_url,
@@ -517,15 +521,15 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
                 if(rowItem.friend_id === uid){
                     let {profiles} = this.props
-                    return( <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                    return( <View style={{flex:1, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                                 <TouchableOpacity>
                                     <FastImage
-                                        style={{width: 60,  
-                                                height: 60,
+                                        style={{width: 50,  
+                                                height: 50,
                                                 borderRadius: 10, 
-                                                borderColor:'gray', 
+                                                // borderColor:'gray', 
                                                 // backgroundColor: '#FF83AF',
-                                                borderWidth:1
+                                                // borderWidth:1
                                                 }}
                                         source={{
                                             uri: profiles.image_url,
@@ -547,15 +551,15 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             </View>)
                 }
 
-                return( <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                return( <View style={{flex:1, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                             <TouchableOpacity>
                                 <FastImage
-                                    style={{width: 60,  
-                                            height: 60,
+                                    style={{width: 50,  
+                                            height: 50,
                                             borderRadius: 10, 
-                                            borderColor:'gray', 
+                                            // borderColor:'gray', 
                                             // backgroundColor: '#FF83AF',
-                                            borderWidth:1
+                                            // borderWidth:1
                                             }}
                                     source={{
                                         uri: rowItem.friend.profile.image_url,
@@ -580,15 +584,15 @@ class ListGroupMember_TabMembersPage extends React.Component{
             case Constant.GROUP_STATUS_MEMBER_DECLINE:{
                 if(rowItem.friend_id === uid){
                     let {profiles} = this.props
-                    return( <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                    return( <View style={{flex:1, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                                 <TouchableOpacity>
                                     <FastImage
-                                        style={{width: 60,  
-                                                height: 60,
+                                        style={{width: 50,  
+                                                height: 50,
                                                 borderRadius: 10, 
-                                                borderColor:'gray', 
+                                                // borderColor:'gray', 
                                                 // backgroundColor: '#FF83AF',
-                                                borderWidth:1
+                                                // borderWidth:1
                                                 }}
                                         source={{
                                             uri: profiles.image_url,
@@ -610,15 +614,15 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             </View>)
                 }
 
-                return(<View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+                return(<View style={{flex:1, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                             <TouchableOpacity>
                                 <FastImage
-                                    style={{width: 60,  
-                                            height: 60,
+                                    style={{width: 50,  
+                                            height: 50,
                                             borderRadius: 10, 
-                                            borderColor:'gray', 
+                                            // borderColor:'gray', 
                                             // backgroundColor: '#FF83AF',
-                                            borderWidth:1
+                                            // borderWidth:1
                                             }}
                                     source={{
                                         uri: rowItem.friend.profile.image_url,
@@ -684,7 +688,6 @@ class ListGroupMember_TabMembersPage extends React.Component{
         let ic_collapse = <MyIcon name={state ? 'collapse-up' : 'collapse-down'}
                                   size={8}
                                   color={'#C7D8DD'} />
-  
         return (
             <View
                 style={{ 
@@ -711,10 +714,13 @@ class ListGroupMember_TabMembersPage extends React.Component{
     }
       
     render() {
+        let {group_id, loading, data} = this.state
+
+        console.log('ListGroupMember_TabMembersPage',  data)
         return (<MenuContext>
                     <View style={{flex:1}}>
                         <Spinner
-                            visible={this.state.loading}
+                            visible={loading}
                             textContent={'Wait...'}
                             textStyle={{color: '#FFF'}}
                             overlayColor={'rgba(0,0,0,0.5)'}
@@ -722,7 +728,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                         <ExpandableList
                             style={{flex:1}}
                             ref={instance => this.ExpandableList = instance}
-                            dataSource={this.state.data}
+                            dataSource={data}
                             headerKey="title"
                             memberKey="member"
                             renderRow={this._renderRow}
@@ -741,7 +747,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                     color={'#C7D8DD'} />)
                                 }}
                             onPress={()=>{
-                                this.props.props.navigation.navigate("GroupMemberInvite", {'group_id':this.state.group_id})
+                                this.props.props.navigation.navigate("GroupMemberInvite", {'group_id':group_id})
                             }}>
                         </ActionButton>
                     </View>
@@ -750,19 +756,24 @@ class ListGroupMember_TabMembersPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
-    console.log(state)
+const mapStateToProps = (state, ownProps) => {
+    // console.log(state)
 
     if(!state._persist.rehydrated){
       return {}
     }
+
+    if(!state.auth.isLogin){
+        return;
+    }
   
     return{
-        uid:getUid(state),
-        profiles:state.auth.users.profiles,
-        friends:state.auth.users.friends,
-        friend_profiles:state.auth.users.friend_profiles,
-        groups:state.auth.users.groups,
+        uid:makeUidState(state, ownProps),
+        profiles:makeProfileState(state, ownProps),
+        friends:makeFriendsState(state, ownProps),
+        friend_profiles:makeFriendProfilesState(state, ownProps),
+        groups:makeGroupsState(state, ownProps),
+        group_profiles:makeGroupProfilesState(state, ownProps),
     }
 }
 
