@@ -23,10 +23,7 @@ import Menu, {
   } from 'react-native-popup-menu';
 
 var _ = require('lodash');
-import ImageWithDefault from '../../Utils/ImageWithDefault'
 import * as actions from '../../Actions'
-
-import Constant from '../../Utils/Constant'
 import MyIcon from '../../config/icon-font.js';
 
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
@@ -49,18 +46,6 @@ class ListGroupMemberPage extends React.Component{
             elevation: 0,
             shadowOpacity: 0
           },
-        // headerLeft: (
-        //     <View style={{paddingLeft:10}}>
-        //         <TouchableOpacity 
-        //             onPress={()=>{
-        //                 // GroupMemberInvite
-        //                 const { params = {} } = navigation.state
-        //                 params.handleInvite()
-        //             }}>
-        //             <Text style={{color:'#C7D8DD', fontSize:18, fontWeight:'bold'}}>Invite</Text>
-        //         </TouchableOpacity> 
-        //     </View>
-        // ),
         headerRight: (
             <View style={{marginRight:10}}>
                 <TouchableOpacity

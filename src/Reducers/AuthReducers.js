@@ -2481,24 +2481,22 @@ export default (state= INITIAL_STATE, action)=>{
                 return state
             }
             
+            // remove classs
             let classs = state.user.classs
-            let _class = _.find(classs,  function(v, k) { 
-                return k == action.class_id
-            })
 
-            if(_class === undefined){
-                return state
-            }
+            let class_members = state.user.class_members
 
-            let newClasss = _.omit(classs, action.class_id)
-            let v = {
-                ...state,
-                user : {
-                    ...state.user,
-                    classs: newClasss
-                }
-            }
-            console.log("Classs", v)
+            let newClasss       = _.omit(classs, action.class_id)
+            let newClassMembers = _.omit(class_members, action.class_id)
+            let v = {...state,
+                        user: {
+                            ...state.user,
+                            classs: newClasss,
+                            class_members: newClassMembers
+                        }
+                    }
+
+            // console.log('REMOVED_CLASS', v, action.class_id, state)
             return v
         }
 
@@ -2507,6 +2505,60 @@ export default (state= INITIAL_STATE, action)=>{
                 return state
             }
 
+            let class_members = state.user.class_members
+            let class_member  = _.find(class_members,  function(v, k) { 
+                                    return k == action.class_id
+                                })
+
+
+            // dispatch({type: ADDED_CLASS_MEMBER, class_id:classsChange.doc.id, class_member_id:classsMembersChange.doc.id, class_member_data:classsMembersChange.doc.data() })
+            if(!class_member){
+                let newClassMembers = {[action.class_member_id]:action.class_member_data}
+                let newState = {...state,
+                                    user: {
+                                        ...state.user,
+                                        class_members: {
+                                            ...state.user.class_members,
+                                            [action.class_id]:newClassMembers
+                                        }
+                                    }
+                                }
+                return newState
+            }else{
+                let find_member =_.find(class_member, (fv, fk)=>{
+                                    return fk == action.class_member_id
+                                })
+                
+                let newClassMembers = {...class_member, [action.class_member_id]:action.class_member_data}
+                if(!find_member){
+                    let newState = {...state,
+                                        user: {
+                                            ...state.user,
+                                            class_members: {
+                                                ...state.user.class_members,
+                                                [action.class_id]:newClassMembers
+                                            }
+                                        }
+                                    }
+                    return newState
+                }else{
+                    if(!_.isEqual(find_member, action.class_member_data)){
+                        let newState = {...state,
+                                            user: {
+                                                ...state.user,
+                                                class_members: {
+                                                    ...state.user.class_members,
+                                                    [action.class_id]:newClassMembers
+                                                }
+                                            }
+                                        }
+
+                        return newState
+                    } 
+                }
+            }
+
+            /*
             let classs = state.user.classs
             let _class = _.find(classs,  function(v, k) { 
                 return k == action.class_id
@@ -2576,6 +2628,7 @@ export default (state= INITIAL_STATE, action)=>{
                     }
                 }
             }
+            */
             return state
         }
 

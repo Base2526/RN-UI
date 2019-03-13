@@ -94,7 +94,7 @@ class ListGroupMember_TabAdminPage extends React.Component{
 
                 if(!friend){
                     if(v.friend_id == uid){
-                        members.push({...v, group_admin_key:k})
+                        members.push({...v, member_key:k})
                     }else{
                         // get from firestore
                         firebase.firestore().collection('profiles').doc(v.friend_id).get()
@@ -114,7 +114,7 @@ class ListGroupMember_TabAdminPage extends React.Component{
                         });
                     }
                 }else{
-                    members.push({...v, group_admin_key:k, friend})
+                    members.push({...v, member_key:k, friend})
                 }
             }
         })
@@ -130,13 +130,9 @@ class ListGroupMember_TabAdminPage extends React.Component{
 
         let {uid} = this.props
 
-        console.log(item, group_id, group)
+        // console.log(item, group_id, group)
 
-        // console.log(item.uid, uid)
-
-        
-
-        // let count = Object.keys(group.group_admins).length
+        let {friend_id, member_key} = item
 
         let count = (_.filter(group.members, (v, k)=>{
                         return v.is_admin
@@ -178,7 +174,7 @@ class ListGroupMember_TabAdminPage extends React.Component{
                             {text: 'Remove admin', onPress: () => {
                                 // console.log('Remove admin')
                                 this.setState({loading:true})
-                                this.props.actionRemoveAsAdminGroup(uid, group_id, item.friend_id, (result) => {
+                                this.props.actionRemoveAsAdminGroup(uid, group_id, friend_id, member_key, (result) => {
                                     this.setState({loading:false})
 
                                     console.log(result)

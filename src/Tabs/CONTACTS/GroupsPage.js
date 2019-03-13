@@ -193,7 +193,46 @@ class GroupsPage extends React.Component{
     }
 
     showMenuGroup = (rowItem)=>{
-      let {group_id} = rowItem
+
+      // console.log('showMenuGroup', rowItem)
+      let {group_id, profile} = rowItem
+
+      let is_admin = _.find(profile.members, (v, k)=>{
+                      // console.log('showMenuGroup', v, k, this.props.uid, v.friend_id)
+                      return v.is_admin && this.props.uid == v.friend_id
+                    })
+
+      let menu_delete_group = <View />
+      if(is_admin){
+        menu_delete_group =  <MenuOption onSelect={() => {
+                          Alert.alert(
+                            'Delete group',
+                            'Are you sure group '+ rowItem.profile.name +'?',
+                            [
+                              // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                              {text: 'Cancel', 
+                                onPress: () => {
+                                    console.log("cancel")
+                                    }, style: 'cancel'},
+                              {text: 'OK', 
+                              onPress: () => {
+                                  // export const actionDeletePost = (uid, app_id, post_id, callback)
+                                    this.setState({loading:true})
+                                    this.props.actionDeleteGroup(this.props.uid, group_id, (result)=>{
+                                        
+                                      console.log(result)
+                                      this.setState({loading:false})
+                                    })
+                                }, 
+                              },
+                            ],
+                            { cancelable: false }
+                          )
+                          }}>
+                            <Text style={{padding:10, fontSize:18}}>Delete group</Text>
+                        </MenuOption>
+      }
+
       return( <View style={{flex:1,
                             position:'absolute', 
                             top:0,
@@ -222,33 +261,7 @@ class GroupsPage extends React.Component{
                                               </MenuOption>
                       }
 
-                      <MenuOption onSelect={() => {
-                        Alert.alert(
-                          'Delete group',
-                          'Are you sure group '+ rowItem.profile.name +'?',
-                          [
-                            // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-                            {text: 'Cancel', 
-                              onPress: () => {
-                                  console.log("cancel")
-                                  }, style: 'cancel'},
-                            {text: 'OK', 
-                            onPress: () => {
-                                // export const actionDeletePost = (uid, app_id, post_id, callback)
-                                  this.setState({loading:true})
-                                  this.props.actionDeleteGroup(this.props.uid, group_id, (result)=>{
-                                      
-                                    console.log(result)
-                                    this.setState({loading:false})
-                                  })
-                              }, 
-                            },
-                          ],
-                          { cancelable: false }
-                        )
-                      }}>
-                          <Text style={{padding:10, fontSize:18}}>Delete group</Text>
-                      </MenuOption>
+                      {menu_delete_group}
                   </MenuOptions>
               </Menu>
             </View>)

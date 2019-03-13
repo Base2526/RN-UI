@@ -194,7 +194,6 @@ class GroupMemberInvite extends React.Component{
                     this.onSeleted(index)
                   }}>
                 <View style={{flex:1, 
-                  height:100, 
                   padding:10, 
                   marginRight:10,
                   backgroundColor:'white', 
@@ -209,12 +208,12 @@ class GroupMemberInvite extends React.Component{
                     color={seleted ? '#E9E9E9' : '#DF2D6C'} 
                   />
                   <FastImage
-                    style={{width: 60,  
-                            height: 60,
+                    style={{width: 50,  
+                            height: 50,
                             borderRadius: 10, 
-                            borderColor:'gray', 
+                            // borderColor:'gray', 
                             // backgroundColor: '#FF83AF',
-                            borderWidth:1
+                            // borderWidth:1
                             }}
                     source={{
                         uri: item.profile.image_url,
@@ -234,18 +233,18 @@ class GroupMemberInvite extends React.Component{
         console.log('-- handleCallback', item) 
     }
 
-    renderSeparator = () => {
-      return (
-        <View
-          style={{
-            height: 1,
-            width: "86%",
-            backgroundColor: "#CED0CE",
-            marginLeft: "14%"
-          }}
-        />
-      )
-    }
+    // renderSeparator = () => {
+    //   return (
+    //     <View
+    //       style={{
+    //         height: 1,
+    //         width: "86%",
+    //         backgroundColor: "#CED0CE",
+    //         marginLeft: "14%"
+    //       }}
+    //     />
+    //   )
+    // }
 
     render(){
         let {loading, data} = this.state

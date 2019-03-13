@@ -14,6 +14,12 @@ import {getHeaderInset, getUid} from '../../Utils/Helpers'
 import * as actions from '../../Actions'
 import MyIcon from '../../config/icon-font.js';
 
+import {makeUidState, 
+        makeClasssState,
+        makeClassMembersState,
+        makeFriendsState, 
+        makeFriendProfilesState} from '../../Reselect'
+
 class ManageClasssPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
@@ -44,38 +50,39 @@ class ManageClasssPage extends React.Component{
 
     componentWillReceiveProps(nextProps) {
         this.loadData(nextProps)
-
-        // let classs = nextProps.auth.users.classs
-        // let arr_classs = Object.keys(classs).map((key, index) => {
-        //     return {...{class_id:key}, ...classs[key]};
-        // })
-
-        // let {class_id} = this.state.data
-        // var v = arr_classs.find(function(element) { 
-        //     return element.class_id == class_id; 
-        // }); 
-
-        // this.setState({data: v})
     }
 
     loadData = (props) => {
         // console.log()
-        let {friends, classs} = props
-
+        let {classs, class_members, friends, friend_profiles} = props
         let {class_id} = this.state
 
-        console.log(class_id)
-        console.log(classs)
-
-        let _class = _.find(classs,  function(v, k) { 
+        let cla = _.find(classs,  function(v, k) { 
             return k == class_id
         })
 
-        if(_class === undefined){
+        if(cla === undefined){
             this.props.navigation.goBack()
             return;
         }
 
+        let class_member =  _.find(class_members, (v, k)=>{
+                                return k == class_id
+                            })
+
+        if(class_member){
+            let data =  _.map(class_member, (v, k)=>{
+                            var friend_profile = _.filter(friends, function(v, k) {
+                                                    return k == value.friend_id;
+                                                });
+
+                            return {...v, friend_profile}
+                        })
+
+            this.setState({data})
+        }
+
+        /*
         let members ={}
         Object.entries(_class.members).forEach(([key, value]) => {
             if(!value.status){
@@ -94,7 +101,7 @@ class ManageClasssPage extends React.Component{
 
         let newData = {...{..._class}, members}
         this.setState({data:newData})
-        // console.log(newData)
+        */
     }
 
     countMembers = (item) =>{
@@ -248,7 +255,7 @@ class ManageClasssPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     // console.log(state)
   
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
@@ -256,11 +263,21 @@ const mapStateToProps = (state) => {
     if(!state._persist.rehydrated){
       return {}
     }
-  
+
+    if(!state.auth.isLogin){
+        return;
+    }
+
     return{
-        uid:getUid(state),
-        friends:state.auth.users.friends,
-        classs:state.auth.users.classs,
+        // uid:getUid(state),
+        // friends:state.auth.users.friends,
+        // classs:state.auth.users.classs,
+
+        uid:makeUidState(state, ownProps),
+        friends:makeFriendsState(state, ownProps),
+        friend_profiles:makeFriendProfilesState(state, ownProps),
+        classs:makeClasssState(state, ownProps),
+        class_members:makeClassMembersState(state, ownProps),
     }
 }
 

@@ -272,6 +272,15 @@ const ListGroupMemberNavigator = createStackNavigator(
         // title: 'Friend Profile',
       }
     },
+    'MyProfilePage': {
+      screen: MyProfilePage,
+      navigationOptions: {
+        // title: 'Friend Profile',
+      }
+    },
+
+
+
   },
   {
     // headerMode: 'none',

@@ -203,6 +203,13 @@ class ManageGroupPage extends React.Component{
         this.props.navigation.navigate('GroupSettingsPage', {group_id:this.state.group_id})
     }
 
+    countMembers = (members) =>{
+        // console.log('members', members)
+        return (_.filter(members, (v, k)=>{
+                  return v.status === Constant.GROUP_STATUS_MEMBER_INVITED
+                })).length
+    }
+
     itemMembers = (group) =>{
         // console.log(group)
         let {members} = group
@@ -340,7 +347,7 @@ class ManageGroupPage extends React.Component{
                                 onPress={()=>{
                                     this.props.navigation.navigate('ListGroupMemberPage', {group_id})
                                 }}>
-                                <Text style={{color:'white', fontWeight:'bold'}}>{group.members ?Object.keys(group.members).length:'0' }+</Text>
+                                <Text style={{color:'white', fontWeight:'bold'}}>{ /*group.members ?Object.keys(group.members).length:'0' */ this.countMembers(group.members) }+</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

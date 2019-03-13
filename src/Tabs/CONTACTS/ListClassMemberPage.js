@@ -22,6 +22,12 @@ import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
+import {makeUidState, 
+        makeClasssState,
+        makeClassMembersState,
+        makeFriendsState, 
+        makeFriendProfilesState} from '../../Reselect'
+
 class ListClassMemberPage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
         title: "List members",
@@ -42,8 +48,8 @@ class ListClassMemberPage extends React.Component{
         super();
         this.state = { 
             renderContent: false,
-            class_id: 0,
             loading: false,
+            class_id: 0,
             data: []
         }
     }
@@ -60,72 +66,16 @@ class ListClassMemberPage extends React.Component{
         this.setState({class_id},()=>{
             this.loadData(this.props)
         })
-
-        /*
-        const { navigation } = this.props;
-        const data = navigation.getParam('data', null);
-
-        this.setState({class_id:data.class_id})
-
-        _this = this
-
-        let newData = []
-        if(data.members !== undefined){
-            _.each(data.members, function(_v, _k) { 
-                if(_v.status){
-                    
-                    var friend = _this.getArrFriends().find(function(element) { 
-                        return element.friend_id == _v.friend_id; 
-                    }); 
-                    // console.log(friend)
-
-                    newData.push(friend)
-                } 
-            })
-        }
-        this.setState({data:newData})
-        */
     }
 
     componentWillReceiveProps(nextProps) {
         this.loadData(nextProps)
-        /*
-        let classs = nextProps.auth.users.classs
-        let arr_classs = Object.keys(classs).map((key, index) => {
-            return {...{class_id:key}, ...classs[key]};
-        })
-
-        let {class_id} = this.state
-        var v = arr_classs.find(function(element) { 
-            return element.class_id == class_id; 
-        }); 
-
-        _this = this
-
-        let newData = []
-        if(v.members !== undefined){
-            _.each(v.members, function(_v, _k) { 
-                if(_v.status){
-                    
-                    var friend = _this.getArrFriends().find(function(element) { 
-                        return element.friend_id == _v.friend_id; 
-                    }); 
-                    // console.log(friend)
-
-                    newData.push(friend)
-                } 
-            })
-        }
-
-        this.setState({data:newData})
-        */
     }
 
     loadData = (props) =>{
         let {class_id} = this.state
-        let {friends, classs, friend_profiles} = props
+        let {friends, friend_profiles, classs, class_members} = props
 
-        console.log(friends, classs, class_id)
         let cla = _.find(classs,  function(v, k) { 
             return k == class_id; 
         })
@@ -135,30 +85,20 @@ class ListClassMemberPage extends React.Component{
             return;
         }
 
-        let newData = []
-        _.each(cla.members, (v, k)=>{
-            if(v.status){
-                // return {...{friend_id:key}, ...friends[key]};
-                // friend =_.find(friends, (vv, kk)=>{
-                //             return v.friend_id == kk
-                //         })
+        let class_member =  _.find(class_members, (v, k)=>{
+                                return k == class_id
+                            })
 
-                let friend_profile =_.find(friend_profiles, (vv, kk)=>{
-                                        return v.friend_id == kk
-                                    })
-                
-                
-                newData.push( {...{friend_id:v.friend_id}, ...{member_key:k}, ...friend_profile} )
-            }
-        })
-
-        console.log(newData)
-        this.setState({data:newData})
+        let data =  _.map(class_member, (v, k)=>{
+                        let friend_profile =_.find(friend_profiles, (fv, fk)=>{
+                                                return v.friend_id == fk
+                                            })
+                        return {friend_id:v.friend_id, member_key:k, friend_profile}
+                    })
+        this.setState({data})
     }
 
     handleSetting = () => {
-        // this.props.navigation.goBack(null)
-
         this.props.navigation.navigate('ClasssSettingsPage')
     }
 
@@ -180,6 +120,9 @@ class ListClassMemberPage extends React.Component{
     }
 
     showMenu = (item)=>{
+
+        let {friend_id, member_key} = item
+
         return( <View style={{flex:1,
                               position:'absolute', 
                               top:0,
@@ -195,13 +138,13 @@ class ListClassMemberPage extends React.Component{
                     </MenuTrigger>
                     <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
                         <MenuOption onSelect={() => {
-                            this.props.navigation.navigate("FriendProfilePage",{'friend_id': item.friend_id})
+                            this.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
                         }}>
                             <Text style={{padding:10, fontSize:18}}>View profile</Text>
                         </MenuOption>
                         <MenuOption onSelect={() => {
                             this.setState({loading:true})
-                            this.props.actionDeleteClassMember(this.props.uid, this.state.class_id, item.member_key, (result) => {
+                            this.props.actionDeleteClassMember(this.props.uid, this.state.class_id, member_key, (result) => {
                                 console.log(result)
                                 this.setState({loading:false})
                             })
@@ -214,76 +157,52 @@ class ListClassMemberPage extends React.Component{
     }
 
     renderItem = ({item, index}) => { 
-
-        console.log(item)
-        // let swipeoutRight = [
-        //     {
-        //         component: <View style={{flex: 1, 
-        //                                 justifyContent:'center', 
-        //                                 alignItems:'center'}}>
-        //                                 <Text style={{color:'white', fontSize:18, fontWeight:'bold'}}>Delete</Text>
-        //                     </View>,
-        //         backgroundColor: 'red',
-        //         onPress: () => { 
-        //             console.log(item)
-
-        //             this.setState({loading:true})
-
-        //             // console.log(this.props.uid, this.state.class_id, item.member_item_id)
-        //             this.props.actionDeleteClassMember(this.props.uid, this.state.class_id, item.member_item_id, (result) => {
-        //                 console.log(result)
-        //                 this.setState({loading:false})
-        //             })
-        //         }
-        //     }
-        // ]
-
         return(
-        // <TouchableOpacity   
-        //         onPress={()=>{  
-        //                     this.props.navigation.navigate("FriendProfilePage",{'friend_id': item.friend_id})
-        //                     }}>
                 <View style={{flex:1, 
-                            //   height:100, 
                               padding:10, 
                               backgroundColor:'white', 
                               flexDirection:'row', 
                               alignItems:'center',}}>
                     <FastImage
-                        style={{width: 50, height: 50, borderRadius: 10, borderColor:'gray', borderWidth:.5}}
+                        style={{width: 50, 
+                                height: 50, 
+                                borderRadius: 10, 
+                                // borderColor:'gray', 
+                                // borderWidth:.5
+                            }}
                         source={{
-                            uri: item.image_url,
+                            uri: item.friend_profile.image_url,
                             headers:{ Authorization: 'someAuthToken' },
                             priority: FastImage.priority.normal,
                         }}
                         resizeMode={FastImage.resizeMode.cover}/>
                     <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                        <Text style={{fontSize:18}}>{item.name}</Text>
+                        <Text style={{fontSize:18}}>{item.friend_profile.name}</Text>
                     </View>
                     {this.showMenu(item)}
-                </View>
-                // </TouchableOpacity>
-                )
+                </View>)
     }
 
     render() {
         let {renderContent, data} = this.state;
+
+        if(!renderContent){
+            return (<View style={{flex:1}}></View>)
+        }
         return (
             <MenuContext>
             <View style={{ flex:1}}>
-            <Spinner
-                visible={this.state.loading}
-                textContent={'Wait...'}
-                textStyle={{color: '#FFF'}}
-                overlayColor={'rgba(0,0,0,0.5)'}/>
-            { renderContent &&
-            <FlatList
-                data={data}
-                ItemSeparatorComponent = {this.FlatListItemSeparator}
-                renderItem={this.renderItem}
-                extraData={data}
-                />
-            }
+                <Spinner
+                    visible={this.state.loading}
+                    textContent={'Wait...'}
+                    textStyle={{color: '#FFF'}}
+                    overlayColor={'rgba(0,0,0,0.5)'}/>
+                <FlatList
+                    data={data}
+                    ItemSeparatorComponent = {this.FlatListItemSeparator}
+                    renderItem={this.renderItem}
+                    extraData={data}
+                    />
                 <ActionButton 
                     buttonColor="rgba(231,76,60,1)"
                     hideShadow={true}
@@ -303,17 +222,27 @@ class ListClassMemberPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     // console.log(state)
     if(!state._persist.rehydrated){
       return {}
     }
+
+    if(!state.auth.isLogin){
+        return;
+    }
   
     return{
-        uid:getUid(state),
-        friends:state.auth.users.friends,
-        friend_profiles:state.auth.users.friend_profiles,
-        classs:state.auth.users.classs,
+        // uid:getUid(state),
+        // friends:state.auth.users.friends,
+        // friend_profiles:state.auth.users.friend_profiles,
+        // classs:state.auth.users.classs,
+
+        uid:makeUidState(state, ownProps),
+        friends:makeFriendsState(state, ownProps),
+        friend_profiles:makeFriendProfilesState(state, ownProps),
+        classs:makeClasssState(state, ownProps),
+        class_members:makeClassMembersState(state, ownProps),
     }
 }
 

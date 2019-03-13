@@ -19,6 +19,7 @@ import {makeUidState,
         makeMyAppicationsState,
         makeMyAppicationsPostsState,
         makeClasssState,
+        makeClassMembersState,
         makeGroupsState,
         makeGroupProfilesState,
         makeGroupMembersState,
@@ -108,6 +109,7 @@ class AuthLoadingScreen extends React.Component {
                 my_applications,
                 my_applications_posts,
                 classs,
+                class_members,
                 groups,
                 group_profiles,
                 group_members,
@@ -119,7 +121,7 @@ class AuthLoadingScreen extends React.Component {
             this.props.trackProfileEmails(uid, emails)
             this.props.trackProfileMyIds(uid, myIds)
             this.props.trackMyApplications(uid, my_applications, my_applications_posts)
-            this.props.trackClasss(uid, classs)
+            this.props.trackClasss(uid, classs, class_members)
             this.props.trackGroups(uid, groups, group_profiles, group_members)
             this.props.trackFriends(uid, friends, friend_profiles)
             
@@ -172,6 +174,7 @@ const mapStateToProps = (state, ownProps) => {
             my_applications:makeMyAppicationsState(state, ownProps),
             my_applications_posts:makeMyAppicationsPostsState(state, ownProps),
             classs:makeClasssState(state, ownProps),
+            class_members:makeClassMembersState(state, ownProps),
             groups:makeGroupsState(state, ownProps),
             group_profiles:makeGroupProfilesState(state, ownProps),
             group_members:makeGroupMembersState(state, ownProps),

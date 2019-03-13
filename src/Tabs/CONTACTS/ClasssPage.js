@@ -5,9 +5,7 @@ import {View,
         ActivityIndicator, 
         TouchableOpacity, 
         Alert} from 'react-native'
-
 import FastImage from 'react-native-fast-image'
-import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
 import Spinner from 'react-native-loading-spinner-overlay';
 var _ = require('lodash');
@@ -23,11 +21,12 @@ import {
 import ActionButton from 'react-native-action-button';
 
 import * as actions from '../../Actions'
-import {getUid, getHeaderInset} from '../../Utils/Helpers'
+import {getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState, 
-        makeClasssState} from '../../Reselect'
+        makeClasssState,
+        makeClassMembersState} from '../../Reselect'
 
 class ClasssPage extends React.Component{
     constructor(props) {
@@ -37,21 +36,10 @@ class ClasssPage extends React.Component{
         renderContent: false,
         loading: false,
         data: [],
-        page: 1,
-        seed: 1,
-        error: null,
-        refreshing: false,
-
-        rowID: null,
       };
     }
 
     componentDidMount() {
-
-      // this.props.watchTaskClassEvent(this.props.uid)
-
-      setTimeout(() => {this.setState({renderContent: true})}, 0);
-
       this.loadData(this.props)
     }
 
@@ -62,12 +50,16 @@ class ClasssPage extends React.Component{
     }
 
     loadData = (props) =>{
-      let data = []
-      for (var key in props.classs) {
-        let classs =  props.classs[key]
-        data.push({...{class_id:key}, ...classs});
-      }
-      this.setState({data});
+      let {classs, class_members} = props
+      let data  = _.map(classs, (cv, ck)=>{
+                      let members = _.find(class_members, (v, k)=>{
+                                      return k == ck
+                                    })
+
+                      return {...cv, class_id:ck, members}
+                  })
+
+      this.setState({data, renderContent: true});
     }
   
     renderFooter = () => {
@@ -87,6 +79,38 @@ class ClasssPage extends React.Component{
     }
     
     showMenuClasss = (item)=>{
+
+      let {class_id} = item
+
+      let memu_delete_class = <View />
+      if(!item.is_default){
+        memu_delete_class = <MenuOption onSelect={() => {
+                                Alert.alert(
+                                  'Delete class',
+                                  'Are you sure class '+item.name+'?',
+                                  [
+                                    // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                                    {text: 'Cancel', 
+                                      onPress: () => {
+                                          console.log("cancel")
+                                          }, style: 'cancel'},
+                                    {text: 'OK', 
+                                      onPress: () => {
+                                        this.setState({loading:true})
+                                        this.props.actionDeleteClass(this.props.uid, class_id, (result) => {
+                                            console.log(result)
+                                            this.setState({loading:false})
+                                        })
+                                      }, 
+                                    },
+                                  ],
+                                  { cancelable: false }
+                                )
+                            }}>
+                                <Text style={{padding:10, fontSize:18}}>Delete</Text>
+                            </MenuOption>
+      }
+      
       return( <View style={{flex:1,
                             position:'absolute', 
                             top:0,
@@ -102,88 +126,37 @@ class ClasssPage extends React.Component{
                   </MenuTrigger>
                   <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
                       <MenuOption onSelect={() => {
-                        this.props.params.navigation.navigate("ListClassMemberPage", {'class_id': item.class_id})
+                        this.props.params.navigation.navigate("ListClassMemberPage", {'class_id': class_id})
                       }}>
                           <Text style={{padding:10, fontSize:18}}>List members</Text>
                       </MenuOption>
                       <MenuOption onSelect={() => {
-                          this.props.params.navigation.navigate('ClasssSettingsPage', {'class_id': item.class_id})
+                          this.props.params.navigation.navigate('ClasssSettingsPage', {'class_id': class_id})
                       }}>
                           <Text style={{padding:10, fontSize:18}}>Settings</Text>
                       </MenuOption>
+                      {memu_delete_class}
                   </MenuOptions>
               </Menu>
             </View>)
     }
 
     countMembers = (item) =>{
-      let count = 0
-      if(item.members !== undefined){
-        _.each(item.members, function(_v, _k) { 
-            if(_v.status){
-              count++
-            } 
-        })
-      }
-
-      return count
+      let m_count = _.filter(item.members, (v, k)=>{
+                      return v.status
+                    })      
+      return m_count.length
     }
 
     isDefault = (item) =>{
-      // {item.is_default ? '(default '+ item.is_favorites +')': ''}
-
       if(item.is_default){
-        // if(item.is_favorites){
-        //   return(' (default, favorite)')
-        // }else{
-          return(' (default)')
-        // }
+        return(' (default)')
       }else{
-        // if(item.is_favorites){
-        //   return(' (favorite)')
-        // }else{
-        //   return('')
-        // }
-
         return('')
       }
     }
 
     renderItem = ({ item, index }) => {
-      var swipeoutBtns = []
-      if(!item.is_default){
-        swipeoutBtns =  [{  component:<View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
-                                        <Text style={{fontWeight:'bold', color:'white', fontSize:16}}>DELETE</Text>
-                                      </View>,
-                            backgroundColor: 'red',
-                            onPress: () => {
-                              Alert.alert(
-                                'Delete Classs',
-                                'Are you sure you want to delete?',
-                                [
-                                  // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
-                                  {text: 'Cancel', 
-                                  onPress: () => {console.log("cancel")}, 
-                                  style: 'cancel'},
-                                  {text: 'OK', 
-                                    onPress: () => {
-                                      console.log(item)
-                                      if(item.class_id !== undefined){
-                                        this.setState({loading:true})
-                                        this.props.actionDeleteClass(this.props.uid, item.class_id, (result) => {
-                                            console.log(result)
-                                            this.setState({loading:false})
-                                        })
-                                      }
-                                    }, 
-                                  },
-                                ],
-                                { cancelable: false })
-                            }
-                          }
-                        ]
-      }
-      
       return (<View
               style={{
                 alignItems: 'center', 
@@ -198,11 +171,7 @@ class ClasssPage extends React.Component{
                             borderWidth:3,
                             justifyContent:'center',
                             alignItems:'center'
-                            }}
-                    // onPress={()=>{
-                    //   this.props.params.navigation.navigate("ManageClasssPage", {'data': item, 'class_id':item.class_id})
-                    // }}
-                    >
+                            }}>
                   <FastImage
                     style={{width: 40, 
                             height: 40, 
@@ -224,7 +193,7 @@ class ClasssPage extends React.Component{
                           {item.name} 
                       </Text>
                       <Text style={{fontSize:12, color:'gray', fontStyle:'italic'}}>
-                        {this.isDefault(item)}
+                        {item.is_default? '(default)' :''}
                       </Text>
                   </View>
                   <Text>
@@ -250,48 +219,43 @@ class ClasssPage extends React.Component{
   
     render() {
       let { renderContent } = this.state;
-
-      if(!this.props.hasOwnProperty('classs')){
+      if(!renderContent){
         return <View style={{flex: 1}}></View>
       }
 
-      console.log(this.state.data)
       return (
         <MenuContext>
-        <View style={{flex:1}}>
-        <Spinner
-          visible={this.state.loading}
-          textContent={'Wait...'}
-          textStyle={{color: '#FFF'}}
-          overlayColor={'rgba(0,0,0,0.5)'}
-        />
-        {
-            renderContent && 
-          <FlatList
-            data={this.state.data}
-            renderItem={this.renderItem}
-            keyExtractor = { (item, index) => index.toString() } 
-            ItemSeparatorComponent = {this.FlatListItemSeparator}
-            ListFooterComponent={this.renderFooter}
-            onEndReachedThreshold={50}
-            extraData={this.state}
-          />
-        }
-        <ActionButton 
-          buttonColor="rgba(231,76,60,1)"
-          offsetX={10} 
-          offsetY={10}
-          hideShadow={true}
-          renderIcon={() => {
-              return(<MyIcon
-                  name={'plus'}
-                  size={25}
-                  color={'#C7D8DD'} />)
-              }}
-          onPress={()=>{
-              this.props.params.navigation.navigate("AddClasssPage")
-          }} />
-        </View>
+          <View style={{flex:1}}>
+            <Spinner
+              visible={this.state.loading}
+              textContent={'Wait...'}
+              textStyle={{color: '#FFF'}}
+              overlayColor={'rgba(0,0,0,0.5)'}
+            />
+            <FlatList
+                data={this.state.data}
+                renderItem={this.renderItem}
+                keyExtractor = { (item, index) => index.toString() } 
+                ItemSeparatorComponent = {this.FlatListItemSeparator}
+                ListFooterComponent={this.renderFooter}
+                onEndReachedThreshold={50}
+                extraData={this.state}
+              />
+            <ActionButton 
+              buttonColor="rgba(231,76,60,1)"
+              offsetX={10} 
+              offsetY={10}
+              hideShadow={true}
+              renderIcon={() => {
+                  return(<MyIcon
+                      name={'plus'}
+                      size={25}
+                      color={'#C7D8DD'} />)
+                  }}
+              onPress={()=>{
+                  this.props.params.navigation.navigate("AddClasssPage")
+              }} />
+          </View>
         </MenuContext>
       );
     }
@@ -311,11 +275,9 @@ const mapStateToProps = (state, ownProps) => {
   }
 
   return{
-    // uid:getUid(state),
-    // classs:state.auth.users.classs
-
     uid:makeUidState(state, ownProps),
     classs:makeClasssState(state, ownProps),
+    class_members:makeClassMembersState(state, ownProps),
   }
 }
 

@@ -637,39 +637,34 @@ export const actionGroupInviteMember = (uid, group_id, members, callback) => dis
 }
 
 // Group MakeAdmin
-export const actionMakeAdminGroup = (uid, group_id, frind_id, callback) => dispatch =>{
-    firebase.firestore().collection('groups').doc(group_id).collection('members').where('friend_id', '==', frind_id).get().then(snapshot => {
-        console.log(snapshot)
-        if(snapshot.size == 0){
-            callback({'status':false, 'message':'Friend not found.'})
-        }else{
-            snapshot.docs.forEach(doc => {
-                firebase.firestore().collection('groups').doc(group_id).collection('members').doc(doc.id).set({
-                    is_admin: true
-                }, { merge: true});
-            })
-
-            callback({'status':true})
-        }
-    })
+export const actionMakeAdminGroup = (uid, group_id, frind_id, member_key, callback) => dispatch =>{
+    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_key).set({
+        is_admin: true
+    }, { merge: true});
+    callback({'status':true})
 }
 
 // Remove as admin
-export const actionRemoveAsAdminGroup = (uid, group_id, frind_id, callback) => dispatch =>{
-    firebase.firestore().collection('groups').doc(group_id).collection('members').where('friend_id', '==', frind_id).get().then(snapshot => {
-        console.log(snapshot)
-        if(snapshot.size == 0){
-            callback({'status':false, 'message':'Friend not found.'})
-        }else{
-            snapshot.docs.forEach(doc => {
-                firebase.firestore().collection('groups').doc(group_id).collection('members').doc(doc.id).set({
-                    is_admin: false
-                }, { merge: true});
-            })
+export const actionRemoveAsAdminGroup = (uid, group_id, frind_id, member_key, callback) => dispatch =>{
+    // firebase.firestore().collection('groups').doc(group_id).collection('members').where('friend_id', '==', frind_id).get().then(snapshot => {
+    //     console.log(snapshot)
+    //     if(snapshot.size == 0){
+    //         callback({'status':false, 'message':'Friend not found.'})
+    //     }else{
+    //         snapshot.docs.forEach(doc => {
+    //             firebase.firestore().collection('groups').doc(group_id).collection('members').doc(doc.id).set({
+    //                 is_admin: false
+    //             }, { merge: true});
+    //         })
 
-            callback({'status':true})
-        }
-    })
+    //         callback({'status':true})
+    //     }
+    // })
+
+    firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_key).set({
+        is_admin: false
+    }, { merge: true});
+    callback({'status':true})
 }
 
 export const actionCreateClass = (uid, class_name, members, uri) => dispatch =>{
@@ -702,7 +697,7 @@ export const actionFavoritesClass = (uid, class_id, favorite_status, callback) =
 export const actionDeleteClass = (uid, class_id, callback) => dispatch =>{
     firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).delete()
     dispatch({ type: REMOVED_CLASS, class_id});
-    callback({'status':true})
+    callback({'status':true, uid, class_id})
 }
 
 // Classs add member 
@@ -2306,27 +2301,27 @@ export const trackMyApplications=(uid, my_applications, my_applications_posts)=>
 }
 
 // track classs
-export const trackClasss=(uid, classs)=> dispatch =>{
+export const trackClasss=(uid, classs, class_members)=> dispatch =>{
     console.log('classs? ', classs)
     firebase.firestore().collection('users').doc(uid).collection('classs').onSnapshot((classsSnapshot) => {
         classsSnapshot.docChanges.forEach(function(classsChange) {
             // console.log("Classs", classsChange.type, classsChange.doc.id, classsChange.doc.data());
 
-            let doc_id   = classsChange.doc.id
-            let doc_data = classsChange.doc.data()
+            let class_id   = classsChange.doc.id
+            let class_data = classsChange.doc.data()
 
             switch(classsChange.type){
                 case 'added':{
                     // ADDED_CLASS class_id, class_data
 
                     let cla = _.find(classs, (v, k)=>{
-                        return doc_id == k
+                        return class_id == k
                     })
 
                     if(cla === undefined){
                         // console.log('classs > ', classs, cla, doc_id )
                         console.log('track classs > added')
-                        dispatch({type: ADDED_CLASS, class_id:doc_id, class_data:doc_data })
+                        dispatch({type: ADDED_CLASS, class_id, class_data})
                     }
                     
                     // console.log('2, classs > ', uid, classsChange.doc.id)
@@ -2337,35 +2332,41 @@ export const trackClasss=(uid, classs)=> dispatch =>{
                             // SELECT_CLASS_MEMBERS
                             // dispatch({type: CLASS_MEMBERS, parent_id:doc.id,class_members_id:pdoc.id, class_members_data:pdoc.data()})
                         
+                            let class_member_id     = classsMembersChange.doc.id
+                            let class_member_data   = classsMembersChange.doc.data()
+
                             switch(classsMembersChange.type){
                                 case 'added':{
                                     // ADDED_CLASS_MEMBER
                                 
-                                    let cla = _.find(classs, (v, k)=>{
-                                        return k == classsChange.doc.id
+                                    let cla = _.find(class_members, (v, k)=>{
+                                        return k == class_id
                                     })
 
-                                    if(cla !== undefined){
-                                        let c = _.find(cla.members, (cv, ck)=>{
-                                            return ck == classsMembersChange.doc.id
+                                    if(cla){
+                                        let c = _.find(cla, (cv, ck)=>{
+                                            return ck == class_member_id
                                         })
-                                        if(c !== undefined){
+
+                                        if(c){
                                             return;
                                         }
                                     }
 
-                                    console.log('track classs > added > members')
-                                    dispatch({type: ADDED_CLASS_MEMBER, class_id:classsChange.doc.id, class_member_id:classsMembersChange.doc.id, class_member_data:classsMembersChange.doc.data() })
+                                    console.log('track classs > members > added ')
+                                    dispatch({type: ADDED_CLASS_MEMBER, class_id, class_member_id, class_member_data})
                                     break;
                                 }
                                 case 'modified':{
+                                    console.log('track classs > members > modified')
                                     // MODIFIED_CLASS_MEMBER
-                                    dispatch({type: MODIFIED_CLASS_MEMBER, class_id:classsChange.doc.id, class_member_id:classsMembersChange.doc.id, class_member_data:classsMembersChange.doc.data() })
+                                    // dispatch({type: MODIFIED_CLASS_MEMBER, class_id, class_member_id:classsMembersChange.doc.id, class_member_data:classsMembersChange.doc.data() })
                                     break;
                                 }
                                 case 'removed':{
+                                    console.log('track classs > members > removed')
                                     // REMOVED_CLASS_MEMBER
-                                    dispatch({type: REMOVED_CLASS_MEMBER, class_id:classsChange.doc.id, class_member_id:classsMembersChange.doc.id})
+                                    // dispatch({type: REMOVED_CLASS_MEMBER, class_id:classsChange.doc.id, class_member_id:classsMembersChange.doc.id})
                                     break;
                                 }
                             }

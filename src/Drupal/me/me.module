@@ -3686,7 +3686,7 @@ function onLoadProfile($uid, $mode){
             }
 
             $classs[$v_classs['value']] = array("image_url"  =>$item_classs_image_url,
-                                                "is_default" =>$item_classs_is_default,
+                                                "is_default" =>$item_classs_is_default === '1' ? TRUE : FALSE,
                                                 "name"       =>$item_classs_name
                                               );
           }
@@ -14865,8 +14865,11 @@ function create_chat_group(){
   $time_start = microtime(true);
   $batch = firestore_db()->batch();
 
+  // global $firebase;
+
   $param_uid    = $_REQUEST['uid'];
-  $lost_profile= (array)json_decode($_REQUEST['lost_profile']);
+  $param_name   = $_REQUEST['name'];
+  $param_members= (array)json_decode($_REQUEST['lost_profile']);
 
   if (count($param_members) == 0) {
     $result['result']   = FALSE;

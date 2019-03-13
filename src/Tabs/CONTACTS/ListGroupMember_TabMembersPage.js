@@ -46,6 +46,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
             data:[],
             group_id :0,
             group:{}, 
+            is_admin:false,
         }
     }
 
@@ -69,6 +70,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
             }
         })
 
+        console.log(group_profile.members, lost_profile)
         if(!isEmpty(lost_profile)){
             this.setState({loading:true})
             this.props.actionFriendProfileMulti99(uid, lost_profile).then((result) => {
@@ -92,13 +94,19 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
     loadData = (props) =>{
         let {group_id}  = this.state
+
+        if(group_id == 0){
+            return;
+        }
+
         let {uid, groups, group_profiles, friends, friend_profiles}    = props
 
         let group = _.find(groups,  function(v, k) { 
             return k == group_id
         })
 
-        if(group === undefined){
+        console.log(group, groups, group_id)
+        if(!group){
             this.handleCancel()
         }
         
@@ -150,6 +158,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                 // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
                                 firebase.firestore().collection('profiles').doc(v.friend_id).get()
                                 .then(doc => {
+                                    console.log('No such document!');
                                     if (!doc.exists) {
                                         console.log('No such document!');
                                     } else {
@@ -174,6 +183,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             if(uid === v.friend_id){
                                 members.push({...v, member_key:k})
                             }else{
+                                console.log('No such document!');
                                 // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
                                 firebase.firestore().collection('profiles').doc(v.friend_id).get()
                                 .then(doc => {
@@ -201,6 +211,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             if(uid === v.friend_id){
                                 declines.push({...v, member_key:k})
                             }else{
+                                console.log('No such document!');
                                 // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
                                 firebase.firestore().collection('profiles').doc(v.friend_id).get()
                                 .then(doc => {
@@ -231,12 +242,23 @@ class ListGroupMember_TabMembersPage extends React.Component{
         // console.log(pendings)
         // console.log(declines)
 
+        let is_admin = false
+        let is_admin_check =  _.find(members, (v, k)=>{
+                                    return v.friend_id == this.props.uid && v.is_admin
+                                })
+
+        if(is_admin_check){
+            is_admin = true
+        }
+        
+
         this.setState({
             data: [ {title: 'Members',member: members}, 
                     {title: 'Pending', member: pendings},
                     {title: 'Decline', member: declines},],
             group_profile: group.group_profile,
-            group
+            group,
+            is_admin
         })
     }
 
@@ -247,7 +269,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
     }
 
     handleCancel = () => {
-        this.props.navigation.goBack(null)
+        // this.props.navigation.goBack(null)
     }
 
     checkInvitor = (rowItem) =>{
@@ -267,8 +289,8 @@ class ListGroupMember_TabMembersPage extends React.Component{
                 }
 
                 let member = _.find(this.state.group.members, (mv, mk)=>{
-                    // return rowItem.invitor == mv.friend_id
-                    return '1'
+                    return rowItem.invitor == mv.friend_id
+                    // return '1'
                 })
 
                 // console.log(member)
@@ -277,10 +299,11 @@ class ListGroupMember_TabMembersPage extends React.Component{
                     return fk == member.friend_id;
                 });
 
+                // console.log('friend_profile', friend_profile)
                 let friend_name = ''
-                // if(friend_profile !== undefined){
-                //     friend_name = friend_profile.profile.name
-                // }
+                if(friend_profile){
+                    friend_name = friend_profile.name
+                }
 
                 return(<Text style={{fontSize:12, color:'gray'}}>Added by {friend_name}</Text>)
             }
@@ -294,10 +317,11 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
         let {uid} = this.props
         let {group_id} = this.state
-        let {friend, friend_id, is_admin} = rowItem
+        let {friend, friend_id, member_key, is_admin} = rowItem
 
         let menu_make_admin = <View />
-        if(!is_admin){
+        if(this.state.is_admin){
+            if(uid !== friend_id && !is_admin){
             menu_make_admin=<MenuOption onSelect={() => {
                                     Alert.alert(
                                         'Add group admin',
@@ -312,7 +336,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                         },
                                         {text: 'Make admin', onPress: () => {
                                             this.setState({loading:true})
-                                            this.props.actionMakeAdminGroup(uid, group_id, friend_id, (result) => {
+                                            this.props.actionMakeAdminGroup(uid, group_id, friend_id, member_key, (result) => {
                                                 this.setState({loading:false})
 
                                                 console.log(result)
@@ -324,32 +348,37 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                 }}>
                                 <Text style={{padding:10, fontSize:18}}>Make admin</Text>
                             </MenuOption>
-          
+            }
         }
 
-        return( <Menu>
-                    <MenuTrigger>
-                        <MyIcon 
+        let memu_trigger = <View />
+        let memu_view_profile = <View />
+        if(uid !== friend_id){
+
+            memu_trigger = <MyIcon 
                             style={{padding:10}}
                             name={'dot-horizontal'}
                             size={15}
                             color={'#C7D8DD'} />  
+
+            memu_view_profile = <MenuOption onSelect={() => {
+                                    if(uid === friend_id){
+                                        this.props.props.navigation.navigate("MyProfilePage")
+                                    }else{
+                                        this.props.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
+                                    }
+                                }}>
+                                    <Text style={{padding:10, fontSize:18}}>View profile</Text>
+                                </MenuOption>
+        }
+
+        return( <Menu>
+                    <MenuTrigger>
+                        {memu_trigger}
                     </MenuTrigger>
                     <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
                         {menu_make_admin}
-                        <MenuOption onSelect={() => {
-
-                            if(uid === friend_id){
-                                this.props.props.navigation.navigate("MyProfilePage")
-                            }else{
-                                this.props.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
-                            }
-                        }}>
-                            <Text style={{padding:10, fontSize:18}}>View profile</Text>
-                        </MenuOption>
-                        {/* <MenuOption onSelect={() => {console.log('Remove from group')}}>
-                            <Text style={{padding:10, fontSize:18}}>Remove from group</Text>
-                        </MenuOption> */}
+                        {memu_view_profile}
                     </MenuOptions>
                 </Menu>)
     }
@@ -740,6 +769,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                         />
                         <ActionButton 
                             buttonColor="rgba(231,76,60,1)"
+                            hideShadow={true}
                             renderIcon={() => {
                                 return(<MyIcon
                                     name={'user-plus'}
