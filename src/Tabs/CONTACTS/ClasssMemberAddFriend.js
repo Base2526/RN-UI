@@ -11,7 +11,16 @@ var _ = require('lodash');
 
 import * as actions from '../../Actions'
 import MyIcon from '../../config/icon-font.js';
-import {getUid} from '../../Utils/Helpers'
+
+import {randomKey} from '../../Utils/Helpers'
+
+import Constant from '../../Utils/Constant'
+
+import {makeUidState, 
+        makeClasssState,
+        makeClassMembersState,
+        makeFriendsState,
+        makeFriendProfilesState} from '../../Reselect'
 
 class ClasssMemberAddFriend extends React.Component{
     static navigationOptions = ({ navigation }) => ({
@@ -28,22 +37,9 @@ class ClasssMemberAddFriend extends React.Component{
             shadowOpacity: 0
         },
         headerLeft: (
-            <View style={{flexDirection:'row', flex:1}}>
-                <TouchableOpacity
-                    style={{paddingLeft:10}}
-                    // disabled={isModify ? false: true}
-                    onPress={() => {
-                        const { params = {} } = navigation.state
-                        params.handleAdd()
-                    }}>
-                    <Text style={{color:'#C7D8DD',fontSize:18, fontWeight:'bold'}}>Add</Text>
-                </TouchableOpacity>
-            </View>
-        ),
-        headerRight: (
             <View style={{marginRight:10}}>
                 <TouchableOpacity
-                    style={{padding:5}}
+                    style={{paddingLeft:10}}
                     // disabled={isModify ? false: true}
                     onPress={() => {
                         const { params = {} } = navigation.state
@@ -53,6 +49,19 @@ class ClasssMemberAddFriend extends React.Component{
                         name={'cancel'}
                         size={25}
                         color={'#C7D8DD'} />
+                </TouchableOpacity>
+            </View>
+        ),
+        headerRight: (
+            <View style={{flexDirection:'row', flex:1}}>
+                <TouchableOpacity
+                    style={{paddingRight:10}}
+                    // disabled={isModify ? false: true}
+                    onPress={() => {
+                        const { params = {} } = navigation.state
+                        params.handleAdd()
+                    }}>
+                    <Text style={{color:'#C7D8DD',fontSize:18, fontWeight:'bold'}}>Add</Text>
                 </TouchableOpacity>
             </View>
         ),
@@ -77,38 +86,6 @@ class ClasssMemberAddFriend extends React.Component{
         this.setState({class_id},()=>{
             this.loadData(this.props)
         })
-
-        /*
-        let classs = auth.users.classs
-
-        let arr_classs = Object.keys(classs).map((key, index) => {
-            return {...{class_id:key}, ...classs[key]};
-        })
-
-        // let {class_id} = this.state
-        var v = arr_classs.find(function(element) { 
-            return element.class_id == class_id; 
-        }); 
-
-        let friend_members = []
-        if(v.members !== undefined){
-            _.each(v.members, function(_v, _k) { 
-                if(_v.status){
-                    friend_members.push(_v.friend_id)
-                }
-            })
-        }
-
-        let friend = this.getArrFriends().filter(function(item){
-            let find = friend_members.find(key=>key==item.friend_id)
-            if(find === undefined){
-                return item
-            }
-            return ;
-        })
-
-        this.setState({data: friend})
-        */
     }
 
     componentWillReceiveProps(nextProps) {
@@ -120,8 +97,52 @@ class ClasssMemberAddFriend extends React.Component{
     }
 
     loadData = (props) =>{
-        console.log(props)
+        let {class_id} = this.state
+        let {friends, friend_profiles, classs, class_members} = props
 
+        let class_member =  _.find(class_members, (v, k)=>{
+                                return k == class_id
+                            })
+
+        // _.map(class_member, (v, k)=>{
+        //     console.log(v, k)
+            
+        // })
+
+        let data = []
+        _.map(friends, (v, k)=>{
+            if(!v.block && !v.hide && v.status == Constant.FRIEND_STATUS_FRIEND){
+
+                let member =_.find(class_member, (mv, mk)=>{
+                                return mv.friend_id == k
+                            })
+
+                let member_key = randomKey()
+                if(member){
+                    if(!member.status){
+                        member_key  =_.findKey(class_member, (key_v, key_k)=>{
+                                            return key_v.friend_id == k
+                                        })
+
+                        let friend_profile  =_.find(friend_profiles, (fv, fk)=>{
+                                                return fk == k
+                                            })
+                                        
+                        data.push({friend_id:k, member_key, friend_profile})
+                    }
+                }else{
+                    let friend_profile  =_.find(friend_profiles, (fv, fk)=>{
+                        return fk == k
+                    })
+                    data.push({friend_id:k, member_key, friend_profile})
+                }
+            } 
+        })
+
+        console.log(data)
+        this.setState({data})
+
+        /*
         let {class_id} = this.state
         let {friends, classs} = props
 
@@ -147,8 +168,8 @@ class ClasssMemberAddFriend extends React.Component{
             }
         })
 
-        console.log(newData)
         this.setState({data:newData})
+        */
     }
 
     handleAdd = () =>{
@@ -162,15 +183,17 @@ class ClasssMemberAddFriend extends React.Component{
         });
 
         let members = []
-        newData.map((value) => {
-            if(value.friend_id !== undefined){
-                members.push(value.friend_id)
-            }
+        newData.map((v) => {
+            // if(value.friend_id !== undefined){
+            let {friend_id, member_key} = v
+            members.push({friend_id, member_key})
+            // }
         })
 
         if(members.length == 0){
             Alert.alert("Empty friend.");
         }else{
+
             this.setState({loading:true})
             this.props.actionClassAddMember(this.props.uid, this.state.class_id, members, (result) => {
                 console.log(result)
@@ -233,14 +256,14 @@ class ClasssMemberAddFriend extends React.Component{
                                     backgroundColor: '#FF83AF',
                                     }}
                             source={{
-                            uri: item.profile.image_url,
+                            uri: item.friend_profile.image_url,
                             headers:{ Authorization: 'someAuthToken' },
                             priority: FastImage.priority.normal,
                             }}
                             resizeMode={FastImage.resizeMode.normal}
                         />
                     <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                        <Text style={{fontSize:18}}>{item.profile.name}</Text>
+                        <Text style={{fontSize:18}}>{item.friend_profile.name}</Text>
                     </View>
                 </View>
                 </TouchableOpacity>)
@@ -260,6 +283,13 @@ class ClasssMemberAddFriend extends React.Component{
     };
 
     render(){
+
+        let{data} = this.state
+
+        if(data.length == 0){
+            return(<View style={{flex:1}}><Text>Empty member</Text></View>)
+        }
+
         return(<View style={{flex:1}}>
                     <Spinner
                         visible={this.state.loading}
@@ -275,16 +305,26 @@ class ClasssMemberAddFriend extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     // console.log(state)
     if(!state._persist.rehydrated){
       return {}
     }
+
+    if(!state.auth.isLogin){
+        return;
+    }
   
     return{
-        uid:getUid(state),
-        friends:state.auth.users.friends,
-        classs:state.auth.users.classs,
+        // uid:getUid(state),
+        // friends:state.auth.users.friends,
+        // classs:state.auth.users.classs,
+
+        uid:makeUidState(state, ownProps),
+        friends:makeFriendsState(state, ownProps),
+        friend_profiles:makeFriendProfilesState(state, ownProps),
+        classs:makeClasssState(state, ownProps),
+        class_members:makeClassMembersState(state, ownProps),
     }
 }
 

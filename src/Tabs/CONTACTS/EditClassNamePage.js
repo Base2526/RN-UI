@@ -10,6 +10,8 @@ var _ = require('lodash');
 import * as actions from '../../Actions'
 import {getUid} from '../../Utils/Helpers'
 
+import {makeUidState, makeClasssState} from '../../Reselect'
+
 class EditClassNamePage extends React.Component{
 
     static navigationOptions = ({ navigation }) => {
@@ -71,12 +73,11 @@ class EditClassNamePage extends React.Component{
         let {class_id} = this.state
         let {classs} = props
 
-        let cla = _.find(classs,  function(v, k) { 
+        let _class = _.find(classs,  function(v, k) { 
             return k == class_id; 
         })
 
-        // console.log(cla)
-        this.setState({data:cla, text:cla.name})
+        this.setState({data:_class, text:_class.name})
     }
 
     handleSave = () => {
@@ -92,8 +93,8 @@ class EditClassNamePage extends React.Component{
                 // console.log('process', this.state.data.group_id)
                 this.setState({loading:true})
                 this.props.actionEditClassNameProfile(this.props.uid, this.state.class_id, this.state.text, (result) => {
-                    console.log(result)
                     this.setState({loading:false})
+
                     const { navigation } = this.props;
                     navigation.goBack();
                 })
@@ -107,10 +108,7 @@ class EditClassNamePage extends React.Component{
 
     render() {
 
-        // console.log(this.state)
-
         let {text} = this.state
-        console.log(text)
         return (<View style={{margin:10}}>
                     <Spinner
                         visible={this.state.loading}
@@ -137,19 +135,23 @@ class EditClassNamePage extends React.Component{
 }
 
 
-const mapStateToProps = (state) => {
-  console.log(state)
+const mapStateToProps = (state, ownProps) => {
+    // console.log(state)
 
-  // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
-  //_persist.rehydrated parameter is initially set to false
-  if(!state._persist.rehydrated){
-    return {}
-  }
+    // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
+    //_persist.rehydrated parameter is initially set to false
+    if(!state._persist.rehydrated){
+        return {}
+    }
+    
+    if(!state.auth.isLogin){
+        return;
+    }
 
-  return{
-    uid:getUid(state),
-    classs:state.auth.users.classs,
-  }
+    return{
+        uid:makeUidState(state, ownProps),
+        classs:makeClasssState(state, ownProps),
+    }
 }
 
 export default connect(mapStateToProps, actions)(EditClassNamePage);

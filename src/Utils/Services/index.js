@@ -230,7 +230,6 @@ export const create_class = (uid, class_name, members, uri) =>{
         type: 'image/png'
     })
     data.append("uid", uid)
-    // data.append("fction", 'add')
     data.append("name", class_name)
     data.append('members', JSON.stringify(members))
 

@@ -19,13 +19,12 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import ImagePicker from 'react-native-image-picker';
 
 import * as actions from '../../Actions'
-import Constant from '../../Utils/Constant'
 import MyIcon from '../../config/icon-font.js';
 
-import {getUid} from '../../Utils/Helpers'
+import {makeUidState, 
+        makeClasssState} from '../../Reselect'
 
 class ClasssSettingsPage extends React.Component{
-
     static navigationOptions = ({ navigation }) => ({
         title: "Classs setting",
         headerTintColor: '#C7D8DD',
@@ -39,33 +38,32 @@ class ClasssSettingsPage extends React.Component{
             elevation: 0,
             shadowOpacity: 0
           },
-        //   headerRight: (
-        //     <View style={{marginRight:10}}>
-        //         <TouchableOpacity
-        //             style={{padding:5}}
-        //             // disabled={isModify ? false: true}
-        //             onPress={() => {
-        //                 const { params = {} } = navigation.state
-        //                 params.handleCancel()
-        //             }}>
-        //             <MyIcon
-        //                 name={'cancel'}
-        //                 size={25}
-        //                 color={'#C7D8DD'} />
-        //         </TouchableOpacity>
-        //     </View>
-        // ),
+          headerRight: (
+            <View style={{marginRight:10}}>
+                <TouchableOpacity
+                    style={{paddingLeft:10}}
+                    // disabled={isModify ? false: true}
+                    onPress={() => {
+                        const { params = {} } = navigation.state
+                        params.handleCancel()
+                    }}>
+                    <MyIcon
+                        name={'cancel'}
+                        size={25}
+                        color={'#C7D8DD'} />
+                </TouchableOpacity>
+            </View>
+        ),
     });
 
     constructor(props) {
         super(props)
 
         this.state ={
+            renderContent: false,
             loading: false,
-            cla: {},
-            name: '',
-            image_url: '',
             class_id: 0,
+            _class:{}
         }
     }
 
@@ -90,18 +88,18 @@ class ClasssSettingsPage extends React.Component{
     }
 
     loadData = (props) =>{
-        // console.log(props)
+        console.log(props)
         let {class_id} = this.state
         let {classs} = props
 
-        let cla = _.find(classs,  function(v, k) { 
+        let _class = _.find(classs,  function(v, k) { 
             return k == class_id; 
         })
 
-        this.setState({cla, image_url:cla.image_url, name:cla.name})
+        this.setState({_class, renderContent:true})
     }
 
-    profilePicture = () => {
+    classProfilePicture = () => {
         let options =  {
             title: 'Select class profile picture',
             noData: true,
@@ -136,6 +134,11 @@ class ClasssSettingsPage extends React.Component{
     }
 
     render(){
+        let {renderContent, _class, class_id} = this.state
+
+        if(!renderContent){
+            return(<View style={{flex:1}}></View>)
+        }
 
         return(
         <KeyboardAwareScrollView>
@@ -148,7 +151,6 @@ class ClasssSettingsPage extends React.Component{
             />
             
             <View style={{flex: 1,}}>
-          
             <TableView >
                 <Section
                     sectionPaddingTop={5}
@@ -179,13 +181,13 @@ class ClasssSettingsPage extends React.Component{
                             marginBottom:10}}>
                             <TouchableOpacity
                                 onPress={()=>{
-                                    this.profilePicture()
+                                    this.classProfilePicture()
                                 }}>
                                 
                                 <FastImage
                                     style={{width: 150, height: 150}}
                                     source={{
-                                        uri: this.state.image_url == "" ? Constant.DEFAULT_AVATARSOURCE_URI : this.state.image_url,
+                                        uri: _class.image_url,
                                         headers:{ Authorization: 'someAuthToken' },
                                         priority: FastImage.priority.normal,
                                     }}
@@ -193,7 +195,7 @@ class ClasssSettingsPage extends React.Component{
                             </TouchableOpacity>
                             <TouchableOpacity style={{position:'absolute', right:0, bottom:0, padding:5, margin:5}}
                                             onPress={()=>{
-                                                this.profilePicture()
+                                                this.classProfilePicture()
                                             }}>
                                 <MyIcon
                                     name={'camera'}
@@ -227,13 +229,13 @@ class ClasssSettingsPage extends React.Component{
                             <TextInput
                                 style={{ fontSize: 22, flex: 1 }}
                                 placeholder="input class name"
-                                value={this.state.name}
+                                value={_class.name}
                                 editable={false}
                                 pointerEvents="none"
                             />
                         }
                         onPress={()=>{
-                            this.props.navigation.navigate("EditClassNamePage", {'class_id': this.state.class_id})
+                            this.props.navigation.navigate("EditClassNamePage", {'class_id': class_id})
                         }}
                         />
                 </Section>
@@ -244,16 +246,19 @@ class ClasssSettingsPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
-    // console.log(state)
+const mapStateToProps = (state, ownProps) => {
+    console.log(state)
     if(!state._persist.rehydrated){
       return {}
     }
+
+    if(!state.auth.isLogin){
+        return;
+    }
   
     return{
-        uid:getUid(state),
-        auth:state.auth,
-        classs:state.auth.users.classs,
+        uid:makeUidState(state, ownProps),
+        classs:makeClasssState(state, ownProps),
     }
 }
 

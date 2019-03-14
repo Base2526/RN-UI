@@ -676,8 +676,8 @@ export const actionCreateClass = (uid, class_name, members, uri) => dispatch =>{
             if(!data.result){
                 return {'status':false, 'message': data}
             }else{
-                dispatch({type: ADDED_CLASS, class_id:data.item_id ,class_data:data.data})
-                return {'status':true, 'data':data}
+                // dispatch({type: ADDED_CLASS, class_id:data.item_id ,class_data:data.data})
+                return {'status':true}
             }
         }
     })
@@ -702,6 +702,22 @@ export const actionDeleteClass = (uid, class_id, callback) => dispatch =>{
 
 // Classs add member 
 export const actionClassAddMember = (uid, class_id, members, callback) => dispatch =>{
+    
+    let batch = firebase.firestore().batch();
+    members.map((v, k)=>{
+        let {friend_id, member_key} = v
+
+        let classRef =  firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(member_key)
+        batch.set(classRef, {status: true,friend_id}, { merge: true})
+    })
+
+    batch.commit().then(function () {
+        callback({'status':true})
+    }).catch(function(err) {
+        console.log("Transaction failure: " + err);
+    });
+
+    /*
     members.map(function(friend_id, k) {
         firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').where('friend_id', '==', friend_id).get().then(snapshot => {
             let value = {friend_id, status: true}
@@ -729,6 +745,7 @@ export const actionClassAddMember = (uid, class_id, members, callback) => dispat
             }
         })
     })
+    */
 }
 
 // REMOVED_CLASS_MEMBER
@@ -749,9 +766,8 @@ export const actionUpdateClassPictureProfile = (uid, class_id, image_uri) => dis
                 return {'status':false, 'message': data}
             }else{
                 // dispatch({ type: UPDATE_GROUP_PICTURE_PROFILE, group_id, image_url:data.image_url});
-                
-                dispatch({ type: UPDATE_CLASS_PICTURE_PROFILE, class_id, image_url:data.image_url});
-                return {'status':true, data}
+                // dispatch({ type: UPDATE_CLASS_PICTURE_PROFILE, class_id, image_url:data.image_url});
+                return {'status':true}
             }
         }
     })
@@ -821,10 +837,8 @@ export const actionEditClassNameProfile = (uid, class_id, name, callback) => dis
         name,
     }, { merge: true});
 
-    // dispatch({ type: EDIT_DISPLAY_NAME_PROFILE, name});
     callback({'status':true})
 }
-
 
 export const actionUpdateStatusFriend = (uid, friend_id, status, callback) => dispatch=>{
     let batch = firebase.firestore().batch();
@@ -2313,15 +2327,18 @@ export const trackClasss=(uid, classs, class_members)=> dispatch =>{
             switch(classsChange.type){
                 case 'added':{
                     // ADDED_CLASS class_id, class_data
-
-                    let cla = _.find(classs, (v, k)=>{
+                    let _class = _.find(classs, (v, k)=>{
                         return class_id == k
                     })
 
-                    if(cla === undefined){
-                        // console.log('classs > ', classs, cla, doc_id )
+                    if(!_class){
                         console.log('track classs > added')
                         dispatch({type: ADDED_CLASS, class_id, class_data})
+                    }else{
+                        if(!_.isEqual(_class, class_data)){
+                            console.log('track classs > added not equal')
+                            dispatch({type: ADDED_CLASS, class_id, class_data})
+                        }
                     }
                     
                     // console.log('2, classs > ', uid, classsChange.doc.id)
@@ -2339,13 +2356,13 @@ export const trackClasss=(uid, classs, class_members)=> dispatch =>{
                                 case 'added':{
                                     // ADDED_CLASS_MEMBER
                                 
-                                    let cla = _.find(class_members, (v, k)=>{
+                                    let class_member = _.find(class_members, (v, k)=>{
                                         return k == class_id
                                     })
 
-                                    if(cla){
-                                        let c = _.find(cla, (cv, ck)=>{
-                                            return ck == class_member_id
+                                    if(class_member){
+                                        let c = _.find(class_member, (cv, ck)=>{
+                                            return ck == class_member_id && _.isEqual(class_member_data, cv)
                                         })
 
                                         if(c){
@@ -2360,7 +2377,7 @@ export const trackClasss=(uid, classs, class_members)=> dispatch =>{
                                 case 'modified':{
                                     console.log('track classs > members > modified')
                                     // MODIFIED_CLASS_MEMBER
-                                    // dispatch({type: MODIFIED_CLASS_MEMBER, class_id, class_member_id:classsMembersChange.doc.id, class_member_data:classsMembersChange.doc.data() })
+                                    dispatch({type: MODIFIED_CLASS_MEMBER, class_id, class_member_id, class_member_data})
                                     break;
                                 }
                                 case 'removed':{
@@ -2378,7 +2395,7 @@ export const trackClasss=(uid, classs, class_members)=> dispatch =>{
                 case 'modified':{
                     // MODIFIED_CLASS
                     // console.log("Classs", classsChange.type, classsChange.doc.id, classsChange.doc.data());
-                    dispatch({type: MODIFIED_CLASS, class_id:classsChange.doc.id ,class_data:classsChange.doc.data() })
+                    dispatch({type: MODIFIED_CLASS, class_id, class_data })
                    
                     break;
                 }

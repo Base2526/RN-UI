@@ -25,7 +25,6 @@ import MyIcon from '../../config/icon-font.js';
 import {makeUidState, 
         makeClasssState,
         makeClassMembersState,
-        makeFriendsState, 
         makeFriendProfilesState} from '../../Reselect'
 
 class ListClassMemberPage extends React.Component{
@@ -42,6 +41,24 @@ class ListClassMemberPage extends React.Component{
             elevation: 0,
             shadowOpacity: 0
         },
+        headerRight: (
+            <View style={{flexDirection:'row', flex:1}}>
+                <TouchableOpacity
+                    style={{paddingRight:10}}
+                    // disabled={isModify ? false: true}
+                    onPress={() => {
+                        const { params = {} } = navigation.state
+                        params.handleMemberAdd()
+                    }}>
+                    <MyIcon
+                        name={'plus'}
+                        size={25}
+                        color={'#C7D8DD'} />
+                </TouchableOpacity>
+            </View>
+        ),
+
+        // 
     });
 
     constructor(){
@@ -55,14 +72,14 @@ class ListClassMemberPage extends React.Component{
     }
 
     componentDidMount() {
-        this.props.navigation.setParams({handleSetting: this.handleSetting })
-        this.props.navigation.setParams({handleAddFriend: this.handleAddFriend })
+        this.props.navigation.setParams({handleMemberAdd: this.handleMemberAdd })
         
         setTimeout(() => {this.setState({renderContent: true})}, 0);
 
         const { navigation } = this.props;
         const class_id = navigation.getParam('class_id', null);
 
+        console.log('class_id', class_id)
         this.setState({class_id},()=>{
             this.loadData(this.props)
         })
@@ -74,7 +91,7 @@ class ListClassMemberPage extends React.Component{
 
     loadData = (props) =>{
         let {class_id} = this.state
-        let {friends, friend_profiles, classs, class_members} = props
+        let {friend_profiles, classs, class_members} = props
 
         let cla = _.find(classs,  function(v, k) { 
             return k == class_id; 
@@ -86,27 +103,30 @@ class ListClassMemberPage extends React.Component{
         }
 
         let class_member =  _.find(class_members, (v, k)=>{
-                                return k == class_id
+                                return k == class_id 
                             })
 
-        let data =  _.map(class_member, (v, k)=>{
-                        let friend_profile =_.find(friend_profiles, (fv, fk)=>{
-                                                return v.friend_id == fk
-                                            })
-                        return {friend_id:v.friend_id, member_key:k, friend_profile}
-                    })
+        let data = []
+        _.map(class_member, (v, k)=>{
+            if(v.status){
+                let friend_profile =_.find(friend_profiles, (fv, fk)=>{
+                        return v.friend_id == fk
+                    })  
+                data.push({friend_id:v.friend_id, member_key:k, friend_profile})
+            }
+        })
+
         this.setState({data})
+
+        console.log(data, class_member)
     }
 
-    handleSetting = () => {
-        this.props.navigation.navigate('ClasssSettingsPage')
-    }
-
-    handleAddFriend = () => {
+    handleMemberAdd = () => {
         this.props.navigation.navigate("ClasssMemberAddFriend", {'class_id':this.state.class_id})
     }
 
-    FlatListItemSeparator = () => {
+
+    ItemSeparatorComponent = () => {
         return (
           <View
             style={{
@@ -116,13 +136,11 @@ class ListClassMemberPage extends React.Component{
               marginLeft: "14%"
             }}
           />
-        );
+        )
     }
 
     showMenu = (item)=>{
-
         let {friend_id, member_key} = item
-
         return( <View style={{flex:1,
                               position:'absolute', 
                               top:0,
@@ -184,7 +202,7 @@ class ListClassMemberPage extends React.Component{
     }
 
     render() {
-        let {renderContent, data} = this.state;
+        let {renderContent, data, class_id} = this.state;
 
         if(!renderContent){
             return (<View style={{flex:1}}></View>)
@@ -199,11 +217,11 @@ class ListClassMemberPage extends React.Component{
                     overlayColor={'rgba(0,0,0,0.5)'}/>
                 <FlatList
                     data={data}
-                    ItemSeparatorComponent = {this.FlatListItemSeparator}
+                    ItemSeparatorComponent = {this.ItemSeparatorComponent}
                     renderItem={this.renderItem}
                     extraData={data}
                     />
-                <ActionButton 
+                {/* <ActionButton 
                     buttonColor="rgba(231,76,60,1)"
                     hideShadow={true}
                     renderIcon={() => {
@@ -213,9 +231,9 @@ class ListClassMemberPage extends React.Component{
                             color={'#C7D8DD'} />)
                         }}
                     onPress={()=>{
-                        this.props.navigation.navigate("ClasssMemberAddFriend", {'class_id':this.state.class_id})
+                        this.props.navigation.navigate("ClasssMemberAddFriend", {'class_id':class_id})
                     }}>
-                </ActionButton>
+                </ActionButton> */}
             </View>
             </MenuContext>
         );
@@ -239,7 +257,6 @@ const mapStateToProps = (state, ownProps) => {
         // classs:state.auth.users.classs,
 
         uid:makeUidState(state, ownProps),
-        friends:makeFriendsState(state, ownProps),
         friend_profiles:makeFriendProfilesState(state, ownProps),
         classs:makeClasssState(state, ownProps),
         class_members:makeClassMembersState(state, ownProps),

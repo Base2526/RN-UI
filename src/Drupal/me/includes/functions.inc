@@ -276,14 +276,14 @@ function create_class(){
   
 	if (!check_header()) {
 	  $result['result'] = FALSE;
-	  $result['message']= "check_header()";
+	  // $result['message']= "check_header()";
 	  return $result;
 	}
   
 	if (empty($_REQUEST['uid']) || empty($_REQUEST['name']) ) {
 	  $result['result'] = FALSE;
-	  $result['message']  = "function : create_class, parameter";
-	  $result['_REQUEST'] = $_REQUEST;
+	  // $result['message']  = "function : create_class, parameter";
+	  // $result['_REQUEST'] = $_REQUEST;
 	  return $result;
 	}
 
@@ -293,13 +293,13 @@ function create_class(){
 
   if (count($param_members) == 0) {
     $result['result']   = FALSE;
-    $result['message']  = "Members empty.";
+    // $result['message']  = "Members empty.";
     return $result;
 	}
 	
 	if(empty($_FILES["idna"])){
 		$result['result']   = FALSE;
-    $result['message']  = "Picture Class empty.";
+    // $result['message']  = "Picture Class empty.";
     return $result;
 	}
 
@@ -336,7 +336,10 @@ function create_class(){
 
 	$value_class = array('image_url'	=> file_create_url(image_style_url('medium', $image_url['uri'])), 
 											 'name'     	=> $param_name,
+											 'created_at' => time(),
 											 'is_default' => FALSE);
+
+											 
 
 	$nycRef =firestore_db()->collection(FIRESTORE_USERS)->document($param_uid)->collection(FIRESTORE_CLASSS)->document($class_entity->item_id);
 	$batch->set($nycRef, $value_class, ['merge' => true]);
@@ -375,8 +378,8 @@ function create_class(){
 	$execution_time = number_format(($time_end - $time_start), 2);
 	
 	$result['result'] = TRUE;
-	$result['item_id']= $class_entity->item_id;
-	$result['data']   = $value_class;
+	// $result['item_id']= $class_entity->item_id;
+	// $result['data']   = $value_class;
 	$result['execution_time']  = $execution_time;
   return $result;
 }

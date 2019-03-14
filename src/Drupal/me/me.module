@@ -10494,13 +10494,14 @@ function update_class_picture_profile(){
       $wrapper->field_class_image_profile->set($file);
       $wrapper->save();
 
+      // file_create_url(image_style_url('medium', $image_url['uri']))
       $image_url = file_create_url(image_style_url('medium', $file['uri']));
 
       // update firestore image_url
       firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_CLASSS)->document($class_id)->set(array("image_url"  => $image_url), ['merge' => true]);
     
       $result['result'] = TRUE; 
-      $result['image_url'] = $image_url;
+      // $result['image_url'] = $image_url;
       return $result;
     }
 

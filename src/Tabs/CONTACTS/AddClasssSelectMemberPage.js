@@ -11,6 +11,11 @@ import FastImage from 'react-native-fast-image'
 import * as actions from '../../Actions'
 import MyIcon from '../../config/icon-font.js';
 
+import Constant from '../../Utils/Constant'
+
+import {makeFriendsState,
+        makeFriendProfilesState} from '../../Reselect'
+
 class AddClasssSelectMemberPage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
         title: "Select member",
@@ -41,34 +46,31 @@ class AddClasssSelectMemberPage extends React.Component{
 
     componentDidMount(){
         this.props.navigation.setParams({ handleAddMember: this.handleAddMember })
-    
 
         const { navigation, auth } = this.props;
-        const data = navigation.getParam('members', null);
+        const members = navigation.getParam('members', null);
 
-        // console.log(members)
+        // let friends = auth.users.friends
 
-        // let members = group.group_profile.members
-        let friends = auth.users.friends
-
-        let key = []
-        _.each(data, function(_v, _k) { 
-            key.push(_v)
-        });
-
-        let newData = []
-        _.each(friends, function(_v, _k) { 
-            let find = key.find(k => k.friend_id==_k)
-            if(find === undefined){
-                newData.push({..._v, friend_id:_k})
-            }else{
-                newData.push(find)
+        let {friends, friend_profiles} = this.props
+        let data = []
+        _.map(friends, (v, k)=>{
+            if(!v.block && !v.hide && v.status == Constant.FRIEND_STATUS_FRIEND){
+                
+                let member =_.find(members, (mv, mk)=>{
+                                return mv.friend_id == k
+                            })
+                if(member){
+                    data.push(member)
+                }else{
+                    let friend_profile =_.find(friend_profiles, (pv, pk)=>{
+                        return pk == k
+                    })
+                    data.push({...v, friend_profile, friend_id:k})
+                }
             }
-        });
-
-        this.setState({data:newData})    
-        
-        // console.log(new Date())
+        })
+        this.setState({data})  
     }
 
     handleAddMember = () =>{
@@ -88,15 +90,7 @@ class AddClasssSelectMemberPage extends React.Component{
         navigation.goBack();
         navigation.state.params.onSeleted(newData);
     }
-
-    onSubmit = () => {
-        console.log('api call')
-        setTimeout(() => {
-          this.setState({ buttonState: 'success' });
-          console.log('api call > onSubmit')
-        }, 2000); // if success, else this.setState({ buttonState: 'error' })
-    };
-
+    
     onSeleted = (index) =>{
         let newData = [...this.state.data];
         if(this.state.data[index].seleted === undefined){
@@ -156,7 +150,7 @@ class AddClasssSelectMemberPage extends React.Component{
                                     borderColor:'gray'
                             }}
                             source={{
-                            uri: item.profile.image_url,
+                            uri: item.friend_profile.image_url,
                             headers:{ Authorization: 'someAuthToken' },
                             priority: FastImage.priority.normal,
                             }}
@@ -164,7 +158,7 @@ class AddClasssSelectMemberPage extends React.Component{
                         />
                     </TouchableOpacity>
                     <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                        <Text style={{fontSize:18}}>{item.profile.name}</Text>
+                        <Text style={{fontSize:18}}>{item.friend_profile.name}</Text>
                     </View>
                 </View>
                 </TouchableOpacity>)
@@ -199,15 +193,20 @@ class AddClasssSelectMemberPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     // console.log(state)
-
     if(!state._persist.rehydrated){
       return {}
     }
+
+    if(!state.auth.isLogin){
+        return;
+    }
   
     return{
-      auth:state.auth
+        //   auth:state.auth
+        friends:makeFriendsState(state, ownProps),
+        friend_profiles:makeFriendProfilesState(state, ownProps),
     }
 }
 

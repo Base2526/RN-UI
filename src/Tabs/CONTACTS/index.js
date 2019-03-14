@@ -179,9 +179,9 @@ const index = createStackNavigator({
     'ChangeFriendsName': {
       screen: ChangeFriendsName
     },
-    'ClasssSettingsPage': {
-      screen: ClasssSettingsPage
-    },
+    // 'ClasssSettingsPage': {
+    //   screen: ClasssSettingsPage
+    // },
 
     'testPushNotifications': {
       screen: testPushNotifications

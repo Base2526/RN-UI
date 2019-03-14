@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { connect } from 'react-redux';
 import ImagePicker from 'react-native-image-picker';
+var _ = require('lodash');
 
 import Constant from '../../Utils/Constant'
 import * as actions from '../../Actions'
@@ -20,6 +21,9 @@ import {getUid} from '../../Utils/Helpers'
 import ImageWithDefault from '../../Utils/ImageWithDefault'
 
 import MyIcon from '../../config/icon-font.js';
+import {makeUidState, 
+        makeFriendsState,
+        makeFriendProfilesState} from '../../Reselect'
 
 // More info on all the options is below in the API Reference... just some common use cases shown here
 const options = {
@@ -116,9 +120,15 @@ class AddClasssPage extends React.Component{
     componentDidMount() {
       this.props.navigation.setParams({ handleCreateClass: this.handleCreateClass })
   
-      this.setState({
-        data: this.loadData(),
-      });
+      // this.setState({
+      //   data: this.loadData(),
+      // });
+
+      this.loadData(this.props)
+    }
+
+    componentWillReceiveProps(nextProps) {
+      this.loadData(nextProps)
     }
 
     onLayout(e) {
@@ -132,31 +142,37 @@ class AddClasssPage extends React.Component{
       }
     }
 
-    loadData=()=>{
+    loadData=(props)=>{
+      let{friend_profiles, friends} = props
+
+      /*
       let friend_member = []
-      let friends = this.props.friends
+      // let friends = this.props.friends
       for (var key in friends) {
         let friend = friends[key]
+
+        let friend_profile =_.find(friend_profiles, (v, k)=>{
+                              return k == key
+                            })
         switch(friend.status){
           case Constant.FRIEND_STATUS_FRIEND:{            
-            friend_member.push({...friend, ...{'friend_id':key}});
-            break
-          }
-
-          case Constant.FRIEND_STATUS_FRIEND_CANCEL:{
-            break
-          }
-
-          case Constant.FRIEND_STATUS_FRIEND_REQUEST:{
-            break
-          }
-
-          case Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND:{
+            friend_member.push({...friend, 'friend_id':key, friend_profile});
             break
           }
         }
       }
       return friend_member
+      */
+
+      let data =_.map(friends, (fv, fk)=>{
+                    let friend_profile =_.find(friend_profiles, (pv, pk)=>{
+                      return fk == pk
+                    })
+
+                    return {...fv, 'friend_id':fk, friend_profile}
+                })
+
+      this.setState({data})
     }
 
     handleCreateClass = () => {
@@ -342,10 +358,12 @@ class AddClasssPage extends React.Component{
         </View>)
     };
 
-    renderItem = ({item, index}) => {      
+    renderItem = ({item, index}) => {   
+      let {friend_id, friend_profile} = item
+      
       let check = null
       var __ = this.state.seleteds.find(function(element) { 
-        return element === item.friend_id; 
+        return element == friend_id; 
       }); 
 
       if(__ !== undefined){
@@ -357,35 +375,32 @@ class AddClasssPage extends React.Component{
               style={{
                 alignItems: 'center', 
                 padding: 10,
-                // borderColor: DictStyle.colorSet.lineColor,
                 flexDirection: 'row',
                 backgroundColor: 'white'
               }}
             >
               <View style={{flex:1, alignItems:'center'}}>
               <TouchableOpacity 
-                  style={{height:60,
-                          width: 60,
-                          borderRadius: 10}}
-                  onPress={()=>this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.friend_id})}>
+                  style={{height:50,
+                          width:50,
+                          borderRadius:10}}
+                  onPress={()=>this.props.navigation.navigate("FriendProfilePage", {'friend_id': friend_id})}>
                     <ImageWithDefault 
-                      source={{uri:item.profile.image_url}}
+                      source={{uri:friend_profile.image_url}}
                       style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/>
               </TouchableOpacity>
               </View>
               <View style={{flex:5}}>
                 <TouchableOpacity 
                   onPress={()=>{
-                    this._check(item.friend_id)
+                    this._check(friend_id)
                   }}
                   style={{flex:1, justifyContent:'center'}}>
                   <Text style={{
                               fontSize: 16, 
                               fontWeight: '600',
-                              // color: DictStyle.colorSet.normalFontColor,
-                              
                               paddingLeft: 10}}>
-                      {item.profile.name}
+                      {friend_profile.name}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -409,7 +424,7 @@ class AddClasssPage extends React.Component{
           /*  เราต้องมีการคำนวณ item ให้เต็มแต่ละแถว  */
           data = {formatData(item.list, this.state.numColumns)}
           numColumns={this.state.numColumns}
-          renderItem={this.renderListItem}
+          renderItem={this.renderItem}
           keyExtractor={this.keyExtractor}
           extraData={this.state}
           contentContainerStyle={{flexGrow: 2, justifyContent: 'center'}}
@@ -417,8 +432,8 @@ class AddClasssPage extends React.Component{
       )
     }
 
-    renderListItem = ({item, index}) => { 
-      
+    renderItem = ({item, index}) => { 
+      console.log(item)
       if ('empty' in item) {
         return <View style={{height: 120, 
           width: 100, 
@@ -465,7 +480,7 @@ class AddClasssPage extends React.Component{
                           borderWidth:1
                         }}
                   source={{
-                    uri: item.profile.image_url,
+                    uri: item.friend_profile.image_url,
                     headers:{ Authorization: 'someAuthToken' },
                     priority: FastImage.priority.normal,
                   }}
@@ -514,7 +529,7 @@ class AddClasssPage extends React.Component{
 
 // uid:getUid(state)
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
@@ -523,10 +538,18 @@ const mapStateToProps = (state) => {
     return {}
   }
 
+  if(!state.auth.isLogin){
+    return;
+  }
+
   return{
-    auth: state.auth,
-    friends: state.auth.users.friends,
-    uid: getUid(state)
+    // auth: state.auth,
+    // friends: state.auth.users.friends,
+    // uid: getUid(state)
+
+    uid:makeUidState(state, ownProps),
+    friends:makeFriendsState(state, ownProps),
+    friend_profiles:makeFriendProfilesState(state, ownProps),
   }
 }
 
