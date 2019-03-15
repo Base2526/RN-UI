@@ -97,22 +97,22 @@ export const ADD_PHONE_PROFILE              = 'add_phone_profile'
 export const EDIT_PHONE_PROFILE             = 'edit_phone_profile'
 export const REMOVE_PHONE_PROFILE           = 'remove_phone_profile'
 
-export const ADD_WEBSITE_FRIEND             = 'add_websites_friend'
-export const EDIT_WEBSITE_FRIEND            = 'edit_websites_friend'
-export const REMOVE_WEBSITE_FRIEND          = 'remove_websites_friend'
+export const ADDED_WEBSITE_FRIEND           = 'added_websites_friend'
+export const MODIFIED_WEBSITE_FRIEND        = 'modified_websites_friend'
+export const REMOVED_WEBSITE_FRIEND         = 'removed_websites_friend'
 
-export const ADD_PHONE_FRIEND               = 'add_phone_friend'
-export const EDIT_PHONE_FRIEND              = 'edit_phone_friend'
-export const REMOVE_PHONE_FRIEND            = 'remove_phone_friend'
+export const ADDED_PHONE_FRIEND             = 'added_phone_friend'
+export const MODIFIED_PHONE_FRIEND          = 'modified_phone_friend'
+export const REMOVED_PHONE_FRIEND           = 'removed_phone_friend'
 
-export const ADD_EMAIL_FRIEND               = 'add_email_friend'
-export const EDIT_EMAIL_FRIEND              = 'edit_email_friend'
-export const REMOVE_EMAIL_FRIEND            = 'remove_email_friend'
+export const ADDED_EMAIL_FRIEND             = 'added_email_friend'
+export const MODIFIED_EMAIL_FRIEND          = 'modified_email_friend'
+export const REMOVED_EMAIL_FRIEND           = 'removed_email_friend'
 
 // 
-export const ADD_MY_ID_FRIEND               = 'add_my_id_friend'
-export const EDIT_MY_ID_FRIEND              = 'edit_my_id_friend'
-export const REMOVE_MY_ID_FRIEND            = 'remove_my_id_friend'
+export const ADDED_MY_ID_FRIEND             = 'added_my_id_friend'
+export const MODIFIED_MY_ID_FRIEND          = 'modified_my_id_friend'
+export const REMOVED_MY_ID_FRIEND           = 'removed_my_id_friend'
 
 export const ADDRESS_PROFILE                = 'address_profile'
 

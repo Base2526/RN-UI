@@ -279,8 +279,8 @@ class ClasssMemberAddFriend extends React.Component{
               marginLeft: "14%"
             }}
           />
-        );
-    };
+        )
+    }
 
     render(){
 

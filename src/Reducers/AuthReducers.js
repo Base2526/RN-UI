@@ -75,21 +75,22 @@ import {USER_LOGIN_SUCCESS,
         EDIT_PHONE_PROFILE,
         REMOVE_PHONE_PROFILE,
 
-        ADD_PHONE_FRIEND,
-        EDIT_PHONE_FRIEND,
-        REMOVE_PHONE_FRIEND,
+        ADDED_PHONE_FRIEND,
+        MODIFIED_PHONE_FRIEND,
+        REMOVED_PHONE_FRIEND,
 
-        ADD_WEBSITE_FRIEND,
-        EDIT_WEBSITE_FRIEND,
-        REMOVE_WEBSITE_FRIEND,
+        ADDED_WEBSITE_FRIEND,
+        MODIFIED_WEBSITE_FRIEND,
+        REMOVED_WEBSITE_FRIEND,
 
-        ADD_EMAIL_FRIEND,
-        EDIT_EMAIL_FRIEND,
-        REMOVE_EMAIL_FRIEND,
+        
+        ADDED_EMAIL_FRIEND,
+        MODIFIED_EMAIL_FRIEND,
+        REMOVED_EMAIL_FRIEND,
 
-        ADD_MY_ID_FRIEND, 
-        EDIT_MY_ID_FRIEND, 
-        REMOVE_MY_ID_FRIEND,
+        ADDED_MY_ID_FRIEND, 
+        MODIFIED_MY_ID_FRIEND, 
+        REMOVED_MY_ID_FRIEND,
 
         ADDRESS_PROFILE,
 
@@ -869,8 +870,8 @@ export default (state= INITIAL_STATE, action)=>{
             return state
         }
 
-        case ADD_PHONE_FRIEND :{
-            if(state.user === null){
+        case ADDED_PHONE_FRIEND :{
+            if(!state.user){
                 return state
             }
 
@@ -880,7 +881,7 @@ export default (state= INITIAL_STATE, action)=>{
                                 })
 
             console.log('phones > added', friend_phone )
-            if(friend_phone === undefined){
+            if(!friend_phone){
                 let fphones = {[action.friend_phone_id]:action.friend_phone_data}
 
                 let v = {...state,
@@ -900,7 +901,7 @@ export default (state= INITIAL_STATE, action)=>{
                                 })
                 
                 let fphones = {...friend_phone, [action.friend_phone_id]:action.friend_phone_data}
-                if(find_phone === undefined){
+                if(!find_phone){
                     let newState = {...state,
                                         user: {
                                             ...state.user,
@@ -934,26 +935,83 @@ export default (state= INITIAL_STATE, action)=>{
             return state
         }
 
-        case EDIT_PHONE_FRIEND:{
-            if(state.users === null){
+        // dispatch({ type: MODIFIED_PHONE_FRIEND, friend_id, friend_phone_id, friend_phone_data})
+        case MODIFIED_PHONE_FRIEND:{
+            if(!state.user){
                 return state
+            }
+            let friend_phones = state.user.friend_phones
+
+            let friend_phone =  _.find(friend_phones,  function(v, k) { 
+                                    return k == action.friend_id
+                                })
+
+            if(!friend_phone){
+                return state
+            }
+
+            let phone = _.find(friend_phone,  function(v, k) { 
+                            return k == action.friend_phone_id
+                        })
+
+            if(!_.isEqual(phone, action.friend_phone_data)){
+
+                let new_friend_phone = {...friend_phone, [action.friend_phone_id]:action.friend_phone_data}
+                let new_state = {...state,
+                                    user : {
+                                        ...state.user,
+                                        friend_phones : {
+                                            ...state.user.friend_phones,
+                                            [action.friend_id]:new_friend_phone
+                                        }
+                                    }
+                                }
+                return new_state
             }
 
             return state
         }
 
-        case REMOVE_PHONE_FRIEND:{
-            if(state.users === null){
+        case REMOVED_PHONE_FRIEND:{
+            if(state.user === null){
+                return state
+            }
+            
+            let friend_phones = state.user.friend_phones
+            if(!friend_phones){
                 return state
             }
 
-            return state
+            let friend_phone =   _.find(friend_phones,  function(v, k) { 
+                                    return k == action.friend_id
+                                })
+            
+            if(!friend_phone){
+                return state
+            }
+
+            let phone = _.find(friend_phone,  function(v, k) { 
+                            return k == action.friend_phone_id
+                        })
+
+            if(!phone){
+                return state
+            }
+
+            let new_friend_phone = _.omit(friend_phone, action.friend_phone_id)
+            let v = {...state,
+                        user : {
+                            ...state.user,
+                            friend_phones : {
+                                ...state.users.friend_phones,
+                                [action.friend_id]:new_friend_phone
+                            }
+                        }
+                    }
+            return v
         }
 
-        // ADD_WEBSITE_FRIEND,
-        // EDIT_WEBSITE_FRIEND,
-        // REMOVE_WEBSITE_FRIEND,
-        case ADD_WEBSITE_FRIEND:{
+        case ADDED_WEBSITE_FRIEND:{
             if(state.user === null){
                 return state
             }
@@ -1011,29 +1069,88 @@ export default (state= INITIAL_STATE, action)=>{
             return state
         }
 
-        case EDIT_WEBSITE_FRIEND:{
-            if(state.users === null){
+        case MODIFIED_WEBSITE_FRIEND:{
+            if(!state.user){
                 return state
+            }
+
+            let friend_websites= state.user.friend_websites
+            let friend_website = _.find(friend_websites,  function(v, k) { 
+                                    return k == action.friend_id
+                                })
+
+            if(!friend_website){
+                return state
+            }
+
+            let website = _.find(friend_website,  function(v, k) { 
+                            return k == action.friend_website_id
+                        })
+
+            if(!_.isEqual(website, action.friend_website_data)){
+
+                let new_friend_website = {...friend_website, [action.friend_website_id]:action.friend_website_data}
+                let new_state = {...state,
+                                    user : {
+                                        ...state.user,
+                                        friend_websites: {
+                                            ...state.user.friend_websites,
+                                            [action.friend_id]:new_friend_website
+                                        }
+                                    }
+                                }
+                return new_state
             }
 
             return state
         }
 
-        case REMOVE_WEBSITE_FRIEND:{
-            if(state.users === null){
+        case REMOVED_WEBSITE_FRIEND:{
+            if(!state.user){
+                return state
+            }
+            
+            let friend_websites = state.user.friend_websites
+            if(!friend_websites){
                 return state
             }
 
-            return state
-        }
+            let friend_website =_.find(friend_websites,  function(v, k) { 
+                                    return k == action.friend_id
+                                })
+            
+            if(!friend_website){
+                return state
+            }
 
+            let phone = _.find(friend_website,  function(v, k) { 
+                            return k == action.friend_website_id
+                        })
+
+            if(!phone){
+                return state
+            }
+
+            let new_friend_website = _.omit(friend_website, action.friend_website_id)
+            let new_state = {...state,
+                                user: {
+                                    ...state.user,
+                                    friend_websites: {
+                                        ...state.users.friend_websites,
+                                        [action.friend_id]:new_friend_website
+                                    }
+                                }
+                            }
+
+            return new_state
+        }
 
         // ADD_EMAIL_FRIEND,
         // EDIT_EMAIL_FRIEND,
         // REMOVE_EMAIL_FRIEND,
 
         // emails
-        case ADD_EMAIL_FRIEND:{
+        case ADDED_EMAIL_FRIEND:{
             if(state.user === null){
                 return state
             }
@@ -1063,7 +1180,7 @@ export default (state= INITIAL_STATE, action)=>{
                                 })
                 
                 let femails = {...friend_email, [action.friend_email_id]:action.friend_email_data}
-                if(find_email === undefined){
+                if(!find_email){
                     let newState = {...state,
                                         user: {
                                             ...state.user,
@@ -1093,27 +1210,84 @@ export default (state= INITIAL_STATE, action)=>{
             return state
         }
 
-        case EDIT_EMAIL_FRIEND:{
-            if(state.user === null){
+        case MODIFIED_EMAIL_FRIEND:{
+            if(!state.user){
                 return state
+            }
+
+            let friend_emails= state.user.friend_emails
+            let friend_email = _.find(friend_emails,  function(v, k) { 
+                                    return k == action.friend_id
+                                })
+
+            if(!friend_email){
+                return state
+            }
+
+            let email = _.find(friend_email,  function(v, k) { 
+                            return k == action.friend_email_id
+                        })
+
+            if(!_.isEqual(email, action.friend_email_data)){
+
+                let new_friend_email = {...friend_email, [action.friend_email_id]:action.friend_email_data}
+                let new_state = {...state,
+                                    user : {
+                                        ...state.user,
+                                        friend_emails: {
+                                            ...state.user.friend_emails,
+                                            [action.friend_id]:new_friend_email
+                                        }
+                                    }
+                                }
+                return new_state
             }
 
             return state
         }
 
-        case REMOVE_EMAIL_FRIEND:{
-            if(state.user === null){
+        case REMOVED_EMAIL_FRIEND:{
+            if(!state.user){
+                return state
+            }
+            
+            let friend_emails = state.user.friend_emails
+            if(!friend_emails){
                 return state
             }
 
-            return state
+            let friend_email =_.find(friend_emails,  function(v, k) { 
+                                    return k == action.friend_id
+                                })
+            
+            if(!friend_email){
+                return state
+            }
+
+            let email = _.find(friend_email,  function(v, k) { 
+                            return k == action.friend_email_id
+                        })
+
+            if(!email){
+                return state
+            }
+
+            let new_friend_email = _.omit(friend_email, action.friend_email_id)
+            let new_state = {...state,
+                                user: {
+                                    ...state.user,
+                                    friend_emails: {
+                                        ...state.users.friend_emails,
+                                        [action.friend_id]:new_friend_email
+                                    }
+                                }
+                            }
+
+            return new_state
         }
 
-        // ADD_MY_ID_FRIEND, 
-        // EDIT_MY_ID_FRIEND, 
-        // REMOVE_MY_ID_FRIEND
-        case ADD_MY_ID_FRIEND:{
-            if(state.user === null){
+        case ADDED_MY_ID_FRIEND:{
+            if(!state.user){
                 return state
             }
 
@@ -1123,7 +1297,7 @@ export default (state= INITIAL_STATE, action)=>{
                                     return k == action.friend_id
                                 })
 
-            if(friend_my_id === undefined){
+            if(!friend_my_id){
                 let fmy_ids = {[action.friend_my_id_id]:action.friend_my_id_data}
 
                 let v = {...state,
@@ -1142,7 +1316,7 @@ export default (state= INITIAL_STATE, action)=>{
                                         })
                 
                 let fmy_ids = {...friend_my_id, [action.friend_my_id_id]:action.friend_my_id_data}
-                if(find_friend_my_id === undefined){
+                if(!find_friend_my_id){
                     let newState = {...state,
                                         user: {
                                             ...state.user,
@@ -1172,20 +1346,79 @@ export default (state= INITIAL_STATE, action)=>{
             return state
         }
 
-        case EDIT_MY_ID_FRIEND:{
-            if(state.user === null){
+        case MODIFIED_MY_ID_FRIEND:{
+            if(!state.user){
                 return state
+            }
+
+            let friend_my_ids= state.user.friend_my_ids
+            let friend_my_id = _.find(friend_my_ids,  function(v, k) { 
+                                    return k == action.friend_id
+                                })
+
+            if(!friend_my_id){
+                return state
+            }
+
+            let my_id = _.find(friend_my_id,  function(v, k) { 
+                            return k == action.friend_my_id_id
+                        })
+
+            if(!_.isEqual(my_id, action.friend_my_id_data)){
+
+                let new_friend_my_id = {...friend_my_id, [action.friend_my_id_id]:action.friend_my_id_data}
+                let new_state = {...state,
+                                    user : {
+                                        ...state.user,
+                                        friend_my_ids: {
+                                            ...state.user.friend_my_ids,
+                                            [action.friend_id]:new_friend_my_id
+                                        }
+                                    }
+                                }
+                return new_state
             }
 
             return state
         }
 
-        case REMOVE_MY_ID_FRIEND:{
-            if(state.user === null){
+        case REMOVED_MY_ID_FRIEND:{
+            if(!state.user){
+                return state
+            }
+            
+            let friend_my_ids = state.user.friend_my_ids
+            if(!friend_my_ids){
                 return state
             }
 
-            return state
+            let friend_my_id =  _.find(friend_my_ids,  function(v, k) { 
+                                    return k == action.friend_id
+                                })
+            
+            if(!friend_my_id){
+                return state
+            }
+
+            let my_id = _.find(friend_my_id,  function(v, k) { 
+                            return k == action.friend_my_id_id
+                        })
+
+            if(!my_id){
+                return state
+            }
+
+            let new_friend_my_id = _.omit(friend_my_id, action.friend_my_id_id)
+            let new_state = {...state,
+                                user: {
+                                    ...state.user,
+                                    friend_my_ids: {
+                                        ...state.users.friend_my_ids,
+                                        [action.friend_id]:new_friend_my_id
+                                    }
+                                }
+                            }
+            return new_state
         }
 
 
@@ -1616,15 +1849,15 @@ export default (state= INITIAL_STATE, action)=>{
                 }
                 return v
             }else{
-                let newGroup = {...group, ...action.group_data}
-                if(!_.isEqual(group, newGroup)){
+                // let newGroup = {...group, ...action.group_data}
+                if(!_.isEqual(group, action.group_data)){
                     // console.log('ADD_GROUP')
                     let v = {...state,
                                 user: {
                                     ...state.user,
                                     groups: {
                                         ...state.user.groups,
-                                        [action.group_id]: newGroup
+                                        [action.group_id]: action.group_data
                                     }
                                 }
                             }
@@ -1645,7 +1878,7 @@ export default (state= INITIAL_STATE, action)=>{
                 return k == action.group_id
             })
 
-            if(group === undefined){
+            if(!group){
                 return state
             }
     
@@ -1672,25 +1905,23 @@ export default (state= INITIAL_STATE, action)=>{
                 return state
             }
 
-            let groups = state.user.groups
-            let group = _.find(groups,  function(v, k) { 
-                return k == action.group_id
-            })
+            let groups          = state.user.groups
+            let group_profiles  = state.user.group_profiles
+            let group_members   = state.user.group_members
+          
+            let new_groups          = _.omit(groups, action.group_id)
+            let new_group_profiles  = _.omit(group_profiles, action.group_id)
+            let new_group_members   = _.omit(group_members, action.group_id)
 
-            if(group !== undefined){
-                // เป็น การลบ object ที่มี key ตรงกันออก
-                // https://stackoverflow.com/questions/3455405/how-do-i-remove-a-key-from-a-javascript-object
-
-                let newGroups = _.omit(groups, action.group_id)
-                let v = {...state,
-                            user: {
-                                ...state.user,
-                                groups:newGroups
+            let newState = {...state,
+                                user: {
+                                    ...state.user,
+                                    groups:new_groups,
+                                    group_profiles:new_group_profiles,
+                                    group_members:new_group_members
+                                }
                             }
-                        }
-                return v
-            }
-            return state
+            return newState
         }
 
 
@@ -1709,7 +1940,7 @@ export default (state= INITIAL_STATE, action)=>{
                                 })
 
             if(!group_profile){
-                let newState = {...state,
+                let new_state = {...state,
                                     user: {
                                         ...state.user,
                                         group_profiles : {
@@ -1719,11 +1950,11 @@ export default (state= INITIAL_STATE, action)=>{
                                     }
                                 }
                 
-                console.log('ADDED_GROUP_PROFILE', action.group_profile_data, newState)
-                return newState;
+                // console.log('ADDED_GROUP_PROFILE', action.group_profile_data, newState)
+                return new_state;
             }else{
                 if(!_.isEqual(group_profile, action.group_profile)){
-                    let newState = {...state,
+                    let new_state = {...state,
                                         user: {
                                             ...state.user,
                                             group_profiles : {
@@ -1733,8 +1964,8 @@ export default (state= INITIAL_STATE, action)=>{
                                         }
                                     }
 
-                    console.log('ADDED_GROUP_PROFILE', friend_profile, action.group_profile_data, newState)
-                    return newState;
+                    // console.log('ADDED_GROUP_PROFILE', friend_profile, action.group_profile_data, newState)
+                    return new_state;
                 }
             }
 
@@ -2110,13 +2341,13 @@ export default (state= INITIAL_STATE, action)=>{
                                 })
 
             if(!group_member){
-                let newGroupMembers = {[action.member_key]:action.member_data}
+                let new_group_members = {[action.member_key]:action.member_data}
                 let newState = {...state,
                                     user: {
                                         ...state.user,
                                         group_members: {
                                             ...state.user.group_members,
-                                            [action.group_id]:newGroupMembers
+                                            [action.group_id]:new_group_members
                                         }
                                     }
                                 }
@@ -2126,14 +2357,14 @@ export default (state= INITIAL_STATE, action)=>{
                                     return fk == action.member_key
                                 })
                 
-                let newGroupMembers = {...group_member, [action.member_key]:action.member_data}
+                let new_group_members = {...group_member, [action.member_key]:action.member_data}
                 if(!find_member){
                     let newState = {...state,
                                         user: {
                                             ...state.user,
                                             group_members: {
                                                 ...state.user.group_members,
-                                                [action.group_id]:newGroupMembers
+                                                [action.group_id]:new_group_members
                                             }
                                         }
                                     }
@@ -2145,7 +2376,7 @@ export default (state= INITIAL_STATE, action)=>{
                                                 ...state.user,
                                                 group_members: {
                                                     ...state.user.group_members,
-                                                    [action.group_id]:newGroupMembers
+                                                    [action.group_id]:new_group_members
                                                 }
                                             }
                                         }
@@ -2169,17 +2400,16 @@ export default (state= INITIAL_STATE, action)=>{
             if(group_member){
                 let new_group_members = {...group_member, [action.member_key]:action.member_data}
 
-                let newState = {...state,
-                    user: {
-                        ...state.user,
-                        group_members: {
-                            ...state.user.group_members,
-                            [action.group_id]:new_group_members
-                        }
-                    }
-                }
-
-                return newState
+                let new_state = {...state,
+                                    user: {
+                                        ...state.user,
+                                        group_members: {
+                                            ...state.user.group_members,
+                                            [action.group_id]:new_group_members
+                                        }
+                                    }
+                                }
+                return new_state
             }
             
             return state
@@ -2203,7 +2433,7 @@ export default (state= INITIAL_STATE, action)=>{
                 if(member){
                     let new_group_member = _.omit(group_member, action.member_key)
 
-                    let newState = {...state,
+                    let new_state = {...state,
                                         user: {
                                             ...state.user,
                                             group_members: {
@@ -2212,8 +2442,7 @@ export default (state= INITIAL_STATE, action)=>{
                                             }
                                         }
                                     }
-
-                    return newState
+                    return new_state
                 }
             }
             

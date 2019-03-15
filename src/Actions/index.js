@@ -82,22 +82,22 @@ import {USER_LOGIN_SUCCESS,
         EDIT_PHONE_PROFILE,
         REMOVE_PHONE_PROFILE,
 
-        ADD_PHONE_FRIEND,
-        EDIT_PHONE_FRIEND,
-        REMOVE_PHONE_FRIEND,
+        ADDED_PHONE_FRIEND,
+        MODIFIED_PHONE_FRIEND,
+        REMOVED_PHONE_FRIEND,
 
-        ADD_WEBSITE_FRIEND,
-        EDIT_WEBSITE_FRIEND,
-        REMOVE_WEBSITE_FRIEND,
+        ADDED_WEBSITE_FRIEND,
+        MODIFIED_WEBSITE_FRIEND,
+        REMOVED_WEBSITE_FRIEND,
 
-        ADD_EMAIL_FRIEND,
-        EDIT_EMAIL_FRIEND,
-        REMOVE_EMAIL_FRIEND,
+        ADDED_EMAIL_FRIEND,
+        MODIFIED_EMAIL_FRIEND,
+        REMOVED_EMAIL_FRIEND,
 
 
-        ADD_MY_ID_FRIEND, 
-        EDIT_MY_ID_FRIEND, 
-        REMOVE_MY_ID_FRIEND,
+        ADDED_MY_ID_FRIEND, 
+        MODIFIED_MY_ID_FRIEND, 
+        REMOVED_MY_ID_FRIEND,
     
         ADDRESS_PROFILE,
 
@@ -505,16 +505,13 @@ export const actionMemberJoinGroup = (uid, group_id, member_key, callback) => di
 
     batch.commit().then(function () {
         console.log("Transaction success: actionMemberJoinGroup");
-
-        dispatch({ type: MEMBER_JOIN_GROUP, group_id, member_key})
+        // dispatch({ type: MEMBER_JOIN_GROUP, group_id, member_key})
         callback({'status':true})
     }).catch(function(err) {
         console.log("Transaction failure: " + err);
 
         callback({'status':false, 'message':err})
     });
-
-    
 }
 
 // Leave Group
@@ -1355,11 +1352,11 @@ export const actionFriendProfile99= (uid, friend_id) => dispatch=>{
                 dispatch({ type: ADDED_FRIEND_PROFILE, friend_id, friend_profile});
 
                 _.each(friend_emails, (ev, ek)=>{
-                    dispatch({ type: ADD_EMAIL_FRIEND, friend_id, friend_email_id:ek, friend_email_data:ev})
+                    dispatch({ type: ADDED_EMAIL_FRIEND, friend_id, friend_email_id:ek, friend_email_data:ev})
                 })
 
                 _.each(friend_my_ids, (mv, mk)=>{
-                    dispatch({ type: ADD_MY_ID_FRIEND, friend_id, friend_my_id_id:mk, friend_my_id_data:mv})
+                    dispatch({ type: ADDED_MY_ID_FRIEND, friend_id, friend_my_id_id:mk, friend_my_id_data:mv})
                 })
 
                 _.each(friend_phones, (pv, pk)=>{
@@ -1401,11 +1398,11 @@ export const actionFriendProfileMulti99 = (uid, lost_profile) => dispatch=>{
                     dispatch({ type: ADDED_FRIEND_PROFILE, friend_id, friend_profile});
 
                     _.each(friend_emails, (ev, ek)=>{
-                        dispatch({ type: ADD_EMAIL_FRIEND, friend_id, friend_email_id:ek, friend_email_data:ev})
+                        dispatch({ type: ADDED_EMAIL_FRIEND, friend_id, friend_email_id:ek, friend_email_data:ev})
                     })
 
                     _.each(friend_my_ids, (mv, mk)=>{
-                        dispatch({ type: ADD_MY_ID_FRIEND, friend_id, friend_my_id_id:mk, friend_my_id_data:mv})
+                        dispatch({ type: ADDED_MY_ID_FRIEND, friend_id, friend_my_id_id:mk, friend_my_id_data:mv})
                     })
 
                     _.each(friend_phones, (pv, pk)=>{
@@ -1418,36 +1415,6 @@ export const actionFriendProfileMulti99 = (uid, lost_profile) => dispatch=>{
                 })
 
                 return {'status':true}
-                /*
-                let v = data.data
-                let friend_emails   = v.friend_emails
-                let friend_my_ids   = v.friend_my_ids
-                let friend_phones   = v.friend_phones
-                let friend_profile  = v.friend_profile
-                let friend_websites = v.friend_websites
-
-                let friend_data = {'status':Constant.FRIEND_STATUS_FRIEND_99, }
-                dispatch({type: ADD_FRIEND, friend_id, friend_data});
-                dispatch({ type: ADDED_FRIEND_PROFILE, friend_id, friend_profile});
-
-                _.each(friend_emails, (ev, ek)=>{
-                    dispatch({ type: ADD_EMAIL_FRIEND, friend_id, friend_email_id:ek, friend_email_data:ev})
-                })
-
-                _.each(friend_my_ids, (mv, mk)=>{
-                    dispatch({ type: ADD_MY_ID_FRIEND, friend_id, friend_my_id_id:mk, friend_my_id_data:mv})
-                })
-
-                _.each(friend_phones, (pv, pk)=>{
-                    dispatch({ type: ADD_PHONE_FRIEND, friend_id, friend_phone_id:pk, friend_phone_data:pv})
-                })
-
-                _.each(friend_websites, (wv, wk)=>{
-                    dispatch({ type: ADD_WEBSITE_FRIEND, friend_id, friend_website_id:wk, friend_website_data:wv})
-                })
-                
-                return {'status':true, friend_profile: v.friend_profile}
-                */
             }
         }
     })
@@ -2424,18 +2391,25 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
                 case 'added':{
 
                     let group = _.find(groups, (v, k)=>{
-                                    return change.doc.id == k
+                                    return group_id == k
                                 })
                         
                     if(!group){
                         console.log("trackGroups users > groups > added")
                         dispatch({ type: ADD_GROUP, group_id, group_data});
+                    }else{
+                        if(!_.isEqual(group, group_data)){
+                            console.log("trackGroups users > groups > added not equal")
+                            dispatch({ type: ADD_GROUP, group_id, group_data});
+                        }
                     }
 
                     // track group profile
                     firebase.firestore().collection('groups').doc(change.doc.id).onSnapshot((docSnapshot) => {
                         // console.log(docSnapshot.id) 
                         // doc.id จะมีค่าเท่ากันกับ  docSnapshot.id 
+
+                        let group_profile_data = docSnapshot.data()
         
                         if(docSnapshot.data() !== undefined){
                             let group_profile = _.find(group_profiles, (v, k)=>{
@@ -2444,7 +2418,12 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
 
                             if(!group_profile){
                                 console.log('track group profile')
-                                dispatch({ type: ADDED_GROUP_PROFILE, group_id:change.doc.id, group_profile_data:docSnapshot.data()});
+                                dispatch({ type: ADDED_GROUP_PROFILE, group_id, group_profile_data});
+                            }else{
+                                if(!_.isEqual(group_profile, group_profile_data)){
+                                    console.log('track group profile not equal')
+                                    dispatch({ type: ADDED_GROUP_PROFILE, group_id, group_profile_data});
+                                }
                             }
                         }
                     })
@@ -2459,7 +2438,6 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
                             
                             if (members_change.type === 'added') {
                                 
-                                
                                 let members = _.find(group_members,  function(fpv, fpk) { 
                                                 return fpk == group_id
                                             })
@@ -2467,14 +2445,26 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
                                 let member  = _.find(members, (mv, mk)=>{
                                                 return mk == member_key && _.isEqual(mv, members_change.doc.data())
                                             })
-                            
-                                if(member){
-                                    return;
+
+                                // console.log(friend_profiles, member)
+                                if(!member){
+                                    console.log('track group > members : added', member_key, member_data)
+                                    dispatch({ type: ADDED_GROUP_MEMBER, group_id, member_key, member_data});
+                                }else{
+                                    if(!_.isEqual(member, member_data)){
+                                        console.log('track group > members : added not equal', member_key, member_data)
+                                        dispatch({ type: ADDED_GROUP_MEMBER, group_id, member_key, member_data});
+                                    }
                                 }
 
-                                console.log('track group > members : added', member_key, member_data)
+                                // let friend_id = _.findKey(friend_profiles, (v, k)=>{
+                                //                     return k == member.friend_id
+                                //                 })
 
-                                dispatch({ type: ADDED_GROUP_MEMBER, group_id, member_key, member_data});
+                                
+                                // if(!friend_id){
+                                profileFriend(member.friend_id, dispatch)
+                                // }
                             }
                             if (members_change.type === 'modified') {
                                 console.log('track group > members : modified');
@@ -2515,13 +2505,12 @@ export const trackFriends=(uid, friends, friend_profiles)=> dispatch =>{
 
         querySnapshot.docChanges.forEach(function(change) {
             // console.log(change.type)
+            let friend_id   = change.doc.id
+            let friend_data = change.doc.data()
+
             if (change.type === 'added') {
-
-                let friend_id   = change.doc.id
-                let friend_data = change.doc.data()
-
                 let friend = _.find(friends, (v, k)=>{
-                    return change.doc.id == k
+                    return friend_id == k
                 })
 
                 console.log('trackFriends > added', friend, friend_data)
@@ -2531,488 +2520,211 @@ export const trackFriends=(uid, friends, friend_profiles)=> dispatch =>{
                     dispatch({ type: ADD_FRIEND, friend_id, friend_data});
                 }
 
-                // friend > profiles
-                firebase.firestore().collection('profiles').doc(change.doc.id).onSnapshot((friendProfileDocSnapshot) => {
-                    // console.log(change.doc.id, friendDocSnapshot)
-                    if (!friendProfileDocSnapshot.exists) {
-                        console.log('No such document!');
-                    } else {
-
-                        let friend_id           = change.doc.id
-                        let new_friend_profile  = friendProfileDocSnapshot.data()
-
-                        let friend_profile  = _.find(friend_profiles, (fpv, fpk)=>{
-                                                return friend_id == fpk
-                                            })
-                        if(friend_profile === undefined){
-                            console.log('trackFriends > added > profile', friend)
-                            dispatch({ type: ADDED_FRIEND_PROFILE, friend_id, friend_profile:new_friend_profile});
-                        } 
-                    }
-                })
-
-                // track friends > phones
-                firebase.firestore().collection('profiles').doc(change.doc.id).collection('phones').onSnapshot((phonesSnapshot) => {
-                    phonesSnapshot.docChanges.forEach(function(phonesChange) {
-                        // console.log(phonesChange.type)
-
-                        // console.log(change.doc.id, phonesChange.doc.id, phonesChange.doc.data())
-                        if (phonesChange.type === 'added') {
-                            let friend_id         = change.doc.id
-                            let friend_phone_id   = phonesChange.doc.id
-                            let friend_phone_data = phonesChange.doc.data()
-
-                            let friend_profile  = _.find(friend_profiles, (fpv, fpk)=>{
-                                return friend_id == fpk
-                            })
-
-                            if(friend_profile !== undefined){
-                                let friend_phone =_.find(friend_profile.phones,  function(fpv, fpk) { 
-                                                return fpk == friend_phone_id
-                                            })
-
-                                if(friend_phone !== undefined){
-                                    return;
-                                }
-
-                                console.log('phones > added', friend_profiles, friend_id, friend_profile)
-                                dispatch({ type: ADD_PHONE_FRIEND, friend_id, friend_phone_id, friend_phone_data})
-                            }
-                        }
-
-                        if (phonesChange.type === 'modified') {
-
-                        }
-
-                        if (phonesChange.type === 'removed') {
-
-                        }
-                    })
-                })
-
-                // track friends > websites
-                firebase.firestore().collection('profiles').doc(change.doc.id).collection('websites').onSnapshot((websitesSnapshot) => {
-                    websitesSnapshot.docChanges.forEach(function(websitesChange) {
-                        // console.log(websitesChange.type)
-
-                        // console.log(change.doc.id, websitesChange.doc.id, websitesChange.doc.data())
-                        if (websitesChange.type === 'added') {
-                            // dispatch({ type: ADD_WEBSITE_FRIEND, friend_id:change.doc.id, website_key:websitesChange.doc.id, website_data:websitesChange.doc.data()})
-                        
-                            let friend_id         = change.doc.id
-                            let friend_website_id   = websitesChange.doc.id
-                            let friend_website_data = websitesChange.doc.data()
-
-                            let friend_profile  = _.find(friend_profiles, (fpv, fpk)=>{
-                                return friend_id == fpk
-                            })
-
-                            if(friend_profile !== undefined){
-                                let websites =_.find(friend_profile.websites,  function(fwv, fwk) { 
-                                                return fwk == friend_website_id
-                                            })
-
-                                if(websites !== undefined){
-                                    return;
-                                }
-
-                                // console.log('websites > added')
-                                dispatch({ type: ADD_WEBSITE_FRIEND, friend_id, friend_website_id, friend_website_data})
-                            }
-                        }
-
-                        if (websitesChange.type === 'modified') {
-
-                        }
-
-                        if (websitesChange.type === 'removed') {
-
-                        }
-                    })
-                })
-
-                // track friends > emails
-                firebase.firestore().collection('profiles').doc(change.doc.id).collection('emails').onSnapshot((emailsSnapshot) => {
-                    emailsSnapshot.docChanges.forEach(function(emailsChange) {
-                        // console.log(emailsChange.type)
-
-                        // console.log(change.doc.id, emailsChange.doc.id, emailsChange.doc.data())
-                        if (emailsChange.type === 'added') {
-                            let friend_id         = change.doc.id
-                            let friend_email_id   = emailsChange.doc.id
-                            let friend_email_data = emailsChange.doc.data()
-
-                            let friend_profile  = _.find(friend_profiles, (fpv, fpk)=>{
-                                return friend_id == fpk
-                            })
-
-                            if(friend_profile !== undefined){
-                                let email =_.find(friend_profile.emails,  function(fwv, fwk) { 
-                                                return fwk == friend_email_id
-                                            })
-
-                                if(email !== undefined){
-                                    return;
-                                }
-
-                                console.log('emails > added')
-                                dispatch({ type: ADD_EMAIL_FRIEND, friend_id, friend_email_id, friend_email_data})
-                            }
-                        }
-
-                        if (emailsChange.type === 'modified') {
-
-                        }
-
-                        if (emailsChange.type === 'removed') {
-
-                        }
-                    })
-                })
-
-
-                // track friends > my_ids
-                firebase.firestore().collection('profiles').doc(change.doc.id).collection('my_ids').onSnapshot((my_idsSnapshot) => {
-                    my_idsSnapshot.docChanges.forEach(function(my_idsChange) {
-                        // console.log(my_idsChange.type)
-
-                        // console.log(change.doc.id, my_idsChange.doc.id, my_idsChange.doc.data())
-                        if (my_idsChange.type === 'added') {
-                            // friend_id:change.doc.id, data:change.doc.data()
-
-                            let friend_id         = change.doc.id
-                            let friend_my_id_id   = my_idsChange.doc.id
-                            let friend_my_id_data = my_idsChange.doc.data()
-
-                            let friend_profile  = _.find(friend_profiles, (fpv, fpk)=>{
-                                return friend_id == fpk
-                            })
-
-                            if(friend_profile !== undefined){
-                                let my_id =_.find(friend_profile.my_ids,  function(fwv, fwk) { 
-                                                return fwk == friend_my_id_id
-                                            })
-
-                                if(my_id !== undefined){
-                                    return;
-                                }
-
-                                console.log('my_ids > added', friend_id, friend_my_id_id, friend_my_id_data, friend_profile)
-                                dispatch({ type: ADD_MY_ID_FRIEND, friend_id, friend_my_id_id, friend_my_id_data})
-                            }
-                        }
-
-                        if (my_idsChange.type === 'modified') {
-
-                        }
-
-                        if (my_idsChange.type === 'removed') {
-
-                        }
-                    })
-                })
-
-                /*
-                dispatch({ type: ADD_FRIEND, friend_id:change.doc.id, friend_data:change.doc.data() });
-
-                // console.log('users>friends', change.doc.data())
-
-                // จะ track ตลอด added, modified, remove 
-                firebase.firestore().collection('profiles').doc(change.doc.id).onSnapshot((friendDocSnapshot) => {
-                    // console.log(change.doc.id, friendDocSnapshot)
-                    if (!friendDocSnapshot.exists) {
-                        console.log('No such document!');
-                    } else {
-                        dispatch({ type: ADDED_FRIEND_PROFILE, friend_id:change.doc.id, friend_profile:friendDocSnapshot.data()});
-                    }
-                })
-
-                // track friends > phones
-                firebase.firestore().collection('profiles').doc(change.doc.id).collection('phones').onSnapshot((phonesSnapshot) => {
-                    phonesSnapshot.docChanges.forEach(function(phonesChange) {
-                        console.log(phonesChange.type)
-
-                        console.log(change.doc.id, phonesChange.doc.id, phonesChange.doc.data())
-                        if (phonesChange.type === 'added') {
-                            // friend_id:change.doc.id, data:change.doc.data()
-
-                            dispatch({ type: ADD_PHONE_FRIEND, friend_id:change.doc.id, phone_key:phonesChange.doc.id, phone_data:phonesChange.doc.data()})
-                        }
-
-                        if (phonesChange.type === 'modified') {
-
-                        }
-
-                        if (phonesChange.type === 'removed') {
-
-                        }
-                    })
-                })
-          
-                // track friends > websites
-                firebase.firestore().collection('profiles').doc(change.doc.id).collection('websites').onSnapshot((websitesSnapshot) => {
-                    websitesSnapshot.docChanges.forEach(function(websitesChange) {
-                        console.log(websitesChange.type)
-
-                        console.log(change.doc.id, websitesChange.doc.id, websitesChange.doc.data())
-                        if (websitesChange.type === 'added') {
-                            // friend_id:change.doc.id, data:change.doc.data()
-
-
-                            dispatch({ type: ADD_WEBSITE_FRIEND, friend_id:change.doc.id, website_key:websitesChange.doc.id, website_data:websitesChange.doc.data()})
-                        }
-
-                        if (websitesChange.type === 'modified') {
-
-                        }
-
-                        if (websitesChange.type === 'removed') {
-
-                        }
-                    })
-                })
-
-                // track friends > emails
-                firebase.firestore().collection('profiles').doc(change.doc.id).collection('emails').onSnapshot((emailsSnapshot) => {
-                    emailsSnapshot.docChanges.forEach(function(emailsChange) {
-                        console.log(emailsChange.type)
-
-                        console.log(change.doc.id, emailsChange.doc.id, emailsChange.doc.data())
-                        if (emailsChange.type === 'added') {
-                            // friend_id:change.doc.id, data:change.doc.data()
-
-                            dispatch({ type: ADD_EMAIL_FRIEND, friend_id:change.doc.id, email_key:emailsChange.doc.id, email_data:emailsChange.doc.data()})
-                        }
-
-                        if (emailsChange.type === 'modified') {
-
-                        }
-
-                        if (emailsChange.type === 'removed') {
-
-                        }
-                    })
-                })
-
-                // track friends > my_ids
-                firebase.firestore().collection('profiles').doc(change.doc.id).collection('my_ids').onSnapshot((my_idsSnapshot) => {
-                    my_idsSnapshot.docChanges.forEach(function(my_idsChange) {
-                        console.log(my_idsChange.type)
-
-                        console.log(change.doc.id, my_idsChange.doc.id, my_idsChange.doc.data())
-                        if (my_idsChange.type === 'added') {
-                            // friend_id:change.doc.id, data:change.doc.data()
-                        }
-
-                        if (my_idsChange.type === 'modified') {
-
-                        }
-
-                        if (my_idsChange.type === 'removed') {
-
-                        }
-                    })
-                })
-
-                firebase.database().ref('user_presence/' + change.doc.id).on('child_added', function (snapshot) {
-                    // console.log(change.doc.id, snapshot.key, snapshot.val())
-
-                    dispatch({ type: ADDED_PRESENCE, userId:change.doc.id, presenceKey:snapshot.key, presenceData:snapshot.val()})
-                });
-
-                firebase.database().ref('user_presence/' + change.doc.id).on('child_changed', function (snapshot) {
-                    // console.log(change.doc.id, snapshot.key, snapshot.val())
-
-                    dispatch({ type: CHANGED_PRESENCE, userId:change.doc.id, presenceKey:snapshot.key, presenceData:snapshot.val()})
-                });
-
-                firebase.database().ref('user_presence/' + change.doc.id).on('child_removed', function (snapshot) {
-                    // console.log(change.doc.id, snapshot.key, snapshot.val())
-
-                    dispatch({ type: REMOVED_PRESENCE, userId:change.doc.id, presenceKey:snapshot.key})
-                });
-                */
+                profileFriend(friend_id, dispatch)
             }
             if (change.type === 'modified') {
-                dispatch({ type: MODIFIED_FRIEND, friend_id:change.doc.id, friend_data:change.doc.data() });
+                dispatch({ type: MODIFIED_FRIEND, friend_id, friend_data});
             }
         })
     })
 }
 
+/* 
+กรณี group member ไม่ใช่เพือนของเรา เราต้องดึง  profile ลงมา save ที่เครื่อง
+*/
+profileFriend = (friend_id, dispatch)=>{
+    var new_state =store.getState();
 
-/*
-onSnapshotPhoneProfile = (uid, phone_key) =>{
-    console.log('onSnapshotPhoneProfile', uid, phone_key)
+    let {friend_emails, 
+        friend_my_ids, 
+        friend_phones, 
+        friend_profiles, 
+        friend_websites} = new_state.auth.user
 
-    firebase.firestore().collection('profiles').doc(uid).collection('phones').doc(phone_key).onSnapshot((querySnapshot) => {
-        console.log('onSnapshotPhoneProfile', querySnapshot)
+    // console.log(friend_emails, 
+    //             friend_my_ids, 
+    //             friend_phones, 
+    //             friend_profiles, 
+    //             friend_websites)
 
-        querySnapshot.docChanges.forEach(function(change) {
-            console.log('onSnapshotPhoneProfile', change.type, change.doc.id, change.doc.data());
+    // friend > profiles
+    firebase.firestore().collection('profiles').doc(friend_id).onSnapshot((friendProfileDocSnapshot) => {
+        // console.log(change.doc.id, friendDocSnapshot)
+        if (!friendProfileDocSnapshot.exists) {
+            console.log('No such document!');
+        } else {
+
+            let friend_data = friendProfileDocSnapshot.data()
+
+            let friend_profile =_.find(friend_profiles, (v, k)=>{
+                                    return k == friend_id
+                                })
+
+            if(!_.isEqual(friend_profile, friend_data) ){
+                console.log('friend profiles > added not equal')
+                dispatch({ type: ADDED_FRIEND_PROFILE, friend_id, friend_profile:friend_data });
+            }
+        }
+    })
+    
+    // track friends > phones
+    firebase.firestore().collection('profiles').doc(friend_id).collection('phones').onSnapshot((phonesSnapshot) => {
+        phonesSnapshot.docChanges.forEach(function(phonesChange) {
+            // console.log(phonesChange.type)
+
+            let friend_phone_id   = phonesChange.doc.id
+            let friend_phone_data = phonesChange.doc.data()
+
+            // console.log(change.doc.id, phonesChange.doc.id, phonesChange.doc.data())
+            if (phonesChange.type === 'added') {
+                let friend_phone      = _.find(friend_phones, (fpv, fpk)=>{
+                                            return friend_id == fpk
+                                        })
+
+                let phone  =  _.find(friend_phone, (fpv, fpk)=>{
+                                    return friend_phone_id == fpk
+                                })
+                if(!phone){
+                    console.log('friend phones > added')
+                    dispatch({ type: ADDED_PHONE_FRIEND, friend_id, friend_phone_id, friend_phone_data})
+                }else{
+                    if(!_.isEqual(phone, friend_phone_data)){
+                        console.log('friend phones > added not equal')
+                        dispatch({ type: ADDED_PHONE_FRIEND, friend_id, friend_phone_id, friend_phone_data})
+                    }
+                }
+            }
+
+            if (phonesChange.type === 'modified') {
+                dispatch({ type: MODIFIED_PHONE_FRIEND, friend_id, friend_phone_id, friend_phone_data})
+            }
+
+            if (phonesChange.type === 'removed') {
+                dispatch({ type: REMOVED_PHONE_FRIEND, friend_id, friend_phone_id})
+            }
+        })
+    })
+
+    // track friends > websites
+    firebase.firestore().collection('profiles').doc(friend_id).collection('websites').onSnapshot((websitesSnapshot) => {
+        websitesSnapshot.docChanges.forEach(function(websitesChange) {
+            // console.log(websitesChange.type)
+
+            let friend_website_id   = websitesChange.doc.id
+            let friend_website_data = websitesChange.doc.data()
+
+            // console.log(change.doc.id, websitesChange.doc.id, websitesChange.doc.data())
+            if (websitesChange.type === 'added') {
+                let friend_website  = _.find(friend_websites, (fpv, fpk)=>{
+                                        return friend_id == fpk
+                                    })
+
+                let website  =  _.find(friend_website, (fpv, fpk)=>{
+                                    return friend_website_id == fpk
+                                })
+                if(!website){
+                    console.log('friend websites > added')
+                    dispatch({ type: ADDED_WEBSITE_FRIEND, friend_id, friend_website_id, friend_website_data})
+                }else{
+                    if(!_.isEqual(website, friend_website_data)){
+                        console.log('friend websites > added not equal', friend_website, friend_website_data)
+                        dispatch({ type: ADDED_WEBSITE_FRIEND, friend_id, friend_website_id, friend_website_data})
+                    }
+                }
+            }
+
+            if (websitesChange.type === 'modified') {
+                dispatch({type: MODIFIED_WEBSITE_FRIEND, friend_id, friend_website_id, friend_website_data})
+            }
+
+            if (websitesChange.type === 'removed') {
+                dispatch({ type: REMOVED_WEBSITE_FRIEND, friend_id, friend_website_id})
+            }
+        })
+    })
+
+    // track friends > emails
+    firebase.firestore().collection('profiles').doc(friend_id).collection('emails').onSnapshot((emailsSnapshot) => {
+        emailsSnapshot.docChanges.forEach(function(emailsChange) {
+            // console.log(emailsChange.type)
+            let friend_email_id   = emailsChange.doc.id
+            let friend_email_data = emailsChange.doc.data()
+
+            // console.log(change.doc.id, emailsChange.doc.id, emailsChange.doc.data())
+            if (emailsChange.type === 'added') {
+                
+                let friend_email  = _.find(friend_emails, (fpv, fpk)=>{
+                    return friend_id == fpk
+                })
+
+                if(friend_email !== undefined){
+                    let email =_.find(friend_email,  function(fwv, fwk) { 
+                                    return fwk == friend_email_id
+                                })
+
+                    if(email){
+
+                        if(!_.isEqual(email, friend_email_data)){
+                            console.log('friend emails > added not equal')
+                            dispatch({ type: ADDED_EMAIL_FRIEND, friend_id, friend_email_id, friend_email_data})
+                        }
+
+                        return;
+                    }
+
+                    console.log('friend emails > added')
+                    dispatch({ type: ADDED_EMAIL_FRIEND, friend_id, friend_email_id, friend_email_data})
+                }
+            }
+
+            if (emailsChange.type === 'modified') {
+                dispatch({type: MODIFIED_EMAIL_FRIEND, friend_id, friend_email_id, friend_email_data})
+            }
+
+            if (emailsChange.type === 'removed') {
+                dispatch({type: REMOVED_EMAIL_FRIEND, friend_id, friend_email_id})
+            }
+        })
+    })
+
+    // track friends > my_ids
+    firebase.firestore().collection('profiles').doc(friend_id).collection('my_ids').onSnapshot((my_idsSnapshot) => {
+        my_idsSnapshot.docChanges.forEach(function(my_idsChange) {
+            let friend_my_id_id   = my_idsChange.doc.id
+            let friend_my_id_data = my_idsChange.doc.data()
+
+            if (my_idsChange.type === 'added') {
+                let friend_my_id  = _.find(friend_my_ids, (fpv, fpk)=>{
+                    return friend_id == fpk
+                })
+
+                if(friend_my_id){
+                    let my_id =_.find(friend_my_id,  function(fwv, fwk) { 
+                                    return fwk == friend_my_id_id
+                                })
+
+                    if(my_id){
+
+                        if(!_.isEqual(my_id, friend_my_id_data)){
+                            console.log('friend my_id > added not equal')
+                            dispatch({ type: ADDED_MY_ID_FRIEND, friend_id, friend_my_id_id, friend_my_id_data})
+                        }
+
+                        return;
+                    }
+
+                    console.log('friend my_id > added')
+                    dispatch({ type: ADDED_MY_ID_FRIEND, friend_id, friend_my_id_id, friend_my_id_data})
+                }
+            }
+
+            if (my_idsChange.type === 'modified') {
+                dispatch({type: MODIFIED_MY_ID_FRIEND, friend_id, friend_my_id_id, friend_my_id_data})
+            }
+
+            if (my_idsChange.type === 'removed') {
+                dispatch({type: REMOVED_MY_ID_FRIEND, friend_id, friend_my_id_id})
+            }
         })
     })
 }
-*/
-
-// export const watchTaskGroupEvent = (uid) => dispatch =>{
-//     console.log('watchTaskGroupEvent')
-    
-//     // track grouds
-//     firebase.firestore().collection('users').doc(uid).collection('groups').onSnapshot((querySnapshot) => {
-//         querySnapshot.docChanges.forEach(function(change) {
-//             console.log(change.type, change.doc.id, change.doc.data());
-
-//             switch(change.type){
-//                 case 'added':{
-//                     // dispatch({type: ADDED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
-                    
-//                     // track group profile
-//                     firebase.firestore().collection('groups').doc(change.doc.id).onSnapshot((docSnapshot) => {
-//                         // console.log(docSnapshot.id) 
-//                         // doc.id จะมีค่าเท่ากันกับ  docSnapshot.id 
-        
-//                         if(docSnapshot.data() !== undefined){
-//                             // console.log(doc.id, " => ", doc.data());
-        
-//                             let newData = {...change.doc.data(), group_profile:docSnapshot.data()}
-//                             console.log(newData)
-//                             dispatch({ type: ADD_GROUP, group_id:docSnapshot.id, data:newData });
-//                         }
-//                     })
-
-//                     // track group > members
-//                     firebase.firestore().collection('groups').doc(change.doc.id).collection('members').onSnapshot((querySnapshot) => {
-//                         querySnapshot.docChanges.forEach(function(members_change) {
-//                             console.log(change.doc.id, members_change.type, members_change.doc.id, members_change.doc.data())
-                            
-//                             if (members_change.type === 'added') {
-//                                 console.log('added: ', change.doc.id, members_change.doc.id, members_change.doc.data());
-
-//                                 let group_id = change.doc.id
-//                                 let member_key = members_change.doc.id
-//                                 let data = members_change.doc.data()
-//                                 // ADDED_GROUP_MEMBER
-
-//                                 dispatch({ type: ADDED_GROUP_MEMBER, group_id, member_key, data});
-//                             }
-//                             if (members_change.type === 'modified') {
-//                                 console.log('modified: ', change.doc.id, members_change.doc.id, members_change.doc.data());
-
-//                                 let group_id = change.doc.id
-//                                 let member_key = members_change.doc.id
-//                                 let data = members_change.doc.data()
-//                                 // MODIFIED_GROUP_MEMBER
-
-//                                 dispatch({ type: MODIFIED_GROUP_MEMBER, group_id, member_key, data});
-//                             }
-//                             if (members_change.type === 'removed') {
-//                                 console.log('removed: ', change.doc.id, members_change.doc.id, members_change.doc.data());
-
-//                                 let group_id = change.doc.id
-//                                 let item_id = members_change.doc.id
-//                                 let data = members_change.doc.data()
-//                                 // REMOVED_GROUP_MEMBER
-
-//                                 dispatch({ type: REMOVED_GROUP_MEMBER, group_id, item_id});
-//                             }
-//                         })
-//                     })
-                    
-//                     break;
-//                 }
-//                 case 'modified':{
-//                     // dispatch({type: MODIFIED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
-                    
-//                     // MODIFIED_GROUP
-//                     dispatch({ type: MODIFIED_GROUP, group_id:change.doc.id, data:change.doc.data() });
-//                     break;
-//                 }
-//                 case 'removed':{
-//                     // dispatch({type: REMOVED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
-//                     dispatch({ type: DELETE_GROUP, group_id:change.doc.id});
-//                     break;
-//                 }
-//             }
-//         });
-//     })
-// }
-
-// export const watchTaskClassEvent = (uid) => dispatch =>{
-//     console.log('watchTaskClassEvent')
-//     firebase.firestore().collection('users').doc(uid).collection('classs').onSnapshot((classsSnapshot) => {
-//         classsSnapshot.docChanges.forEach(function(classsChange) {
-//             console.log("Classs", classsChange.type, classsChange.doc.id, classsChange.doc.data());
-
-//             switch(classsChange.type){
-//                 case 'added':{
-//                     // ADDED_CLASS class_id, class_data
-//                     dispatch({type: ADDED_CLASS, class_id:classsChange.doc.id ,class_data:classsChange.doc.data() })
-
-//                     firebase.firestore().collection('users').doc(uid).collection('classs').doc(classsChange.doc.id).collection('members').onSnapshot((classsMembersSnapshot) => {
-//                         classsMembersSnapshot.docChanges.forEach(function(classsMembersChange) {
-//                             console.log("Classs", classsChange.doc.data(), classsMembersChange.type, classsMembersChange.doc.id, classsMembersChange.doc.data());
-//                             // console.log("CLASS_MEMBERS ", doc.id, " => ", doc.data());
-//                             // SELECT_CLASS_MEMBERS
-//                             // dispatch({type: CLASS_MEMBERS, parent_id:doc.id,class_members_id:pdoc.id, class_members_data:pdoc.data()})
-                        
-//                             switch(classsMembersChange.type){
-//                                 case 'added':{
-//                                     // ADDED_CLASS_MEMBER
-//                                     dispatch({type: ADDED_CLASS_MEMBER, class_id:classsChange.doc.id, class_member_id:classsMembersChange.doc.id, class_member_data:classsMembersChange.doc.data() })
-//                                     break;
-//                                 }
-//                                 case 'modified':{
-//                                     // MODIFIED_CLASS_MEMBER
-//                                     dispatch({type: MODIFIED_CLASS_MEMBER, class_id:classsChange.doc.id, class_member_id:classsMembersChange.doc.id, class_member_data:classsMembersChange.doc.data() })
-//                                     break;
-//                                 }
-//                                 case 'removed':{
-//                                     // REMOVED_CLASS_MEMBER
-//                                     dispatch({type: REMOVED_CLASS_MEMBER, class_id:classsChange.doc.id, class_member_id:classsMembersChange.doc.id})
-//                                     break;
-//                                 }
-//                             }
-//                         })
-//                     })
-//                     break;
-//                 }
-//                 case 'modified':{
-//                     // MODIFIED_CLASS
-//                     // console.log("Classs", classsChange.type, classsChange.doc.id, classsChange.doc.data());
-//                     dispatch({type: MODIFIED_CLASS, class_id:classsChange.doc.id ,class_data:classsChange.doc.data() })
-                   
-//                     break;
-//                 }
-//                 case 'removed':{
-//                     // REMOVED_CLASS
-//                     dispatch({type: REMOVED_CLASS, class_id:classsChange.doc.id})
-//                     break;
-//                 }
-//             }
-//         })
-
-//     })
-// }
-
-// export const watchTaskMyApplicationEvent = (uid) => dispatch =>{
-//     firebase.firestore().collection('users').doc(uid).collection('my_applications').onSnapshot((qSnapshot) => {
-//         qSnapshot.docChanges.forEach(function(change) {
-//             console.log(change.type, change.doc.id, change.doc.data());
-//             switch(change.type){
-//                 case 'added':{
-//                     dispatch({type: ADDED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
-//                     break;
-//                 }
-//                 case 'modified':{
-//                     dispatch({type: MODIFIED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
-//                     break;
-//                 }
-//                 case 'removed':{
-//                     dispatch({type: REMOVED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
-//                     break;
-//                 }
-//             }
-//         })
-//     })
-// }

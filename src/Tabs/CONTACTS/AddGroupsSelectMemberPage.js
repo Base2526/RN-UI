@@ -135,7 +135,6 @@ class AddGroupsSelectMemberPage extends React.Component{
                 this.onSeleted(index)
             }}>
             <View style={{flex:1, 
-                height:100, 
                 padding:10, 
                 marginRight:10,
                 backgroundColor:'white', 
@@ -159,11 +158,11 @@ class AddGroupsSelectMemberPage extends React.Component{
                         this.onSeleted(index)
                     }}>
                     <FastImage
-                        style={{width: 80, 
-                                height: 80, 
-                                borderRadius: 40, 
-                                borderWidth:.5,
-                                borderColor:'gray'
+                        style={{width: 50, 
+                                height: 50, 
+                                borderRadius: 25, 
+                                // borderWidth:.5,
+                                // borderColor:'gray'
                         }}
                         source={{
                         uri: item.profile.image_url,
@@ -187,15 +186,15 @@ class AddGroupsSelectMemberPage extends React.Component{
 
     renderSeparator = () => {
         return (
-          <View
-            style={{
-              height: 1,
-              width: "100%",
-              backgroundColor: "#CED0CE",
-            //   marginLeft: "14%"
-            }}
-          />
-        );
+            <View
+              style={{
+                height: .5,
+                width: "86%",
+                backgroundColor: "#CED0CE",
+                marginLeft: "14%"
+              }}
+            />
+        )
     };
 
     render(){
@@ -213,14 +212,15 @@ class AddGroupsSelectMemberPage extends React.Component{
 
 const mapStateToProps = (state, ownProps) => {
     // console.log(state)
-
     if(!state._persist.rehydrated){
       return {}
     }
+
+    if(!state.auth.isLogin){
+        return;
+    }
   
     return{
-    //   auth:state.auth
-
         friends:makeFriendsState(state, ownProps),
         friend_profiles:makeFriendProfilesState(state, ownProps),
     }

@@ -251,14 +251,14 @@ class ListGroupMember_TabMembersPage extends React.Component{
             is_admin = true
         }
         
-
         this.setState({
             data: [ {title: 'Members',member: members}, 
                     {title: 'Pending', member: pendings},
                     {title: 'Decline', member: declines},],
             group_profile: group.group_profile,
             group,
-            is_admin
+            is_admin,
+            renderContent: true
         })
     }
 
@@ -743,9 +743,12 @@ class ListGroupMember_TabMembersPage extends React.Component{
     }
       
     render() {
-        let {group_id, loading, data} = this.state
+        let {group_id, loading, data, renderContent} = this.state
 
-        console.log('ListGroupMember_TabMembersPage',  data)
+        if(!renderContent){
+            return(<View style={{flex:1}}></View>)
+        }
+
         return (<MenuContext>
                     <View style={{flex:1}}>
                         <Spinner

@@ -14870,11 +14870,11 @@ function create_chat_group(){
 
   $param_uid    = $_REQUEST['uid'];
   $param_name   = $_REQUEST['name'];
-  $param_members= (array)json_decode($_REQUEST['lost_profile']);
+  $param_members= (array)json_decode($_REQUEST['members']);
 
   if (count($param_members) == 0) {
     $result['result']   = FALSE;
-    $result['message']  = "Members empty.";
+    // $result['message']  = "Members empty.";
     return $result;
   }
 

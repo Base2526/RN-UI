@@ -345,9 +345,9 @@ class ManageGroupPage extends React.Component{
                             <TouchableOpacity 
                                 style={{width: 36, height: 36, borderRadius: 18, justifyContent:'center', alignItems:'center', backgroundColor:'#BCD1D5'}}
                                 onPress={()=>{
-                                    this.props.navigation.navigate('ListGroupMemberPage', {group_id})
+                                    this.props.navigation.navigate('ListGroupMemberPage', {'group_id': group_id})
                                 }}>
-                                <Text style={{color:'white', fontWeight:'bold'}}>{ /*group.members ?Object.keys(group.members).length:'0' */ this.countMembers(group.members) }+</Text>
+                                <Text style={{color:'white', fontWeight:'bold'}}>{ this.countMembers(group.members) }+</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -370,7 +370,7 @@ class ManageGroupPage extends React.Component{
 }
 
 const mapStateToProps = (state, ownProps) => {
-    console.log(state)
+    // console.log(state)
   
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
     //_persist.rehydrated parameter is initially set to false
@@ -383,13 +383,6 @@ const mapStateToProps = (state, ownProps) => {
     }
     
     return{
-        // uid:getUid(state),
-        // profiles:state.auth.users.profiles,
-        // groups:state.auth.users.groups,
-        // friends:state.auth.users.friends,
-        // friend_profiles:state.auth.users.friend_profiles,
-        // isConnected:state.offline.online,
-
         uid: makeUidState(state, ownProps),
         profile: makeProfileState(state, ownProps),
         groups: makeGroupsState(state, ownProps),

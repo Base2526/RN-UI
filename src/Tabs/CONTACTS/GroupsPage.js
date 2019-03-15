@@ -35,14 +35,7 @@ class GroupsPage extends React.Component{
       this.state = {
         renderContent: false,
         loading: false,
-        data: [],
-        page: 1,
-        seed: 1,
         error: null,
-        // refreshing: false,
-
-        sectionID: null,
-        rowID: null,
 
         favorites:[],
         invited:[],
@@ -68,7 +61,7 @@ class GroupsPage extends React.Component{
       // console.log(groups)
       let {groups, group_profiles} = props
 
-      console.log('GroupsPage', groups, group_profiles)
+      // console.log('GroupsPage', groups, group_profiles)
 
       let group_invited = []
       let group_joined = []
@@ -99,14 +92,6 @@ class GroupsPage extends React.Component{
           }
         }
       }
-
-      /* 
-           let arrayPost = _.map(posts, (v, k)=>{
-                            return {...v, post_id:k}
-                        }).reverse();
-      */
-
-      // console.log('GroupsPage', group_invited, group_joined, group_favorites)
 
       this.setState({
         favorites: {
@@ -267,22 +252,9 @@ class GroupsPage extends React.Component{
             </View>)
     }
 
-    actionAddGroup = () =>{
-      return(<ActionButton 
-        buttonColor="rgba(231,76,60,1)"
-        offsetX={10} 
-        offsetY={10}
-        hideShadow={true}
-        renderIcon={() => {
-            return(<MyIcon
-                name={'plus'}
-                size={25}
-                color={'#C7D8DD'} />)
-            }}
-        onPress={()=>{
-            this.props.params.navigation.navigate("AddGroupsPage")
-        }} />)
-    }
+    // actionAddGroup = () =>{
+    //   return()
+    // }
 
     _renderSection = (section, sectionId, state)  => {
       let member_size = 0
@@ -345,6 +317,8 @@ class GroupsPage extends React.Component{
 
     _renderRow = (rowItem, rowId, sectionId) => {
       console.log(rowItem)
+      let {group_id, profile} = rowItem
+
       switch(sectionId){
         // favorites
         case 0:{
@@ -356,7 +330,7 @@ class GroupsPage extends React.Component{
           return(<TouchableOpacity 
                     key={rowItem.item_id} 
                     onPress={() => {
-                      this.props.params.navigation.navigate("ManageGroupPage", {'group_id': rowItem.group_id}) 
+                      this.props.params.navigation.navigate("ManageGroupPage", {'group_id': group_id}) 
                     }}>
                     <View
                       style={{
@@ -366,7 +340,7 @@ class GroupsPage extends React.Component{
                       }}>
                         <TouchableOpacity
                           onPress={() => {
-                            this.props.params.navigation.navigate("ManageGroupPage", {'group_id': rowItem.group_id}) 
+                            this.props.params.navigation.navigate("ManageGroupPage", {'group_id': group_id}) 
                           }}>
                           <FastImage
                               style={{width: 50, 
@@ -407,7 +381,7 @@ class GroupsPage extends React.Component{
           <TouchableOpacity 
             key={rowItem.item_id} 
             onPress={() => {
-              this.props.params.navigation.navigate("ManageGroupPage", {'group_id': rowItem.group_id}) 
+              this.props.params.navigation.navigate("ManageGroupPage", {'group_id': group_id}) 
             }}>
             <View
               style={{
@@ -419,7 +393,7 @@ class GroupsPage extends React.Component{
                 <TouchableOpacity
                   // style={{width: 80, height: 80, borderRadius: 40}}
                   onPress={() => {
-                    this.props.params.navigation.navigate("ManageGroupPage", {'group_id': rowItem.group_id}) 
+                    this.props.params.navigation.navigate("ManageGroupPage", {'group_id': group_id}) 
                   }}>
                   <FastImage
                       style={{width: 50, 
@@ -429,7 +403,7 @@ class GroupsPage extends React.Component{
                               // borderColor:'gray'
                             }}
                       source={{
-                        uri: rowItem.profile.image_url,
+                        uri: profile.image_url,
                         headers:{ Authorization: 'someAuthToken' },
                         priority: FastImage.priority.normal,
                       }}
@@ -441,7 +415,7 @@ class GroupsPage extends React.Component{
                                 fontWeight: '600', 
                                 paddingBottom:5
                               }}>
-                      {rowItem.profile.name} { rowItem.profile.members === undefined ? '' : "(" + this.countMembers(rowItem.profile.members) /*Object.keys(rowItem.members).length*/ +")" }
+                      {profile.name} { profile.members === undefined ? '' : "(" + this.countMembers(profile.members) +")" }
                   </Text>
                 </View>
                 {this.showMenuGroup(rowItem)} 
@@ -485,7 +459,20 @@ class GroupsPage extends React.Component{
                 } }
                 renderSectionHeaderX={this._renderSection}
                 openOptions={[0, 1, 2, 3]}/>
-            {this.actionAddGroup()}
+            <ActionButton 
+              buttonColor="rgba(231,76,60,1)"
+              offsetX={10} 
+              offsetY={10}
+              hideShadow={true}
+              renderIcon={() => {
+                  return(<MyIcon
+                      name={'plus'}
+                      size={25}
+                      color={'#C7D8DD'} />)
+                  }}
+              onPress={()=>{
+                  this.props.params.navigation.navigate("AddGroupsPage")
+              }}/>
           </View>
         </MenuContext>
       );
@@ -493,8 +480,6 @@ class GroupsPage extends React.Component{
 }
 
 const mapStateToProps = (state, ownProps) => {
-  // console.log(state)
-
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
   //_persist.rehydrated parameter is initially set to false
   if(!state._persist.rehydrated){

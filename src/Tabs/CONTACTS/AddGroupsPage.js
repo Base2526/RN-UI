@@ -109,7 +109,7 @@ class AddGroupsPage extends React.Component{
           seleteds: [],
           groupName: '',
           orientation:'PORTRAIT',
-          numColumns:4,
+          numColumns:6,
           sections : [
             {
               title: "Members",
@@ -135,9 +135,9 @@ class AddGroupsPage extends React.Component{
     onLayout(e) {
       const {width, height} = Dimensions.get('window')
       if(width<height){
-        this.setState({orientation:'PORTRAIT', numColumns:4})
+        this.setState({orientation:'PORTRAIT', numColumns:6})
       }else{
-        this.setState({orientation:'LANDSCAPE', numColumns:6})
+        this.setState({orientation:'LANDSCAPE', numColumns:8})
       }
     }
 
@@ -232,8 +232,6 @@ class AddGroupsPage extends React.Component{
         sections: newSections
       })
     }
-
-
 
     onSelectImage = () => {
       /**
@@ -406,9 +404,9 @@ class AddGroupsPage extends React.Component{
                   style={{width: calculatorWidthHeightItem(5, this.state.numColumns),  
                           height: calculatorWidthHeightItem(5, this.state.numColumns),
                           borderRadius: calculatorWidthHeightItem(5, this.state.numColumns)/2, 
-                          borderColor:'gray', 
+                          // borderColor:'gray', 
                           // backgroundColor: '#FF83AF',
-                          borderWidth:1
+                          // borderWidth:1
                         }}
                   source={{
                     uri: item.profile.image_url,
@@ -493,10 +491,11 @@ const mapStateToProps = (state, ownProps) => {
     return {}
   }
 
-  return{
-    // auth:state.auth,
-    // uid:getUid(state)
+  if(!state.auth.isLogin){
+    return;
+  }
 
+  return{
     uid:makeUidState(state, ownProps),
     friends:makeFriendsState(state, ownProps),
     friend_profiles:makeFriendProfilesState(state, ownProps),
