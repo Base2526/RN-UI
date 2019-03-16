@@ -177,8 +177,9 @@ const getGroups = (state, props) => {
 
 const getGroupProfiles = (state, props) => {
     let group_profiles = state.auth.user.group_profiles
-    let new_group_profiles = {...group_profiles}
+    // let new_group_profiles = {...group_profiles}
 
+    /*
     _.each(group_profiles, (v,k)=>{
         let {group_members} = state.auth.user
         let members = _.find(group_members, (mv, mk)=>{
@@ -191,8 +192,10 @@ const getGroupProfiles = (state, props) => {
 
         new_group_profiles = {...new_group_profiles, [k]:v}
     })
+    */
 
-    return new_group_profiles
+    // return new_group_profiles
+    return group_profiles
 }
 
 const getGroupMembers = (state, props) =>{

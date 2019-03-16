@@ -1948,33 +1948,6 @@ export const trackProfiles=(uid, profiles)=> dispatch =>{
 
 // track phones
 export const trackProfilesPhones=(uid, phones)=> dispatch =>{
-    /*
-    var phonesRef = firebase.firestore().collection('profiles').doc(uid).collection('phones')
-    var promises = []
-    _.each(phones, (v, k)=>{
-        let promise = phonesRef.where('phone_number', '<', v.phone_number).where('phone_number', '>', v.phone_number).get()
-
-        // Push the promise to the array
-        promises.push(promise)
-
-        onSnapshotPhoneProfile(uid, k)
-    })
-
-    Promise.all(promises).then(res => {
-                            console.log('Get: d', res)
-                            res.forEach(r => {
-                                // if(r.size == 0){
-                                r.forEach(d => {
-                                    console.log('Get: d', d.id, d.data());
-                                });
-                                console.log('Get: r', r, r.size);
-                            });
-                        }).catch(function(err) {
-                            console.log('Get: d', err.message); // some coding error in handling happened
-                        });
-
-                        */
-
     firebase.firestore().collection('profiles').doc(uid).collection('phones').onSnapshot((querySnapshot) => {
         // querySnapshot.
         // console.log('fromCache > ', querySnapshot.metadata.fromCache)
@@ -1986,8 +1959,8 @@ export const trackProfilesPhones=(uid, phones)=> dispatch =>{
                 let phone = _.find(phones, (v, k)=>{
                                 return doc_id == k
                             })
-                // console.log('phone > ', phone)
-                if(phone === undefined){
+                            
+                if(!phone){
                     dispatch({ type: ADD_PHONE_PROFILE, phone_key:doc_id, phone_data:doc_data});
                 }
             }
@@ -2108,7 +2081,7 @@ export const trackProfileMyIds=(uid, myIds)=> dispatch =>{
 
 // trach my application
 export const trackMyApplications=(uid, my_applications, my_applications_posts)=> dispatch =>{
-    console.log('trackMyApplications', my_applications, my_applications_posts)
+    // console.log('trackMyApplications', my_applications, my_applications_posts)
     firebase.firestore().collection('users').doc(uid).collection('my_applications').onSnapshot((qSnapshot) => {
         qSnapshot.docChanges.forEach(function(change) {
             // console.log(change.type, change.doc.id, change.doc.data());
@@ -2405,15 +2378,15 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
                     }
 
                     // track group profile
-                    firebase.firestore().collection('groups').doc(change.doc.id).onSnapshot((docSnapshot) => {
+                    firebase.firestore().collection('groups').doc(group_id).onSnapshot((docSnapshot) => {
                         // console.log(docSnapshot.id) 
                         // doc.id จะมีค่าเท่ากันกับ  docSnapshot.id 
 
                         let group_profile_data = docSnapshot.data()
         
-                        if(docSnapshot.data() !== undefined){
+                        if(group_profile_data){
                             let group_profile = _.find(group_profiles, (v, k)=>{
-                                                    return change.doc.id == k
+                                                    return group_id == k
                                                 })
 
                             if(!group_profile){
@@ -2421,7 +2394,7 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
                                 dispatch({ type: ADDED_GROUP_PROFILE, group_id, group_profile_data});
                             }else{
                                 if(!_.isEqual(group_profile, group_profile_data)){
-                                    console.log('track group profile not equal')
+                                    console.log('track group profile not equal', group_profile, group_profile_data)
                                     dispatch({ type: ADDED_GROUP_PROFILE, group_id, group_profile_data});
                                 }
                             }
@@ -2446,7 +2419,8 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
                                                 return mk == member_key && _.isEqual(mv, members_change.doc.data())
                                             })
 
-                                // console.log(friend_profiles, member)
+                                profileFriend(member_data.friend_id, dispatch)
+
                                 if(!member){
                                     console.log('track group > members : added', member_key, member_data)
                                     dispatch({ type: ADDED_GROUP_MEMBER, group_id, member_key, member_data});
@@ -2454,7 +2428,7 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
                                     if(!_.isEqual(member, member_data)){
                                         console.log('track group > members : added not equal', member_key, member_data)
                                         dispatch({ type: ADDED_GROUP_MEMBER, group_id, member_key, member_data});
-                                    }
+                                    }     
                                 }
 
                                 // let friend_id = _.findKey(friend_profiles, (v, k)=>{
@@ -2463,7 +2437,7 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
 
                                 
                                 // if(!friend_id){
-                                profileFriend(member.friend_id, dispatch)
+                                
                                 // }
                             }
                             if (members_change.type === 'modified') {
@@ -2513,10 +2487,10 @@ export const trackFriends=(uid, friends, friend_profiles)=> dispatch =>{
                     return friend_id == k
                 })
 
-                console.log('trackFriends > added', friend, friend_data)
+                // console.log('trackFriends > added', friend, friend_data)
                 // if(friend === undefined){
                 if(!_.isEqual(friend, friend_data)){
-                    console.log('trackFriends > added', friend)
+                    console.log('trackFriends > added', friend, friend_data)
                     dispatch({ type: ADD_FRIEND, friend_id, friend_data});
                 }
 
@@ -2540,12 +2514,6 @@ profileFriend = (friend_id, dispatch)=>{
         friend_phones, 
         friend_profiles, 
         friend_websites} = new_state.auth.user
-
-    // console.log(friend_emails, 
-    //             friend_my_ids, 
-    //             friend_phones, 
-    //             friend_profiles, 
-    //             friend_websites)
 
     // friend > profiles
     firebase.firestore().collection('profiles').doc(friend_id).onSnapshot((friendProfileDocSnapshot) => {

@@ -20,10 +20,13 @@
 
 //#import <TwitterKit/TWTRKit.h>
 
+#import "RNSplashScreen.h"  // here
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  
   // firebase
   [FIRApp configure];
   [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
@@ -60,6 +63,8 @@
       NSLog(@"  %@", name);
     }
   }
+  
+  [RNSplashScreen show];  // here
   
   return YES;
 }

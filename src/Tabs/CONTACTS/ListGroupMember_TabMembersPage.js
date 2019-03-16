@@ -34,7 +34,8 @@ import {makeUidState,
         makeFriendsState, 
         makeFriendProfilesState, 
         makeGroupsState,
-        makeGroupProfilesState} from '../../Reselect'
+        makeGroupProfilesState,
+        makeGroupMembersState} from '../../Reselect'
 
 class ListGroupMember_TabMembersPage extends React.Component{
 
@@ -53,10 +54,16 @@ class ListGroupMember_TabMembersPage extends React.Component{
     componentWillMount(){
         let {group_id} = this.props.params
 
-        let {uid, group_profiles, friend_profiles} = this.props
+        let {uid, group_profiles, friend_profiles, group_members} = this.props
         let group_profile = _.find(group_profiles, (v, k)=>{
-            return k == group_id
-        })
+                                return k == group_id
+                            })
+
+        let group_member =  _.find(group_members, (v,k)=>{
+                                return k == group_id 
+                            })
+
+        group_profile = {...group_profile, members:group_member}
 
         /// check is friend_profile ครบหรือไม่  ถ้าไม่ครบเราต้องวิ่งไปดึงจาก server
         let lost_profile = []
@@ -807,6 +814,7 @@ const mapStateToProps = (state, ownProps) => {
         friend_profiles:makeFriendProfilesState(state, ownProps),
         groups:makeGroupsState(state, ownProps),
         group_profiles:makeGroupProfilesState(state, ownProps),
+        group_members:makeGroupMembersState(state, ownProps),
     }
 }
 

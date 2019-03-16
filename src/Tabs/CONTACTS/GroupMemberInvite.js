@@ -19,7 +19,8 @@ import {makeUidState,
         makeFriendsState, 
         makeFriendProfilesState, 
         makeGroupsState,
-        makeGroupProfilesState} from '../../Reselect'
+        makeGroupProfilesState,
+        makeGroupMembersState} from '../../Reselect'
 
 class GroupMemberInvite extends React.Component{
     
@@ -77,7 +78,7 @@ class GroupMemberInvite extends React.Component{
     loadData = (props) =>{
 
       let {group_id} = this.state
-      let {groups, group_profiles, friends, friend_profiles} = props
+      let {group_profiles, group_members, friends, friend_profiles} = props
 
       let group_profile = _.find(group_profiles, (v, k)=>{
                             return k == group_id
@@ -89,9 +90,9 @@ class GroupMemberInvite extends React.Component{
       _.each(friends, (fv, fk)=>{
         // console.log('group_profile', fv, fk)
         if(fv.status === Constant.FRIEND_STATUS_FRIEND){
-          let member = _.find(group_profile.members, (gv, gk)=>{
-            return gv.friend_id == fk 
-          })
+          let member =_.find(group_members, (gv, gk)=>{
+                        return gv.friend_id == fk 
+                      })
   
           let friend_profile = _.find(friend_profiles, (fpv, fpk)=>{
                                   return fk == fpk
@@ -282,6 +283,7 @@ const mapStateToProps = (state, ownProps) => {
       friend_profiles:makeFriendProfilesState(state, ownProps),
       groups:makeGroupsState(state, ownProps),
       group_profiles:makeGroupProfilesState(state, ownProps),
+      group_members:makeGroupMembersState(state, ownProps),
     }
 }
 

@@ -439,7 +439,6 @@ class home extends Component {
             return(<View style={{flex:1}}></View>)
         }
 
-        console.log("home > render()")
         return (
             <View style={{backgroundColor:'white', flex:1}} onLayout={this.onLayout.bind(this)} >
                 {/* {menuView} */}
@@ -473,14 +472,8 @@ const mapStateToProps = (state, ownProps) => {
     }
     
     return{
-        // auth:state.auth,
-        // isConnected:state.offline.online,
-
-
         isConnected: makeIsConnectedState(state, ownProps),
     }
 }
-
-
 
 export default connect(mapStateToProps, actions)(home);

@@ -19,7 +19,9 @@ import {getUid} from '../../Utils/Helpers'
 
 import {makeUidState,
         makeGroupsState,
-        makeGroupProfilesState} from '../../Reselect'
+        makeGroupProfilesState,
+        // makeGroupMembersState
+        } from '../../Reselect'
 
 class GroupSettingsPage extends React.Component{
 
@@ -284,6 +286,7 @@ const mapStateToProps = (state, ownProps) => {
         uid: makeUidState(state, ownProps),
         groups: makeGroupsState(state, ownProps),
         group_profiles:makeGroupProfilesState(state, ownProps),
+        // group_members:makeGroupMembersState(state, ownProps),
     }
 }
 

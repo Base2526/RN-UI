@@ -1630,19 +1630,19 @@ export default (state= INITIAL_STATE, action)=>{
                 return newState;
             }else{
 
-                let newFriend = {...friend, ...action.friend_data}
-                if(!_.isEqual(friend, newFriend)){
+                // let newFriend = {...friend, ...action.friend_data}
+                if(!_.isEqual(friend, action.friend_data)){
                     let newState = {...state,
                                         user: {
                                             ...state.user,
                                             friends : {
                                                 ...state.user.friends,
-                                                [action.friend_id]:newFriend
+                                                [action.friend_id]:action.friend_data
                                             }
                                         }
                                     }
 
-                    console.log('ADD_FRIEND', newFriend, friend, newState)
+                    console.log('ADD_FRIEND', action.friend_data, friend, newState)
                     return newState;
                 }
             }
@@ -1953,7 +1953,7 @@ export default (state= INITIAL_STATE, action)=>{
                 // console.log('ADDED_GROUP_PROFILE', action.group_profile_data, newState)
                 return new_state;
             }else{
-                if(!_.isEqual(group_profile, action.group_profile)){
+                if(!_.isEqual(group_profile, action.group_profile_data)){
                     let new_state = {...state,
                                         user: {
                                             ...state.user,

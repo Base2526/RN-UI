@@ -8,6 +8,7 @@ import {
 import { connect } from 'react-redux';
 
 import firebase from 'react-native-firebase';
+import SplashScreen from 'react-native-splash-screen'
 
 import * as actions from '../Actions';
 import {makeUidState, 
@@ -36,6 +37,8 @@ class AuthLoadingScreen extends React.Component {
     }
 
     componentDidMount() {
+        SplashScreen.hide();
+
         // console.log('AuthLoadingScreen', this.props.is_login)
         this._bootstrapAsync();
 

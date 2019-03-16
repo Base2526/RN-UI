@@ -24,6 +24,7 @@ import {makeUidState,
         makeProfileState, 
         makeGroupsState,
         makeGroupProfilesState,
+        makeGroupMembersState,
         makeFriendsState,
         makeFriendProfilesState,
         makeIsConnectedState,} from '../../Reselect'
@@ -115,7 +116,13 @@ class ManageGroupPage extends React.Component{
                                 return group_id == k
                             })
 
-        console.log(group, group_profile)
+        // console.log(group, group_profile)
+
+        let group_member =  _.find(group_members, (v, k)=>{
+                                return group_id == k
+                            })
+
+        group_profile = {...group_profile, members:group_member}
 
         let members = {}
         _.each(group_profile.members, (v, k)=>{
@@ -387,6 +394,7 @@ const mapStateToProps = (state, ownProps) => {
         profile: makeProfileState(state, ownProps),
         groups: makeGroupsState(state, ownProps),
         group_profiles:makeGroupProfilesState(state, ownProps),
+        group_members:makeGroupMembersState(state, ownProps),
         friends: makeFriendsState(state, ownProps),
         friend_profiles: makeFriendProfilesState(state, ownProps),
         isConnected: makeIsConnectedState(state, ownProps),

@@ -29,7 +29,8 @@ import {makeUidState,
         makeFriendsState, 
         makeFriendProfilesState, 
         makeGroupsState,
-        makeGroupProfilesState} from '../../Reselect'
+        makeGroupProfilesState,
+        makeGroupMembersState} from '../../Reselect'
 
 class ListGroupMember_TabAdminPage extends React.Component{
     constructor(){
@@ -71,10 +72,14 @@ class ListGroupMember_TabAdminPage extends React.Component{
         }
 
         let group_profile = _.find(group_profiles, (v, k)=>{
-            return k == group_id
-        })
+                                return k == group_id
+                            })
+
+        let group_member =  _.find(group_members, (v, k)=>{
+                                return k == group_id
+                            })
         
-        group = {...group, ...group_profile}
+        group = {...group, ...group_profile, members:group_member}
 
         let members = []
         
@@ -324,6 +329,7 @@ const mapStateToProps = (state, ownProps) => {
         friend_profiles:makeFriendProfilesState(state, ownProps),
         groups:makeGroupsState(state, ownProps),
         group_profiles:makeGroupProfilesState(state, ownProps),
+        group_members:makeGroupMembersState(state, ownProps),
     }
 }
 

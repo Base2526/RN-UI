@@ -26,7 +26,8 @@ import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState, 
         makeGroupsState,
-        makeGroupProfilesState} from '../../Reselect'
+        makeGroupProfilesState,
+        makeGroupMembersState} from '../../Reselect'
 
 class GroupsPage extends React.Component{
     constructor(props) {
@@ -59,7 +60,7 @@ class GroupsPage extends React.Component{
 
     loadData=(props)=>{
       // console.log(groups)
-      let {groups, group_profiles} = props
+      let {groups, group_profiles, group_members} = props
 
       // console.log('GroupsPage', groups, group_profiles)
 
@@ -76,6 +77,11 @@ class GroupsPage extends React.Component{
         if(!group_profile){
           continue
         }
+
+        let group_member =_.find(group_members, (v, k)=>{
+                            return k == key
+                          })
+        group_profile = {...group_profile, members:group_member}
 
         switch(group.status){ // GROUP_STATUS_MEMBER_INVITED
           case Constant.GROUP_STATUS_MEMBER_INVITED:{
@@ -494,6 +500,7 @@ const mapStateToProps = (state, ownProps) => {
     uid:makeUidState(state, ownProps),
     groups:makeGroupsState(state, ownProps),
     group_profiles:makeGroupProfilesState(state, ownProps),
+    group_members:makeGroupMembersState(state, ownProps),
   }
 }
 
