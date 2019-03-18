@@ -298,13 +298,17 @@ export const updateIsLogin = (users, callback) => {
 }
 
 export const actionLogout = (uid, dispatch, callback) => {
-    firebase.database().ref('user_presence/' + uid).orderByChild("udid").equalTo(DeviceInfo.getUniqueID()).once('value').then(function (snapshot) { 
-        if(snapshot.val() !== null){
-          firebase.database().ref("user_presence/" + uid + "/"+ Object.keys(snapshot.val())[0] +"/").update({
-            'status':'offline'
-          });
-        }
-    })
+    // firebase.database().ref('user_presence/' + uid).orderByChild("udid").equalTo(DeviceInfo.getUniqueID()).once('value').then(function (snapshot) { 
+    //     if(snapshot.val() !== null){
+    //       firebase.database().ref("user_presence/" + uid + "/"+ Object.keys(snapshot.val())[0] +"/").update({
+    //         'status':'offline'
+    //       });
+    //     }
+    // })
+
+    firebase.database().ref("user_presence/" + uid + "/"+ DeviceInfo.getUniqueID() +"/").update({
+        'status':'offline'
+    });
 
     // firebase.database().ref('idna/user/1').off()
     // unsubscribe();
@@ -1909,27 +1913,27 @@ export const watchTaskEvent=(uid, fcmToken) => dispatch => {
     const oldRealTimeDb = firebase.database();
     const onlineRef = oldRealTimeDb.ref('.info/connected');
     onlineRef.on('value', snapshot => {
-        // console.log('-- 0')
+        // let new_state =store.getState();
+        // let {user_presences} = new_state.presence
 
-        let new_state =store.getState();
-        let {user_presences} = new_state.presence
+        // let user_presence = _.find(user_presences, (v, k)=>{
+        //                         return k == uid
+        //                     })
 
-        let user_presence = _.find(user_presences, (v, k)=>{
-                                return k == uid
-                            })
+        // if(user_presence){
+            // let presence_key =  _.findKey(user_presence, (v, k)=>{
+            //                         return v.udid == DeviceInfo.getUniqueID()
+            //                     })
 
-        if(user_presence){
-            let presence_key =  _.findKey(user_presence, (v, k)=>{
-                                    return v.udid == DeviceInfo.getUniqueID()
-                                })
+            // if(!presence_key){
+            //     presence_key = randomKey()
+            // }
 
-            if(!presence_key){
-                presence_key = randomKey()
-            }
+            let presence_key = DeviceInfo.getUniqueID()
 
             oldRealTimeDb.ref("user_presence/" + uid + "/"+ presence_key +"/").set({
                 'platform': Platform.OS,
-                'udid': DeviceInfo.getUniqueID(),
+                // 'udid': DeviceInfo.getUniqueID(),
                 'bundle_identifier': DeviceInfo.getBundleId(),
                 'build_number': DeviceInfo.getBuildNumber(),
                 'build_version':DeviceInfo.getVersion(),
@@ -1943,7 +1947,7 @@ export const watchTaskEvent=(uid, fcmToken) => dispatch => {
                         .onDisconnect() // Set up the disconnect hook
                         .set({
                             'platform': Platform.OS,
-                            'udid': DeviceInfo.getUniqueID(),
+                            // 'udid': DeviceInfo.getUniqueID(),
                             'bundle_identifier': DeviceInfo.getBundleId(),
                             'build_number': DeviceInfo.getBuildNumber(),
                             'build_version':DeviceInfo.getVersion(),
@@ -1952,76 +1956,20 @@ export const watchTaskEvent=(uid, fcmToken) => dispatch => {
                             'status':'offline',
                             'updated_at':firebase.database.ServerValue.TIMESTAMP,
                         });
-        }else{
-            
-            let presence_key = randomKey()
-
-            oldRealTimeDb.ref('user_presence/' + uid + "/"+ presence_key +"/").set({
-                                                                                    'platform': Platform.OS,
-                                                                                    'udid': DeviceInfo.getUniqueID(),
-                                                                                    'bundle_identifier': DeviceInfo.getBundleId(),
-                                                                                    'build_number': DeviceInfo.getBuildNumber(),
-                                                                                    'build_version':DeviceInfo.getVersion(),
-                                                                                    'model_number': DeviceInfo.getModel(),
-                                                                                    'fcmToken':fcmToken,
-                                                                                    'status':'online',
-                                                                                    'updated_at':firebase.database.ServerValue.TIMESTAMP,
-                                                                                });
-        }
-
-
-        /*
-        oldRealTimeDb.ref('user_presence/' + uid).orderByChild("udid").equalTo(DeviceInfo.getUniqueID()).once('value').then(function (snapshot) { 
-            // console.log('-- 1', snapshot.val())
-
-            if(snapshot.val() === null){
-                
-                // แก้ปัณหาโดยการใช้ flag ไปก่อนเพราะว่าจะมีการ push data ที่มี udid ซํ้ากัน
-                // ซึ่งในความเป็นจิงไม่ถูกต้อง
-                // ** ลองเทส ดึงข้อมูลออกมาตรวจสอบก้ยังไม่สำเร็จจึงแก้ปัญหาโดยการใช้ flag ไปก่อน
-            
-                if(!flag){
-                    flag = true
-                    oldRealTimeDb.ref('user_presence/' + uid).push({
-                            'platform': Platform.OS,
-                            'udid': DeviceInfo.getUniqueID(),
-                            'bundle_identifier': DeviceInfo.getBundleId(),
-                            'build_number': DeviceInfo.getBuildNumber(),
-                            'build_version':DeviceInfo.getVersion(),
-                            'model_number': DeviceInfo.getModel(),
-                            'fcmToken':fcmToken,
-                            'status':'online'
-                        });
-                }else{
-                    return;
-                }
-            }else{
-                oldRealTimeDb.ref("user_presence/" + uid + "/"+ Object.keys(snapshot.val())[0] +"/").set({
-                    'platform': Platform.OS,
-                    'udid': DeviceInfo.getUniqueID(),
-                    'bundle_identifier': DeviceInfo.getBundleId(),
-                    'build_number': DeviceInfo.getBuildNumber(),
-                    'build_version':DeviceInfo.getVersion(),
-                    'model_number': DeviceInfo.getModel(),
-                    'fcmToken':fcmToken,
-                    'status':'online'
-                });
-
-                oldRealTimeDb.ref("user_presence/" + uid + "/"+ Object.keys(snapshot.val())[0] +"/")
-                    .onDisconnect() // Set up the disconnect hook
-                    .set({
-                        'platform': Platform.OS,
-                        'udid': DeviceInfo.getUniqueID(),
-                        'bundle_identifier': DeviceInfo.getBundleId(),
-                        'build_number': DeviceInfo.getBuildNumber(),
-                        'build_version':DeviceInfo.getVersion(),
-                        'model_number': DeviceInfo.getModel(),
-                        'fcmToken':fcmToken,
-                        'status':'offline'
-                    });
-            } 
-        })
-        */
+        // }else{
+        //     let presence_key = randomKey()
+        //     oldRealTimeDb.ref('user_presence/' + uid + "/"+ presence_key +"/").set({
+        //                                                                             'platform': Platform.OS,
+        //                                                                             'udid': DeviceInfo.getUniqueID(),
+        //                                                                             'bundle_identifier': DeviceInfo.getBundleId(),
+        //                                                                             'build_number': DeviceInfo.getBuildNumber(),
+        //                                                                             'build_version':DeviceInfo.getVersion(),
+        //                                                                             'model_number': DeviceInfo.getModel(),
+        //                                                                             'fcmToken':fcmToken,
+        //                                                                             'status':'online',
+        //                                                                             'updated_at':firebase.database.ServerValue.TIMESTAMP,
+        //                                                                         });
+        // }
     })
 }
 
