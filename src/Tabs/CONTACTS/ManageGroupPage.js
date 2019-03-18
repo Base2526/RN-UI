@@ -15,7 +15,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 
 import {getHeaderInset} from '../../Utils/Helpers'
 import * as actions from '../../Actions'
-import {checkInternetConnectionDialog} from '../../Utils/Helpers'
+import {checkInternetDialog} from '../../Utils/Helpers'
 
 import MyIcon from '../../config/icon-font.js';
 import Constant from '../../Utils/Constant'
@@ -100,7 +100,7 @@ class ManageGroupPage extends React.Component{
     }
 
     loadData = (props) =>{
-        let {groups, friends, uid, friend_profiles, group_profiles} = props
+        let {groups, group_members, friends, uid, friend_profiles, group_profiles} = props
         let {group_id} = this.state
 
         let group  = _.find(groups, (v, k)=>{
@@ -293,7 +293,7 @@ class ManageGroupPage extends React.Component{
             return(<View style={{flex:1, backgroundColor:'#DF2D6C'}}></View>)
         }
 
-        let {isConnected} = this.props
+        let {is_connected} = this.props
 
         // console.log(group)
         // return(<View style={{flex:1, backgroundColor:'#DF2D6C'}}></View>)
@@ -323,8 +323,8 @@ class ManageGroupPage extends React.Component{
                                 style={{justifyContent:'center', alignItems:'center'}}
                                 onPress={()=>{
 
-                                    if(!isConnected){
-                                        checkInternetConnectionDialog()
+                                    if(!is_connected){
+                                        checkInternetDialog()
                                     }else{
                                         let is_favorites = true;
                                         if(group.is_favorites !== undefined){
@@ -393,11 +393,11 @@ const mapStateToProps = (state, ownProps) => {
         uid: makeUidState(state, ownProps),
         profile: makeProfileState(state, ownProps),
         groups: makeGroupsState(state, ownProps),
-        group_profiles:makeGroupProfilesState(state, ownProps),
-        group_members:makeGroupMembersState(state, ownProps),
+        group_profiles: makeGroupProfilesState(state, ownProps),
+        group_members: makeGroupMembersState(state, ownProps),
         friends: makeFriendsState(state, ownProps),
         friend_profiles: makeFriendProfilesState(state, ownProps),
-        isConnected: makeIsConnectedState(state, ownProps),
+        is_connected: makeIsConnectedState(state, ownProps),
     }
 }
 export default connect(mapStateToProps, actions)(ManageGroupPage);

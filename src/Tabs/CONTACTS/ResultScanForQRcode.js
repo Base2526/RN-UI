@@ -99,10 +99,10 @@ class ResultScanForQRcode extends Component {
     addFriend = (friend_id) =>{
         let uid = this.props.uid
 
-        this.setState({loading:true})
-        this.props.actionInviteFriend(uid, friend_id, (result) => {
-            this.setState({loading:false})
-        })
+        // this.setState({loading:true})
+        // this.props.actionInviteFriend(uid, friend_id, (result) => {
+        //     this.setState({loading:false})
+        // })
     }
 
     componentWillReceiveProps(nextProps) {

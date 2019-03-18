@@ -12,10 +12,10 @@ export const UPDATE_PROFILE = "update_profile"
 export const ADD_FRIEND             = "add_friend"
 export const MODIFIED_FRIEND        = "modified_friend"
 export const FRIEND_PROFILE         = "friend_profile"
-// 
+
+export const REMOVED_FRIEND         = "removed_friend"
 
 export const ADDED_FRIEND_PROFILE   = "added_friend_profile"
-
 
 export const UPDATE_STATUS_FRIEND   = "update_status_friend" 
 export const CHANGE_FRIEND_NAME     = "change_friend_name"
@@ -135,3 +135,8 @@ export const REMOVED_PRESENCE               = 'removed_presence'
 
 
 export const ADDED_FEELINGS_AND_PRIVACY     = 'added_feelings_and_privacy'
+
+
+export const ADDED_PEOPLE_YOU_MAY_KHOW      = 'added_people_you_may_khow'
+export const MODIFIED_PEOPLE_YOU_MAY_KHOW   = 'modified_people_you_may_khow'
+export const REMOVED_PEOPLE_YOU_MAY_KHOW    = 'removed_people_you_may_khow'

@@ -110,7 +110,6 @@ class home extends Component {
         super(props)
 
         this.state= {
-            // isConnected: true,
             positionSelect: 0,
             renderContent: false,
         }
@@ -155,12 +154,11 @@ class home extends Component {
       
     render() {
         let {renderContent} = this.state;
-        let {isConnected} = this.props
+        let {is_connected} = this.props
 
-        // console.log(isConnected)
         return (
             <View style={{backgroundColor:'white', flex:1}}>
-                {!isConnected ?<OfflineNotice />:<View />}
+                {!is_connected ?<OfflineNotice />:<View />}
                 { renderContent &&
                 <ScrollableTabView
                     // style={{height:500}}
@@ -190,10 +188,8 @@ const mapStateToProps = (state, ownProps) => {
         return;
     }
 
-    // console.log(state.offline)
     return{
-        // isConnected:state.offline.online
-        isConnected: makeIsConnectedState(state, ownProps),
+        is_connected: makeIsConnectedState(state, ownProps),
     }
 }
 

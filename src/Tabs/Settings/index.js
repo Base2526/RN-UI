@@ -17,6 +17,8 @@ import GoogleSearchCompanyDetail from './GoogleSearchCompanyDetail'
 
 import FriendProfilePage from '../CONTACTS/FriendProfilePage';
 
+import SettingListFriendOnlinePage from './SettingListFriendOnlinePage'
+
 const index =  createStackNavigator({
     'home': {
         screen: homeY,
@@ -39,7 +41,7 @@ const index =  createStackNavigator({
     'friend_request_sent': {
         screen: SettingListFriendRequestSent,
         navigationOptions: {
-          title: 'Friend Request Sent'
+          // title: 'Friend Request Sent'
         },
     },
     'manage_class': {
@@ -91,6 +93,9 @@ const index =  createStackNavigator({
           // title: 'Friend Profile',
         }
       },
+    'SettingListFriendOnlinePage':{
+      screen: SettingListFriendOnlinePage,
+    }
 })
 
 index.navigationOptions = ({ navigation }) => {
@@ -108,7 +113,8 @@ index.navigationOptions = ({ navigation }) => {
         routeName === 'manage_customize_tab_menus' ||
         routeName === 'google_search_company' ||
         routeName === 'google_search_company_detail' ||
-        routeName === 'FriendProfilePage') {
+        routeName === 'FriendProfilePage' ||
+        routeName === 'SettingListFriendOnlinePage') {
       navigationOptions.tabBarVisible = false;
     }
     return navigationOptions;

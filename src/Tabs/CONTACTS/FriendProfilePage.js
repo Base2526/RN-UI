@@ -807,10 +807,10 @@ class FriendProfilePage extends React.Component{
                                         {friend.status === Constant.FRIEND_STATUS_FRIEND_99 ? <TouchableOpacity
                                             style={{padding:5}}
                                             onPress={()=>{
-                                                this.setState({loading:true})
-                                                this.props.actionInviteFriend(this.props.uid, friend_id, (result) => {
-                                                    this.setState({loading:false})
-                                                })
+                                                // this.setState({loading:true})
+                                                // this.props.actionInviteFriend(this.props.uid, friend_id, (result) => {
+                                                //     this.setState({loading:false})
+                                                // })
                                             }}>
                                             <MyIcon
                                                 name={'user-plus'}

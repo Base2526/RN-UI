@@ -1,5 +1,4 @@
 import React from 'react'
-
 import {
     View,
     Text,
@@ -23,18 +22,19 @@ import {
 
 import ActionButton from 'react-native-action-button';
 var _ = require('lodash');
-import base64 from 'react-native-base64'
 
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
-import {getUid, getHeaderInset} from '../../Utils/Helpers'
+import {getHeaderInset} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
+import {checkInternetDialog} from '../../Utils/Helpers'
 
 import {makeUidState, 
         makeProfileState, 
         makeFriendsState, 
         makeFriendProfilesState, 
-        makePresencesState} from '../../Reselect'
+        makePresencesState,
+        makeIsConnectedState} from '../../Reselect'
 
 class FriendsPage extends React.Component{
 
@@ -51,8 +51,6 @@ class FriendsPage extends React.Component{
     }
     
     componentDidMount() {
-      // setTimeout(() => {this.setState({renderContent: true})}, 0);
-
       this.loadData(this.props)
     }
 
@@ -202,19 +200,8 @@ class FriendsPage extends React.Component{
       }
         
       let data = [profile, favorites, friendRequests, friendRequestSents, _friends];
-      // console.log(data)
       this.setState({data})
-      // if(_.isEqual(data, this.state.data)){
-      //   console.log('FriendsPage > loadData : equal')
-      //   return;
-      // }else{
-      //   console.log('FriendsPage > loadData : not equal')
-
-      //   console.log(data)
-        
-      // }
     }
-
 
     _itemOnPress=(item, rowId, sectionId)=>{
       if(rowId == 0 && sectionId == 0){
@@ -225,6 +212,8 @@ class FriendsPage extends React.Component{
     }
 
     showMenuFriend = (rowItem)=>{
+      let {is_connected} = this.props
+
       return( <View style={{flex:1,
                             position:'absolute', 
                             top:0,
@@ -246,8 +235,50 @@ class FriendsPage extends React.Component{
                           <Text style={{padding:10, fontSize:18}}>Chat</Text>
                       </MenuOption>
                       <MenuOption onSelect={() => {
+                            if(!is_connected){
+                              checkInternetDialog()
+                              return 
+                            }
+
+                            let mute = true;
+                            if(rowItem.mute !== undefined){
+                              mute = !rowItem.mute
+                            }
+                            
+                            // this.setState({loading:true})
+                            this.props.actionFriendMute(this.props.uid, rowItem.friend_id, mute,(result)=>{
+                              console.log(result)
+                              // this.setState({loading:false})
+                            })
+                          }}>
+                          <Text style={{padding:10, fontSize:18}}>{rowItem.mute ? 'Mute': 'Unmute'}</Text>
+                      </MenuOption>
+                      <MenuOption onSelect={() => {
+                            if(!is_connected){
+                              checkInternetDialog()
+                              return 
+                            }
+
+                            let is_favorite = true
+                            if(rowItem.is_favorite !== undefined){
+                                is_favorite = !rowItem.is_favorite
+                            }
+
+                            // this.setState({loading:true})
+                            this.props.actionFriendFavirite(this.props.uid, rowItem.friend_id, is_favorite, (result) => {
+                                console.log(result)
+                                // this.setState({loading:false})
+                            })
+                          }}>
+                          <Text style={{padding:10, fontSize:18}}>{rowItem.is_favorite ? 'Unfavorite': 'Favorite'}</Text>
+                      </MenuOption>
+                      <MenuOption onSelect={() => {
+                        if(!is_connected){
+                          checkInternetDialog()
+                          return 
+                        }
+
                         let name = rowItem.change_friend_name ? rowItem.change_friend_name : rowItem.profile.name
-                  
                         Alert.alert(
                           '',
                           'Hide '+ name +'?',
@@ -258,15 +289,10 @@ class FriendsPage extends React.Component{
                             style: 'cancel'},
                             {text: 'OK', 
                             onPress: () => {
-                                // let hide = false;
-                                // if(rowItem.hide !== undefined){
-                                //   hide = !rowItem.hide
-                                // }
-
-                                this.setState({loading:true})
+                                // this.setState({loading:true})
                                 this.props.actionFriendHide(this.props.uid, rowItem.friend_id, true, (result)=>{
                                   console.log(result)
-                                  this.setState({loading:false})
+                                  // this.setState({loading:false})
                                 })
                               }, 
                             },
@@ -277,8 +303,12 @@ class FriendsPage extends React.Component{
                           <Text style={{padding:10, fontSize:18}}>Hide</Text>
                       </MenuOption>
                       <MenuOption onSelect={() => {
+                          if(!is_connected){
+                            checkInternetDialog()
+                            return 
+                          }
+
                           let name = rowItem.change_friend_name ? rowItem.change_friend_name : rowItem.profile.name
-                  
                           Alert.alert(
                             '',
                             'Block '+ name + '?',
@@ -289,10 +319,10 @@ class FriendsPage extends React.Component{
                               style: 'cancel'},
                               {text: 'OK', 
                               onPress: () => {
-                                this.setState({loading:true})
+                                // this.setState({loading:true})
                                 this.props.actionFriendBlock(this.props.uid, rowItem.friend_id, true,(result)=>{
-                                  // console.log(result)
-                                  this.setState({loading:false})
+                                  console.log(result)
+                                  // this.setState({loading:false})
                                 })
                               }, 
                               },
@@ -302,34 +332,6 @@ class FriendsPage extends React.Component{
 
                       }}>
                           <Text style={{padding:10, fontSize:18}}>Block</Text>
-                      </MenuOption>
-                      <MenuOption onSelect={() => {
-                            let mute = true;
-                            if(rowItem.mute !== undefined){
-                              mute = !rowItem.mute
-                            }
-                            
-                            this.setState({loading:true})
-                            this.props.actionFriendMute(this.props.uid, rowItem.friend_id, mute,(result)=>{
-                              console.log(result)
-                              this.setState({loading:false})
-                            })
-                          }}>
-                          <Text style={{padding:10, fontSize:18}}>{rowItem.mute ? 'Mute': 'Unmute'}</Text>
-                      </MenuOption>
-                      <MenuOption onSelect={() => {
-                            let is_favorite = true
-                            if(rowItem.is_favorite !== undefined){
-                                is_favorite = !rowItem.is_favorite
-                            }
-
-                            this.setState({loading:true})
-                            this.props.actionFriendFavirite(this.props.uid, rowItem.friend_id, is_favorite, (result) => {
-                                console.log(result)
-                                this.setState({loading:false})
-                            })
-                          }}>
-                          <Text style={{padding:10, fontSize:18}}>{rowItem.is_favorite ? 'Unfavorite': 'Favorite'}</Text>
                       </MenuOption>
                   </MenuOptions>
               </Menu>
@@ -692,8 +694,6 @@ class FriendsPage extends React.Component{
 }
 
 const mapStateToProps = (state, ownProps) => {
-  // console.log(state, ownProps)
-
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
   //_persist.rehydrated parameter is initially set to false
   if(!state._persist.rehydrated){
@@ -705,17 +705,13 @@ const mapStateToProps = (state, ownProps) => {
   }
 
   return{
-    // uid:getUid(state),
-    // friends:state.auth.users.friends,
-    // friend_profiles:state.auth.users.friend_profiles,
-    // profiles:state.auth.users.profiles,
-    // presences:state.presence.user_presences,
-
     uid: makeUidState(state, ownProps),
     friends:makeFriendsState(state, ownProps),
     friend_profiles:makeFriendProfilesState(state, ownProps),
     profiles:makeProfileState(state, ownProps),
     presences:makePresencesState(state, ownProps),
+
+    is_connected: makeIsConnectedState(state, ownProps),
   }
 }
 export default connect(mapStateToProps, actions)(FriendsPage);

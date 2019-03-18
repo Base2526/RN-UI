@@ -27,10 +27,16 @@ import MyIcon from '../../config/icon-font.js';
 import {makeUidState, 
         makeFriendsState,
         makeFriendProfilesState} from '../../Reselect'
+// import console = require('console');
 
+  //       const {state} = navigation;
+  // return {
+  //   title: `${state.params.title}`,
+  // };
 class SettingListFriendRequestSent extends React.Component{
   static navigationOptions = ({ navigation }) => ({
-    title: "Friend request",
+    // title: "Friend Request Sent",
+    title:`${navigation.state.params.title}`,
     headerTintColor: '#C7D8DD',
     headerStyle: {
       backgroundColor: 'rgba(186, 53, 100, 1.0)',
@@ -53,7 +59,7 @@ class SettingListFriendRequestSent extends React.Component{
   }
 
   componentDidMount(){
-      this.loadData(this.props)
+    this.loadData(this.props)
   }
 
   componentWillReceiveProps(nextProps) {
@@ -63,7 +69,7 @@ class SettingListFriendRequestSent extends React.Component{
   loadData = (props) =>{
     let {friends, friend_profiles} = props
 
-    let friend_member = []
+    let data = []
     for (var key in friends) {
         let friend = friends[key]
         switch(friend.status){
@@ -72,18 +78,21 @@ class SettingListFriendRequestSent extends React.Component{
                                   return k == key
                                 })
             if(friend_profile !== undefined){
-              friend_member.push({...friend, friend_id:key, profile:friend_profile});
+              data.push({...friend, friend_id:key, profile:friend_profile});
             } 
             break
           }            
         }
     }
 
-    // console.log(friend_member)
+    // console.log(data.length)
 
-    this.setState({
-        data:friend_member
-    })
+    if(!_.isEqual(data, this.state.data)){
+      const {setParams} = props.navigation;
+      setParams({ title: 'Friend Request('+ data.length +')'})
+    }
+
+    this.setState({data})
   }
 
   renderSeparator = () => {

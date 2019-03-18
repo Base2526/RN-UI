@@ -106,7 +106,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
             return;
         }
 
-        let {uid, groups, group_profiles, friends, friend_profiles}    = props
+        let {uid, groups, group_profiles, group_members, friends, friend_profiles}    = props
 
         let group = _.find(groups,  function(v, k) { 
             return k == group_id
@@ -120,6 +120,12 @@ class ListGroupMember_TabMembersPage extends React.Component{
         let group_profile = _.find(group_profiles, (v, k)=>{
                                 return k == group_id
                             })
+
+        let group_member =  _.find(group_members, (v,k)=>{
+                                return k == group_id 
+                            })
+
+        group_profile = {...group_profile, members:group_member}
                             
         // console.log('1, ListGroupMember_TabMembersPage', group, group_profile)
 
@@ -127,13 +133,13 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
         // console.log('2, ListGroupMember_TabMembersPage', group, group_profile)
 
-        let group_members = group.members
+        // let group_members = group.members
         
         let members  = []
         let pendings = []
         let declines = []
 
-        _.each(group_members, (v, k)=>{
+        _.each(group.members, (v, k)=>{
             console.log(v, k)
             var friend = _.find(friends, function(fv, fk) {
                 return fk == v.friend_id;

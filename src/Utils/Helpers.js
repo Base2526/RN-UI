@@ -307,10 +307,10 @@ export function randomKey() {
     return text;
 }
 
-export function checkInternetConnectionDialog(){
+export function checkInternetDialog(){
     Alert.alert(
         '',
-        'Please check internet connection and retry.',
+        'Please check internet connection.',
         [
           {text: 'OK', onPress: () => console.log('close, please check internet connection and retry.')},
         ],

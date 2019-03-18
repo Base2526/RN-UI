@@ -9,7 +9,6 @@ import { connect } from 'react-redux';
 import ImagePicker from 'react-native-image-picker';
 import {QRscanner, QRreader} from 'react-native-qr-scanner';
 import Spinner from 'react-native-loading-spinner-overlay';
-import base64 from 'react-native-base64'
 
 import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'

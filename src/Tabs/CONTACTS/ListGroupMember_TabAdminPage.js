@@ -61,7 +61,8 @@ class ListGroupMember_TabAdminPage extends React.Component{
             friends, 
             friend_profiles, 
             groups, 
-            group_profiles}    = props
+            group_profiles,
+            group_members}    = props
 
         let group = _.find(groups,  function(v, k) { 
             return k == group_id

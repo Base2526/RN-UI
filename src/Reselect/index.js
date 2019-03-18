@@ -210,6 +210,10 @@ const getClassMembers = (state, props) => {
     return state.auth.user.class_members
 }
 
+const getPeopleYouMayKhows = (state, props) => {
+    return state.auth.user.people_you_may_khows
+}
+
 const getIsConnected = (state, props) => {
     return state.offline.online
 }
@@ -326,8 +330,13 @@ export const makeClassMembersState = createSelector(
     (class_members) => class_members
 )
 
+export const makePeopleYouMayKhowState = createSelector(
+    [ getPeopleYouMayKhows ],
+    (people_you_may_khows) => people_you_may_khows
+)
+
 // isConnected
 export const makeIsConnectedState = createSelector(
     [ getIsConnected ],
-    (isConnected) => isConnected
+    (is_connected) => is_connected
 )

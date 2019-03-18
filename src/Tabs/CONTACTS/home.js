@@ -433,7 +433,7 @@ class home extends Component {
 
     render() {
         let {renderContent} = this.state;
-        let {isConnected} = this.props
+        let {is_connected} = this.props
 
         if(!renderContent){
             return(<View style={{flex:1}}></View>)
@@ -442,7 +442,7 @@ class home extends Component {
         return (
             <View style={{backgroundColor:'white', flex:1}} onLayout={this.onLayout.bind(this)} >
                 {/* {menuView} */}
-                {!isConnected ?<OfflineNotice />:<View />}
+                {!is_connected ?<OfflineNotice />:<View />}
                 <ScrollableTabView
                     // style={{height:500}}
                     initialPage={0}
@@ -472,7 +472,7 @@ const mapStateToProps = (state, ownProps) => {
     }
     
     return{
-        isConnected: makeIsConnectedState(state, ownProps),
+        is_connected: makeIsConnectedState(state, ownProps),
     }
 }
 

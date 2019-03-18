@@ -21,12 +21,13 @@ var _ = require('lodash');
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
 // import PlaceHolderFastImage from '../../Utils/PlaceHolderFastImage'
-import {getUid, getHeaderInset} from '../../Utils/Helpers'
+import {getHeaderInset, checkInternetDialog} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState, 
         makeFriendsState,
-        makeFriendProfilesState} from '../../Reselect'
+        makeFriendProfilesState,
+        makeIsConnectedState} from '../../Reselect'
 
 class SettingListBlock extends React.Component{
     static navigationOptions = ({ navigation }) => ({
@@ -46,79 +47,40 @@ class SettingListBlock extends React.Component{
     constructor(props){
         super(props)
         this.state = {
-            data:[],
-            loading:false
+          data:[],
+          loading:false,
+          renderContent: false,
         }
     }
 
     componentDidMount(){
-        this.setState({
-            data:[]
-        })
-
-        this.loadData(this.props)
+      this.loadData(this.props)
     }
 
     componentWillReceiveProps(nextProps) {
-      // console.log(nextProps)
-
       this.loadData(nextProps)
-
-      /*
-      if(nextProps.auth === undefined){
-          return;
-      }
-
-      let friend_member = []
-      for (var key in nextProps.auth.users.friends) {
-          let friend =  nextProps.auth.users.friends[key]
-          switch(friend.status){
-            case Constant.FRIEND_STATUS_FRIEND:{
-
-              if(friend.block){
-                  friend_member.push({...friend, friend_id:key});
-              }
-              break
-            }            
-          }
-      }
-
-      this.setState({
-          data:friend_member
-      })
-      */
     }
 
     loadData = (props) =>{
       let {friends, friend_profiles} = props
 
-      let friend_member = []
-      for (var key in friends) {
-        let friend =  friends[key]
-        switch(friend.status){
-          case Constant.FRIEND_STATUS_FRIEND:{
-
-            if(friend.block){
-
-              let friend_profile =_.find(friend_profiles, (v, k)=>{
-                return k == key
-              })
-
-              friend_member.push({...friend, friend_id:key, profile:friend_profile});
-                // friend_member.push({...friend, friend_id:key});
-            }
-            break
-          }            
+      let data = []
+      _.map(friends, (value, key)=>{
+        if(value.status === Constant.FRIEND_STATUS_FRIEND && value.block){
+          let friend_profile =_.find(friend_profiles, (v, k)=>{
+                                return k == key
+                              })
+          data.push({...value, friend_id:key, friend_profile});
         }
-      }
-
-      this.setState({
-          data:friend_member
       })
+
+      this.setState({data, renderContent:true})
     }
 
-  
     showMenu = (item)=>{
+
+      let {is_connected} = this.props
+
       return( <View style={{flex:1,
                             position:'absolute', 
                             top:0,
@@ -134,25 +96,36 @@ class SettingListBlock extends React.Component{
                           color={'gray'} />  
                   </MenuTrigger>
                   <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
-                      {/* <MenuOption onSelect={() => {
-                        // this.props.params.navigation.navigate("ChatPage")
-                      }}>
-                          <Text style={{padding:10, fontSize:18}}>Remove</Text>
-                      </MenuOption> */}
                       <MenuOption onSelect={() => {
-                        this.setState({loading:true})
+
+                        if(!is_connected){
+                          checkInternetDialog()
+                          return 
+                        }
+
+                        // this.setState({loading:true})
                         this.props.actionFriendBlock(this.props.uid, item.friend_id, false, (result)=>{
-                            // console.log(result)
-                            this.setState({loading:false})
+                            console.log(result)
+                            // this.setState({loading:false})
                         })
                       }}>
                           <Text style={{padding:10, fontSize:18}}>Unblock</Text>
                       </MenuOption>
-                      {/* <MenuOption onSelect={() => {
-                          
+                      <MenuOption onSelect={() => {
+                        
+                        if(!is_connected){
+                          checkInternetDialog()
+                          return 
+                        }
+
+                        // this.setState({loading:true})
+                        this.props.actionFriendDelete(this.props.uid, item.friend_id, (result)=>{
+                            console.log(result)
+                            // this.setState({loading:false})
+                        })
                       }}>
-                          <Text style={{padding:10, fontSize:18}}>Block</Text>
-                      </MenuOption> */}
+                        <Text style={{padding:10, fontSize:18}}>Delete friend</Text>
+                      </MenuOption>
                   </MenuOptions>
               </Menu>
             </View>)
@@ -185,7 +158,7 @@ class SettingListBlock extends React.Component{
                                 // borderColor:'gray'
                             }}
                         source={{
-                            uri: item.profile.image_url,
+                            uri: item.friend_profile.image_url,
                             headers:{ Authorization: 'someAuthToken' },
                             priority: FastImage.priority.normal,
                         }}
@@ -199,73 +172,30 @@ class SettingListBlock extends React.Component{
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
 
-                         {item.hasOwnProperty('change_friend_name') ? item.change_friend_name : item.profile.name}
+                         {item.hasOwnProperty('change_friend_name') ? item.change_friend_name : item.friend_profile.name}
                     </Text>
                     <Text style={{fontSize: 13, 
                                 color: '#222',
                                 paddingLeft: 10}}>
-                         {item.profile.status_message}
+                         {item.friend_profile.status_message}
                     </Text>
                 </View>
-                    
                 {this.showMenu(item)}
-                { /*
-                <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0 , margin:5, }}>
-                    <TouchableOpacity
-                        onPress={()=>{
-                            
-                           Alert.alert(
-                            '',
-                            '',
-                            [
-                              {text: 'Remove', 
-                                onPress: () => {
-                                    this.props.actionUpdateStatusFriend(this.props.uid, item.friend_id, Constant.FRIEND_STATUS_FRIEND_REMOVE, (data)=>{
-                                    })
-                                },
-                              },
-
-                              {text: 'Unblock', 
-                                onPress: () => {
-
-                                  let block = false;
-                                  if(item.block !== undefined){
-                                    block = !item.block
-                                  }
-                                  this.setState({loading:true})
-                                  this.props.actionFriendBlock(this.props.uid, item.friend_id, block, (result)=>{
-                                      console.log(result)
-                                      this.setState({loading:false})
-                                  })
-                                }, 
-                              },
-                              {text: 'Cancel', 
-                                onPress: () => {
-                                    console.log("cancel")
-                                }, 
-                                style: 'cancel'
-                              },
-                            ],
-                            { cancelable: false }
-                          )
-                        }}>
-                        <View style={{borderColor:'red', borderWidth:1, borderRadius:10, padding:5, marginLeft:5}}>
-                            <Text style={{color:'red'}}>Edit</Text>
-                        </View>
-                    </TouchableOpacity>
-                </View> 
-                */ }
             </View>
         )
     }
 
     render(){
-        let {data} = this.state
-        // console.log(data)
+        let {data, renderContent, loading} = this.state
+
+        if(!renderContent){
+          return (<View style={{flex:1}}></View>)
+        }
+
         return( <MenuContext>
                 <View style={{flex:1}}>
                   <Spinner
-                    visible={this.state.loading}
+                    visible={loading}
                     textContent={'Wait...'}
                     textStyle={{color: '#FFF'}}
                     overlayColor={'rgba(0,0,0,0.5)'}/>
@@ -281,22 +211,22 @@ class SettingListBlock extends React.Component{
 }
 
 const mapStateToProps = (state, ownProps) => {
-    // console.log(state)
-  
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
     //_persist.rehydrated parameter is initially set to false
     if(!state._persist.rehydrated){
       return {}
     }
+
+    if(!state.auth.isLogin){
+      return;
+    }
   
     return{
-      // uid:getUid(state),
-      // auth:state.auth
-
       uid: makeUidState(state, ownProps),
       friends: makeFriendsState(state, ownProps),
-
       friend_profiles:makeFriendProfilesState(state, ownProps),
+
+      is_connected: makeIsConnectedState(state, ownProps),
     }
 }
   

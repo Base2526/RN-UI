@@ -14,6 +14,7 @@ import {USER_LOGIN_SUCCESS,
         UPDATE_PROFILE,
         ADD_FRIEND,
         MODIFIED_FRIEND,
+        REMOVED_FRIEND,
         // FRIEND_PROFILE,
         ADDED_FRIEND_PROFILE,
         UPDATE_STATUS_FRIEND,
@@ -120,6 +121,10 @@ import {USER_LOGIN_SUCCESS,
         ADDED_PRESENCE,
         CHANGED_PRESENCE,
         REMOVED_PRESENCE,
+
+
+        ADDED_PEOPLE_YOU_MAY_KHOW,
+        REMOVED_PEOPLE_YOU_MAY_KHOW,
         } from './types'
 
 import {randomKey} from '../Utils/Helpers'
@@ -346,24 +351,37 @@ export const actionPeopleYouMayKhow = (uid) => dispatch=>{
             if(!data.result){
                 return {'status':false, 'message': data.message}
             }else{
-                return {'status':true, 'data':data}
+                // เราจะเก็บ data ลง redux เป็น object เราจึงจำเป็นต้องแปลงก่อน
+                let people_you_may_khow_data = {}
+                data.data.map((v, k)=>{
+                    people_you_may_khow_data = {...people_you_may_khow_data, [v.uid]:v}
+                })
+
+                dispatch({ type: ADDED_PEOPLE_YOU_MAY_KHOW, people_you_may_khow_data});
+                return {'status':true}
             }
         }
     })
 }
 
-export const actionInviteFriend = (uid, friend_id, callback) => dispatch =>{
-    let userRef = firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
-    userRef.get()
-    .then(doc => {
-        let chat_id = randomKey()
-        if (!doc.exists) {
-        } else {
-            let data = doc.data();
-            if(data.chat_id){
-                chat_id = data.chat_id
-            }
-        }
+// REMOVED_PEOPLE_YOU_MAY_KHOW
+export const actionRemovedPeopleYouMayKhow = (uid, friend_id, callback) => dispatch =>{
+    dispatch({ type: REMOVED_PEOPLE_YOU_MAY_KHOW, friend_id});
+    callback({'status':true})
+}
+
+export const actionInviteFriend = (uid, friend_id, chat_id, callback) => dispatch =>{
+    // let userRef = firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
+    // userRef.get()
+    // .then(doc => {
+    //     let chat_id = randomKey()
+    //     if (!doc.exists) {
+    //     } else {
+    //         let data = doc.data();
+    //         if(data.chat_id){
+    //             chat_id = data.chat_id
+    //         }
+    //     }
 
         let batch = firebase.firestore().batch();
 
@@ -377,16 +395,19 @@ export const actionInviteFriend = (uid, friend_id, callback) => dispatch =>{
 
         batch.commit().then(function () {
             // console.log("Transaction success: actionInviteFriend");
+
+            dispatch({ type: REMOVED_PEOPLE_YOU_MAY_KHOW, friend_id});
+
             callback({'status':true})
         }).catch(function(err) {
             // console.log("Transaction failure: " + err);
             callback({'status':false, 'message':err})
         });
-    })
-    .catch(err => {
-        // console.log('Error getting document', err);
-        callback({'status':false, 'message':err})
-    });
+    // })
+    // .catch(err => {
+    //     // console.log('Error getting document', err);
+    //     callback({'status':false, 'message':err})
+    // });
 }
 
 export const actionAddFriend = (uid, friend_id, data, profile, callback) => dispatch =>{
@@ -922,46 +943,64 @@ export const actionChangeFriendsName = (uid, friend_id, name, callback) => dispa
 
 // friend hide
 export const actionFriendHide = (uid, friend_id, hide, callback) => dispatch=> {
+    dispatch({ type: FRIEND_HIDE, friend_id, hide});
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         hide,
+        is_favorite: false
     }, { merge: true}).then(()=> {
-        dispatch({ type: FRIEND_HIDE, friend_id, hide});
         callback({'status':true})
     }).catch(error => {
+        dispatch({ type: FRIEND_HIDE, friend_id, hide:!hide});
         callback({'status':false, 'message': error})
     })      
 }
 
 // friend block
 export const actionFriendBlock = (uid, friend_id, block, callback) => dispatch=> {
+    dispatch({ type: FRIEND_BLOCK, friend_id, block});
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
-        block,
+        block, 
+        is_favorite: false
     }, { merge: true}).then(()=> {
-        dispatch({ type: FRIEND_BLOCK, friend_id, block});
         callback({'status':true})
     }).catch(error => {
+        dispatch({ type: FRIEND_BLOCK, friend_id, block:!block});
         callback({'status':false, 'message': error})
     })  
 }
 
 // friend mute/unmute
 export const actionFriendMute = (uid, friend_id, mute, callback) => dispatch=> {
+    dispatch({ type: FRIEND_MUTE, friend_id, mute});
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         mute,
     }, { merge: true}).then(()=> {
-        dispatch({ type: FRIEND_MUTE, friend_id, mute});
         callback({'status':true})
     }).catch(error => {
+        dispatch({ type: FRIEND_MUTE, friend_id, mute:!mute});
         callback({'status':false, 'message': error})
     })
 }
 
 // friend favorite
 export const actionFriendFavirite = (uid, friend_id, favorite_status, callback) => dispatch=> {
+    dispatch({ type: FRIEND_FAVORITE, friend_id, favorite_status});
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         is_favorite: favorite_status,
     }, { merge: true}).then(()=> {
-        dispatch({ type: FRIEND_FAVORITE, friend_id, favorite_status});
+        callback({'status':true})
+    }).catch(error => {
+        dispatch({ type: FRIEND_FAVORITE, friend_id, is_favorite: !favorite_status});
+        callback({'status':false, 'message': error})
+    })
+}
+
+// friend delete  'status':Constant.FRIEND_STATUS_FRIEND_REMOVE
+export const actionFriendDelete = (uid, friend_id, callback) => dispatch=> {
+    dispatch({ type: REMOVED_FRIEND, friend_id});
+    firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
+        'status':Constant.FRIEND_STATUS_FRIEND_REMOVE
+    }, { merge: true}).then(()=> {
         callback({'status':true})
     }).catch(error => {
         callback({'status':false, 'message': error})
@@ -1373,7 +1412,6 @@ export const actionFriendProfile99= (uid, friend_id) => dispatch=>{
     })
 }
 
-
 export const actionFriendProfileMulti99 = (uid, lost_profile) => dispatch=>{
     return friend_profile_multi_99(uid, lost_profile).then(data => {
         if((data instanceof Array)){
@@ -1420,8 +1458,8 @@ export const actionFriendProfileMulti99 = (uid, lost_profile) => dispatch=>{
     })
 }
 
-let unsubscribe = null;
 
+let unsubscribe = null;
 export const watchTaskEvent=(uid, fcmToken) => dispatch => {
     console.log('-------------- watchTaskEvent()')
 
@@ -1865,20 +1903,83 @@ export const watchTaskEvent=(uid, fcmToken) => dispatch => {
     */
 
 
+
     // track online/offline
     let flag = false
     const oldRealTimeDb = firebase.database();
     const onlineRef = oldRealTimeDb.ref('.info/connected');
     onlineRef.on('value', snapshot => {
         // console.log('-- 0')
+
+        let new_state =store.getState();
+        let {user_presences} = new_state.presence
+
+        let user_presence = _.find(user_presences, (v, k)=>{
+                                return k == uid
+                            })
+
+        if(user_presence){
+            let presence_key =  _.findKey(user_presence, (v, k)=>{
+                                    return v.udid == DeviceInfo.getUniqueID()
+                                })
+
+            if(!presence_key){
+                presence_key = randomKey()
+            }
+
+            oldRealTimeDb.ref("user_presence/" + uid + "/"+ presence_key +"/").set({
+                'platform': Platform.OS,
+                'udid': DeviceInfo.getUniqueID(),
+                'bundle_identifier': DeviceInfo.getBundleId(),
+                'build_number': DeviceInfo.getBuildNumber(),
+                'build_version':DeviceInfo.getVersion(),
+                'model_number': DeviceInfo.getModel(),
+                'fcmToken':fcmToken,
+                'status':'online',
+                'updated_at':firebase.database.ServerValue.TIMESTAMP,
+            });
+
+            oldRealTimeDb.ref("user_presence/" + uid + "/"+ presence_key +"/")
+                        .onDisconnect() // Set up the disconnect hook
+                        .set({
+                            'platform': Platform.OS,
+                            'udid': DeviceInfo.getUniqueID(),
+                            'bundle_identifier': DeviceInfo.getBundleId(),
+                            'build_number': DeviceInfo.getBuildNumber(),
+                            'build_version':DeviceInfo.getVersion(),
+                            'model_number': DeviceInfo.getModel(),
+                            'fcmToken':fcmToken,
+                            'status':'offline',
+                            'updated_at':firebase.database.ServerValue.TIMESTAMP,
+                        });
+        }else{
+            
+            let presence_key = randomKey()
+
+            oldRealTimeDb.ref('user_presence/' + uid + "/"+ presence_key +"/").set({
+                                                                                    'platform': Platform.OS,
+                                                                                    'udid': DeviceInfo.getUniqueID(),
+                                                                                    'bundle_identifier': DeviceInfo.getBundleId(),
+                                                                                    'build_number': DeviceInfo.getBuildNumber(),
+                                                                                    'build_version':DeviceInfo.getVersion(),
+                                                                                    'model_number': DeviceInfo.getModel(),
+                                                                                    'fcmToken':fcmToken,
+                                                                                    'status':'online',
+                                                                                    'updated_at':firebase.database.ServerValue.TIMESTAMP,
+                                                                                });
+        }
+
+
+        /*
         oldRealTimeDb.ref('user_presence/' + uid).orderByChild("udid").equalTo(DeviceInfo.getUniqueID()).once('value').then(function (snapshot) { 
             // console.log('-- 1', snapshot.val())
+
             if(snapshot.val() === null){
-                /* 
-                    แก้ปัณหาโดยการใช้ flag ไปก่อนเพราะว่าจะมีการ push data ที่มี udid ซํ้ากัน
-                    ซึ่งในความเป็นจิงไม่ถูกต้อง
-                    ** ลองเทส ดึงข้อมูลออกมาตรวจสอบก้ยังไม่สำเร็จจึงแก้ปัญหาโดยการใช้ flag ไปก่อน
-                */
+                
+                // แก้ปัณหาโดยการใช้ flag ไปก่อนเพราะว่าจะมีการ push data ที่มี udid ซํ้ากัน
+                // ซึ่งในความเป็นจิงไม่ถูกต้อง
+                // ** ลองเทส ดึงข้อมูลออกมาตรวจสอบก้ยังไม่สำเร็จจึงแก้ปัญหาโดยการใช้ flag ไปก่อน
+            
                 if(!flag){
                     flag = true
                     oldRealTimeDb.ref('user_presence/' + uid).push({
@@ -1919,8 +2020,9 @@ export const watchTaskEvent=(uid, fcmToken) => dispatch => {
                         'status':'offline'
                     });
             } 
-        });     
-    });
+        })
+        */
+    })
 }
 
 // track profiles
@@ -2497,6 +2599,7 @@ export const trackFriends=(uid, friends, friend_profiles)=> dispatch =>{
                 profileFriend(friend_id, dispatch)
             }
             if (change.type === 'modified') {
+                console.log('trackFriends > modified', friend_id, friend_data)
                 dispatch({ type: MODIFIED_FRIEND, friend_id, friend_data});
             }
         })
@@ -2515,11 +2618,15 @@ profileFriend = (friend_id, dispatch)=>{
         friend_profiles, 
         friend_websites} = new_state.auth.user
 
+    let {user_presences} = new_state.presence
+
+    // console.log(user_presences)
+
     // friend > profiles
     firebase.firestore().collection('profiles').doc(friend_id).onSnapshot((friendProfileDocSnapshot) => {
         // console.log(change.doc.id, friendDocSnapshot)
         if (!friendProfileDocSnapshot.exists) {
-            console.log('No such document!');
+            console.log('No such document!', friend_id);
         } else {
 
             let friend_data = friendProfileDocSnapshot.data()
@@ -2695,4 +2802,51 @@ profileFriend = (friend_id, dispatch)=>{
             }
         })
     })
+
+
+    firebase.database().ref('user_presence/' + friend_id).on('child_added', function (snapshot) {
+        // console.log(change.doc.id, snapshot.key, snapshot.val())
+
+        let presenceKey = snapshot.key
+        let presenceData = snapshot.val()
+
+        let user_presence  = _.find(user_presences, (fpv, fpk)=>{
+                                return friend_id == fpk
+                            })
+
+        if(user_presence){
+            // console.log('> ', user_presences, user_presence, friend_id, snapshot.key, snapshot.val())
+
+            let presense =  _.find(user_presence, (v, k)=>{
+                                return k == presenceKey
+                            })
+
+            if(presense){
+
+                if(!_.isEqual(presense, presenceData)){
+                    console.log('user_presence > child_added')
+                    dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
+                }
+            }else{
+                console.log('user_presence > child_added')
+                dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
+            }
+        }else{
+            console.log('user_presence > child_added')
+            dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
+        }
+        
+    });
+
+    firebase.database().ref('user_presence/' + friend_id).on('child_changed', function (snapshot) {
+        // console.log(change.doc.id, snapshot.key, snapshot.val())
+        console.log('user_presence > child_changed')
+        dispatch({ type: CHANGED_PRESENCE, userId:friend_id, presenceKey:snapshot.key, presenceData:snapshot.val()})
+    });
+
+    firebase.database().ref('user_presence/' + friend_id).on('child_removed', function (snapshot) {
+        // console.log(change.doc.id, snapshot.key, snapshot.val())
+        console.log('user_presence > child_removed')
+        dispatch({ type: REMOVED_PRESENCE, userId:friend_id, presenceKey:snapshot.key})
+    });
 }

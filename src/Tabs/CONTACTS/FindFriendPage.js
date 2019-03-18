@@ -25,6 +25,9 @@ import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 import Constant from '../../Utils/Constant'
 
+import {makeUidState, 
+        makeIsConnectedState} from '../../Reselect'
+
 class FindFriendPage extends React.Component{
   static navigationOptions = ({ navigation }) => ({
       title: "Find Friend",
@@ -61,10 +64,6 @@ class FindFriendPage extends React.Component{
   componentDidMount() {
     setTimeout(() => {this.setState({renderContent: true})}, 0);
 
-    this.setState({
-      error: null,
-      refreshing: false
-    });
   }
 
   handleSearch = () => {
@@ -283,22 +282,17 @@ class FindFriendPage extends React.Component{
                 onChangeText={(text) => this.setState({text})}
                 value={this.state.text}
                 clearButtonMode='while-editing'
-                // maxLength={30}
                 placeholder= "Enter your friend's ID"
-                // editable={this.state.data.length -1 == 10?false:true} 
             />
             <TouchableOpacity 
                 style={{paddingLeft:10, 
                         paddingRight:10,
                         marginLeft:10,
-                        // backgroundColor:this.state.data.length -1 == 10?'gray':'red',
                         backgroundColor:'#CE3B6E',
                         justifyContent:'center'}}
                 onPress={()=>{
                     this.handleSearch()
-                }}
-                // disabled={this.state.data.length -1 == 10? true:false}
-                >
+                }}>
                 <Text style={{color:'#C7D8DD', fontWeight:'bold'}}>Search</Text>
             </TouchableOpacity>
           </View>
@@ -321,12 +315,22 @@ class FindFriendPage extends React.Component{
   }
 }
 
-const mapStateToProps = (state) => {
-  console.log(state)
+const mapStateToProps = (state, ownProps) => {
+  if(!state._persist.rehydrated){
+    return {}
+  }
+
+  if(!state.auth.isLogin){
+    return;
+  }
+
   return({
       // loading:state.auth.loading,
       // isLogin:state.auth.isLogin
-      uid:getUid(state)
+      // uid:getUid(state)
+
+      uid: makeUidState(state, ownProps),
+      is_connected: makeIsConnectedState(state, ownProps),
   })
 }
 

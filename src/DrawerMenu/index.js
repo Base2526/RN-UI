@@ -365,7 +365,6 @@ class DrawerMenu extends React.Component{
                         }}>
                         <FastImage
                             style={StyleSheet.absoluteFill}
-                            // source={require('../../Images/boxpink.png')}
                             source={{
                                 uri: profiles.bg_url,
                                 headers:{ Authorization: 'someAuthToken' },
@@ -378,11 +377,6 @@ class DrawerMenu extends React.Component{
                                     marginLeft:10,
                                     alignItems:'center'}}>
                             <TouchableOpacity style={{}}>
-                                {/* <TestSVG 
-                                    width={80}
-                                    height={80}
-                                    strokeWidth={3}
-                                    image_uri={users.profiles.image_url}/>  */}
                                 <FastImage
                                     style={{width: 80, height: 80, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
                                     source={{
@@ -399,9 +393,7 @@ class DrawerMenu extends React.Component{
                                         color:'white',}}>{profiles.name}</Text>
                             </View>
                         </View>
-                        
                     </View>
-
                     <ScrollView>
                         <View>
                             <Text>Accounts</Text>

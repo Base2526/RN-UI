@@ -27,12 +27,12 @@ export default (state= INITIAL_STATE, action)=>{
             state = {...state, 
                     user_presences: action.payload.presence.user_presences,}
 
-            // console.log(state, action)
+            console.log(state, action)
             return state
         }
     
         case ADDED_PRESENCE:{
-            if(state.user_presence === null){
+            if(!state.user_presences){
                 return state
             }
 
@@ -47,7 +47,7 @@ export default (state= INITIAL_STATE, action)=>{
                                 return k == userId
                             })
 
-            if(user_presence === undefined){
+            if(!user_presence){
                 user_presences = {...user_presences, [userId]:{[presenceKey]:presenceData}}
                 return {...state, user_presences}
             }else{
@@ -55,24 +55,24 @@ export default (state= INITIAL_STATE, action)=>{
                                     return k == presenceKey
                                 })
 
-                if(presense === undefined){
+                if(!presense){
                     presense = {[presenceKey]:presenceData}
                     user_presence = {...user_presence, ...presense}
-                    let newState = {...state, 
+                    let new_state = {...state, 
                                     user_presences:{
                                         ...state.user_presences,
                                         [userId]:user_presence
                                     }
                                 }
                     // console.log(newState)
-                    return newState
+                    return new_state
                 }
             }
             return state
         }
 
         case CHANGED_PRESENCE:{
-            if(state.user_presence === null){
+            if(!state.user_presences){
                 return state
             }
 
@@ -86,7 +86,7 @@ export default (state= INITIAL_STATE, action)=>{
                 return k == userId
             })
 
-            if(user_presence === undefined){
+            if(!user_presence){
                 return state
             }
 
@@ -98,20 +98,20 @@ export default (state= INITIAL_STATE, action)=>{
                 // console.log('Not equal')
 
                 user_presence = {...user_presence, ...{[presenceKey]:presenceData}}
-                let newState = {...state, 
-                    user_presences:{
-                        ...state.user_presences,
-                        [userId]:user_presence
-                    }
-                }
-                return newState
+                let new_state = {...state, 
+                                    user_presences:{
+                                        ...state.user_presences,
+                                        [userId]:user_presence
+                                    }
+                                }
+                return new_state
             }
 
             return state
         }
 
         case REMOVED_PRESENCE:{
-            if(state.user_presence === null){
+            if(!state.user_presences){
                 return state
             }
 
@@ -133,17 +133,15 @@ export default (state= INITIAL_STATE, action)=>{
             })
 
             if(presense !== undefined){
-
                 user_presence = _.omit(user_presence, presenceKey)
-
-                let newState = {...state, 
-                    user_presences:{
-                        ...state.user_presences,
-                        [userId]:user_presence
-                    }
-                }
+                let new_state = {...state, 
+                                    user_presences:{
+                                        ...state.user_presences,
+                                        [userId]:user_presence
+                                    }
+                                }
                 // console.log(newState)
-                return newState;
+                return new_state;
             }
 
             return state

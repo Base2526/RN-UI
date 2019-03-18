@@ -7,24 +7,26 @@ import { View,
         FlatList, 
         ActivityIndicator, 
         Alert} from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import { connect } from 'react-redux';
 import FastImage from 'react-native-fast-image'
 import Spinner from 'react-native-loading-spinner-overlay';
 import {
-  MenuProvider,
-  Menu,
-  MenuContext,
-  MenuTrigger,
-  MenuOptions,
-  MenuOption,
-} from 'react-native-popup-menu';
+        MenuProvider,
+        Menu,
+        MenuContext,
+        MenuTrigger,
+        MenuOptions,
+        MenuOption,
+      } from 'react-native-popup-menu';
+var _ = require('lodash');
 
 import * as actions from '../../Actions'
-import {getUid, getHeaderInset} from '../../Utils/Helpers'
+import {getHeaderInset, isEmpty, randomKey} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
-
-import {makeUidState,} from '../../Reselect'
+import {makeUidState, 
+        makeIsConnectedState,
+        makeFriendsState,
+        makePeopleYouMayKhowState} from '../../Reselect'
 
 class AddFriendsPage extends React.Component{
 
@@ -60,16 +62,36 @@ class AddFriendsPage extends React.Component{
 
   componentDidMount() {
     setTimeout(() => {this.setState({renderContent: true})}, 0);
-    let {uid} = this.props
+    let {uid, people_you_may_khows} = this.props
 
-    this.props.actionPeopleYouMayKhow(uid).then((result) => {
-      if(result.status){
+    if(isEmpty(people_you_may_khows)){
+      this.props.actionPeopleYouMayKhow(uid).then((result) => {
+        // if(result.status){
+  
+        //   this.setState({refreshing: false});
+        // }else{
+        //   this.setState({refreshing: false});
+        // }
 
-        this.setState({data:result.data.data, refreshing: false});
-      }else{
+        console.log(result)
+      })
+    }else{
+      this.loadData(this.props)
+    }
+  }
 
-      }
-    })
+  componentWillReceiveProps(nextProps){
+    this.loadData(nextProps)
+  }
+
+  loadData = (props) =>{
+    let {people_you_may_khows} = props
+    let data =_.map(people_you_may_khows, (v, k)=>{
+                return v
+              })
+      
+    console.log(data)
+    this.setState({data, refreshing:false})
   }
    
   ItemSeparatorComponent = () => {
@@ -86,7 +108,7 @@ class AddFriendsPage extends React.Component{
   }
 
   showMenu = (item, index)=>{
-    console.log(item)
+    // console.log(item)
     return( <View style={{flex:1,
                           position:'absolute', 
                           top:0,
@@ -102,36 +124,43 @@ class AddFriendsPage extends React.Component{
                 </MenuTrigger>
                 <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
                     <MenuOption onSelect={() => {
-                      // this.props.params.navigation.navigate("ListClassMemberPage", {'class_id': item.class_id})
-
                       this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
                     }}>
                         <Text style={{padding:10, fontSize:18}}>View profile</Text>
                     </MenuOption>
                     <MenuOption onSelect={() => {
-                      this.setState({loading:true})
-                      this.props.actionInviteFriend(this.props.uid, item.uid, (result) => {
-                          this.setState({loading:false})
 
-                          let data = [...this.state.data];
-                          data.splice(index, 1)
-                          this.setState({data})
+                      let {friends} = this.props
+
+                      let find_friend = _.find(friends, (v, k)=>{
+                                          return k == item.uid
+                                        })
+
+                      let chat_id = randomKey()
+                      if(find_friend){
+                        chat_id = find_friend.chat_id
+                      }
+                      console.log(find_friend)
+                      
+                      this.setState({loading:true})
+                      this.props.actionInviteFriend(this.props.uid, item.uid, chat_id, (result) => {
+                        console.log(result)  
+                        this.setState({loading:false})
+
+                        // let data = [...this.state.data];
+                        // data.splice(index, 1)
+                        // this.setState({data})
                       })
+                      
                     }}>
                         <Text style={{padding:10, fontSize:18}}>Add friend</Text>
                     </MenuOption>
-                    {/* <MenuOption onSelect={() => {
-                        // this.props.params.navigation.navigate('ClasssSettingsPage', {'class_id': item.class_id})
-                    }}>
-                        <Text style={{padding:10, fontSize:18}}>Remove</Text>
-                    </MenuOption> */}
                 </MenuOptions>
             </Menu>
           </View>)
   }
 
   renderHeader = () => {
-    // return <SearchBar placeholder="Type Here..." lightTheme round />;
     return(
       <View style={{justifyContent:'center'}}>
           <View style={{flexDirection:'row', justifyContent:'center', backgroundColor:'rgba(186, 53, 100, 1.0)'}}>
@@ -248,7 +277,6 @@ class AddFriendsPage extends React.Component{
   render() {
       let {renderContent, data} = this.state;
 
-      console.log(data)
       return (
         <MenuContext>
         <View style={{flex:1, backgroundColor: 'white'}}>
@@ -278,8 +306,6 @@ class AddFriendsPage extends React.Component{
 }
 
 const mapStateToProps = (state, ownProps) => {
-  // console.log(state)
-
   if(!state._persist.rehydrated){
     return {}
   }
@@ -290,6 +316,9 @@ const mapStateToProps = (state, ownProps) => {
 
   return({
       uid:makeUidState(state, ownProps),
+      friends:makeFriendsState(state, ownProps),
+      people_you_may_khows:makePeopleYouMayKhowState(state, ownProps),
+      is_connected:makeIsConnectedState(state, ownProps),
   })
 }
 

@@ -155,7 +155,14 @@ class homeY extends React.Component {
               title="Friend request sent" 
               accessory="DisclosureIndicator"
               onPress={()=>{
-                this.props.navigation.navigate("friend_request_sent")
+                this.props.navigation.navigate("friend_request_sent", {title:'Friend Request'})
+              }} />
+            <Cell 
+              cellStyle="Basic" 
+              title="Friend online" 
+              accessory="DisclosureIndicator"
+              onPress={()=>{
+                this.props.navigation.navigate("SettingListFriendOnlinePage", {title:''})
               }} />
             <Cell 
               cellStyle="Basic" 
@@ -201,16 +208,15 @@ class homeY extends React.Component {
                 this.props.navigation.navigate("google_search_company")
               }} />
 
-
-            <Cell 
+            {/* <Cell 
               cellStyle="Basic" 
               title="Test check firebase : ON" 
               accessory="DisclosureIndicator"
               onPress={()=>{
                 // this.props.navigation.navigate("google_search_company")
-              }} />
+              }} /> */}
 
-            <Cell 
+            {/* <Cell 
               cellStyle="Basic" 
               title="Test check firebase : OFF" 
               accessory="DisclosureIndicator"
@@ -219,7 +225,7 @@ class homeY extends React.Component {
              
                 // firebase.database().ref('idna/user/1').off()
                 // console.log('off')
-             }} />
+             }} /> */}
             <Cell 
               cellStyle="Basic" 
               title="Logout" 

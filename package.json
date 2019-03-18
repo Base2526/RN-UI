@@ -15,7 +15,6 @@
     "react": "16.6.1",
     "react-native": "0.57.7",
     "react-native-action-button": "^2.8.5",
-    "react-native-base64": "0.0.2",
     "react-native-camera": "^1.4.3",
     "react-native-camera-roll-picker": "file:src/Library/react-native-camera-roll-picker",
     "react-native-comments": "^1.1.1",
