@@ -3,6 +3,8 @@ import {View,
         Text, 
         TouchableOpacity, 
         SafeAreaView,
+        CameraRoll,
+        Alert,
         StyleSheet} from 'react-native'
 import { connect } from 'react-redux';
 
@@ -17,6 +19,9 @@ import {
   MenuOptions,
   MenuOption,
 } from 'react-native-popup-menu';
+
+var RNFS = require('react-native-fs')
+import Share, {ShareSheet, Button} from 'react-native-share';
 
 import * as actions from '../../Actions'
 import MyIcon from '../../config/icon-font.js';
@@ -49,10 +54,17 @@ class MyQRcode extends React.Component{
                                 color={'#C7D8DD'} />
                         </MenuTrigger>
                         <MenuOptions optionsContainerStyle={{ }}>
-                            <MenuOption onSelect={() => {}}>
+                            <MenuOption onSelect={() => {
+                              const { params = {} } = navigation.state
+                              params.handleShare()
+                            }}>
                                 <Text style={{padding:10, fontSize:18}}>Share</Text>
                             </MenuOption>
-                            <MenuOption onSelect={() => {}}>
+                            <MenuOption onSelect={() => {
+
+                              const { params = {} } = navigation.state
+                              params.handleSaveToDevice()
+                            }}>
                                 <Text style={{padding:10, fontSize:18}}>Save to device</Text>
                             </MenuOption>
                             {/* <MenuOption onSelect={() => {}}>
@@ -119,11 +131,63 @@ class MyQRcode extends React.Component{
     }
 
     handleShare = () => {
+      let {profile} = this.state
 
+      let shareOptions = {
+        title: "Share QRcode",
+        message: "Share QRcode",
+        url: profile.url_my_qrcode,
+        subject: "Share QRcode" //  for email
+      }
+    
+      Share.open(shareOptions);
     }
 
     handleSaveToDevice = () =>{
+      console.log('handleSaveToDevice')
+      let {profile} = this.state
+      
+      let toFile = `${RNFS.DocumentDirectoryPath}/react-native.png`
+      RNFS.downloadFile({
+        fromUrl: profile.url_my_qrcode,
+        toFile,
+      }).promise.then((r) => {
+        // this.setState({ isDone: true })
 
+        var promise = CameraRoll.saveToCameraRoll(toFile);
+        promise.then((result) => {
+          console.log(result);
+          if(!result){
+            Alert.alert(
+              'Save to device error.',
+              '',
+              [
+                {text: 'Close', onPress: () => console.log('OK Pressed')},
+              ],
+              {cancelable: false},
+            );
+          }else{
+            // console.log('success save image')
+            Alert.alert(
+              'Save to device success.',
+              '',
+              [
+                {text: 'Close', onPress: () => console.log('OK Pressed')},
+              ],
+              {cancelable: false},
+            );
+          }
+        }).catch((error) => {
+          Alert.alert(
+            'Save to device error.',
+            '',
+            [
+              {text: 'Close', onPress: () => console.log('OK Pressed')},
+            ],
+            {cancelable: false},
+          );
+        });
+      });
     }
 
     handleCancel = () => {

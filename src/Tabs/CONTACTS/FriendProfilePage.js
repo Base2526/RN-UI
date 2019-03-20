@@ -9,6 +9,7 @@ import {FlatList,
         ScrollView,
         SafeAreaView,
         Dimensions,
+        StatusBar,
         Linking} from 'react-native'
 import firebase from 'react-native-firebase';
 import { Header } from 'react-navigation';
@@ -44,6 +45,11 @@ import {makeUidState,
         makeClasssState} from '../../Reselect'
 
 class FriendProfilePage extends React.Component{
+    static navigationOptions = { 
+        title: 'Friend profile', 
+        header: null ,
+    }
+    /*
     static navigationOptions = ({ navigation}) => {
         const { params = {} } = navigation.state
         let {is_favorite, friend_status} =params
@@ -101,6 +107,7 @@ class FriendProfilePage extends React.Component{
             ),
         }
     }
+    */
 
     constructor(){
         super();
@@ -729,10 +736,50 @@ class FriendProfilePage extends React.Component{
                             }/>
         }
 
-        
+        let button_arrow_back = <View style={{flexDirection:'row', justifyContent:'center', alignItems:'center'}}>
+                                    <MyIcon
+                                        // name={is_favorite ? 'star' : 'star-empty'}
+                                        name={'ios-arrow-left'}
+                                        size={25}
+                                        color={'#C7D8DD'} />
+                                        <Text style={{color:'#C7D8DD', paddingLeft:8, fontSize:18}}>Back</Text>
+                                </View>
+        if(Platform.OS != "ios"){
+            button_arrow_back = <MyIcon
+                                    // name={is_favorite ? 'star' : 'star-empty'}
+                                    name={'android-arrow-left'}
+                                    size={20}
+                                    color={'#C7D8DD'} />
+        }
 
+        /*
+        ...ifIphoneX({
+                            marginTop: 50
+                        }, {
+                            paddingTop: 0
+                        })
+        */
         return (
-            <View style={{flex:1 }}>
+            <View style={{flex:1, }}>
+            {/* <View
+                //To set the background color in IOS Status Bar also
+                style={{
+                    backgroundColor: '#00BCD4',
+                    height: Platform.OS === 'ios' ? 20 : StatusBar.currentHeight,
+                }}>
+                <StatusBar 
+                    barStyle = "dark-content" 
+                    // dark-content, light-content and default
+                    hidden = {false}
+                    //To hide statusBar
+                    backgroundColor = "#00BCD4"
+                    //Background color of statusBar
+                    translucent = {false}
+                    //allowing light, but not detailed shapes
+                    networkActivityIndicatorVisible = {true}
+                    />
+            </View> */}
+            <View style={{flex:1}}>
                 <Spinner
                     visible={this.state.loading}
                     textContent={'Wait...'}
@@ -755,13 +802,83 @@ class FriendProfilePage extends React.Component{
                     </ScrollView>
                 </Modal>
 
-                <ScrollView style={{ flex: 1,}}>
+                <View style={{height:Header.HEIGHT +  (isIphoneX() ? 25 : 0), //- (Platform.OS == "ios" ? 20 : 0), 
+                              backgroundColor: 'rgba(186, 53, 100, 1.0)',
+                            //   backgroundColor: 'rgba(52, 52, 52, 0.8)',
+                            //   paddingTop: Platform.OS == "ios" ? 20 : 0,
+                            // ...ifIphoneX({
+                            //     marginTop: 50
+                            // }, {
+                            //     marginTop: 0
+                            // }),
+                              justifyContent: Platform.OS == "ios" ?'flex-end':'center'}}>
+
+                    <View style={{flexDirection:'row', 
+                                position:'absolute', 
+                                // backgroundColor:'yellow',
+                                // right:0,
+                                // marginLeft:5
+                                }}>
+                        <TouchableOpacity
+                            style={{padding:10}}
+                            onPress={()=>{
+                                this.props.navigation.goBack(null)
+                            }}>
+                            {/* <MyIcon
+                                // name={is_favorite ? 'star' : 'star-empty'}
+                                name={'ios-arrow-left'}
+                                size={25}
+                                color={'#C7D8DD'} /> */}
+
+                            {button_arrow_back}
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{flexDirection:'row', 
+                                position:'absolute', 
+                                // backgroundColor:'yellow',
+                                right:0,
+                                // marginRight:5
+                                }}>
+                        <TouchableOpacity 
+                            style={{padding:10}}
+                            onPress={()=>{
+                                // const { params = {} } = navigation.state
+                                // if(Object.keys(params).length !== 0){
+                                //     params.handleShare()
+                                // }
+                            }}>
+                            {/* <MyIcon
+                                name={'share'}
+                                size={25}
+                                color={'#C7D8DD'} /> */}
+
+                            <MyIcon
+                                // name={is_favorite ? 'star' : 'star-empty'}
+                                name={'star'}
+                                size={25}
+                                color={'#C7D8DD'} />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{padding:10}}
+                            onPress={()=>{
+                                // const { params = {} } = navigation.state
+                                // if(Object.keys(params).length !== 0){
+                                //     params.handleShare()
+                                // }
+                            }}>
+                            <MyIcon
+                                name={'share'}
+                                size={25}
+                                color={'#C7D8DD'} />
+                        </TouchableOpacity>
+                    </View>    
+                </View>
+                <ScrollView style={{ }}>
                 <View style={{flex:1, backgroundColor:'gray', ...ifIphoneX({
                                                     marginBottom: 25
                                                 }, {
                                                     marginBottom: 0
                                                 })}}>
-                    <View style={{flex:1, paddingTop: this.getHeaderInset(), flexDirection:'row'}}>
+                    <View style={{flex:1, /*paddingTop: this.getHeaderInset(),*/ flexDirection:'row'}}>
                         <FastImage
                             style={StyleSheet.absoluteFill}
                             source={{
@@ -896,7 +1013,7 @@ class FriendProfilePage extends React.Component{
                 </View>
                 </ScrollView> 
             </View>
-            // </SafeAreaView>
+            </View>
        );
     }
 }

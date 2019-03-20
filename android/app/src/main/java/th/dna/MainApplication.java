@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.CallbackManager;
 import com.facebook.react.ReactApplication;
+import com.rnfs.RNFSPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.google.firebase.database.FirebaseDatabase;
 import com.reactlibrary.messagecompose.RNMessageComposePackage;
@@ -65,6 +66,7 @@ public class MainApplication extends Application implements ShareApplication, Re
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNFSPackage(),
             new SplashScreenReactPackage(),
             new RNMessageComposePackage(),
             new QRScanReaderPackage(),

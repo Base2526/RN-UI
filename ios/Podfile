@@ -16,7 +16,16 @@ target 'RN_UI' do
   pod 'Crashlytics'
   
   # Add these to your Podfile
-  pod 'React', :path => '../node_modules/react-native'
+    pod 'React', :path => '../node_modules/react-native'
+#pod 'React', :path => '../node_modules/react-native', :subspecs => [
+##// other subspecs you may already have here
+#'RCTImage',
+#]
+#  pod 'React', :path => '../node_modules/react-native', :subspecs => [
+##        'Core',
+##        'CxxBridge', # Include this for RN >= 0.47
+#        'RCTImage' # <- Add this line
+#  ]
   pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga'
 
   target 'RN_UI-tvOSTests' do
@@ -30,15 +39,17 @@ target 'RN_UI' do
 
 #    pod 'react-native-fetch-blob', :path => '../node_modules/react-native-fetch-blob'
 
-    pod 'RNShare', :path => '../node_modules/react-native-share'
+#    pod 'RNShare', :path => '../node_modules/react-native-share'
 
 #    pod 'RNSVG', :path => '../node_modules/react-native-svg'
 
-    pod 'react-native-mail', :path => '../node_modules/react-native-mail'
+#    pod 'react-native-mail', :path => '../node_modules/react-native-mail'
 
-    pod 'ReactNativePermissions', :path => '../node_modules/react-native-permissions'
+#    pod 'ReactNativePermissions', :path => '../node_modules/react-native-permissions'
 
-    pod 'react-native-splash-screen', :path => '../node_modules/react-native-splash-screen'
+#    pod 'react-native-splash-screen', :path => '../node_modules/react-native-splash-screen'
+
+#    pod 'RNFS', :path => '../node_modules/react-native-fs'
 
   end
 

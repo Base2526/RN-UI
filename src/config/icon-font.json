@@ -339,6 +339,18 @@
       "css": "reload",
       "code": 59421,
       "src": "fontawesome"
+    },
+    {
+      "uid": "b714be5a812a474811604f700dfc87ce",
+      "css": "ios-arrow-left",
+      "code": 61447,
+      "src": "mfglabs"
+    },
+    {
+      "uid": "c21d309f797d3644dc8d28c4617738ce",
+      "css": "android-arrow-left",
+      "code": 59422,
+      "src": "mfglabs"
     }
   ]
 }
