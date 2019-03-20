@@ -9,7 +9,7 @@ import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.google.firebase.database.FirebaseDatabase;
 import com.reactlibrary.messagecompose.RNMessageComposePackage;
 import com.lewin.qrcode.QRScanReaderPackage;
-import com.reactlibrary.messagecompose.RNMessageComposePackage;
+//import com.reactlibrary.messagecompose.RNMessageComposePackage;
 import com.chirag.RNMail.RNMail;
 //import com.horcrux.svg.SvgPackage;
 import cl.json.RNSharePackage;

@@ -9,6 +9,8 @@ import MessageCompose from 'react-native-message-compose';
 import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
+import {makeUidState} from '../../Reselect'
+
 class InviteFriendByTextmessagePage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
@@ -18,7 +20,7 @@ class InviteFriendByTextmessagePage extends React.Component{
             backgroundColor: 'rgba(186, 53, 100, 1.0)',
         },
     })
-
+    
     constructor(props){
         super(props)
         this.state ={
@@ -34,6 +36,7 @@ class InviteFriendByTextmessagePage extends React.Component{
         }else{
             this.getContacts()
         }
+
     }
 
     getContacts(){
@@ -101,6 +104,26 @@ class InviteFriendByTextmessagePage extends React.Component{
     }
 
     async sendMessage(phoneNumber) {
+      try {
+        const res = await MessageCompose.send({
+          recipients: [phoneNumber],
+          subject: 'Join me on DNA',
+          body: 'Join me on DNA',
+          attachments: [{
+            filename: 'mytext',
+            ext: '.txt',
+            mimeType: 'text/plain',
+            text: 'Join me on DNA',
+          }],
+        });
+        console.log(res);
+      } catch (e) {
+        console.log('error', e);
+      }
+    }
+
+    
+    async sendMessage2(phoneNumber) {
         try {
           await MessageCompose.send({
             recipients: [phoneNumber],
@@ -114,9 +137,17 @@ class InviteFriendByTextmessagePage extends React.Component{
             //   text: 'Hello my friend', // Use this if the data is in UTF8 text.
             // //   data: '...BASE64_ENCODED_STRING...', // Or, use this if the data is not in plain text.
             // }],
+            attachments: [{
+              filename: 'mytext',
+              ext: '.txt',
+              mimeType: 'text/plain',
+              text: 'Hello my friend',
+            }],
           });
         } catch (e) {
           // e.code may be 'cannotSendText' || 'cancelled' || 'failed'
+
+          console.log(e)
         }
       }
 
@@ -165,12 +196,21 @@ class InviteFriendByTextmessagePage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
-    console.log(state)
-    return({
-        uid:getUid(state),
-        profiles: state.auth.users.profiles
-    })
+const mapStateToProps = (state, ownProps) => {
+    
+  // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
+  //_persist.rehydrated parameter is initially set to false
+  if(!state._persist.rehydrated){
+    return {}
+  }
+
+  if(!state.auth.isLogin){
+    return;
+  }
+
+  return({
+    uid: makeUidState(state, ownProps),
+  })
 }
   
 export default connect(mapStateToProps, actions)(InviteFriendByTextmessagePage);

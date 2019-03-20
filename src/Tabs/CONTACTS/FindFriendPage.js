@@ -22,7 +22,7 @@ import {
 
 import MyIcon from '../../config/icon-font.js';
 import * as actions from '../../Actions'
-import {randomKey, getHeaderInset} from '../../Utils/Helpers'
+import {randomKey, getHeaderInset, checkInternetDialog} from '../../Utils/Helpers'
 import Constant from '../../Utils/Constant'
 
 import {makeUidState, 
@@ -67,7 +67,10 @@ class FindFriendPage extends React.Component{
 
   }
 
-  handleSearch = () => {
+  search = () => {
+
+    let {is_connected} = this.props
+
     let text = this.state.text.trim()
     // console.log(text)
 
@@ -81,6 +84,12 @@ class FindFriendPage extends React.Component{
 
     this.setState({friends:[]})
 
+    if(!is_connected){
+      checkInternetDialog()
+      return 
+    }
+
+
     this.setState({loading:true})
     this.props.actionFindMyID(this.props.uid, 'text', text).then((result) => {
       // console.log(result)  
@@ -92,8 +101,6 @@ class FindFriendPage extends React.Component{
                 })
 
         this.setState({friends:__, isSearch:true})
-
-        console.log(__)
       }
     })
   }
@@ -126,7 +133,10 @@ class FindFriendPage extends React.Component{
     );
   }
 
-  addFriend = (friend_id) =>{
+  addFriend = (item, index) =>{
+    let {uid} = this.props
+    let {friends} = this.state
+    /*
     let {uid, friends} = this.props
     let find_friend = _.find(friends, (v, k)=>{
                         return k == friend_id
@@ -136,18 +146,55 @@ class FindFriendPage extends React.Component{
     if(find_friend){
         chat_id = find_friend.chat_id
     }
+    */
 
+    //chat_id
+
+    let chat_id = randomKey()
+    if(item.chat_id){
+        chat_id = item.chat_id
+    }
+
+  
+    // let new_friends = [...friends];
+    // new_friends[index] = {...new_friends[index], status: Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND}
+    // this.setState({available: newArray});
+
+    // console.log(item, chat_id, friends, new_friends)
+
+    // let {renderContent, friends, isSearch} = this.state;
+
+  
     this.setState({loading:true})
-    this.props.actionInviteFriend(uid, friend_id, chat_id, (result) => {
+    this.props.actionInviteFriend(uid, item.uid, chat_id, (result) => {
         this.setState({loading:false})
+
+        // status:Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND
+
+        let new_friends = [...friends];
+        new_friends[index] = {...new_friends[index], status: Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND}
+    
+        this.setState({friends: new_friends});
     })
   }
+
+  /*
+  FRIEND_STATUS_FRIEND: '10',
+  FRIEND_STATUS_FRIEND_CANCEL: '13',
+  FRIEND_STATUS_FRIEND_CANCEL_FROM_FRIEND: '40', 
+  FRIEND_STATUS_FRIEND_REQUEST: '11',
+  FRIEND_STATUS_WAIT_FOR_A_FRIEND: '12',
+  FRIEND_STATUS_FRIEND_REMOVE: '41',
+  FRIEND_STATUS_FRIEND_99:'45',
+  */
 
   showMenu = (item, index)=>{
     console.log(item)
 
+    let {friends} = this.state
+
     let menuOptions = <View />
-    switch(item.friend_status){
+    switch(item.status){
       case Constant.FRIEND_STATUS_FRIEND:{
         menuOptions = <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
                         <MenuOption onSelect={() => {
@@ -176,6 +223,10 @@ class FindFriendPage extends React.Component{
                             this.props.actionUpdateStatusFriend(this.props.uid, item.uid, Constant.FRIEND_STATUS_FRIEND_CANCEL, (result)=>{
                                 console.log(result)
                                 this.setState({loading:false})
+
+                                let new_friends = [...friends];
+                                new_friends[index] = {...new_friends[index], status: Constant.FRIEND_STATUS_FRIEND_CANCEL}
+                                this.setState({friends: new_friends});
                             })
                           }}>
                           <Text style={{padding:10, fontSize:18}}>Cancel request</Text>
@@ -196,6 +247,12 @@ class FindFriendPage extends React.Component{
                             this.props.actionUpdateStatusFriend(this.props.uid, item.uid, Constant.FRIEND_STATUS_FRIEND_CANCEL, (result)=>{
                                 console.log(result)
                                 this.setState({loading:false})
+
+
+
+                                let new_friends = [...friends];
+                                new_friends[index] = {...new_friends[index], status: Constant.FRIEND_STATUS_FRIEND_CANCEL}
+                                this.setState({friends: new_friends});
                             })
                           }}>
                           <Text style={{padding:10, fontSize:18}}>Cancel request</Text>
@@ -204,8 +261,10 @@ class FindFriendPage extends React.Component{
         break
       }
 
+      // FRIEND_STATUS_FRIEND_CANCEL_FROM_FRIEND
       case 0:
-      case Constant.FRIEND_STATUS_FRIEND_CANCEL:{
+      case Constant.FRIEND_STATUS_FRIEND_CANCEL:
+      case Constant.FRIEND_STATUS_FRIEND_CANCEL_FROM_FRIEND: {
         menuOptions = <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
                         <MenuOption onSelect={() => {
                           this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
@@ -215,12 +274,84 @@ class FindFriendPage extends React.Component{
                         <MenuOption onSelect={() => {
                             // this.props.navigation.navigate("ChatPage")
 
-                            this.addFriend(item.uid)
+                            this.addFriend(item, index)
                           }}>
                           <Text style={{padding:10, fontSize:18}}>Add friend</Text>
                         </MenuOption>
                       </MenuOptions>
         break
+      }
+
+      case Constant.FRIEND_STATUS_FRIEND_REMOVE:{
+        if(item.is_block){
+          menuOptions = <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
+                          <MenuOption onSelect={() => {
+                              this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
+                            }}>
+                            <Text style={{padding:10, fontSize:18}}>View profile</Text>
+                          </MenuOption>
+                          <MenuOption onSelect={() => {
+                            // this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
+                            
+                            this.setState({loading:true})
+                            this.props.actionFriendUnremove_Unblock(this.props.uid, item.uid, (result)=>{
+                                console.log(result)
+                                this.setState({loading:false})
+
+                                // status:Constant.FRIEND_STATUS_FRIEND
+
+                                let new_friends = [...friends];
+                                new_friends[index] = {...new_friends[index], status: Constant.FRIEND_STATUS_FRIEND}
+                                this.setState({friends: new_friends});
+                            })
+                          }}>
+                              <Text style={{padding:10, fontSize:18}}>Unblock</Text>
+                          </MenuOption>
+                          
+                        </MenuOptions>
+        }else{
+          menuOptions = <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
+                          <MenuOption onSelect={() => {
+                              this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
+                            }}>
+                            <Text style={{padding:10, fontSize:18}}>View profile</Text>
+                          </MenuOption>
+                          <MenuOption onSelect={() => {
+                            // this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
+                            
+                            // this.setState({loading:true})
+                            // this.props.actionFriendUnremove_Unblock(this.props.uid, item.uid, (result)=>{
+                            //     console.log(result)
+                            //     this.setState({loading:false})
+
+                            //     // status:Constant.FRIEND_STATUS_FRIEND
+
+                            //     let new_friends = [...friends];
+                            //     new_friends[index] = {...new_friends[index], status: Constant.FRIEND_STATUS_FRIEND}
+                            //     this.setState({friends: new_friends});
+                            // })
+
+                            this.setState({loading:true})
+                            this.props.actionFriendUnremove_Chat(this.props.uid, item.uid, (result)=>{
+                                console.log(result)
+                                this.setState({loading:false})
+
+
+                                let new_friends = [...friends];
+                                new_friends[index] = {...new_friends[index], status: Constant.FRIEND_STATUS_FRIEND}
+                                this.setState({friends: new_friends});
+
+                                this.props.navigation.navigate("ChatPage")
+                            })
+                          }}>
+                              <Text style={{padding:10, fontSize:18}}>Chat</Text>
+                          </MenuOption>
+                          
+                        </MenuOptions>
+        }
+
+        
+              break
       }
     }
 
@@ -244,6 +375,30 @@ class FindFriendPage extends React.Component{
 
   renderItem = ({item, index}) => {
     console.log(item)
+    let {uid} = this.props
+
+    /*
+    <Text style={{fontSize: 14,
+                        paddingLeft: 5,
+                        fontStyle: 'italic',
+                        color: 'gray'}}>{item.id}(id) </Text>
+    */
+
+    let status = <View />
+
+    switch(item.status){
+      case Constant.FRIEND_STATUS_FRIEND:{
+        status = <Text style={{fontSize: 14,
+                  paddingLeft: 5,
+                  fontStyle: 'italic',
+                  color: 'gray'}}>Friend</Text>
+        break
+      }
+      case Constant.FRIEND_STATUS_FRIEND_CANCEL_FROM_FRIEND:{
+        break
+      }
+    }
+
     return(
       <View
         style={{
@@ -273,13 +428,10 @@ class FindFriendPage extends React.Component{
         <View>
           <Text style={{fontSize: 18,
                         paddingLeft: 5,
-                        fontWeight: 'bold'}}>{item.name} {this.props.uid == item.uid ? '(You)' : ''}</Text>
-          <Text style={{fontSize: 14,
-                        paddingLeft: 5,
-                        fontStyle: 'italic',
-                        color: 'gray'}}>{item.id}(id) </Text>
+                        fontWeight: 'bold'}}>{item.name} {uid == item.uid ? '(You)' : ''}</Text>
+          {status}
         </View>
-        {this.props.uid == item.uid ? <View /> : this.showMenu(item, index)}
+        {uid == item.uid ? <View /> : this.showMenu(item, index)}
       </View>) 
   }
   
@@ -314,8 +466,7 @@ class FindFriendPage extends React.Component{
                 onChangeText={(text) => this.setState({text})}
                 value={this.state.text}
                 clearButtonMode='while-editing'
-                placeholder= "Enter your friend's ID"
-            />
+                placeholder= "Enter your friend's ID"/>
             <TouchableOpacity 
                 style={{paddingLeft:10, 
                         paddingRight:10,
@@ -323,7 +474,7 @@ class FindFriendPage extends React.Component{
                         backgroundColor:'#CE3B6E',
                         justifyContent:'center'}}
                 onPress={()=>{
-                    this.handleSearch()
+                    this.search()
                 }}>
                 <Text style={{color:'#C7D8DD', fontWeight:'bold'}}>Search</Text>
             </TouchableOpacity>
@@ -357,13 +508,9 @@ const mapStateToProps = (state, ownProps) => {
   }
 
   return({
-      // loading:state.auth.loading,
-      // isLogin:state.auth.isLogin
-      // uid:getUid(state)
-
-      uid: makeUidState(state, ownProps),
-      friends: makeFriendsState(state, ownProps),
-      is_connected: makeIsConnectedState(state, ownProps),
+    uid: makeUidState(state, ownProps),
+    friends: makeFriendsState(state, ownProps),
+    is_connected: makeIsConnectedState(state, ownProps),
   })
 }
 
