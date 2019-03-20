@@ -14,7 +14,7 @@ import {
     MenuOptions,
     MenuOption,
   } from 'react-native-popup-menu';
-
+import moment from 'moment';
 import * as actions from '../../Actions'
 import {getHeaderInset, checkInternetDialog} from '../../Utils/Helpers'
 import {makeUidState,  
@@ -64,7 +64,7 @@ class SettingListForceLogout extends React.Component{
 
         let data = []
         _.map(presence, (v, k)=>{
-            if(v.udid != DeviceInfo.getUniqueID()){
+            if(k != DeviceInfo.getUniqueID()){
                 data.push({...v, presence_key:k})
             }
         })
@@ -114,6 +114,7 @@ class SettingListForceLogout extends React.Component{
                             //     console.log(result)
                             //     // this.setState({loading:false})
                             // })
+
                         }}>
                             <Text style={{padding:10, fontSize:18}}>Force logout</Text>
                         </MenuOption>
@@ -123,13 +124,23 @@ class SettingListForceLogout extends React.Component{
     }
 
     renderItem({ item, index }) {
+
+        let backgroundColor = '#C7D8DD'
+        if(item.status == 'online'){
+            backgroundColor = '#00ff80'
+        }
+
+        var dateTime = new Date(item.updated_at)
+        let last_access = <Text>Last access: {moment(dateTime).format('MMMM Do YYYY, h:mm:ss a')}</Text>
+
+        console.log(item)
         return(<View style={{paddingLeft:10, 
                             paddingTop:15, 
                             paddingBottom:15,
                             flexDirection:'row'}}>
                     <View style={{width: 16, 
                         height: 16, 
-                        backgroundColor:'#00ff80', 
+                        backgroundColor, 
                         borderWidth: 2,
                         borderColor: 'white',
                         borderRadius: 8,
@@ -137,9 +148,9 @@ class SettingListForceLogout extends React.Component{
                         marginRight:10}} />
                     <View>
                         <Text>{item.model_number} ({item.platform})</Text>
-                        <Text>{item.status}</Text>
-                        {this.showMenu(item)}
+                        {last_access}
                     </View>
+                    {this.showMenu(item)}
                 </View>)
     }
     

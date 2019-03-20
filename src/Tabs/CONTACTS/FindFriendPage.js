@@ -22,10 +22,11 @@ import {
 
 import MyIcon from '../../config/icon-font.js';
 import * as actions from '../../Actions'
-import {getUid, getHeaderInset} from '../../Utils/Helpers'
+import {randomKey, getHeaderInset} from '../../Utils/Helpers'
 import Constant from '../../Utils/Constant'
 
 import {makeUidState, 
+        makeFriendsState,
         makeIsConnectedState} from '../../Reselect'
 
 class FindFriendPage extends React.Component{
@@ -91,6 +92,8 @@ class FindFriendPage extends React.Component{
                 })
 
         this.setState({friends:__, isSearch:true})
+
+        console.log(__)
       }
     })
   }
@@ -123,7 +126,24 @@ class FindFriendPage extends React.Component{
     );
   }
 
-  showMenu = (item)=>{
+  addFriend = (friend_id) =>{
+    let {uid, friends} = this.props
+    let find_friend = _.find(friends, (v, k)=>{
+                        return k == friend_id
+                    })
+
+    let chat_id = randomKey()
+    if(find_friend){
+        chat_id = find_friend.chat_id
+    }
+
+    this.setState({loading:true})
+    this.props.actionInviteFriend(uid, friend_id, chat_id, (result) => {
+        this.setState({loading:false})
+    })
+  }
+
+  showMenu = (item, index)=>{
     console.log(item)
 
     let menuOptions = <View />
@@ -152,7 +172,11 @@ class FindFriendPage extends React.Component{
                             <Text style={{padding:10, fontSize:18}}>View profile</Text>
                         </MenuOption>
                         <MenuOption onSelect={() => {
-                            // this.props.navigation.navigate("ChatPage")
+                            this.setState({loading:true})
+                            this.props.actionUpdateStatusFriend(this.props.uid, item.uid, Constant.FRIEND_STATUS_FRIEND_CANCEL, (result)=>{
+                                console.log(result)
+                                this.setState({loading:false})
+                            })
                           }}>
                           <Text style={{padding:10, fontSize:18}}>Cancel request</Text>
                         </MenuOption>
@@ -168,7 +192,11 @@ class FindFriendPage extends React.Component{
                             <Text style={{padding:10, fontSize:18}}>View profile</Text>
                         </MenuOption>
                         <MenuOption onSelect={() => {
-                            // this.props.navigation.navigate("ChatPage")
+                            this.setState({loading:true})
+                            this.props.actionUpdateStatusFriend(this.props.uid, item.uid, Constant.FRIEND_STATUS_FRIEND_CANCEL, (result)=>{
+                                console.log(result)
+                                this.setState({loading:false})
+                            })
                           }}>
                           <Text style={{padding:10, fontSize:18}}>Cancel request</Text>
                         </MenuOption>
@@ -176,7 +204,8 @@ class FindFriendPage extends React.Component{
         break
       }
 
-      case 0:{
+      case 0:
+      case Constant.FRIEND_STATUS_FRIEND_CANCEL:{
         menuOptions = <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
                         <MenuOption onSelect={() => {
                           this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
@@ -185,6 +214,8 @@ class FindFriendPage extends React.Component{
                         </MenuOption>
                         <MenuOption onSelect={() => {
                             // this.props.navigation.navigate("ChatPage")
+
+                            this.addFriend(item.uid)
                           }}>
                           <Text style={{padding:10, fontSize:18}}>Add friend</Text>
                         </MenuOption>
@@ -227,8 +258,9 @@ class FindFriendPage extends React.Component{
                   style={{width: 40, 
                           height: 40, 
                           borderRadius: 10, 
-                          borderWidth:.5, 
-                          borderColor:'gray'}}
+                          // borderWidth:.5, 
+                          // borderColor:'gray'
+                        }}
                   source={{
                     uri: item.image_url,
                     headers:{ Authorization: 'someAuthToken' },
@@ -247,7 +279,7 @@ class FindFriendPage extends React.Component{
                         fontStyle: 'italic',
                         color: 'gray'}}>{item.id}(id) </Text>
         </View>
-        {this.props.uid == item.uid ? <View /> : this.showMenu(item)}
+        {this.props.uid == item.uid ? <View /> : this.showMenu(item, index)}
       </View>) 
   }
   
@@ -330,6 +362,7 @@ const mapStateToProps = (state, ownProps) => {
       // uid:getUid(state)
 
       uid: makeUidState(state, ownProps),
+      friends: makeFriendsState(state, ownProps),
       is_connected: makeIsConnectedState(state, ownProps),
   })
 }

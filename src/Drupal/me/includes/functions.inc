@@ -1792,6 +1792,37 @@ function group_invite_new_members(){
 	$result['execution_time']  = $execution_time;
 	return  $result;
 }
+
+function createQRcode($uid, $encrypt){
+
+	// $account = user_load($uid);
+
+	// Gen QRCode
+	//set it to writable location, a place for temp generated PNG files
+	$PNG_TEMP_DIR = PATH_FOLDER_QRCODE;//config_pages_get(CONFIG_PAGES_TYPE, 'field_path_folder_qrcode'); 
+
+	//Create the directory if it does not already exist, otherwise check the permissions
+	file_prepare_directory($PNG_TEMP_DIR, FILE_CREATE_DIRECTORY);
+	
+	// $encrypt     = dec_enc('encrypt', 'bundle*' . BUNDLE_IDENTIFIER .'|type*friend|friendId*'. $account->uid);//dec_enc('encrypt', $group_id);
+	$errorCorrectionLevel = "M";
+	$matrixPointSize = 8;
+
+	$filename = $PNG_TEMP_DIR.'/'.md5($encrypt.'|'.$errorCorrectionLevel.'|'.$matrixPointSize).'.png';
+	QRcode::png(URL_SERVER() . "/qe?" . $encrypt, $filename, $errorCorrectionLevel, $matrixPointSize, 2);  
+
+	$currentDate = date("Ymd");
+	$name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
+	$image = file_get_contents($filename); 
+	//Saves a file to the specified destination and creates a database entry.
+	$url_my_qrcode = klovers_file_save_data($uid, $image, 'public://qrcode/' . $name, FILE_EXISTS_RENAME);
+	
+	// Delete file ที่  QRCode  สร้างขึ้นมาเพราะว่าเราเก็บเข้าระบบแล้ว
+	unlink($filename);
+	// Gen QRCode
+
+	return (array)$url_my_qrcode;
+}
   
 /*
 	สร้าง QRCode &  profile ที่ firebase ให้แต่ละ user โดยแต่ละ application (heart, dna)

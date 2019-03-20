@@ -126,7 +126,7 @@ class homeY extends React.Component {
     // }
 
     return (
-      <ScrollView contentContainerStyle={styles.stage}>
+      <ScrollView>
       <Spinner
             visible={loading}
             textContent={'Wait...'}
@@ -139,6 +139,7 @@ class homeY extends React.Component {
               cellStyle="Basic" 
               title="Friend hide" 
               accessory="DisclosureIndicator"
+              hideSeparator={true}
               onPress={()=>{
                 this.props.navigation.navigate("hide")
               }} />
@@ -146,6 +147,7 @@ class homeY extends React.Component {
               cellStyle="Basic" 
               title="Friend block" 
               accessory="DisclosureIndicator"
+              hideSeparator={true}
               onPress={()=>{
                 this.props.navigation.navigate("block")
               }} />
@@ -154,6 +156,7 @@ class homeY extends React.Component {
               cellStyle="Basic" 
               title="Friend request sent" 
               accessory="DisclosureIndicator"
+              hideSeparator={true}
               onPress={()=>{
                 this.props.navigation.navigate("friend_request_sent", {title:'Friend Request'})
               }} />
@@ -161,6 +164,7 @@ class homeY extends React.Component {
               cellStyle="Basic" 
               title="Friend online" 
               accessory="DisclosureIndicator"
+              hideSeparator={true}
               onPress={()=>{
                 this.props.navigation.navigate("SettingListFriendOnlinePage", {title:''})
               }} />
@@ -168,6 +172,7 @@ class homeY extends React.Component {
               cellStyle="Basic" 
               title="Manage class" 
               accessory="DisclosureIndicator"
+              hideSeparator={true}
               onPress={()=>{
                 this.props.navigation.navigate("manage_class")
               }} />
@@ -175,6 +180,7 @@ class homeY extends React.Component {
               cellStyle="Basic" 
               title="Manage group" 
               accessory="DisclosureIndicator"
+              hideSeparator={true}
               onPress={()=>{
                 this.props.navigation.navigate("manage_group")
               }} />
@@ -182,6 +188,7 @@ class homeY extends React.Component {
               cellStyle="Basic" 
               title="Manage my application" 
               accessory="DisclosureIndicator"
+              hideSeparator={true}
               onPress={()=>{
                 this.props.navigation.navigate("manage_my_application")
               }} />
@@ -189,6 +196,7 @@ class homeY extends React.Component {
               cellStyle="Basic" 
               title="Force Logout" 
               accessory="DisclosureIndicator"
+              hideSeparator={true}
               onPress={()=>{
                 this.props.navigation.navigate("manage_force_logout")
               }} />
@@ -196,6 +204,7 @@ class homeY extends React.Component {
               cellStyle="Basic" 
               title="Customize tab menus" 
               accessory="DisclosureIndicator"
+              hideSeparator={true}
               onPress={()=>{
                 this.props.navigation.navigate("manage_customize_tab_menus")
               }} />
@@ -204,28 +213,11 @@ class homeY extends React.Component {
               cellStyle="Basic" 
               title="Google Search Company" 
               accessory="DisclosureIndicator"
+              hideSeparator={true}
               onPress={()=>{
                 this.props.navigation.navigate("google_search_company")
               }} />
 
-            {/* <Cell 
-              cellStyle="Basic" 
-              title="Test check firebase : ON" 
-              accessory="DisclosureIndicator"
-              onPress={()=>{
-                // this.props.navigation.navigate("google_search_company")
-              }} /> */}
-
-            {/* <Cell 
-              cellStyle="Basic" 
-              title="Test check firebase : OFF" 
-              accessory="DisclosureIndicator"
-              onPress={()=>{
-                // this.props.navigation.navigate("google_search_company")
-             
-                // firebase.database().ref('idna/user/1').off()
-                // console.log('off')
-             }} /> */}
             <Cell 
               cellStyle="Basic" 
               title="Logout" 
@@ -241,50 +233,7 @@ class homeY extends React.Component {
                     style: 'cancel'},
                     {text: 'OK', 
                     onPress: () => {
-
-                      this.onLogout()
-                      // console.log(this.state)
-                      /*
-                      loadAsyncStorage(Constant.USER_LOGIN).then((data) => {      
-                            if(data.status){
-                              let value = JSON.parse(data.value)
-                              console.log(value.provider)
-                              console.log("then #1")
-                              if(value.provider == Constant.PROVIDERS.USER){
-
-                              }else if(value.provider == Constant.PROVIDERS.TWITTER){
-                                console.log("Logout Twitter")
-                                RNTwitterSignIn.init(Constant.TWITTER_COMSUMER_KEY, Constant.TWITTER_CONSUMER_SECRET)
-                                RNTwitterSignIn.logOut()
-                              }else if(value.provider == Constant.PROVIDERS.GOOGLE){
-
-                              }else if(value.provider == Constant.PROVIDERS.FACEBOOK){
-                                console.log("Logout Facebook")
-                                LoginManager.logOut()
-                              }
-                            }
-                          }).then(()=>{
-
-                            // group_deleteAll(v=>{
-                            //   console.log(v)
-                            // })
-                            // groupDetail_deleteAll(v=>{
-                            //   console.log(v)
-                            // })
-
-                            console.log("then #2")
-                            removeAsyncStorageByKey(Constant.USER_LOGIN).then((data) => {      
-                              if(data.status){
-                                console.log("Go to Auth")
-                                this.props.navigation.navigate("Auth")
-                              }else{
-                                
-                              }
-                            })
-                          }).catch((error)=>{
-                        })
-
-                        */
+                        this.onLogout()
                       }, 
                     },
                   ],

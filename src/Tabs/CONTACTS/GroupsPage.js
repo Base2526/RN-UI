@@ -440,7 +440,7 @@ class GroupsPage extends React.Component{
       if(favorites.member.length == 0 && invited.member.length == 0 && groups.member.length == 0){
         return  <View style={{flex: 1}}>
                   <Text>Empty Group</Text>
-                  {this.actionAddGroup()}
+                  {/* {this.actionAddGroup()} */}
                 </View>
       }
 

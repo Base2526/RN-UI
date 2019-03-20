@@ -2,11 +2,13 @@ var _ = require('lodash');
 
 import {ADDED_PRESENCE,
         CHANGED_PRESENCE,
-        REMOVED_PRESENCE}  from '../Actions/types'
+        REMOVED_PRESENCE,
+        USER_LOGOUT}  from '../Actions/types'
 
 const INITIAL_STATE = {user_presences:null}
 
 import Constant from '../Utils/Constant'
+import {isEmpty} from '../Utils/Helpers'
 export default (state= INITIAL_STATE, action)=>{
     // console.log(action)
 
@@ -27,12 +29,19 @@ export default (state= INITIAL_STATE, action)=>{
             state = {...state, 
                     user_presences: action.payload.presence.user_presences,}
 
-            console.log(state, action)
+            // console.log(state, action)
             return state
+        }
+
+        case USER_LOGOUT: {
+            console.log('USER_LOGOUT')
+            return INITIAL_STATE
         }
     
         case ADDED_PRESENCE:{
-            if(!state.user_presences){
+            if( isEmpty(action.userId) || 
+                isEmpty(action.presenceKey) || 
+                isEmpty(action.presenceData)){
                 return state
             }
 
@@ -43,12 +52,16 @@ export default (state= INITIAL_STATE, action)=>{
             let presenceKey = action.presenceKey;
             let presenceData = action.presenceData;
 
+            // console.log('added_presence', action)
             let user_presence = _.find(user_presences, (v, k)=>{
                                 return k == userId
                             })
 
+            console.log('user_presence', action, user_presence)
             if(!user_presence){
                 user_presences = {...user_presences, [userId]:{[presenceKey]:presenceData}}
+                
+                console.log('user_presence', action, user_presence)
                 return {...state, user_presences}
             }else{
                 let presense =  _.find(user_presence, (v, k)=>{
@@ -64,8 +77,20 @@ export default (state= INITIAL_STATE, action)=>{
                                         [userId]:user_presence
                                     }
                                 }
-                    // console.log(newState)
+                    console.log('user_presence', state, new_state)
                     return new_state
+                }else{
+                    if(!_.isEqual(presense, presenceData)){
+                        user_presence = {...user_presence, ...{[presenceKey]:presenceData}}
+                        let new_state = {...state, 
+                                        user_presences:{
+                                            ...state.user_presences,
+                                            [userId]:user_presence
+                                        }
+                                    }
+                        console.log('user_presence', new_state, user_presence)
+                        return new_state
+                    }
                 }
             }
             return state

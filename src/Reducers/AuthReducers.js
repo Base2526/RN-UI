@@ -148,6 +148,7 @@ export default (state= INITIAL_STATE, action)=>{
         }
 
         case USER_LOGOUT: {
+            console.log('USER_LOGOUT')
             return INITIAL_STATE
         }
 
@@ -1695,7 +1696,9 @@ export default (state= INITIAL_STATE, action)=>{
                         })
 
             if(friend){
-                let new_friends  = _.omit(friends, action.friend_id)
+                // let new_friends  = _.omit(friends, action.friend_id)
+                let new_friend  ={...friend, 'status':Constant.FRIEND_STATUS_FRIEND_REMOVE}
+                let new_friends = {...friends, [action.friend_id]:new_friend}
                 let new_state = {...state,
                                     user: {
                                         ...state.user,

@@ -203,7 +203,7 @@ class SettingListBlock extends React.Component{
                       data={data}
                       showsVerticalScrollIndicator={false}
                       renderItem={this.renderItem.bind(this)}
-                      keyExtractor={item => item.item_id}
+                      keyExtractor = { (item, index) => index.toString() } 
                   />
                 </View>
                 </MenuContext>)

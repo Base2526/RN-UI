@@ -1618,6 +1618,7 @@ function me_services_resources()
         'access arguments append' => FALSE,
       ),
     ),
+
     // 
     'accept_friend'=>array(
       'create' =>array(
@@ -5786,7 +5787,7 @@ function recreate_qrcode(){
 
   if (!check_header()) {
     $result['result']   = FALSE;
-    $result['message']  = "check_header()";
+    // $result['message']  = "check_header()";
     return $result;
   }
 
@@ -5794,7 +5795,7 @@ function recreate_qrcode(){
 
   if (!isset($param['uid'])) {
     $result['result'] = FALSE;
-    $result['message'] = "Error : parameter";
+    // $result['message'] = "Error : parameter";
     return $result;
   }
 
@@ -5807,31 +5808,44 @@ function recreate_qrcode(){
 
   ///-----------
 
-  $account = user_load($uid);
+  // $account = user_load($uid);
 
-  generatorQRCode($account, $platform, $bundleidentifier);
+  // generatorQRCode($account, $platform, $bundleidentifier);
 
-  $profile = profile2_by_uid_load($account->uid, 'main');
+  $encrypt        = dec_enc('encrypt', 'bundle*' . BUNDLE_IDENTIFIER .'|type*friend|friendId*'. $uid);//dec_enc('encrypt', $group_id);
+  $file_my_qrcode = createQRcode($uid, $encrypt);
+
+  // file_create_url(image_style_url('medium', $file_my_qrcode['uri']))
+
+  $profile = profile2_by_uid_load($uid, 'main');
+  $profile->field_profile_my_qrcode[LANGUAGE_NONE][0] = $file_my_qrcode;
+  profile2_save($profile);
+
+  /*
+  $profile = profile2_by_uid_load($uid, 'main');
   // $url_my_qrcode = substr(file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']), strlen($GLOBALS['base_url']));
 
   $url_my_qrcode = file_create_url($profile->field_profile_my_qrcode[LANGUAGE_NONE][0]['uri']);
 
-  
   // add profile ให้กับ user
-  $values = array(
+  $data_update = array(
                   "url_my_qrcode" => $url_my_qrcode
                 );
   
-  /*
-   #1 : บันทึก profile ตัวเองไว้ที่ firebase
-  */
-  $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $account->uid . '/profiles/', $values);
 
+  firestore_db()->collection(FIRESTORE_PROFILES)->document($uid)->set($data_update, ['merge' => true]);
+  */
   ///-----------
+
+  $url_my_qrcode = file_create_url(image_style_url('medium', $file_my_qrcode['uri']));
+
+  $data_update = array(
+    "url_my_qrcode" => $url_my_qrcode
+  );
+  firestore_db()->collection(FIRESTORE_PROFILES)->document($uid)->set($data_update, ['merge' => true]);
 
   $result['result']        = TRUE;
   $result['url_my_qrcode'] = $url_my_qrcode;
-
   return $result;
 }
 
@@ -6400,6 +6414,7 @@ function check_my_id(){
 
   $time_start = microtime(true);
 
+  $result['type'] = $param_type;
   switch($param_type){
     case 'check':{
 
@@ -6442,14 +6457,12 @@ function check_my_id(){
         
           if (strcasecmp($hostEntity->type, 'main') == 0) {      
 
+            /*
             // check ว่าเพือนคนนี้มีความสัมพัน ยังไงกับเราไม
             $friend_status = 0;
             $profile_friend = profile2_by_uid_load($hostEntity->uid, 'main');
             foreach ($profile_friend->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
               // จะได้ เพือนมาทั้งหมด
-
-              $friend = array();
-
               $data_item_load = field_collection_item_load($value['value']);
               if($data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] == $param_uid){
                 $friend_status_tid = $data_item_load->field_friend_status[LANGUAGE_NONE][0]['tid'];
@@ -6458,13 +6471,36 @@ function check_my_id(){
                 break;
               }
             }
+            */
+
+            // เปลี่ยนการดึงเพือนของเพือนมาเช็ดเราเปลียนมามาดึงเพือนเขาเรามาเช็ด
+            $profile_friend = profile2_by_uid_load($param_uid, 'main');
+
+            $friend_status = 0;
+            $friends_hide  = FALSE;
+            $friends_block = FALSE;
+            foreach ($profile_friend->field_profile_friends[LANGUAGE_NONE] as $k => $v) {
+              // จะได้ เพือนมาทั้งหมด
+              $data_item_load = field_collection_item_load($v['value']);
+              if($data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] == $item_load->hostEntity()->uid){
+                $friend_status = $data_item_load->field_friend_status[LANGUAGE_NONE][0]['tid'];
+
+                // $item_value[$data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value']] = $friend_status;
+                
+                
+                $friends_block= $data_item_load->field_profile_friends_block[LANGUAGE_NONE][0]['value'] == 0 ? FALSE: TRUE;
+                $friends_hide = $data_item_load->field_profile_friends_hide[LANGUAGE_NONE][0]['value'] == 0 ? FALSE: TRUE;
+                break;
+              }
+            }
 
             $friend = array();
-
             $friend['name']       = $profile_friend->field_profile_name[LANGUAGE_NONE][0]['value'];
             $friend['uid']        = $profile_friend->uid;
             $friend['image_url']  = file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']));
             $friend['friend_status'] = $friend_status;
+            $friend['is_block']  = $friends_block;
+            $friend['is_hide']  = $friends_hide;
 
             $friends[] = $friend;
           }
@@ -6493,7 +6529,7 @@ function check_my_id(){
       $entities = $query->entityCondition('entity_type', 'field_collection_item')
                         ->entityCondition('bundle', 'field_profile_my_id')
                         // ->fieldCondition('field_profile_my_id_value', 'value', $param['id'], '=')
-                        ->fieldCondition('field_profile_my_id_value', 'value', '%'. $param['id'] .'%', 'LIKE')
+                        ->fieldCondition('field_profile_my_id_value', 'value', '%'. $param_id .'%', 'LIKE')
                         ->fieldCondition('field_enable', 'value', '1', '=' )
                         ->execute();
 
@@ -6508,6 +6544,7 @@ function check_my_id(){
         foreach ($item_ids as $key => $value) { 
           //   // $hostEntity = field_collection_item_load($creator_v)->hostEntity();
 
+          $item_value = array();
           //   $data_item_load = field_collection_item_load($creator_v['value']);
 
           //   $result[$creator_k][] =  $creator_v['value'];//$data_item_load;//->field_profile_my_id_value[LANGUAGE_NONE][0]['value'];
@@ -6516,6 +6553,7 @@ function check_my_id(){
 
           // $hostEntity = field_collection_item_load($creator_v)->hostEntity();
 
+          /*
           $profile_friend = profile2_by_uid_load($item_load->hostEntity()->uid, 'main');
 
           $friend_status = 0;
@@ -6524,23 +6562,48 @@ function check_my_id(){
             $data_item_load = field_collection_item_load($v['value']);
             if($data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] == $param_uid){
               $friend_status = $data_item_load->field_friend_status[LANGUAGE_NONE][0]['tid'];
+
+              $item_value[$data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value']] = $friend_status;
+              break;
+            }
+          }
+          */
+
+          // เปลี่ยนการดึงเพือนของเพือนมาเช็ดเราเปลียนมามาดึงเพือนเขาเรามาเช็ด
+          $profile_friend = profile2_by_uid_load($param_uid, 'main');
+
+          $friend_status = 0;
+          $friends_hide  = FALSE;
+          $friends_block = FALSE;
+          foreach ($profile_friend->field_profile_friends[LANGUAGE_NONE] as $k => $v) {
+            // จะได้ เพือนมาทั้งหมด
+            $data_item_load = field_collection_item_load($v['value']);
+            if($data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] == $item_load->hostEntity()->uid){
+              $friend_status = $data_item_load->field_friend_status[LANGUAGE_NONE][0]['tid'];
+
+              // $item_value[$data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value']] = $friend_status;
+              
+              
+              $friends_block= $data_item_load->field_profile_friends_block[LANGUAGE_NONE][0]['value'] == 0 ? FALSE: TRUE;
+              $friends_hide = $data_item_load->field_profile_friends_hide[LANGUAGE_NONE][0]['value'] == 0 ? FALSE: TRUE;
               break;
             }
           }
 
-          $v = array();
-          $v['hostEntity->uid']= $item_load->hostEntity()->uid;
+          // $item_value['hostEntity->uid']= $item_load->hostEntity()->uid;
 
-          $v['name']       = $profile_friend->field_profile_name[LANGUAGE_NONE][0]['value'];
-          $v['uid']        = $profile_friend->uid;
-          $v['image_url']  = file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']));
+          $item_value['name']       = $profile_friend->field_profile_name[LANGUAGE_NONE][0]['value'];
+          $item_value['uid']        = $profile_friend->uid;
+          $item_value['image_url']  = file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']));
 
-          $v['id']     = $item_load->field_profile_my_id_value[LANGUAGE_NONE][0]['value'];
-          $v['enable']    = $item_load->field_enable[LANGUAGE_NONE][0]['value'];
-          $v['objectId']  = $item_load->field_object_id[LANGUAGE_NONE][0]['value'];
-          $v['friend_status'] = $friend_status;
+          $item_value['id']     = $item_load->field_profile_my_id_value[LANGUAGE_NONE][0]['value'];
+          $item_value['enable']    = $item_load->field_enable[LANGUAGE_NONE][0]['value'];
+          $item_value['objectId']  = $item_load->field_object_id[LANGUAGE_NONE][0]['value'];
+          $item_value['friend_status'] = $friend_status;
+          $item_value['is_block']  = $friends_block;
+          $item_value['is_hide']  = $friends_hide;
 
-          $friends[$value] = $v;
+          $friends[$value] = $item_value;
         }
       }
                         
@@ -6599,11 +6662,16 @@ function scan_qrcode(){
             $profile = profile2_by_uid_load($param_uid, 'main');
 
             $friend_status = 0;
+            $friends_block = FALSE;
+            $friends_hide = FALSE;
             foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $k => $v) {
               // จะได้ เพือนมาทั้งหมด
               $data_item_load = field_collection_item_load($v['value']);
               if($data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] == $decrypt_id[1]){
                 $friend_status = $data_item_load->field_friend_status[LANGUAGE_NONE][0]['tid'];
+                
+                $friends_block= $data_item_load->field_profile_friends_block[LANGUAGE_NONE][0]['value'] == 0 ? FALSE: TRUE;
+                $friends_hide = $data_item_load->field_profile_friends_hide[LANGUAGE_NONE][0]['value'] == 0 ? FALSE: TRUE;
                 break;
               }
             }
@@ -6620,8 +6688,10 @@ function scan_qrcode(){
               $v['image_url']  = getDefualtProfilePicture();
             }
            
-            $v['friend_status'] = $friend_status;
+            $v['status']        = $friend_status;
             $v['type']          = $decrypt_type[1];
+            $v['is_block']      = $friends_block;
+            $v['is_hide']       = $friends_hide;
 
             $time_end       = microtime(true);
             $execution_time = number_format(($time_end - $time_start), 2);

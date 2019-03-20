@@ -368,6 +368,25 @@ export const update_picture_profile  = (uid, image_uri) =>{
     })
 }
 
+// Recreate QRcode
+export const recreate_qrcode = (uid) => {
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({
+            'uid':uid,
+        }),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.RECREATE_QRCODE, data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+        });
+}
+
 export const update_picture_bg_profile  = (uid, image_uri) =>{
     var data = new FormData();
     data.append('idna', {

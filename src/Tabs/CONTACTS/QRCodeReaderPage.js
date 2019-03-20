@@ -1,6 +1,4 @@
-
 import React, { Component } from 'react';
-
 import {Alert,
         Text,
         TouchableOpacity,
@@ -11,7 +9,9 @@ import {QRscanner, QRreader} from 'react-native-qr-scanner';
 import Spinner from 'react-native-loading-spinner-overlay';
 
 import * as actions from '../../Actions'
-import {getUid, getHeaderInset} from '../../Utils/Helpers'
+import {checkInternetDialog} from '../../Utils/Helpers'
+
+import {makeUidState, makeIsConnectedState} from '../../Reselect'
 
 class QRCodeReaderPage extends Component {
   static navigationOptions = ({navigation}) => { 
@@ -79,12 +79,21 @@ class QRCodeReaderPage extends Component {
   }
 
   dataSplit = (data) =>{
+
+    let {uid, is_connected} = this.props
+
     let qe = data.split("?");
     console.log(qe)
 
     if(qe.length == 2){
+
+      if(!is_connected){
+        checkInternetDialog()
+        return 
+      }
+
       this.setState({loading:true})
-      this.props.actionScanQRcode(this.props.uid, qe[1]).then((result) => {
+      this.props.actionScanQRcode(uid, qe[1]).then((result) => {
           this.setState({loading:false})
           console.log(result)
 
@@ -113,11 +122,11 @@ class QRCodeReaderPage extends Component {
             // is_exist
 
             let data = result.data.data
-            // console.log(data)
+            console.log(data)
 
             if(data.type == 'friend'){
-              if(data.friend_status == 0){
-                if(data.uid == this.props.uid){
+              if(data.status == 0){
+                if(data.uid == uid){
                   setTimeout(() => {
                     Alert.alert(
                       '',
@@ -146,64 +155,6 @@ class QRCodeReaderPage extends Component {
                 this.props.navigation.navigate("ResultScanForQRcode", {close:this.close, scanAgain:this.scanAgain, friend:data})
               }
             }
-
-            /*
-            if(!result.data.is_exist){
-              setTimeout(() => {
-                Alert.alert(
-                  '',
-                  'Friend not found.',
-                  [
-                    {
-                      text: 'Close',
-                      onPress: () => {
-                        this.props.navigation.goBack(null)
-                      },
-                      style: 'cancel',
-                    },
-                    {text: 'Scan again', onPress: () => {
-                      this.setState({
-                        re_activate: this.state.re_activate + 1
-                      });
-                    }},
-                  ],
-                  {cancelable: false},
-                )
-              }, 100)
-            }else{
-              // onScroll={this.props.handleScroll}
-              // You cannot add yourself as a friend.
-
-              let friend = result.data.friends[0]
-              console.log(friend)
-
-              if(friend.uid == this.props.uid){
-                setTimeout(() => {
-                  Alert.alert(
-                    '',
-                    'You cannot add yourself as a friend.',
-                    [
-                      {
-                        text: 'Close',
-                        onPress: () => {
-                          this.props.navigation.goBack(null)
-                        },
-                        style: 'cancel',
-                      },
-                      {text: 'Scan again', onPress: () => {
-                        this.setState({
-                          re_activate: this.state.re_activate + 1
-                        });
-                      }},
-                    ],
-                    {cancelable: false},
-                  )
-                }, 100)
-              }else{
-                this.props.navigation.navigate("ResultScanForQRcode", {close:this.close, scanAgain:this.scanAgain, friend})
-              }
-            }
-            */
           }    
       })
     }
@@ -288,8 +239,8 @@ class QRCodeReaderPage extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  console.log(state)
+const mapStateToProps = (state, ownProps) => {
+  // console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
   //_persist.rehydrated parameter is initially set to false
@@ -297,9 +248,15 @@ const mapStateToProps = (state) => {
     return {}
   }
 
+  if(!state.auth.isLogin){
+    return;
+  }
+
   return{
-    uid:getUid(state),
-    // groups:state.auth.users.groups
+    // uid:getUid(state),
+
+    uid: makeUidState(state, ownProps),
+    is_connected: makeIsConnectedState(state, ownProps),
   }
 }
 

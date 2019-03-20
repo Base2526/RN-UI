@@ -321,6 +321,24 @@
       "css": "check-ok",
       "code": 59418,
       "src": "fontawesome"
+    },
+    {
+      "uid": "8d40bca7a7f11091ca865e07535fcc47",
+      "css": "group-plus",
+      "code": 59420,
+      "src": "elusive"
+    },
+    {
+      "uid": "c9b928dc82d7d77033644fcf59dca3b3",
+      "css": "flashlight",
+      "code": 59419,
+      "src": "entypo"
+    },
+    {
+      "uid": "bc71f4c6e53394d5ba46b063040014f1",
+      "css": "reload",
+      "code": 59421,
+      "src": "fontawesome"
     }
   ]
 }

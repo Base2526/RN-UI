@@ -402,7 +402,10 @@ class FriendsPage extends React.Component{
                       this._itemOnPress(rowItem, rowId, sectionId)
                     }}>
                     <FastImage
-                      style={{width: 50, height: 50, borderRadius: 10, borderColor:'gray'}}
+                      style={{width: 50, 
+                              height: 50, 
+                              borderRadius: 10, 
+                              borderColor:'gray'}}
                       source={{
                         uri: rowItem.image_url,
                         headers:{ Authorization: 'someAuthToken' },

@@ -252,8 +252,6 @@ class AddFriendsPage extends React.Component{
             style={{width: 50, 
                     height: 50, 
                     borderRadius: 10, 
-                    borderWidth:1, 
-                    borderColor:'gray'
                   }}
             source={{
               uri: item.url_image,

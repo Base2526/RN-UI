@@ -6,11 +6,22 @@ import {View,
         StyleSheet} from 'react-native'
 import { connect } from 'react-redux';
 
-import * as actions from '../../Actions'
-import ImageWithDefault from '../../Utils/ImageWithDefault'
-import {getStatusBarHeight} from '../../Utils/Helpers'
+import FastImage from 'react-native-fast-image'
+import { ifIphoneX } from 'react-native-iphone-x-helper'
+import Spinner from 'react-native-loading-spinner-overlay';
+import {
+  MenuProvider,
+  Menu,
+  MenuContext,
+  MenuTrigger,
+  MenuOptions,
+  MenuOption,
+} from 'react-native-popup-menu';
 
+import * as actions from '../../Actions'
 import MyIcon from '../../config/icon-font.js';
+
+import {makeUidState, makeProfileState} from '../../Reselect'
 
 class MyQRcode extends React.Component{
 
@@ -27,6 +38,31 @@ class MyQRcode extends React.Component{
               elevation: 0,
               shadowOpacity: 0
           },
+          headerLeft: (
+            <View style={{flexDirection:'row', padding:5}}>
+                    <Menu style={{ zIndex: 10 }}>
+                        <MenuTrigger>
+                            <MyIcon
+                                // style={{paddingRight:10}}
+                                name={'dot-vertical'}
+                                size={20}
+                                color={'#C7D8DD'} />
+                        </MenuTrigger>
+                        <MenuOptions optionsContainerStyle={{ }}>
+                            <MenuOption onSelect={() => {}}>
+                                <Text style={{padding:10, fontSize:18}}>Share</Text>
+                            </MenuOption>
+                            <MenuOption onSelect={() => {}}>
+                                <Text style={{padding:10, fontSize:18}}>Save to device</Text>
+                            </MenuOption>
+                            {/* <MenuOption onSelect={() => {}}>
+                                <Text style={{padding:10, fontSize:18}}>Menu 2</Text>
+                            </MenuOption> */}
+                            
+                        </MenuOptions>
+                    </Menu>
+                </View>
+          ),
           headerRight: (
               <View style={{marginRight:10}}>
                   <TouchableOpacity
@@ -57,55 +93,122 @@ class MyQRcode extends React.Component{
         seed: 1,
         error: null,
         refreshing: false,
+
+
+        profile:{}
       };
     }
   
     componentDidMount() {
-      setTimeout(() => {this.setState({renderContent: true})}, 0);
+      // setTimeout(() => {this.setState({renderContent: true})}, 0);
+      this.props.navigation.setParams({handleShare: this.handleShare })
+      this.props.navigation.setParams({handleSaveToDevice: this.handleSaveToDevice })
 
       this.props.navigation.setParams({handleCancel: this.handleCancel })
+    
+      this.loadData(this.props)
+    }
+
+    componentWillReceiveProps(nextProps){
+      this.loadData(nextProps)
+    }
+
+    loadData = (props) =>{
+      let {profile} = props
+      this.setState({profile, renderContent:true})
+    }
+
+    handleShare = () => {
+
+    }
+
+    handleSaveToDevice = () =>{
+
     }
 
     handleCancel = () => {
       this.props.navigation.goBack(null)
     }
+
+    reCreateQRcode = () =>{
+      this.setState({loading:true})
+      this.props.actionRecreateQRcode(this.props.uid).then((result) => {
+        this.setState({loading:false})
+        console.log(result)
+      })
+    }
    
     render() {
-        let {profiles} = this.props
+        let {profile, renderContent, loading} = this.state
+
+        if(!renderContent){
+          return(<View style={{flex:1}}></View>)
+        }
+
         return (
         <SafeAreaView style={{flex:1}}>
             <View style={{flex: 1,  
                           justifyContent: 'center', 
                           alignItems: 'center',}}>
-                <ImageWithDefault 
-                    source={{uri: profiles.url_my_qrcode}}
-                    style={{width: 200,
-                            height: 200,
-                            marginTop: -(100 + getStatusBarHeight()),
-                            marginLeft: -100}}
-                    />
+                  <Spinner
+                    visible={loading}
+                    textContent={'Wait...'}
+                    textStyle={{color: '#FFF'}}
+                    overlayColor={'rgba(0,0,0,0.5)'}/>
+                  <View style={{width: 200, height: 200,}}>
+                    <FastImage
+                        style={{width: 200, height: 200, }}
+                        source={{
+                          uri: profile.url_my_qrcode,
+                          headers:{ Authorization: 'someAuthToken' },
+                          priority: FastImage.priority.normal,
+                        }}
+                        resizeMode={FastImage.resizeMode.cover}/>
+                    <TouchableOpacity
+                      style={{position:'absolute', bottom:10, right:10}}
+                      onPress={()=>{
+                        this.reCreateQRcode()
+                      }}>
+                      <MyIcon
+                          name={'reload'}
+                          size={25}
+                          color={'#C7D8DD'} />
+                    </TouchableOpacity>
+                  </View>
             </View>
-            <TouchableOpacity style={{position:'absolute', right:0, bottom:0, padding:10,}}
+            <TouchableOpacity style={{position:'absolute', 
+                                      right:0, 
+                                      ...ifIphoneX({
+                                        bottom: 30
+                                      }, {
+                                        bottom: 0
+                                      }),
+                                      padding:10,}}
                               onPress={()=>{
                                 this.props.navigation.navigate("MyQRcode_QRCodeReaderPage")
                               }}>
                 <Text style={{fontSize:18}}>QR code reader</Text>
             </TouchableOpacity>
         </SafeAreaView>
-      );
+      )
     }
 }
 
-
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
   //_persist.rehydrated parameter is initially set to false
   if(!state._persist.rehydrated){
     return {}
   }
 
+  if(!state.auth.isLogin){
+      return;
+  }
+
   return{
-    profiles:state.auth.users.profiles
+    // profiles:state.auth.users.profiles
+    uid: makeUidState(state, ownProps),
+    profile: makeProfileState(state, ownProps),
   }
 }
 

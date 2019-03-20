@@ -204,7 +204,7 @@ class SettingListHide extends React.Component{
                       data={data}
                       showsVerticalScrollIndicator={false}
                       renderItem={this.renderItem}
-                      keyExtractor={item => item.item_id}
+                      keyExtractor = { (item, index) => index.toString() } 
                       ItemSeparatorComponent={this.ItemSeparatorComponent}/>
                 </View>
               </MenuContext>)

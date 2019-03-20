@@ -52,6 +52,7 @@ class AuthLoadingScreen extends React.Component {
 
         // console.log('fcmToken')
         // console.log('fcmToken', fcmToken)
+
     }
 
     hasPermission = () =>{
@@ -127,6 +128,8 @@ class AuthLoadingScreen extends React.Component {
             this.props.trackClasss(uid, classs, class_members)
             this.props.trackGroups(uid, groups, group_profiles, group_members)
             this.props.trackFriends(uid, friends, friend_profiles)
+
+            this.props.trackLocation(uid)
             
             AsyncStorage.getItem('fcmToken', null).then((fcmToken) => {
                 this.props.watchTaskEvent(uid, fcmToken)

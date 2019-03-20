@@ -9,9 +9,13 @@ import FastImage from 'react-native-fast-image'
 var _ = require('lodash');
 
 import * as actions from '../../Actions'
-import {getUid, getHeaderInset} from '../../Utils/Helpers'
+import {randomKey, checkInternetDialog} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 import Constant from '../../Utils/Constant'
+
+import {makeUidState, 
+        makeFriendsState,
+        makeIsConnectedState,} from '../../Reselect'
 
 class ResultScanForQRcode extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -70,14 +74,45 @@ class ResultScanForQRcode extends Component {
         this.props.navigation.setParams({handleCancel: this.handleCancel })
         this.props.navigation.setParams({handleScanAgain: this.handleScanAgain })
 
-        const { state, setParams, navigate } = this.props.navigation;
-        const params = state.params || {};
-
         const { navigation } = this.props;
         const friend = navigation.getParam('friend', null);
 
-        this.setState({friend})
+        // console.log(friend)
+        // this.setState({friend})
 
+        this.setState({friend}, ()=>{
+            this.loadData(this.props)
+        })
+    }
+
+    componentWillReceiveProps(nextProps) {
+        // let {friends} = nextProps
+        // let {friend}  = this.state
+
+        // let __  =   _.find(friends, (v, k)=>{
+        //                 return k == friend.uid
+        //             })
+        
+        // if(__){
+        //     friend = {...friend, status:__.status}
+        //     this.setState({friend})
+        // }
+
+        this.loadData(nextProps)
+    }
+
+    loadData = (props) =>{
+        let {friends} = props
+        let {friend}  = this.state
+
+        let __  =   _.find(friends, (v, k)=>{
+            return k == friend.uid
+        })
+
+        if(__){
+            friend = {...friend, status:__.status}
+            this.setState({friend})
+        }
     }
 
     handleCancel = () => {
@@ -97,26 +132,20 @@ class ResultScanForQRcode extends Component {
     }
 
     addFriend = (friend_id) =>{
-        let uid = this.props.uid
+        let {uid, friends} = this.props
+        let find_friend = _.find(friends, (v, k)=>{
+                            return k == friend_id
+                        })
 
-        // this.setState({loading:true})
-        // this.props.actionInviteFriend(uid, friend_id, (result) => {
-        //     this.setState({loading:false})
-        // })
-    }
-
-    componentWillReceiveProps(nextProps) {
-        let {friends} = nextProps
-        let {friend}  = this.state
-
-        let __  =   _.find(friends, (v, k)=>{
-                        return k == friend.uid
-                    })
-        
-        if(__ !== undefined){
-            friend = {...friend, friend_status:__.status}
-            this.setState({friend})
+        let chat_id = randomKey()
+        if(find_friend){
+            chat_id = find_friend.chat_id
         }
+
+        this.setState({loading:true})
+        this.props.actionInviteFriend(uid, friend_id, chat_id, (result) => {
+            this.setState({loading:false})
+        })
     }
 
     render() {
@@ -125,8 +154,10 @@ class ResultScanForQRcode extends Component {
         console.log(friend)
 
         let btn = <View />
-        switch(friend.friend_status){
+        switch(friend.status){
             case 0 :
+            case Constant.FRIEND_STATUS_FRIEND_CANCEL_FROM_FRIEND:
+            // case Constant.FRIEND_STATUS_FRIEND_REMOVE:
             case Constant.FRIEND_STATUS_FRIEND_CANCEL:{
                 btn =   <View style={{flexDirection:'row', marginTop:20}}>
                             <TouchableOpacity style={{padding:10, 
@@ -232,6 +263,107 @@ class ResultScanForQRcode extends Component {
                         </View>;
                 break;
             }
+
+            /**
+             * กรณีที่เรา block แล้วก้ delete friend คนนี้ออกหรือ 
+             * กรณีที่เรา hide แล้วก้ delete friend คนนี้ออก
+             * ดังนั้นจะแยกออกเป็นสองกรณีคือเราต้องเช็ด ว่า friend เรา block หรือ hide
+             * ถ้าเรา block ตอนแสดงต้องมี ปุ่ม unblock, cancel
+             * ถ้าเรา hide ตอนแสดงต้องมี ปุ่ม chat, cancel <= ตอนเรากด ปุ่ม chat หลังบ้านเราจะทำการ unhide ให้อัติโนมัติ
+             */
+            case Constant.FRIEND_STATUS_FRIEND_REMOVE:{
+
+                if(friend.is_block){
+                    btn =   <View style={{flexDirection:'row', marginTop:20}}>
+                                <TouchableOpacity style={{padding:10, 
+                                                        margin:5, 
+                                                        borderColor:'gray', 
+                                                        borderWidth:1}}
+                                                    onPress={()=>{
+                                                        // this.props.navigation.navigate("ChatPage")
+                                                        // alert('Cancel request')
+
+                                                        /*
+                                                        this.setState({loading:true})
+                                                        this.props.actionUpdateStatusFriend(this.props.uid, friend.uid, Constant.FRIEND_STATUS_FRIEND, (result)=>{
+                                                            console.log(result)
+                                                            // this.setState({loading:false})
+                                                        })
+
+                                                        // export const actionFriendBlock = (uid, friend_id, block, callback) => dispatch=> {
+
+                                                        this.props.actionFriendBlock(this.props.uid, friend.uid, false, (result)=>{
+                                                            console.log(result)
+                                                            this.setState({loading:false})
+                                                        })
+                                                        */
+
+                                                        this.setState({loading:true})
+                                                        this.props.actionFriendUnremove_Unblock(this.props.uid, friend.uid, (result)=>{
+                                                            console.log(result)
+                                                            this.setState({loading:false})
+                                                        })
+                                                    }}>
+                                    <Text>Unblock</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{padding:10, 
+                                                        margin:5, 
+                                                        borderColor:'gray', 
+                                                        borderWidth:1}}
+                                                    onPress={()=>{
+                                                        this.props.navigation.navigate("FriendProfilePage",{'friend_id': friend.uid})
+                                                    }}>
+                                    <Text>View profile</Text>
+                                </TouchableOpacity>
+                            </View>;
+                }else{
+                    btn =   <View style={{flexDirection:'row', marginTop:20}}>
+                                <TouchableOpacity style={{padding:10, 
+                                                        margin:5, 
+                                                        borderColor:'gray', 
+                                                        borderWidth:1}}
+                                                    onPress={()=>{
+                                                        // this.props.navigation.navigate("ChatPage")
+                                                        // alert('Cancel request')
+
+                                                        /*
+                                                        this.setState({loading:true})
+                                                        this.props.actionUpdateStatusFriend(this.props.uid, friend.uid, Constant.FRIEND_STATUS_FRIEND, (result)=>{
+                                                            console.log(result)
+                                                            // this.setState({loading:false})
+                                                        })
+
+                                                        this.props.actionFriendHide(this.props.uid, friend.uid, false, (result)=>{
+                                                            console.log(result)
+                                                            this.setState({loading:false})
+
+                                                            this.props.navigation.navigate("ChatPage")
+                                                        })
+                                                        */
+
+                                                        this.setState({loading:true})
+                                                        this.props.actionFriendUnremove_Chat(this.props.uid, friend.uid, (result)=>{
+                                                            console.log(result)
+                                                            this.setState({loading:false})
+
+                                                            this.props.navigation.navigate("ChatPage")
+                                                        })
+                                                    }}>
+                                    <Text>Chat</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{padding:10, 
+                                                        margin:5, 
+                                                        borderColor:'gray', 
+                                                        borderWidth:1}}
+                                                    onPress={()=>{
+                                                        this.props.navigation.navigate("FriendProfilePage",{'friend_id': friend.uid})
+                                                    }}>
+                                    <Text>View profile</Text>
+                                </TouchableOpacity>
+                            </View>;
+                }
+                break;
+            }
         }
 
         /*
@@ -267,19 +399,28 @@ class ResultScanForQRcode extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
-  console.log(state)
+const mapStateToProps = (state, ownProps) => {
+    // console.log(state)
 
-  // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
-  //_persist.rehydrated parameter is initially set to false
-  if(!state._persist.rehydrated){
-    return {}
-  }
+    // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
+    //_persist.rehydrated parameter is initially set to false
+    if(!state._persist.rehydrated){
+        return {}
+    }
 
-  return{
-    uid:getUid(state),
-    friends:state.auth.users.friends
-  }
+    if(!state.auth.isLogin){
+        return;
+    }
+
+    return{
+        // uid:getUid(state),
+        // friends:state.auth.users.friends
+
+        uid:makeUidState(state, ownProps),
+        friends:makeFriendsState(state, ownProps),
+
+        is_connected: makeIsConnectedState(state, ownProps),
+    }
 }
 
 export default connect(mapStateToProps, actions)(ResultScanForQRcode);

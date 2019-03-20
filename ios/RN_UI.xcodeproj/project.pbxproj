@@ -46,7 +46,6 @@
 		46763DF151B5A5BBC78080CB /* libPods-RN_UI-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8437CFC842FC64DF045C837B /* libPods-RN_UI-tvOS.a */; };
 		48CA84DB806447BD8F0A5B69 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 793A774F8F6344F795C0D794 /* Octicons.ttf */; };
 		4E74DDC0B8004333A2BCB125 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D768439A7918459182BD69CC /* FontAwesome.ttf */; };
-		600A018A221E56010008A21F /* idnaicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 600A0188221E55D00008A21F /* idnaicons.ttf */; };
 		600B88DF223C9B41004574A7 /* libSplashScreen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 600B88DD223C9B33004574A7 /* libSplashScreen.a */; };
 		6029165221D5BE4100401259 /* libART.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6029164F21D5BE3300401259 /* libART.a */; };
 		602B1405222925C600FD7D10 /* libReactNativePermissions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 602B14042229258C00FD7D10 /* libReactNativePermissions.a */; };
@@ -62,6 +61,7 @@
 		6099C96A2220102100B6F046 /* RNMessageComposeBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 6099C9682220102100B6F046 /* RNMessageComposeBridge.m */; };
 		60C41D6E2223B5B300EE298A /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60C41D352223B5B300EE298A /* UserNotifications.framework */; };
 		60CE1A2921E3A5210014523D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 60CE1A2821E3A5210014523D /* GoogleService-Info.plist */; };
+		60F43FF8224097B800033D93 /* idnaicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60F43FF72240979500033D93 /* idnaicons.ttf */; };
 		60F8B5EA21F57F8E00F10F48 /* libRNShare.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F8B5E621F57F8600F10F48 /* libRNShare.a */; };
 		60F92A6C21C370F600AC5145 /* libSQLite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F92A6B21C370B900AC5145 /* libSQLite.a */; };
 		60F92A6E21C3710100AC5145 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F92A6D21C3710100AC5145 /* libsqlite3.0.tbd */; };
@@ -549,7 +549,6 @@
 		52E3AF2DFEA74EBC9D4FE04B /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		5966EA3452EE4DDAB0934A38 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
-		600A0188221E55D00008A21F /* idnaicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = idnaicons.ttf; path = ../src/assets/fonts/idnaicons.ttf; sourceTree = "<group>"; };
 		600B88A0223C9B33004574A7 /* SplashScreen.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SplashScreen.xcodeproj; path = "../node_modules/react-native-splash-screen/ios/SplashScreen.xcodeproj"; sourceTree = "<group>"; };
 		6029164921D5BE3300401259 /* ART.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ART.xcodeproj; path = "../node_modules/react-native/Libraries/ART/ART.xcodeproj"; sourceTree = "<group>"; };
 		602B13FF2229258500FD7D10 /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativePermissions.xcodeproj; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; };
@@ -567,6 +566,7 @@
 		60C41D172223B22D00EE298A /* RN_UI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = RN_UI.entitlements; path = RN_UI/RN_UI.entitlements; sourceTree = "<group>"; };
 		60C41D352223B5B300EE298A /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		60CE1A2821E3A5210014523D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		60F43FF72240979500033D93 /* idnaicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = idnaicons.ttf; sourceTree = "<group>"; };
 		60F8B5AF21F57F8500F10F48 /* RNShare.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNShare.xcodeproj; path = "../node_modules/react-native-share/ios/RNShare.xcodeproj"; sourceTree = "<group>"; };
 		60F92A3421C370B800AC5145 /* SQLite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SQLite.xcodeproj; path = "../node_modules/react-native-sqlite-storage/src/ios/SQLite.xcodeproj"; sourceTree = "<group>"; };
 		60F92A6D21C3710100AC5145 /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
@@ -774,9 +774,9 @@
 		13B07FAE1A68108700A75B9A /* RN_UI */ = {
 			isa = PBXGroup;
 			children = (
+				60F43FF72240979500033D93 /* idnaicons.ttf */,
 				60C41D172223B22D00EE298A /* RN_UI.entitlements */,
 				6099C96B2220117900B6F046 /* RNMessageCompose */,
-				600A0188221E55D00008A21F /* idnaicons.ttf */,
 				60CE1A2821E3A5210014523D /* GoogleService-Info.plist */,
 				60F92ABD21C3A0E100AC5145 /* www */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
@@ -1817,7 +1817,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				600A018A221E56010008A21F /* idnaicons.ttf in Resources */,
+				60F43FF8224097B800033D93 /* idnaicons.ttf in Resources */,
 				60CE1A2921E3A5210014523D /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
