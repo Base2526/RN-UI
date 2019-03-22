@@ -397,6 +397,13 @@ class FindFriendPage extends React.Component{
       case Constant.FRIEND_STATUS_FRIEND_CANCEL_FROM_FRIEND:{
         break
       }
+      case Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND:{
+        status = <Text style={{fontSize: 14,
+                  paddingLeft: 5,
+                  fontStyle: 'italic',
+                  color: 'gray'}}>Wait friend access</Text>
+        break
+      }
     }
 
     return(

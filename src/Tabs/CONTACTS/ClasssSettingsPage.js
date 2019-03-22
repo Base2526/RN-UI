@@ -21,8 +21,11 @@ import ImagePicker from 'react-native-image-picker';
 import * as actions from '../../Actions'
 import MyIcon from '../../config/icon-font.js';
 
+import {checkInternetDialog} from '../../Utils/Helpers'
+
 import {makeUidState, 
-        makeClasssState} from '../../Reselect'
+        makeClasssState,
+        makeIsConnectedState} from '../../Reselect'
 
 class ClasssSettingsPage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
@@ -88,7 +91,7 @@ class ClasssSettingsPage extends React.Component{
     }
 
     loadData = (props) =>{
-        console.log(props)
+        // console.log(props)
         let {class_id} = this.state
         let {classs} = props
 
@@ -96,6 +99,7 @@ class ClasssSettingsPage extends React.Component{
             return k == class_id; 
         })
 
+        // console.log(_class)
         this.setState({_class, renderContent:true})
     }
 
@@ -112,6 +116,8 @@ class ClasssSettingsPage extends React.Component{
             maxHeight: 500,
         }
 
+        let {is_connected} = this.props
+
         ImagePicker.showImagePicker(options, (response) => {
             console.log('Response = ', response);
 
@@ -122,6 +128,12 @@ class ClasssSettingsPage extends React.Component{
             } else if (response.customButton) {
                 console.log('User tapped custom button: ', response.customButton);
             } else {
+
+                if(!is_connected){
+                    checkInternetDialog()
+                    return 
+                }
+
                 this.setState({loading:true})
                 this.props.actionUpdateClassPictureProfile(this.props.uid, this.state.class_id, response.uri).then((result) => {
                     console.log(result)
@@ -259,6 +271,8 @@ const mapStateToProps = (state, ownProps) => {
     return{
         uid:makeUidState(state, ownProps),
         classs:makeClasssState(state, ownProps),
+
+        is_connected: makeIsConnectedState(state, ownProps),
     }
 }
 

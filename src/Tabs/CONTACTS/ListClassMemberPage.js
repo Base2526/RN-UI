@@ -19,13 +19,15 @@ import {
 } from 'react-native-popup-menu';
 
 import * as actions from '../../Actions'
-import {getUid, getHeaderInset} from '../../Utils/Helpers'
+import {getHeaderInset, checkInternetDialog} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState, 
         makeClasssState,
         makeClassMembersState,
-        makeFriendProfilesState} from '../../Reselect'
+        makeFriendProfilesState,
+    
+        makeIsConnectedState} from '../../Reselect'
 
 class ListClassMemberPage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
@@ -97,7 +99,7 @@ class ListClassMemberPage extends React.Component{
             return k == class_id; 
         })
 
-        if(cla === undefined){
+        if(!cla){
             this.props.navigation.goBack(null)
             return;
         }
@@ -125,7 +127,6 @@ class ListClassMemberPage extends React.Component{
         this.props.navigation.navigate("ClasssMemberAddFriend", {'class_id':this.state.class_id})
     }
 
-
     ItemSeparatorComponent = () => {
         return (
           <View
@@ -140,6 +141,8 @@ class ListClassMemberPage extends React.Component{
     }
 
     showMenu = (item)=>{
+
+        let {is_connected} = this.props
         let {friend_id, member_key} = item
         return( <View style={{flex:1,
                               position:'absolute', 
@@ -161,6 +164,12 @@ class ListClassMemberPage extends React.Component{
                             <Text style={{padding:10, fontSize:18}}>View profile</Text>
                         </MenuOption>
                         <MenuOption onSelect={() => {
+                            if(!is_connected){
+                                checkInternetDialog()
+                                return 
+                            }
+  
+
                             this.setState({loading:true})
                             this.props.actionDeleteClassMember(this.props.uid, this.state.class_id, member_key, (result) => {
                                 console.log(result)
@@ -219,21 +228,7 @@ class ListClassMemberPage extends React.Component{
                     data={data}
                     ItemSeparatorComponent = {this.ItemSeparatorComponent}
                     renderItem={this.renderItem}
-                    extraData={data}
-                    />
-                {/* <ActionButton 
-                    buttonColor="rgba(231,76,60,1)"
-                    hideShadow={true}
-                    renderIcon={() => {
-                        return(<MyIcon
-                            name={'user-plus'}
-                            size={25}
-                            color={'#C7D8DD'} />)
-                        }}
-                    onPress={()=>{
-                        this.props.navigation.navigate("ClasssMemberAddFriend", {'class_id':class_id})
-                    }}>
-                </ActionButton> */}
+                    extraData={data}/>
             </View>
             </MenuContext>
         );
@@ -251,15 +246,12 @@ const mapStateToProps = (state, ownProps) => {
     }
   
     return{
-        // uid:getUid(state),
-        // friends:state.auth.users.friends,
-        // friend_profiles:state.auth.users.friend_profiles,
-        // classs:state.auth.users.classs,
-
         uid:makeUidState(state, ownProps),
         friend_profiles:makeFriendProfilesState(state, ownProps),
         classs:makeClasssState(state, ownProps),
         class_members:makeClassMembersState(state, ownProps),
+
+        is_connected:makeIsConnectedState(state, ownProps),
     }
 }
 

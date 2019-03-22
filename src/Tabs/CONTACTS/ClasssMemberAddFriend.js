@@ -316,10 +316,6 @@ const mapStateToProps = (state, ownProps) => {
     }
   
     return{
-        // uid:getUid(state),
-        // friends:state.auth.users.friends,
-        // classs:state.auth.users.classs,
-
         uid:makeUidState(state, ownProps),
         friends:makeFriendsState(state, ownProps),
         friend_profiles:makeFriendProfilesState(state, ownProps),

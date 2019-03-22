@@ -21,13 +21,15 @@ import ActionButton from 'react-native-action-button';
 
 import Constant from '../../Utils/Constant'
 import * as actions from '../../Actions'
-import {getHeaderInset} from '../../Utils/Helpers'
+import {getHeaderInset, checkInternetDialog} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState, 
         makeGroupsState,
         makeGroupProfilesState,
-        makeGroupMembersState} from '../../Reselect'
+        makeGroupMembersState,
+      
+        makeIsConnectedState} from '../../Reselect'
 
 class GroupsPage extends React.Component{
     constructor(props) {
@@ -105,7 +107,7 @@ class GroupsPage extends React.Component{
           member:group_favorites.reverse()
         },
         invited: {
-          title: 'Groups invitations',
+          title: 'Invitations',
           member:group_invited.reverse()
         },
         groups: {
@@ -123,6 +125,12 @@ class GroupsPage extends React.Component{
     }
 
     favorites = (group_id, status) =>{
+      let {is_connected} = this.props
+      if(!is_connected){
+        checkInternetDialog()
+        return 
+      } 
+
       this.setState({loading:true})
       this.props.actionFavoritesGroup(this.props.uid, group_id, status, (result) => {
           this.setState({loading:false})
@@ -130,14 +138,18 @@ class GroupsPage extends React.Component{
     }
 
     showMenuInvited = (rowItem)=>{
-      let {uid} = this.props
+      let {uid, is_connected} = this.props
       let {profile, group_id} = rowItem
 
       let member_key = _.findKey(profile.members,  function(v, k) { 
         return v.friend_id == uid
       })
 
-      return(<View style={{flex:1,position:'absolute', right:0, marginRight:10}}>
+      return(<View style={{ flex:1,
+                            position:'absolute', 
+                            right:0, 
+                            top:0,
+                            marginRight:10}}>
                 <Menu>
                   <MenuTrigger>
                       <MyIcon 
@@ -148,6 +160,11 @@ class GroupsPage extends React.Component{
                   </MenuTrigger>
                   <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
                       <MenuOption onSelect={() => {
+
+                            if(!is_connected){
+                              checkInternetDialog()
+                              return 
+                            }
                             
                             console.log(member_key)
                             if(member_key !== undefined){
@@ -165,17 +182,22 @@ class GroupsPage extends React.Component{
                           <Text style={{padding:10, fontSize:18}}>Join</Text>
                       </MenuOption>
                       <MenuOption onSelect={() => {
-                            if(member_key !== undefined){
-                              this.setState({loading:true})
-                              this.props.actionMemberDeclineGroup(uid, group_id, member_key, (result) => {
-                                setTimeout(() => {
-                                  this.setState({loading:false})
-                                }, 200);
-                              })
-                            }else{
-                              console.log(member_key)
-                            }
-                          }}>
+                          if(!is_connected){
+                            checkInternetDialog()
+                            return 
+                          }
+
+                          if(member_key !== undefined){
+                            this.setState({loading:true})
+                            this.props.actionMemberDeclineGroup(uid, group_id, member_key, (result) => {
+                              setTimeout(() => {
+                                this.setState({loading:false})
+                              }, 200);
+                            })
+                          }else{
+                            console.log(member_key)
+                          }
+                        }}>
                           <Text style={{padding:10, fontSize:18}}>Decline</Text>
                       </MenuOption>
                   </MenuOptions>
@@ -184,6 +206,8 @@ class GroupsPage extends React.Component{
     }
 
     showMenuGroup = (rowItem)=>{
+
+      let {is_connected} = this.props
 
       // console.log('showMenuGroup', rowItem)
       let {group_id, profile} = rowItem
@@ -208,12 +232,17 @@ class GroupsPage extends React.Component{
                               {text: 'OK', 
                               onPress: () => {
                                   // export const actionDeletePost = (uid, app_id, post_id, callback)
-                                    this.setState({loading:true})
-                                    this.props.actionDeleteGroup(this.props.uid, group_id, (result)=>{
-                                        
-                                      console.log(result)
-                                      this.setState({loading:false})
-                                    })
+                                  if(!is_connected){
+                                    checkInternetDialog()
+                                    return 
+                                  }  
+                                  
+                                  this.setState({loading:true})
+                                  this.props.actionDeleteGroup(this.props.uid, group_id, (result)=>{
+                                      
+                                    console.log(result)
+                                    this.setState({loading:false})
+                                  })
                                 }, 
                               },
                             ],
@@ -338,6 +367,7 @@ class GroupsPage extends React.Component{
                     onPress={() => {
                       this.props.params.navigation.navigate("ManageGroupPage", {'group_id': group_id}) 
                     }}>
+                    
                     <View
                       style={{
                         alignItems: 'center', 
@@ -437,10 +467,27 @@ class GroupsPage extends React.Component{
         return <View style={{flex: 1}}></View>
       }
 
+      let action_button = <ActionButton 
+                            buttonColor="rgba(231,76,60,1)"
+                            offsetX={10} 
+                            offsetY={10}
+                            hideShadow={true}
+                            renderIcon={() => {
+                                return(<MyIcon
+                                    name={'plus'}
+                                    size={25}
+                                    color={'#C7D8DD'} />)
+                                }}
+                            onPress={()=>{
+                                this.props.params.navigation.navigate("AddGroupsPage")
+                            }}/>
+
       if(favorites.member.length == 0 && invited.member.length == 0 && groups.member.length == 0){
         return  <View style={{flex: 1}}>
                   <Text>Empty Group</Text>
                   {/* {this.actionAddGroup()} */}
+
+                  {action_button}
                 </View>
       }
 
@@ -465,20 +512,7 @@ class GroupsPage extends React.Component{
                 } }
                 renderSectionHeaderX={this._renderSection}
                 openOptions={[0, 1, 2, 3]}/>
-            <ActionButton 
-              buttonColor="rgba(231,76,60,1)"
-              offsetX={10} 
-              offsetY={10}
-              hideShadow={true}
-              renderIcon={() => {
-                  return(<MyIcon
-                      name={'plus'}
-                      size={25}
-                      color={'#C7D8DD'} />)
-                  }}
-              onPress={()=>{
-                  this.props.params.navigation.navigate("AddGroupsPage")
-              }}/>
+            {action_button}
           </View>
         </MenuContext>
       );
@@ -501,6 +535,8 @@ const mapStateToProps = (state, ownProps) => {
     groups:makeGroupsState(state, ownProps),
     group_profiles:makeGroupProfilesState(state, ownProps),
     group_members:makeGroupMembersState(state, ownProps),
+
+    is_connected: makeIsConnectedState(state, ownProps),
   }
 }
 

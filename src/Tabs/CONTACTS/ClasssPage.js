@@ -21,12 +21,13 @@ import {
 import ActionButton from 'react-native-action-button';
 
 import * as actions from '../../Actions'
-import {getHeaderInset} from '../../Utils/Helpers'
+import {getHeaderInset, checkInternetDialog} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState, 
         makeClasssState,
-        makeClassMembersState} from '../../Reselect'
+        makeClassMembersState,
+        makeIsConnectedState} from '../../Reselect'
 
 class ClasssPage extends React.Component{
     constructor(props) {
@@ -80,6 +81,8 @@ class ClasssPage extends React.Component{
     
     showMenuClasss = (item)=>{
 
+      let {is_connected}  = this.props
+
       let {class_id} = item
 
       let memu_delete_class = <View />
@@ -96,6 +99,13 @@ class ClasssPage extends React.Component{
                                           }, style: 'cancel'},
                                     {text: 'OK', 
                                       onPress: () => {
+
+                                        if(!is_connected){
+                                          checkInternetDialog()
+                                          return 
+                                        }
+            
+
                                         this.setState({loading:true})
                                         this.props.actionDeleteClass(this.props.uid, class_id, (result) => {
                                             console.log(result)
@@ -278,6 +288,8 @@ const mapStateToProps = (state, ownProps) => {
     uid:makeUidState(state, ownProps),
     classs:makeClasssState(state, ownProps),
     class_members:makeClassMembersState(state, ownProps),
+
+    is_connected: makeIsConnectedState(state, ownProps),
   }
 }
 

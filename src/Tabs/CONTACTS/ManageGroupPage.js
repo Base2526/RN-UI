@@ -4,16 +4,17 @@ import {StyleSheet,
         Text, 
         TouchableOpacity,
         Alert,
+        Platform
         } from 'react-native'
-        
-import firebase from 'react-native-firebase';
+ 
+import { Header } from 'react-navigation';
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
-import { ifIphoneX } from 'react-native-iphone-x-helper';
+import { isIphoneX, ifIphoneX } from 'react-native-iphone-x-helper';
 var _ = require('lodash');
 import Spinner from 'react-native-loading-spinner-overlay';
 
-import {getHeaderInset} from '../../Utils/Helpers'
+import {isEmpty} from '../../Utils/Helpers'
 import * as actions from '../../Actions'
 import {checkInternetDialog} from '../../Utils/Helpers'
 
@@ -31,6 +32,12 @@ import {makeUidState,
 
 class ManageGroupPage extends React.Component{
 
+    static navigationOptions = { 
+        // title: 'Friend profile', 
+        header: null ,
+    }
+
+    /*
     static navigationOptions = ({ navigation }) => {
 
         let menuHeaderRight = <View style={{flexDirection:'row', flex:1, marginRight:10}}>
@@ -69,6 +76,7 @@ class ManageGroupPage extends React.Component{
             ),
         }
     };
+    */
 
     constructor(){
         super();
@@ -76,7 +84,10 @@ class ManageGroupPage extends React.Component{
             loading:false,
             renderContent: false,
             group_id:0,
-            group:{}
+            group:{},
+
+            group_member:{},
+            member_is_join:false, // ตัวบอกว่า member คนนี้ ตอบรับการเชิญแล้วหรือยัง
         }
     }
 
@@ -107,20 +118,49 @@ class ManageGroupPage extends React.Component{
             return group_id == k
         })
 
-        if(group === undefined){
+        if(!group){
             this.props.navigation.goBack(null)
+            return
         }
        
-
         let group_profile = _.find(group_profiles, (v, k)=>{
                                 return group_id == k
                             })
 
-        // console.log(group, group_profile)
-
         let group_member =  _.find(group_members, (v, k)=>{
                                 return group_id == k
                             })
+
+        if(!group_member){
+            this.props.navigation.goBack(null)
+            return
+        }
+
+        // check GROUP STATUS MEMBER
+        let member =_.find(group_member, (v, k)=>{
+                        return v.friend_id == uid
+                    })
+        // console.log(group_member, member)
+
+        let member_is_join = false
+        switch(member.status){
+            case Constant.GROUP_STATUS_MEMBER_INVITED:{
+
+                break;
+            }
+
+            case Constant.GROUP_STATUS_MEMBER_JOINED:{
+                member_is_join=true
+                break;
+            }
+
+            default:{
+                this.props.navigation.goBack(null)
+            }
+        }
+        // check GROUP STATUS MEMBER
+
+        
 
         group_profile = {...group_profile, members:group_member}
 
@@ -196,10 +236,10 @@ class ManageGroupPage extends React.Component{
 
         let newGroup = {...group, profile:group_profile, members}
 
-        console.log(friends)
-        console.log(newGroup)
+        // console.log(friends)
+        // console.log(newGroup)
 
-        this.setState({group: newGroup})
+        this.setState({group: newGroup, member_is_join, group_member})
     }
 
     handleChat = () => {
@@ -287,24 +327,169 @@ class ManageGroupPage extends React.Component{
     }
 
     render() {
-        let {group_id, group} = this.state
+        let {group_id, group, member_is_join, group_member} = this.state
 
         if (Object.keys(group).length == 0) {
             return(<View style={{flex:1, backgroundColor:'#DF2D6C'}}></View>)
         }
 
-        let {is_connected} = this.props
+        let {uid, is_connected} = this.props
 
         // console.log(group)
         // return(<View style={{flex:1, backgroundColor:'#DF2D6C'}}></View>)
+        let button_arrow_back = <View style={{flexDirection:'row', justifyContent:'center', alignItems:'center'}}>
+                                    <MyIcon
+                                        name={'ios-arrow-left'}
+                                        size={25}
+                                        color={'#C7D8DD'} />
+                                        <Text style={{color:'#C7D8DD', paddingLeft:8, fontSize:18}}>Back</Text>
+                                </View>
+        if(Platform.OS != "ios"){
+            button_arrow_back = <MyIcon
+                                    name={'android-arrow-left'}
+                                    size={20}
+                                    color={'#C7D8DD'} />
+        }
+
+        let memu_right = <View style={{ flexDirection:'row', 
+                                        position:'absolute', 
+                                        right:0,}}>
+                            <TouchableOpacity 
+                                style={{padding:10}}
+                                onPress={()=>{
+                                    if(!is_connected){
+                                        checkInternetDialog()
+                                        return 
+                                      }
+
+                                      let member_key =  _.findKey(group_member,  function(v, k) { 
+                                                            return v.friend_id == uid
+                                                        })
+            
+                                      if(member_key){
+                                        this.setState({loading:true})
+                                        this.props.actionMemberDeclineGroup(uid, group_id, member_key, (result) => {
+                                          setTimeout(() => {
+                                            this.setState({loading:false})
+
+                                            this.props.navigation.goBack(null)
+                                          }, 200);
+                                        })
+                                      }else{
+                                        console.log(member_key)
+                                      }
+                                }}>
+                                <Text style={{color:'#C7D8DD', fontSize:18}}>Decline</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                                style={{padding:10}}
+                                onPress={()=>{
+                                    if(!is_connected){
+                                        checkInternetDialog()
+                                        return 
+                                    }
+
+                                    let member_key =_.findKey(group_member,  function(v, k) { 
+                                                        return v.friend_id == uid
+                                                    })
+                                    // console.log(member_key)
+
+                                    console.log(member_key)
+                                    if(member_key){
+                                        this.setState({loading:true})
+                                        this.props.actionMemberJoinGroup(uid, group_id, member_key, (result) => {
+                                            console.log(result)
+                                            setTimeout(() => {
+                                                this.setState({loading:false})
+                                            }, 200);
+                                        })
+                                    }else{
+                                        console.log(member_key)
+                                    }
+
+                                }}>
+                                <Text style={{color:'#C7D8DD', fontSize:18}}>Join</Text>
+                            </TouchableOpacity>
+                        </View> 
+        if(member_is_join){
+            memu_right =<View style={{ flexDirection:'row', 
+                                        position:'absolute', 
+                                        right:0,}}>
+                            <TouchableOpacity 
+                                style={{padding:10}}
+                                onPress={()=>{
+                                    this.handleChat()
+                                }}>
+                                <MyIcon
+                                    name={'friend-chat'}
+                                    size={25}
+                                    color={'#C7D8DD'} />
+
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{  padding:10}}
+                                                        onPress={()=>{
+                                                            this.handleSettings()
+                                                        }}>
+                                <MyIcon
+                                    name={'settings'}
+                                    size={25}
+                                    color={'#C7D8DD'} />
+                            </TouchableOpacity>
+                        </View>
+        }
+
+        let button_favorites = <View />
+        if(member_is_join){
+            button_favorites = <TouchableOpacity
+                                    style={{justifyContent:'center', alignItems:'center'}}
+                                    onPress={()=>{
+
+                                        if(!is_connected){
+                                            checkInternetDialog()
+                                        }else{
+                                            let is_favorites = true;
+                                            if(group.is_favorites !== undefined){
+                                                is_favorites = !group.is_favorites
+                                            }
+
+                                            this.setState({loading:true})
+                                            this.props.actionFavoritesGroup(this.props.uid, group_id, is_favorites, (result) => {
+                                                console.log(result)
+                                                this.setState({loading:false})
+                                            })
+                                        }
+                                    }}>
+                                    <MyIcon
+                                        name={group.is_favorites ? 'star' : 'star-empty' } // star
+                                        size={30}
+                                        color={'#C7D8DD'} />
+                                </TouchableOpacity>
+        }
+        
         return (
-                <View style={{flex:1, backgroundColor:'#DF2D6C', paddingTop:getHeaderInset()}}>
+                <View style={{flex:1, backgroundColor:'#DF2D6C' /*, paddingTop:getHeaderInset()*/ }}>
                     <Spinner
                         visible={this.state.loading}
                         textContent={'Wait...'}
                         textStyle={{color: '#FFF'}}
                         overlayColor={'rgba(0,0,0,0.5)'}
                     />
+                    <View style={{height:Header.HEIGHT +  (isIphoneX() ? 25 : 0), //- (Platform.OS == "ios" ? 20 : 0), 
+                              backgroundColor: '#DF2D6C',
+                              justifyContent: Platform.OS == "ios" ?'flex-end':'center'}}>
+
+                        <View style={{ flexDirection:'row', position:'absolute'}}>
+                            <TouchableOpacity
+                                style={{padding:10}}
+                                onPress={()=>{
+                                    this.props.navigation.goBack(null)
+                                }}>
+                                {button_arrow_back}
+                            </TouchableOpacity>
+                        </View>
+                        {memu_right}
+                    </View>
+
                     <View style={{ alignItems:'center'}}>
                         <TouchableOpacity
                             style={{paddingTop:10}}>
@@ -319,30 +504,7 @@ class ManageGroupPage extends React.Component{
                             />
                         </TouchableOpacity>
                         <View style={{padding:5, flexDirection:'row'}}>
-                            <TouchableOpacity
-                                style={{justifyContent:'center', alignItems:'center'}}
-                                onPress={()=>{
-
-                                    if(!is_connected){
-                                        checkInternetDialog()
-                                    }else{
-                                        let is_favorites = true;
-                                        if(group.is_favorites !== undefined){
-                                            is_favorites = !group.is_favorites
-                                        }
-
-                                        this.setState({loading:true})
-                                        this.props.actionFavoritesGroup(this.props.uid, group_id, is_favorites, (result) => {
-                                            console.log(result)
-                                            this.setState({loading:false})
-                                        })
-                                    }
-                                }}>
-                                <MyIcon
-                                    name={group.is_favorites ? 'star' : 'star-empty' } // star
-                                    size={30}
-                                    color={'#C7D8DD'} />
-                            </TouchableOpacity>
+                            {button_favorites}
                             <View style={{paddingLeft:5}}>
                                 <Text style={{fontSize:26, fontWeight:'bold', textAlignVertical: 'bottom', color:'#BCD1D5'}}>{group.profile.name}</Text>
                             </View>

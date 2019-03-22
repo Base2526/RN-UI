@@ -75,16 +75,16 @@ class FriendsPage extends React.Component{
       //   console.log('FriendsPage > loadData : this.setState({renderContent: true})')
       // }
       
-      let {presences, profiles, friends, friend_profiles} = props
+      let {presences, profile, friends, friend_profiles} = props
 
       // console.log(friends, friend_profiles)
-      let profile = {
+      let my_profile = {
         title: 'Profile',
         member: [
           {
-            name: profiles.name,
-            status: profiles.status_message,
-            image_url: profiles.image_url,
+            name: profile.name,
+            status: profile.status_message,
+            image_url: profile.image_url,
           }
         ]
       }
@@ -199,7 +199,7 @@ class FriendsPage extends React.Component{
         member: friend_member
       }
         
-      let data = [profile, favorites, friendRequests, friendRequestSents, _friends];
+      let data = [my_profile, favorites, friendRequests, friendRequestSents, _friends];
       this.setState({data})
     }
 
@@ -475,8 +475,8 @@ class FriendsPage extends React.Component{
                             resizeMode={FastImage.resizeMode.cover}
                           />
     
-                      {rowItem.is_online ? <View style={{width: 16, 
-                                              height: 16, 
+                      {rowItem.is_online ? <View style={{width: 10, 
+                                              height: 10, 
                                               backgroundColor: '#00ff80', 
                                               position: 'absolute',
                                               borderWidth: 2,
@@ -542,8 +542,8 @@ class FriendsPage extends React.Component{
                         resizeMode={FastImage.resizeMode.cover}
                       />
 
-                  {rowItem.is_online ? <View style={{width: 16, 
-                                          height: 16, 
+                  {rowItem.is_online ? <View style={{width: 10, 
+                                          height: 10, 
                                           backgroundColor: '#00ff80', 
                                           position: 'absolute',
                                           borderWidth: 2,
@@ -711,7 +711,7 @@ const mapStateToProps = (state, ownProps) => {
     uid: makeUidState(state, ownProps),
     friends:makeFriendsState(state, ownProps),
     friend_profiles:makeFriendProfilesState(state, ownProps),
-    profiles:makeProfileState(state, ownProps),
+    profile:makeProfileState(state, ownProps),
     presences:makePresencesState(state, ownProps),
 
     is_connected: makeIsConnectedState(state, ownProps),

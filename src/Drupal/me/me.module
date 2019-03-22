@@ -14939,8 +14939,6 @@ function create_chat_group(){
   $time_start = microtime(true);
   $batch = firestore_db()->batch();
 
-  // global $firebase;
-
   $param_uid    = $_REQUEST['uid'];
   $param_name   = $_REQUEST['name'];
   $param_members= (array)json_decode($_REQUEST['members']);
@@ -15103,8 +15101,8 @@ function create_chat_group(){
   // โหลดเพือนขึ้นมาเพือบันทึก field_chat_group
 
   // เราต้อง insert คนที่สร้าง group ลงไปก่อนด้วย
-  $result['item_id'] = $node->nid;
-  $result['group']   = $f_v;
+  // $result['item_id'] = $node->nid;
+  $result['group']   =  array('group_id'=>$node->nid, 'group_data'=>$f_v);//$f_v;
 
 
   watchdog(TAG, '@ : %v', array('%v'=> serialize($param_members)), WATCHDOG_INFO);
@@ -15171,14 +15169,11 @@ function create_chat_group(){
 
     //watchdog(TAG, '> create_chat_group header: %item_id, %friend_id', array('%item_id'=> $members_friend_field_entity->item_id, '%friend_id'=>$members_friend_id), WATCHDOG_INFO);
 
-    $f_v = array( "item_id"  => $members_friend_field_entity->item_id,
-                  "status"   => '35'
-                );
-
     // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH . $members_friend_id . '/' . PATH_GROUPS . '/' . $node->nid . '/' , $f_v);
 
-
-    $t[$members_friend_id][$node->nid] = $f_v;
+    $t[$members_friend_id][$node->nid] = array( "item_id"  => $members_friend_field_entity->item_id,
+                                                "status"   => '35'
+                                              );
 
 
     // ส่ง notification บอกเพือนว่ามี การเชิญเข้ากลุ่ม
@@ -15235,10 +15230,12 @@ function create_chat_group(){
   $batch->set($nycRef, $f_item, ['merge' => true]);
 
   $result['result']       = TRUE;
-  $result['group_profile']= $f_item;
-  $result['members']      = $f_members;
+  $result['group_profile']= array('group_id'=>$node->nid, 'group_profile_data'=>$f_item);
+  $result['group_member'] = array('group_id'=>$node->nid, 'group_member_data'=>$f_members);
   // $result['group_admins'] = $group_admins;
   // $result['t']            = $t;
+
+  // $result['groups']       = '';
 
   /*
   การที่เราเก้บเอามา วน loop สร้างหลังจาก /idna/chat_groups/{node_id}  เพราะว่าเราตั้งใจ เพราะเครื่อง client จะ tack chat_groupd ไม่เจอเราจึ่งแก้ปัญหาแบบนี้ไปก่อน

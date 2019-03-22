@@ -458,6 +458,49 @@ class ListGroupMember_TabMembersPage extends React.Component{
                 </Menu>)
     }
 
+    showMenuDeline = (rowItem) =>{
+        let {group_id} = this.state
+        let {uid} = this.props
+
+        return( <Menu>
+                    <MenuTrigger>
+                        <MyIcon 
+                            style={{padding:10}}
+                            name={'dot-horizontal'}
+                            size={15}
+                            color={'#C7D8DD'} />  
+                    </MenuTrigger>
+                    <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
+                        <MenuOption onSelect={() => {
+                                                console.log(uid, group_id, rowItem.friend_id, rowItem.member_key)
+                                                
+                                                this.setState({loading:true})
+                                                this.props.actionMemberInviteAgainGroup(uid, group_id, rowItem.friend_id, rowItem.member_key, (result) => {
+                                                    console.log(result)
+        
+                                                    this.setState({loading:false})
+                                                })
+                                                
+                                            }}>
+                            <Text style={{padding:10, fontSize:18}}>Invite</Text>
+                        </MenuOption>
+                        <MenuOption onSelect={() => {
+                                                console.log(uid, group_id, rowItem.friend_id, rowItem.member_key)
+                                                
+                                                this.setState({loading:true})
+                                                this.props.actionCanceledGroupMember(uid, group_id, rowItem.friend_id, rowItem.member_key, (result) => {
+                                                    this.setState({loading:false})
+                    
+                                                    console.log(result)
+                                                })
+                                                
+                                            }}>
+                            <Text style={{padding:10, fontSize:18}}>Cancel</Text>
+                        </MenuOption>
+                    </MenuOptions>
+                </Menu>)
+    }
+
     _renderRow = (rowItem, rowId, sectionId) => {
         let {group_id} = this.state
         let {uid} = this.props
@@ -677,6 +720,9 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
                             <Text style={{fontSize:18}}>{rowItem.friend.change_friend_name !== undefined ?rowItem.friend.change_friend_name: rowItem.friend.profile.name}</Text>
                             </View>
+
+                            {this.showMenuDeline(rowItem)} 
+                            { /*
                             <View style={{flexDirection:'row', position:'absolute', right:0, bottom:0, margin:5, }}>
                                 <TouchableOpacity
                                     style={{padding:5, 
@@ -711,7 +757,8 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                     }}>
                                     <Text style={{color:'red'}}>Cancel</Text>
                                 </TouchableOpacity>
-                                </View>
+                            </View>
+                            */ }
                         </View>)
             }
         }

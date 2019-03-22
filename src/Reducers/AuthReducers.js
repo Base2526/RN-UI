@@ -1165,7 +1165,7 @@ export default (state= INITIAL_STATE, action)=>{
                                     return k == action.friend_id
                                 })
 
-            if(friend_email === undefined){
+            if(!friend_email){
                 let femails = {[action.friend_email_id]:action.friend_email_data}
 
                 let v = {...state,
@@ -1865,7 +1865,7 @@ export default (state= INITIAL_STATE, action)=>{
                 return k == action.group_id
             })
 
-            if(group === undefined){
+            if(!group){
                 let v = {
                     ...state,
                     user: {
@@ -2276,17 +2276,50 @@ export default (state= INITIAL_STATE, action)=>{
         }
 
         case MEMBER_DECLINE_GROUP:{
-
-            if(state.users === null){
+            if(!state.user){
                 return state
             }
 
-            let groups = state.users.groups
+            let group_members   = state.user.group_members
+            let group_member    = _.find(group_members,  function(v, k) { 
+                                    return k == action.group_id
+                                  })
+
+            let member =_.find(group_member, (v, k)=>{
+                            return k == action.member_key
+                        })
+            
+            if(!member){
+                let new_member = {...member, status:Constant.GROUP_STATUS_MEMBER_DECLINE}
+
+                let new_group_member = {...group_member, [action.member_key]:new_member}
+
+                let v = {...state,
+                            user: {
+                                ...state.user,
+                                group_members: {
+                                    ...state.user.group_members,
+                                    [action.group_id]: new_group_member
+                                }
+                            }
+                        }
+
+                console.log(state, v)
+                return v
+            }
+
+            return state
+            /*
+            if(!state.user){
+                return state
+            }
+
+            let groups = state.user.groups
             let group = _.find(groups,  function(v, k) { 
                 return k == action.group_id
             })
 
-            if(group === undefined){
+            if(!group){
                 return state 
             }
 
@@ -2314,10 +2347,47 @@ export default (state= INITIAL_STATE, action)=>{
                     return v
                 }
             }
+            
             return state
+            */
         }
 
         case MEMBER_INVITE_AGAIN_GROUP:{
+            if(!state.user){
+                return state
+            }
+
+            let group_members   = state.user.group_members
+            let group_member    = _.find(group_members,  function(v, k) { 
+                                    return k == action.group_id
+                                  })
+
+            let member =_.find(group_member, (v, k)=>{
+                            return k == action.member_key
+                        })
+            
+            if(!member){
+                let new_member = {...member, status:Constant.GROUP_STATUS_MEMBER_INVITED}
+
+                let new_group_member = {...group_member, [action.member_key]:new_member}
+
+                let v = {...state,
+                            user: {
+                                ...state.user,
+                                group_members: {
+                                    ...state.user.group_members,
+                                    [action.group_id]: new_group_member
+                                }
+                            }
+                        }
+
+                console.log(state, v)
+                
+                return v
+            }
+
+            return state
+            /*
             if(state.users === null){
                 return state
             }
@@ -2357,6 +2427,7 @@ export default (state= INITIAL_STATE, action)=>{
                 return v   
             }
             return state
+            */
         }
 
         case ADDED_GROUP_MEMBER:{

@@ -344,7 +344,22 @@ export const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
             if(!data.result){
                 return {'status':false, 'message': data.message}
             }else{
-                // console.log(data)
+                let {group, group_profile, group_member} = data
+
+                console.log(group, group_profile, group_member)
+
+                dispatch({ type: ADD_GROUP, group_id:group.group_id, group_data:group.group_data});
+
+                dispatch({ type: ADDED_GROUP_PROFILE, group_id:group_profile.group_id, group_profile_data:group_profile.group_profile_data});
+
+                _.map(group_member.group_member_data, (v, k)=>{
+                    dispatch({ type: ADDED_GROUP_MEMBER, group_id:group_member.group_id, member_key:k, member_data:v});
+                })
+                
+                // 
+
+                // array('group_id'=>$node->nid, 'group_data'=>$f_v);
+
                 // let newGroup = { item_id: data.group.item_id, 
                 //                  status: data.group.status, 
                 //                  group_profile: data.group_profile,
@@ -425,16 +440,6 @@ export const actionFavoritesGroup = (uid, group_id, favorite_status, callback) =
     - update status GROUP_STATUS_MEMBER_JOINED : users/{user_id}/groups/{group_id}/status = GROUP_STATUS_MEMBER_JOINED
     - update status == GROUP_STATUS_MEMBER_JOINED groups/{group_id}/members/{item_id}/status = GROUP_STATUS_MEMBER_JOINED
 */
-
-/*
-
-                let batch = firebase.firestore().batch();
-
-                let groupsRef = firebase.firestore().collection('groups').doc(group_id).collection('members').doc(key);
-                let groupsValue = { friend_id, 
-                                    status: Constant.GROUP_STATUS_MEMBER_INVITED}
-                batch.set(groupsRef, groupsValue, { merge: true});
-*/
 export const actionMemberJoinGroup = (uid, group_id, member_key, callback) => dispatch => {
     let batch = firebase.firestore().batch();
     let usersRef = firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id)
@@ -445,7 +450,7 @@ export const actionMemberJoinGroup = (uid, group_id, member_key, callback) => di
 
     batch.commit().then(function () {
         console.log("Transaction success: actionMemberJoinGroup");
-        // dispatch({ type: MEMBER_JOIN_GROUP, group_id, member_key})
+        dispatch({ type: MEMBER_JOIN_GROUP, group_id, member_key})
         callback({'status':true})
     }).catch(function(err) {
         console.log("Transaction failure: " + err);
@@ -613,6 +618,17 @@ export const actionCreateClass = (uid, class_name, members, uri) => dispatch =>{
             if(!data.result){
                 return {'status':false, 'message': data}
             }else{
+                // let {class, member} = data;
+
+                dispatch({type: ADDED_CLASS, class_id:data.class.class_id, class_data:data.class.class_data})
+                
+                // console.log(data.class, data.member)
+
+                // class_members
+                _.map(data.member.class_members, (class_member_data, class_member_id)=>{
+                    dispatch({type: ADDED_CLASS_MEMBER, class_id:data.member.class_id, class_member_id, class_member_data})
+                })
+
                 // dispatch({type: ADDED_CLASS, class_id:data.item_id ,class_data:data.data})
                 return {'status':true}
             }
@@ -644,8 +660,12 @@ export const actionClassAddMember = (uid, class_id, members, callback) => dispat
     members.map((v, k)=>{
         let {friend_id, member_key} = v
 
+        let class_member_data = {status: true,friend_id}
+
+        dispatch({type: ADDED_CLASS_MEMBER, class_id, class_member_id:member_key, class_member_data})
+
         let classRef =  firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(member_key)
-        batch.set(classRef, {status: true,friend_id}, { merge: true})
+        batch.set(classRef, class_member_data, { merge: true})
     })
 
     batch.commit().then(function () {
@@ -653,43 +673,14 @@ export const actionClassAddMember = (uid, class_id, members, callback) => dispat
     }).catch(function(err) {
         console.log("Transaction failure: " + err);
     });
-
-    /*
-    members.map(function(friend_id, k) {
-        firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').where('friend_id', '==', friend_id).get().then(snapshot => {
-            let value = {friend_id, status: true}
-            if(snapshot.size == 0){
-                let key = randomKey()
-                
-                firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(key).set(value, { merge: true})
-            
-                dispatch({type: MODIFIED_CLASS_MEMBER, class_id, class_member_id:key, class_member_data:value })
-                // callback({'status':true})
-
-                if(k == members.length - 1){
-                    callback({'status':true})
-                }
-            }else{
-                snapshot.docs.forEach(doc => {
-                    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(doc.id).set({status: true}, { merge: true})
-                    
-                    dispatch({type: MODIFIED_CLASS_MEMBER, class_id, class_member_id:doc.id, class_member_data:value })
-                    
-                    if(k == members.length - 1){
-                        callback({'status':true})
-                    }
-                })
-            }
-        })
-    })
-    */
 }
 
 // REMOVED_CLASS_MEMBER
 export const actionDeleteClassMember = (uid, class_id, member_key, callback) => dispatch =>{
     // users/{userId}/classs/{classId}/members/{key}
-    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(member_key).set({status: false}, { merge: true})
+
     dispatch({type: REMOVED_CLASS_MEMBER, class_id, member_key})
+    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(member_key).set({status: false}, { merge: true})
     callback({'status':true})
 }
 
@@ -769,11 +760,18 @@ export const actionLikePost = (creator, uid, app_id, post_id, status, callback) 
     callback({'status':true})
 }
 
-export const actionEditClassNameProfile = (uid, class_id, name, callback) => dispatch =>{
-    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).set({
-        name,
-    }, { merge: true});
+/*
+// MODIFIED_CLASS
+export const actionModifiedClass = (uid, class_name, callback) => dispatch =>{
 
+    dispatch({type: MODIFIED_CLASS, class_id, class_data })
+}
+*/
+
+export const actionEditClassNameProfile = (uid, class_id, class_data, callback) => dispatch =>{
+    dispatch({type: MODIFIED_CLASS, class_id, class_data })
+
+    firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).set(class_data, { merge: true});
     callback({'status':true})
 }
 
@@ -839,9 +837,9 @@ export const actionFriendUnremove_Chat = (uid, friend_id, callback) => dispatch=
 
 // key, this.props.uid, friend.friend_id
 export const actionSelectClassMember = (uid, friend_id, class_id, member_key, status,callback) => dispatch=> {
-    if(!member_key){
-        member_key = randomKey()
-    }
+
+    // callback({'status':true, uid, friend_id, class_id, member_key, status})
+    dispatch({type: ADDED_CLASS_MEMBER, class_id, class_member_id:member_key, class_member_data:{friend_id, status} })
 
     firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').doc(member_key).set({
         friend_id, status
@@ -852,8 +850,6 @@ export const actionSelectClassMember = (uid, friend_id, class_id, member_key, st
     .catch(error => {
         callback({'status':false, 'message': error})
     })  
-
-    dispatch({type: ADDED_CLASS_MEMBER, class_id, class_member_id:member_key, class_member_data:{friend_id, status} })
 
     /*
     firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).collection('members').where('friend_id', '==', friend_id).get().then(snapshot => {
@@ -941,14 +937,14 @@ export const actionFriendMute = (uid, friend_id, mute, callback) => dispatch=> {
 }
 
 // friend favorite
-export const actionFriendFavirite = (uid, friend_id, favorite_status, callback) => dispatch=> {
-    dispatch({ type: FRIEND_FAVORITE, friend_id, favorite_status});
+export const actionFriendFavirite = (uid, friend_id, is_favorite, callback) => dispatch=> {
+    dispatch({ type: FRIEND_FAVORITE, friend_id, favorite_status:is_favorite});
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
-        is_favorite: favorite_status,
+        is_favorite,
     }, { merge: true}).then(()=> {
         callback({'status':true})
     }).catch(error => {
-        dispatch({ type: FRIEND_FAVORITE, friend_id, is_favorite: !favorite_status});
+        dispatch({ type: FRIEND_FAVORITE, friend_id, is_favorite: !is_favorite});
         callback({'status':false, 'message': error})
     })
 }
@@ -1873,7 +1869,7 @@ export const trackClasss=(uid, classs, class_members)=> dispatch =>{
                                 case 'removed':{
                                     console.log('track classs > members > removed')
                                     // REMOVED_CLASS_MEMBER
-                                    // dispatch({type: REMOVED_CLASS_MEMBER, class_id:classsChange.doc.id, class_member_id:classsMembersChange.doc.id})
+                                    dispatch({type: REMOVED_CLASS_MEMBER, class_id, class_member_id})
                                     break;
                                 }
                             }
@@ -1902,9 +1898,13 @@ export const trackClasss=(uid, classs, class_members)=> dispatch =>{
 
 // track groups
 export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch =>{
-    // console.log("trackGroups", groups)
+    // console.log("trackGroups", groups, uid)
+
+    // /users/549127/groups
     firebase.firestore().collection('users').doc(uid).collection('groups').onSnapshot((querySnapshot) => {
+        // console.log("trackGroups #1", querySnapshot)
         querySnapshot.docChanges.forEach(function(change) {
+            // console.log("trackGroups #2")
             // console.log(change.type, change.doc.id, change.doc.data());
         
             let group_id    = change.doc.id
@@ -1917,6 +1917,7 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
                                     return group_id == k
                                 })
                         
+                    console.log("trackGroups users")
                     if(!group){
                         console.log("trackGroups users > groups > added")
                         dispatch({ type: ADD_GROUP, group_id, group_data});
@@ -2026,7 +2027,6 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
 export const trackFriends=(uid, friends, friend_profiles)=> dispatch =>{
     firebase.firestore().collection('users').doc(uid).collection('friends').onSnapshot((querySnapshot) => {
         // console.log(querySnapshot)
-
         querySnapshot.docChanges.forEach(function(change) {
             // console.log(change.type)
             let friend_id   = change.doc.id
@@ -2177,14 +2177,14 @@ profileFriend = (friend_id, dispatch)=>{
             let friend_email_id   = emailsChange.doc.id
             let friend_email_data = emailsChange.doc.data()
 
-            // console.log(change.doc.id, emailsChange.doc.id, emailsChange.doc.data())
+            // console.log(emailsChange.type, friend_id, friend_email_id, friend_email_data)
             if (emailsChange.type === 'added') {
                 
                 let friend_email  = _.find(friend_emails, (fpv, fpk)=>{
                     return friend_id == fpk
                 })
 
-                if(friend_email !== undefined){
+                if(friend_email){
                     let email =_.find(friend_email,  function(fwv, fwk) { 
                                     return fwk == friend_email_id
                                 })
@@ -2200,6 +2200,8 @@ profileFriend = (friend_id, dispatch)=>{
                     }
 
                     console.log('friend emails > added')
+                    dispatch({ type: ADDED_EMAIL_FRIEND, friend_id, friend_email_id, friend_email_data})
+                }else{
                     dispatch({ type: ADDED_EMAIL_FRIEND, friend_id, friend_email_id, friend_email_data})
                 }
             }

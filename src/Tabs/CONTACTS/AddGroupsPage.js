@@ -20,12 +20,13 @@ var _ = require('lodash');
 
 import * as actions from '../../Actions'
 import Constant from '../../Utils/Constant'
-import {getUid} from '../../Utils/Helpers'
+import {checkInternetDialog} from '../../Utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState,  
         makeFriendsState, 
-        makeFriendProfilesState,} from '../../Reselect'
+        makeFriendProfilesState,
+        makeIsConnectedState,} from '../../Reselect'
 
 // More info on all the options is below in the API Reference... just some common use cases shown here
 const options = {
@@ -67,7 +68,6 @@ const calculatorWidthHeightItem=(margin, itemRow)=>{
 }
 
 class AddGroupsPage extends React.Component{
-
     static navigationOptions = ({ navigation }) => ({
         title: "Create group",
         headerTintColor: '#C7D8DD',
@@ -169,6 +169,8 @@ class AddGroupsPage extends React.Component{
     }
 
     handleCreateGroup = () => {
+      let {is_connected} = this.props
+
       let groupName = this.state.groupName.trim()
       let uri = this.state.avatarSource.uri; 
 
@@ -190,15 +192,20 @@ class AddGroupsPage extends React.Component{
         alert("Select friend is empty.")
       }else{
 
+        if(!is_connected){
+          checkInternetDialog()
+          return 
+        } 
+
         this.setState({loading:true})
         this.props.actionCreateGroup(this.props.uid, groupName, seleteds, this.state.avatarSource.uri).then((result) => {
           console.log(result)
 
           if(result.status){
-            setTimeout(() => {
+            // setTimeout(() => {
               this.setState({loading:false})
               this.props.navigation.goBack(null)
-            }, 200);
+            // }, 200);
           }else{
             this.setState({loading:false})
             setTimeout(() => {
@@ -499,6 +506,8 @@ const mapStateToProps = (state, ownProps) => {
     uid:makeUidState(state, ownProps),
     friends:makeFriendsState(state, ownProps),
     friend_profiles:makeFriendProfilesState(state, ownProps),
+
+    is_connected: makeIsConnectedState(state, ownProps),
   }
 }
 

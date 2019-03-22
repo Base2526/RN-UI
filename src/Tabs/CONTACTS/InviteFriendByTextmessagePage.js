@@ -110,9 +110,9 @@ class InviteFriendByTextmessagePage extends React.Component{
           subject: 'Join me on DNA',
           body: 'Join me on DNA',
           attachments: [{
-            filename: 'mytext',
-            ext: '.txt',
-            mimeType: 'text/plain',
+            // filename: 'mytext',
+            // ext: '.txt',
+            // mimeType: 'text/plain',
             text: 'Join me on DNA',
           }],
         });
@@ -121,7 +121,6 @@ class InviteFriendByTextmessagePage extends React.Component{
         console.log('error', e);
       }
     }
-
     
     async sendMessage2(phoneNumber) {
         try {

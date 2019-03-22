@@ -85,12 +85,20 @@ class AddFriendsPage extends React.Component{
   }
 
   loadData = (props) =>{
-    let {people_you_may_khows} = props
-    let data =_.map(people_you_may_khows, (v, k)=>{
-                return v
-              })
+    let {friends, people_you_may_khows} = props
+
+    let data =[]
+    _.map(people_you_may_khows, (v, k)=>{
+      let friend =  _.find(friends, (fv, fk)=>{
+                      return v.uid == fk
+                    })
+
+      if(!friend){
+        data.push(v)
+      }
+    })
       
-    console.log(data)
+    // console.log(data)
     this.setState({data, refreshing:false})
   }
    

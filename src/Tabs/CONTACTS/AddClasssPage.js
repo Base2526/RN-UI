@@ -17,13 +17,16 @@ var _ = require('lodash');
 
 import Constant from '../../Utils/Constant'
 import * as actions from '../../Actions'
-import {getUid} from '../../Utils/Helpers'
-import ImageWithDefault from '../../Utils/ImageWithDefault'
+import {checkInternetDialog} from '../../Utils/Helpers'
+// import ImageWithDefault from '../../Utils/ImageWithDefault'
+
+// import FastImage from 'react-native-fast-image'
 
 import MyIcon from '../../config/icon-font.js';
 import {makeUidState, 
         makeFriendsState,
-        makeFriendProfilesState} from '../../Reselect'
+        makeFriendProfilesState,
+        makeIsConnectedState} from '../../Reselect'
 
 // More info on all the options is below in the API Reference... just some common use cases shown here
 const options = {
@@ -75,7 +78,7 @@ class AddClasssPage extends React.Component{
             data: [],
             seleteds: [],
             orientation:'PORTRAIT',
-            numColumns:4,
+            numColumns:6,
             sections : [
               {
                 title: "Members",
@@ -136,9 +139,9 @@ class AddClasssPage extends React.Component{
       // console.log(width, height)
   
       if(width<height){
-        this.setState({orientation:'PORTRAIT', numColumns:4})
+        this.setState({orientation:'PORTRAIT', numColumns:6})
       }else{
-        this.setState({orientation:'LANDSCAPE', numColumns:6})
+        this.setState({orientation:'LANDSCAPE', numColumns:8})
       }
     }
 
@@ -176,6 +179,8 @@ class AddClasssPage extends React.Component{
     }
 
     handleCreateClass = () => {
+      let {is_connected} = this.props
+
       let className = this.state.className.trim()
       let uri = this.state.avatarSource.uri; 
 
@@ -198,15 +203,20 @@ class AddClasssPage extends React.Component{
       }else{
         console.log('className : ' + className + ", uri : " + uri)
 
+        if(!is_connected){
+          checkInternetDialog()
+          return 
+        }
+
         this.setState({loading:true})
         this.props.actionCreateClass(this.props.uid, className, seleteds, this.state.avatarSource.uri).then((result) => {
           console.log(result)
 
           this.setState({loading:false})
           if(result.status){
-            setTimeout(() => {
+            // setTimeout(() => {
               this.props.navigation.goBack()
-            }, 200);
+            // }, 200);
           }else{
             setTimeout(() => {
               Alert.alert(result.message);
@@ -343,9 +353,6 @@ class AddClasssPage extends React.Component{
                     value={this.state.className}/>
               </View>
             </View>
-            {/* <View style={{position:'absolute', bottom:0, right:0, padding:5}}>
-              <Text style={{fontSize:16, fontWeight:'bold'}}>{this.state.sections[0].data[0].list.length == 1 ? '0': this.state.sections[0].data[0].list.length - 1}/50</Text>
-            </View> */}
             <View
               style={{
                 height: 1,
@@ -385,9 +392,22 @@ class AddClasssPage extends React.Component{
                           width:50,
                           borderRadius:10}}
                   onPress={()=>this.props.navigation.navigate("FriendProfilePage", {'friend_id': friend_id})}>
-                    <ImageWithDefault 
+                    {/* <ImageWithDefault 
                       source={{uri:friend_profile.image_url}}
-                      style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/>
+                      style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/> */}
+
+                    <FastImage
+                      style={{width: 50, 
+                              height: 50, 
+                              borderRadius: 10, 
+                              borderColor:'gray'}}
+                      source={{
+                        uri: friend_profile.image_url,
+                        headers:{ Authorization: 'someAuthToken' },
+                        priority: FastImage.priority.normal,
+                      }}
+                      resizeMode={FastImage.resizeMode.cover}
+                    />
               </TouchableOpacity>
               </View>
               <View style={{flex:5}}>
@@ -433,7 +453,7 @@ class AddClasssPage extends React.Component{
     }
 
     renderItem = ({item, index}) => { 
-      console.log(item)
+      // console.log(item)
       if ('empty' in item) {
         return <View style={{height: 120, 
           width: 100, 
@@ -527,10 +547,8 @@ class AddClasssPage extends React.Component{
     }
 }
 
-// uid:getUid(state)
-
 const mapStateToProps = (state, ownProps) => {
-  console.log(state)
+  // console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
   //_persist.rehydrated parameter is initially set to false
@@ -543,13 +561,11 @@ const mapStateToProps = (state, ownProps) => {
   }
 
   return{
-    // auth: state.auth,
-    // friends: state.auth.users.friends,
-    // uid: getUid(state)
-
     uid:makeUidState(state, ownProps),
     friends:makeFriendsState(state, ownProps),
     friend_profiles:makeFriendProfilesState(state, ownProps),
+
+    is_connected: makeIsConnectedState(state, ownProps),
   }
 }
 

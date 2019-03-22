@@ -8,9 +8,10 @@ import Spinner from 'react-native-loading-spinner-overlay';
 var _ = require('lodash');
 
 import * as actions from '../../Actions'
-import {getUid} from '../../Utils/Helpers'
-
-import {makeUidState, makeClasssState} from '../../Reselect'
+import {checkInternetDialog} from '../../Utils/Helpers'
+import {makeUidState, 
+        makeClasssState,
+        makeIsConnectedState} from '../../Reselect'
 
 class EditClassNamePage extends React.Component{
 
@@ -46,6 +47,7 @@ class EditClassNamePage extends React.Component{
       super(props);
 
       this.state = {
+          class_id:0,
           data:{},
           text:'',
           loading:false
@@ -73,31 +75,43 @@ class EditClassNamePage extends React.Component{
         let {class_id} = this.state
         let {classs} = props
 
-        let _class = _.find(classs,  function(v, k) { 
-            return k == class_id; 
-        })
+        let _class =_.find(classs,  function(v, k) { 
+                        return k == class_id; 
+                    })
 
+        console.log(_class)
         this.setState({data:_class, text:_class.name})
     }
 
     handleSave = () => {
+        let {is_connected} = this.props
+        let {data, text, class_id} = this.state
         if(this.state.text.length == 0){
             alert('Class name is empty?')
         }else{
             // console.log(this.state.data.group_profile.name)
             // console.log(this.state)
-            if(this.state.data.name === this.state.text){
+            if(data.name === text){
                 const { navigation } = this.props;
                 navigation.goBack();
             }else{
                 // console.log('process', this.state.data.group_id)
+
+                if(!is_connected){
+                    checkInternetDialog()
+                    return 
+                }
+                let new_data = {...data, name:text}
+                // console.log(new_data)
+                
                 this.setState({loading:true})
-                this.props.actionEditClassNameProfile(this.props.uid, this.state.class_id, this.state.text, (result) => {
+                this.props.actionEditClassNameProfile(this.props.uid, class_id, new_data, (result) => {
                     this.setState({loading:false})
 
                     const { navigation } = this.props;
                     navigation.goBack();
                 })
+            
             }
         }
     }
@@ -151,6 +165,8 @@ const mapStateToProps = (state, ownProps) => {
     return{
         uid:makeUidState(state, ownProps),
         classs:makeClasssState(state, ownProps),
+
+        is_connected: makeIsConnectedState(state, ownProps),
     }
 }
 

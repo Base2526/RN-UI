@@ -334,16 +334,16 @@ function create_class(){
 
 	$my_class_item_load = field_collection_item_load($class_entity->item_id);
 
-	$value_class = array('image_url'	=> file_create_url(image_style_url('medium', $image_url['uri'])), 
+	$v_class = array('image_url'	=> file_create_url(image_style_url('medium', $image_url['uri'])), 
 											 'name'     	=> $param_name,
 											 'created_at' => time(),
 											 'is_default' => FALSE);
 
-											 
-
 	$nycRef =firestore_db()->collection(FIRESTORE_USERS)->document($param_uid)->collection(FIRESTORE_CLASSS)->document($class_entity->item_id);
-	$batch->set($nycRef, $value_class, ['merge' => true]);
+	$batch->set($nycRef, $v_class, ['merge' => true]);
 
+
+	$v_class_member = array();
 	foreach ($param_members as $members_friend_id){
 
 		$key_class_member = generateRandomString(LENGTH_CHAT_ID);
@@ -360,11 +360,13 @@ function create_class(){
 		$class_member_entity->save();
 	
 		$value_class_member = array('friend_id'=> $members_friend_id, 
-																'item_id'=>$class_member_entity->item_id,
+																// 'item_id'=>$class_member_entity->item_id,
 																'status'=>TRUE);
 
 
-		$value_class['members'][$key_class_member] = $value_class_member;
+		// $value_class['members'][$key_class_member] = $value_class_member;
+
+		$v_class_member[$key_class_member] = $value_class_member;
 
 		// update firestore
 		$nycRef =firestore_db()->collection(FIRESTORE_USERS)->document($param_uid)->collection(FIRESTORE_CLASSS)->document($class_entity->item_id)->collection('members')->document($key_class_member);
@@ -378,8 +380,8 @@ function create_class(){
 	$execution_time = number_format(($time_end - $time_start), 2);
 	
 	$result['result'] = TRUE;
-	// $result['item_id']= $class_entity->item_id;
-	// $result['data']   = $value_class;
+	$result['class']   = array('class_id'=>$class_entity->item_id, 'class_data'=> $v_class);
+	$result['member']  = array('class_id'=>$class_entity->item_id, 'class_members'=>$v_class_member);
 	$result['execution_time']  = $execution_time;
   return $result;
 }

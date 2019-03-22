@@ -11,6 +11,8 @@ import Mailer from 'react-native-mail';
 import * as actions from '../../Actions'
 import {getUid, getHeaderInset} from '../../Utils/Helpers'
 
+import {makeUidState, makeProfileState} from '../../Reselect'
+
 class InviteFriendByEmailPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => ({
@@ -65,9 +67,6 @@ class InviteFriendByEmailPage extends React.Component{
 
                         item.email = emailAddresse.email
                     })
-
-                    
-
                     // item.email = contact.emailAddresses
 
                     items.push(item)
@@ -118,9 +117,9 @@ class InviteFriendByEmailPage extends React.Component{
     }
 
     sendMail = (mail) =>{
-        let {profiles} = this.props
+        let {profile} = this.props
 
-        let body = profiles.name + ' is inviting you to join DNA, the all-in-one communication app! Enjoy free voice and video calls, group chats, stickers, games, and more with your friends and family. Download DNA here: https://line.me/D Add ' + profiles.name + ' as a friend by accessing the link below or scanning the attached QR code. https://line.me/ti/p/2NH1U25c58'
+        let body = profile.name + ' is inviting you to join DNA, the all-in-one communication app! Enjoy free voice and video calls, group chats, stickers, games, and more with your friends and family. Download DNA here: https://line.me/D Add ' + profile.name + ' as a friend by accessing the link below or scanning the attached QR code. https://line.me/ti/p/2NH1U25c58'
         Mailer.mail({
             subject: 'Join me on DNA',
             recipients: [mail],
@@ -179,11 +178,24 @@ class InviteFriendByEmailPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
-    console.log(state)
+const mapStateToProps = (state, ownProps) => {
+     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
+    //_persist.rehydrated parameter is initially set to false
+    if(!state._persist.rehydrated){
+        return {}
+    }
+
+    if(!state.auth.isLogin){
+        return;
+    }
+
     return({
-        uid:getUid(state),
-        profiles: state.auth.users.profiles
+        // uid:getUid(state),
+        // profiles: state.auth.users.profiles
+
+
+        uid: makeUidState(state, ownProps),
+        profile:makeProfileState(state, ownProps),
     })
 }
   
