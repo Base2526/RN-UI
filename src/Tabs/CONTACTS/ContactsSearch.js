@@ -8,9 +8,20 @@ import {View,
 import { connect } from 'react-redux';
 import ExpandableList from 'react-native-expandable-section-flatlist'
 var _ = require('lodash');
+
+
 import * as actions from '../../Actions'
 import FastImage from 'react-native-fast-image'
 import MyIcon from '../../config/icon-font.js';
+import {isEmpty} from '../../Utils/Helpers'
+
+import {makeClasssState,
+        makeClassMembersState,
+        makeGroupsState,
+        makeGroupProfilesState,
+        makeGroupMembersState,
+        makeFriendsState,
+        makeFriendProfilesState,} from '../../Reselect'
 
 // https://stackoverflow.com/questions/43309879/search-in-object-react
 class ContactsSearch extends React.Component{
@@ -41,7 +52,6 @@ class ContactsSearch extends React.Component{
   }
 
   componentDidMount(){
-
     let tabFriends = []
     let tabGroups = []
     let tabClasss = []
@@ -57,6 +67,92 @@ class ContactsSearch extends React.Component{
     // Hide that keyboard!
     Keyboard.dismiss()
 
+    console.log('text', text)
+
+    if(isEmpty(text)){
+      alert("Empty key search")
+    }
+
+    let {friends, friend_profiles, group_profiles, classs} = this.props
+
+    
+    // let _friends =_.filter(friends,function(v, k) { 
+    //                 if(v.change_friend_name){
+    //                   console.log(v.change_friend_name.toLowerCase().includes(text.toLowerCase()))
+    //                   return v.change_friend_name.toLowerCase().includes(text.toLowerCase())
+    //                 }
+    //                 return;
+    //               }).map((vv, kk)=>{
+    //                 return {vv, kk};
+    //               });
+
+    // ---------------------  tabFriends
+    let _friends= []
+    _.map(friends, (v, k)=>{
+      if(v.change_friend_name){
+        if(v.change_friend_name.toLowerCase().includes(text.toLowerCase())){
+          _friends.push(k)
+        }
+      }
+    })
+
+    _.map(friend_profiles, (v, k)=>{
+      if(v.name){
+        if(v.name.toLowerCase().includes(text.toLowerCase())){
+          _friends.push(k)
+        }
+      }
+      if(v.status_message){
+        if(v.name.toLowerCase().includes(text.toLowerCase())){
+          _friends.push(k)
+        }
+      }
+    })
+
+    // Removing duplicate array values
+    const new_friends = _friends.filter(function(elem, pos) {
+                          return _friends.indexOf(elem) == pos;
+                        }); 
+
+    let tabFriends = []
+    _.map(new_friends, (v, k)=>{
+      let _f  =_.find(friends, (fv, fk)=>{
+                return v == fk
+              })
+      if(_f){
+        let _fp =_.find(friend_profiles, (fv, fk)=>{
+                  return v == fk
+                })
+        tabFriends.push({friend_id:v, ..._f, profile:_fp}) 
+      }
+    })
+    // ---------------------  tabFriends
+
+    // ---------------------  tabGroups
+
+    let tabGroups= []
+    _.map(group_profiles, (v, k)=>{
+      if(v.name){
+        if(v.name.toLowerCase().includes(text.toLowerCase())){
+        // if(v.change_friend_name.toLowerCase().includes(text.toLowerCase())){
+          tabGroups.push({...v, group_id:k})
+        }
+      }
+    })
+    
+    // ---------------------  tabGroups
+
+    // ---------------------  tabClasss
+    // let tabClasss= []
+    let tabClasss = _.filter(classs,  function(v, k) { 
+      return v.name.toLowerCase().includes(text.toLowerCase())
+    })
+    // ---------------------  tabClasss
+
+    let data = [{title: 'Tab Friends',member: tabFriends}, {title: 'Tab Groups', member: tabGroups}, {title: 'Tab Classs', member: tabClasss}]
+    this.setState({data})
+
+    /*
     let friends = this.props.auth.users.friends
     let classs = this.props.auth.users.classs
     let groups = this.props.auth.users.groups
@@ -84,48 +180,7 @@ class ContactsSearch extends React.Component{
         data
       })
     }
-  }
-
-
-  loadData = () => {
-    let friends = this.props.auth.users.friends
-  }
-
-  _handleResults(results) {
-    // this.setState({ results });
-    console.log(results)
-
-    // Hide that keyboard!
-    Keyboard.dismiss()
-
-    this.setState({ results });
-
-    let tabFriends = []
-    let tabGroups = []
-    let tabClasss = []
-
-    for(let i = 0; i < 3; i++){
-      tabFriends.push({
-        name:"",
-        image_url:""
-      })
-
-      tabGroups.push({
-        name:"",
-        image_url:""
-      })
-
-      tabClasss.push({
-        name:"",
-        image_url:""
-      })
-    }
-
-    this.setState({
-      data: [{title: 'Tab Friends',member: tabFriends}, {title: 'Tab Groups', member: tabGroups}, {title: 'Tab Classs', member: tabClasss}]
-    })
-
-    
+    */
   }
 
   onHide(results){
@@ -182,16 +237,24 @@ class ContactsSearch extends React.Component{
         return( 
           <TouchableOpacity
             onPress={()=>{
-              let friend_id = _.findKey(this.props.auth.users.friends,  function(v, k) { 
-                return v.chat_id == rowItem.chat_id
-              })
-              if(friend_id !== undefined){
-                this.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
-              }
+              // console.log(rowItem)
+              // let friend_id = _.findKey(this.props.auth.users.friends,  function(v, k) { 
+              //   return v.chat_id == rowItem.chat_id
+              // })
+              // if(friend_id !== undefined){
+              //   this.props.navigation.navigate("FriendProfilePage",{'friend_id': friend_id})
+              // }
+
+              this.props.navigation.navigate("FriendProfilePage",{'friend_id': rowItem.friend_id})
             }}>
-            <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+            <View style={{flex:1, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                 <FastImage
-                  style={{width: 60, height: 60, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
+                  style={{width: 50, 
+                          height: 50, 
+                          borderRadius: 10, 
+                          // borderWidth:.5, 
+                          // borderColor:'gray'
+                        }}
                   source={{
                     uri: rowItem.profile.image_url,
                     headers:{ Authorization: 'someAuthToken' },
@@ -209,25 +272,34 @@ class ContactsSearch extends React.Component{
         return( 
           <TouchableOpacity
             onPress={()=>{
-              let group_id = _.findKey(this.props.auth.users.groups,  function(v, k) { 
-                return v.item_id == rowItem.item_id
-              })
-              if(group_id !== undefined){
-                this.props.navigation.navigate("ManageGroupPage",{'group_id': group_id})
-              }
+
+              // console.log(rowItem)
+              // let group_id = _.findKey(this.props.auth.users.groups,  function(v, k) { 
+              //   return v.item_id == rowItem.item_id
+              // })
+              // if(group_id !== undefined){
+              //   this.props.navigation.navigate("ManageGroupPage",{'group_id': group_id})
+              // }
+
+              this.props.navigation.navigate("ManageGroupPage",{'group_id': rowItem.group_id})
             }}>
-          <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+          <View style={{flex:1, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                   <FastImage
-                    style={{width: 60, height: 60, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
+                    style={{width: 50, 
+                            height: 50, 
+                            borderRadius: 10, 
+                            // borderWidth:.5, 
+                            // borderColor:'gray'
+                          }}
                     source={{
-                      uri: rowItem.group_profile.image_url,
+                      uri: rowItem.image_url,
                       headers:{ Authorization: 'someAuthToken' },
                       priority: FastImage.priority.normal,
                     }}
                     resizeMode={FastImage.resizeMode.cover}
                   />
             <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-              <Text style={{fontSize:18}}>{rowItem.group_profile.name}</Text>
+              <Text style={{fontSize:18}}>{rowItem.name}</Text>
             </View>
           </View>
           </TouchableOpacity>)
@@ -238,11 +310,16 @@ class ContactsSearch extends React.Component{
           <TouchableOpacity
             onPress={()=>{
               // console.log(rowItem)
-              this.props.navigation.navigate("ManageClasssPage", {'data': rowItem})
+              // this.props.navigation.navigate("ManageClasssPage", {'data': rowItem})
             }}>
-          <View style={{flex:1, height:100, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
+          <View style={{flex:1, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
               <FastImage
-                style={{width: 60, height: 60, borderRadius: 10, borderWidth:.5, borderColor:'gray'}}
+                style={{width: 50, 
+                        height: 50, 
+                        borderRadius: 10, 
+                        // borderWidth:.5, 
+                        // borderColor:'gray'
+                      }}
                 source={{
                   uri: rowItem.image_url,
                   headers:{ Authorization: 'someAuthToken' },
@@ -257,8 +334,6 @@ class ContactsSearch extends React.Component{
           </TouchableOpacity>)
       }
     }
-
-    
   }
 
   render(){
@@ -272,7 +347,7 @@ class ContactsSearch extends React.Component{
                           value={this.state.text}
                           clearButtonMode='while-editing'
                           // maxLength={30}
-                          placeholder= 'input search key'
+                          placeholder= 'search friend, group, class'
                           // editable={this.state.data.length -1 == 10?false:true} 
                       />
                       <TouchableOpacity 
@@ -310,8 +385,8 @@ class ContactsSearch extends React.Component{
   }
 }
 
-const mapStateToProps = (state) => {
-  console.log(state)
+const mapStateToProps = (state, ownProps) => {
+  // console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
   //_persist.rehydrated parameter is initially set to false
@@ -319,8 +394,20 @@ const mapStateToProps = (state) => {
     return {}
   }
 
+  if(!state.auth.isLogin){
+    return;
+  }
+
   return{
-    auth:state.auth
+    // auth:state.auth,
+
+    friends:makeFriendsState(state, ownProps),
+    friend_profiles:makeFriendProfilesState(state, ownProps),
+    groups:makeGroupsState(state, ownProps),
+    group_profiles:makeGroupProfilesState(state, ownProps),
+    group_members:makeGroupMembersState(state, ownProps),
+    classs:makeClasssState(state, ownProps),
+    class_members:makeClassMembersState(state, ownProps),
   }
 }
 

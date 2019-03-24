@@ -271,6 +271,10 @@ function create_class2(){
 }
 
 // new version react-native
+
+/* 
+ยอมให้ตอน create empty member ได้
+*/
 function create_class(){
 	$result = array();
   
@@ -291,11 +295,13 @@ function create_class(){
   $param_name   = $_REQUEST['name'];
   $param_members= (array)json_decode($_REQUEST['members']);
 
+	/*
   if (count($param_members) == 0) {
     $result['result']   = FALSE;
     // $result['message']  = "Members empty.";
     return $result;
 	}
+	*/
 	
 	if(empty($_FILES["idna"])){
 		$result['result']   = FALSE;
@@ -1315,6 +1321,43 @@ function classs(){
 	return  $result;
 }
 
+/*
+[NOTE BY danbrown AT php DOT net: The array_diff_assoc_recursive function is a 
+combination of efforts from previous notes deleted.
+Contributors included (Michael Johnson), (jochem AT iamjochem DAWT com), 
+(sc1n AT yahoo DOT com), and (anders DOT carlsson AT mds DOT mdh DOT se).]
+*/
+function array_diff_assoc_recursive($array1, $array2)
+{
+	foreach($array1 as $key => $value)
+	{
+		if(is_array($value))
+		{
+			if(!isset($array2[$key]))
+			{
+				$difference[$key] = $value;
+			}
+			elseif(!is_array($array2[$key]))
+			{
+				$difference[$key] = $value;
+			}
+			else
+			{
+				$new_diff = array_diff_assoc_recursive($value, $array2[$key]);
+				if($new_diff != FALSE)
+				{
+					$difference[$key] = $new_diff;
+				}
+			}
+		}
+		elseif(!isset($array2[$key]) || $array2[$key] != $value)
+		{
+			$difference[$key] = $value;
+		}
+	}
+	return !isset($difference) ? 0 : $difference;
+}
+
 function presence(){
 	$result = array();
 	if (!check_header()) {
@@ -1362,7 +1405,13 @@ function presence(){
 			$vs['field_online'][LANGUAGE_NONE][0]['value']                   = $newValue['status'];
 			$vs['field_key_token_notification'][LANGUAGE_NONE][0]['value']   = $newValue['fcmToken'];
 			$vs['field_object_id'][LANGUAGE_NONE][0]['value']   						 = $objectId;
-			
+
+			$vs['field_updated_at'][LANGUAGE_NONE][0]['value']   						 = $newValue['updated_at'];
+
+			if (array_key_exists('position', $newValue)) {
+				$vs['field_position'][LANGUAGE_NONE][0]['value']   						 = serialize($newValue['position']);
+			}
+
 			// Create the field collection entry and associate it with the profile
 			$field_entity = entity_create('field_collection_item', $vs);
 			$field_entity->setHostEntity('profile2', $profile);
@@ -1403,6 +1452,10 @@ function presence(){
 		
 		$array_diff_assoc  = array_diff_assoc($a2, $a1);
 
+		// $array_diff_assoc2  = array_diff_assoc_recursive($a2['position'], $a1['position']);
+
+		// watchdog(TAG, 'presence : %array_diff_assoc -> %array_diff_assoc2', array('%array_diff_assoc'=>serialize($array_diff_assoc), '%array_diff_assoc2'=>serialize($array_diff_assoc2)), WATCHDOG_INFO);
+
 		// $result['array_diff_assoc'] = $array_diff_assoc;
 
 		// if (property_exists($array_diff_assoc, 'status')) {
@@ -1410,6 +1463,24 @@ function presence(){
 		// $result['-x2-'] = array_key_exists('status3', $array_diff_assoc);//property_exists((array)$array_diff_assoc, 'status');
 		// $result['--c--'] = gettype($array_diff_assoc);
 		// }
+		
+		/* 
+			กรณี position เราใช้ function array_diff_assoc ไม่สามารถ diff array > 1 ได้
+			เราจึงแยกออกมาเช็ด
+		*/
+		if (array_key_isset('position', $a2)) {
+		
+			$position_before = '';
+			if (array_key_isset('position', $a1)) {
+				$position_before = serialize($a1['position']);
+			}
+		
+			$position_after = serialize($a2['position']);
+			if($position_before != $position_after){
+				$array_diff_assoc = array_merge($array_diff_assoc, array('position'=>$position_after));
+				// watchdog(TAG, 'presence-position : a2 %a2', array('%a2'=>serialize($a2['position'])), WATCHDOG_INFO);
+			}
+		}
 
 		// กรณีข้อมูลไม่มีการเปลียนแปลง
 		if(count($array_diff_assoc) < 1){
@@ -1430,38 +1501,55 @@ function presence(){
       $collection_item = field_collection_item_load(array_keys($entities['field_collection_item'])[0]);
       $wrapper = entity_metadata_wrapper('field_collection_item', $collection_item);
 
-			if (array_key_isset('build_number', $array_diff_assoc)) {
-				$wrapper->field_device_access_build->set($array_diff_assoc['build_number']);
-			}
+			if (array_key_isset('updated_at', $array_diff_assoc)) {
+			
+				if($array_diff_assoc['updated_at'] > $wrapper->field_updated_at->value()){
 
-			if (array_key_isset('build_version', $array_diff_assoc)) {
-				$wrapper->field_device_access_version->set($array_diff_assoc['build_version']);
-			}
+					// watchdog(TAG, '> presence : array_diff_assoc %array_diff_assoc - %updated_at', array('%array_diff_assoc'=>$array_diff_assoc['updated_at'], '%updated_at'=>$wrapper->field_updated_at->value()), WATCHDOG_INFO);
+					
+					if (array_key_isset('build_number', $array_diff_assoc)) {
+						$wrapper->field_device_access_build->set($array_diff_assoc['build_number']);
+					}
+		
+					if (array_key_isset('build_version', $array_diff_assoc)) {
+						$wrapper->field_device_access_version->set($array_diff_assoc['build_version']);
+					}
+		
+					if (array_key_isset('bundle_identifier', $array_diff_assoc)) {
+						$wrapper->field_bundle_identifier->set($array_diff_assoc['bundle_identifier']);
+					}
+		
+					if (array_key_isset('fcmToken', $array_diff_assoc)) {
+						$wrapper->field_key_token_notification->set($array_diff_assoc['fcmToken']);
+					}
+		
+					if (array_key_isset('model_number', $array_diff_assoc)) {
+						$wrapper->field_model_number->set($array_diff_assoc['model_number']);
+					}
+		
+					if (array_key_isset('platform', $array_diff_assoc)) {
+						$wrapper->field_platform->set($array_diff_assoc['platform']);
+					}
+		
+					if (array_key_isset('status', $array_diff_assoc)) {
+						$wrapper->field_online->set($array_diff_assoc['status']);
+					}
+		
+					if (array_key_isset('udid', $array_diff_assoc)) {
+						$wrapper->field_udid->set($array_diff_assoc['udid']);
+					}
+		
+					if (array_key_exists('position', $array_diff_assoc)) {
+						$wrapper->field_position->set(serialize($array_diff_assoc['position']));
+					}
 
-			if (array_key_isset('bundle_identifier', $array_diff_assoc)) {
-				$wrapper->field_bundle_identifier->set($array_diff_assoc['bundle_identifier']);
-			}
+					if (array_key_exists('updated_at', $array_diff_assoc)) {
+						$wrapper->field_updated_at->set($array_diff_assoc['updated_at']);
+					}
 
-			if (array_key_isset('fcmToken', $array_diff_assoc)) {
-				$wrapper->field_key_token_notification->set($array_diff_assoc['fcmToken']);
+					$wrapper->save();
+				}	
 			}
-
-			if (array_key_isset('model_number', $array_diff_assoc)) {
-				$wrapper->field_model_number->set($array_diff_assoc['model_number']);
-			}
-
-			if (array_key_isset('platform', $array_diff_assoc)) {
-				$wrapper->field_platform->set($array_diff_assoc['platform']);
-			}
-
-			if (array_key_isset('status', $array_diff_assoc)) {
-				$wrapper->field_online->set($array_diff_assoc['status']);
-			}
-
-			if (array_key_isset('udid', $array_diff_assoc)) {
-				$wrapper->field_udid->set($array_diff_assoc['udid']);
-			}
-      $wrapper->save();
     }
 	}
 

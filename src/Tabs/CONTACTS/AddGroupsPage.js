@@ -169,28 +169,28 @@ class AddGroupsPage extends React.Component{
     }
 
     handleCreateGroup = () => {
-      let {is_connected} = this.props
+      let {uid, is_connected} = this.props
 
-      let groupName = this.state.groupName.trim()
+      let group_name = this.state.groupName.trim()
       let uri = this.state.avatarSource.uri; 
 
       let seleteds = []
       let list = this.state.sections[0].data[0].list
       list.map((value) => {
-        if(value.friend_id !== undefined){
+        if(value.friend_id){
           seleteds.push(value.friend_id)
         }
       })
 
-      if(groupName === "" && uri === "" && seleteds.length === 0){
+      if(group_name === "" && uri === "" && seleteds.length === 0){
         alert("Group name and Image && Select friend is empty.")
-      }else if(groupName === ""){
+      }else if(group_name === ""){
         alert("Group name is empty.")
       }else if(uri === ""){
         alert("Image is empty.")
-      }else if(seleteds.length === 0){
+      }/*else if(seleteds.length === 0){
         alert("Select friend is empty.")
-      }else{
+      }*/else{
 
         if(!is_connected){
           checkInternetDialog()
@@ -198,7 +198,7 @@ class AddGroupsPage extends React.Component{
         } 
 
         this.setState({loading:true})
-        this.props.actionCreateGroup(this.props.uid, groupName, seleteds, this.state.avatarSource.uri).then((result) => {
+        this.props.actionCreateGroup(uid, group_name, seleteds, this.state.avatarSource.uri).then((result) => {
           console.log(result)
 
           if(result.status){

@@ -1917,7 +1917,7 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
                                     return group_id == k
                                 })
                         
-                    console.log("trackGroups users")
+                    // console.log("trackGroups users")
                     if(!group){
                         console.log("trackGroups users > groups > added")
                         dispatch({ type: ADD_GROUP, group_id, group_data});
@@ -2068,11 +2068,8 @@ profileFriend = (friend_id, dispatch)=>{
 
     // console.log(new_state.auth.user)
 
-
     var new_state =store.getState();
     let {user_presences} = new_state.presence
-
-
 
     // friend > profiles
     firebase.firestore().collection('profiles').doc(friend_id).onSnapshot((friendProfileDocSnapshot) => {
@@ -2080,6 +2077,7 @@ profileFriend = (friend_id, dispatch)=>{
         if (!friendProfileDocSnapshot.exists) {
             console.log('No such document!', friend_id);
         } else {
+            console.log('friend profiles >' + friendProfileDocSnapshot.size)
 
             let friend_data = friendProfileDocSnapshot.data()
 
@@ -2218,6 +2216,7 @@ profileFriend = (friend_id, dispatch)=>{
 
     // track friends > my_ids
     firebase.firestore().collection('profiles').doc(friend_id).collection('my_ids').onSnapshot((my_idsSnapshot) => {
+       
         my_idsSnapshot.docChanges.forEach(function(my_idsChange) {
             let friend_my_id_id   = my_idsChange.doc.id
             let friend_my_id_data = my_idsChange.doc.data()
@@ -2257,11 +2256,8 @@ profileFriend = (friend_id, dispatch)=>{
         })
     })
 
-
     firebase.database().ref('user_presence/' + friend_id).on('child_added', function (snapshot) {
         // console.log(change.doc.id, snapshot.key, snapshot.val())
-
-        
 
         let presenceKey = snapshot.key
         let presenceData = snapshot.val()

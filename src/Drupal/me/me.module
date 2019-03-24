@@ -14943,11 +14943,13 @@ function create_chat_group(){
   $param_name   = $_REQUEST['name'];
   $param_members= (array)json_decode($_REQUEST['members']);
 
+  /*
   if (count($param_members) == 0) {
     $result['result']   = FALSE;
     // $result['message']  = "Members empty.";
     return $result;
   }
+  */
 
   // chat_id เป้น id ที่ไว้สำหรับอ้างอิงเป้น chat id  
   $chat_id = generateRandomString(LENGTH_CHAT_ID);
@@ -15023,6 +15025,8 @@ function create_chat_group(){
   $m_profile['status']    = '36';
   $m_profile['item_id']   = $member_field_entity->item_id;
   $m_profile['is_admin']  = TRUE;
+  $m_profile['created_at'] = time();
+  
   $f_members[$objectId]   = $m_profile;
 
   // $nycRef = $db->collection('cities')->document('NYC');
