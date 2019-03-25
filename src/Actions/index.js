@@ -1460,7 +1460,7 @@ export const trackProfiles=(uid, profiles)=> dispatch =>{
         //         this.navigation.navigate("AuthLoading")
         //     })
         // }
-        if(docSnapshot.data() !== undefined){
+        if(docSnapshot.data()){
             // console.log('trackProfiles', profiles, docSnapshot.data())
             
             if(!_.isEqual(profiles, docSnapshot.data())){
@@ -1970,7 +1970,7 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
                                                 return mk == member_key && _.isEqual(mv, members_change.doc.data())
                                             })
 
-                                profileFriend(member_data.friend_id, dispatch)
+                                // profileFriend(member_data.friend_id, dispatch)
 
                                 if(!member){
                                     console.log('track group > members : added', member_key, member_data)
@@ -1981,15 +1981,6 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
                                         dispatch({ type: ADDED_GROUP_MEMBER, group_id, member_key, member_data});
                                     }     
                                 }
-
-                                // let friend_id = _.findKey(friend_profiles, (v, k)=>{
-                                //                     return k == member.friend_id
-                                //                 })
-
-                                
-                                // if(!friend_id){
-                                
-                                // }
                             }
                             if (members_change.type === 'modified') {
                                 console.log('track group > members : modified');
@@ -2044,7 +2035,7 @@ export const trackFriends=(uid, friends, friend_profiles)=> dispatch =>{
                     dispatch({ type: ADD_FRIEND, friend_id, friend_data});
                 }
 
-                profileFriend(friend_id, dispatch)
+                // profileFriend(friend_id, dispatch)
             }
             if (change.type === 'modified') {
                 console.log('trackFriends > modified', friend_id, friend_data)
@@ -2058,6 +2049,9 @@ export const trackFriends=(uid, friends, friend_profiles)=> dispatch =>{
 กรณี group member ไม่ใช่เพือนของเรา เราต้องดึง  profile ลงมา save ที่เครื่อง
 */
 profileFriend = (friend_id, dispatch)=>{
+
+    return;
+    
     var new_state =store.getState();
 
     let {friend_emails, 

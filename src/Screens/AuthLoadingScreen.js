@@ -120,6 +120,7 @@ class AuthLoadingScreen extends React.Component {
                 } = this.props
 
             this.props.trackProfiles(uid, profiles)
+            /*
             this.props.trackProfilesPhones(uid, phones)
             this.props.trackProfileWebsites(uid, websites)
             this.props.trackProfileEmails(uid, emails)
@@ -128,6 +129,7 @@ class AuthLoadingScreen extends React.Component {
             this.props.trackClasss(uid, classs, class_members)
             this.props.trackGroups(uid, groups, group_profiles, group_members)
             this.props.trackFriends(uid, friends, friend_profiles)
+            */
 
             this.props.trackLocation(uid)
             
