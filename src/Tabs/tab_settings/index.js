@@ -1,7 +1,7 @@
 import { createStackNavigator } from 'react-navigation';
 // import Home from './home';
 
-import Home from './homeX';
+// import Home from './homeX';
 
 import homeY from './homeY'
 import SettingListHide from './SettingListHide'
