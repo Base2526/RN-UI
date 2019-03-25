@@ -9,7 +9,7 @@ import {View,
 
 import SubmitButton from 'react-native-submit-button';
 
-import ImageWithDefault from '../Utils/ImageWithDefault'
+import ImageWithDefault from '../utils/ImageWithDefault'
 
 export default class GroupMemberInviteItem extends React.Component {
 

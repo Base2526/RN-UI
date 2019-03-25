@@ -10,7 +10,7 @@ import { createOffline } from '@redux-offline/redux-offline';
 import offlineConfig from '@redux-offline/redux-offline/lib/defaults/index';
 
 import ReduxThunk from 'redux-thunk'
-import reducers from './Reducers'
+import reducers from './reducers'
 
 const persistConfig = {
   key: 'root',

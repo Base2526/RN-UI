@@ -4,19 +4,18 @@ import {View,
         Dimensions} from 'react-native'
 import { createDrawerNavigator, createStackNavigator, createSwitchNavigator, createAppContainer, StackNavigator } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import Tabs from './Tabs';  //Tab Nav
-import Profile from './Profile'; //Stack Nav
+import Tabs from './tabs';  //Tab Nav
+import Profile from './profile'; //Stack Nav
 
-import SignUp from "./Screens/SignUp";
-import SignIn from "./Screens/SignIn";
-import ForgotPassword from "./Screens/ForgotPassword"
-import Welcome from "./Screens/Welcome"
+import SignUp from "./screens/SignUp";
+import SignIn from "./screens/SignIn";
+import ForgotPassword from "./screens/ForgotPassword"
+import Welcome from "./screens/Welcome"
 
-import DrawerMenu from './DrawerMenu'
+import DrawerMenu from './drawer_menu'
 
-import AuthLoadingScreen from './Screens/AuthLoadingScreen'
+import AuthLoadingScreen from './screens/AuthLoadingScreen'
 
-// import {setDrawerStatus} from './Utils/Helpers'
 
 // var {height, width} = Dimensions.get('window');
 

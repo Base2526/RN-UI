@@ -4,10 +4,10 @@ import { Card, Button, FormLabel, FormInput } from "react-native-elements";
 
 import Spinner from 'react-native-loading-spinner-overlay';
 
-import Constant from '../Utils/Constant'
-import {validateEmail} from '../Utils/Helpers'
+import Constant from '../utils/Constant'
+import {validateEmail} from '../utils/Helpers'
 
-import {register} from '../Utils/Services'
+import {register} from '../utils/Services'
 
 export default class SignUp extends React.Component{
   constructor(props){

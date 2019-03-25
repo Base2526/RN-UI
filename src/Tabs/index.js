@@ -2,9 +2,9 @@ import React from 'react';
 import {View, Text, Image} from 'react-native'
 import { createBottomTabNavigator, createStackNavigator } from 'react-navigation';
 
-import ContactsScreen from './CONTACTS';
-import iDNAScreen from './iDNA';
-import SettingsScreen from './Settings';
+import ContactsScreen from './tab_contacts';
+import iDNAScreen from './tab_idnas';
+import SettingsScreen from './tab_settings';
 import MyIcon from '../config/icon-font.js';
 
 const SettingsTabs = createBottomTabNavigator({

@@ -10,14 +10,12 @@ import {
 } from 'react-native';
 
 import { Header } from 'react-navigation';
-
 import { isIphoneX } from 'react-native-iphone-x-helper';
-
 import FastImage from 'react-native-fast-image'
 
-import {getStatusBarHeight} from '../Utils/Helpers'
 
-import ImageWithDefault from '../Utils/ImageWithDefault'
+import {getStatusBarHeight} from '../utils/Helpers'
+import ImageWithDefault from '../utils/ImageWithDefault'
 
 
 const remote = 'http://s1.bwallpapers.com/wallpapers/2014/05/09/blue-full-hd-desktop-wallpapers_034316171.jpg';

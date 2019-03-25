@@ -111,7 +111,7 @@ import {USER_LOGIN_SUCCESS,
         ADDED_FEELINGS_AND_PRIVACY,
     
         ADDED_PEOPLE_YOU_MAY_KHOW,
-        REMOVED_PEOPLE_YOU_MAY_KHOW,}  from '../Actions/types'
+        REMOVED_PEOPLE_YOU_MAY_KHOW,}  from '../actions/types'
 
 const INITIAL_STATE = {users:null,
                        user:null,
@@ -122,9 +122,9 @@ const INITIAL_STATE = {users:null,
                        application_category: null
                        }
 
-import {isEquivalent2Object} from '../Utils/Helpers'
+import {isEquivalent2Object} from '../utils/Helpers'
 
-import Constant from '../Utils/Constant'
+import Constant from '../utils/Constant'
 
 export default (state= INITIAL_STATE, action)=>{
     console.log(action)

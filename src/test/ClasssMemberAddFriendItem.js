@@ -8,8 +8,7 @@ import {View,
         TouchableHighlight} from 'react-native'
 
 import SubmitButton from 'react-native-submit-button';
-
-import ImageWithDefault from '../Utils/ImageWithDefault'
+import ImageWithDefault from '../utils/ImageWithDefault'
 
 export default class ClasssMemberAddFriendItem extends React.Component {
 

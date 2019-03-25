@@ -13,10 +13,10 @@ import {
 const FBSDK = require('react-native-fbsdk');
 const { LoginButton, AccessToken, LoginManager } = FBSDK;
 
-import Constant from '../Utils/Constant'
-import {saveAsyncStorage} from '../Utils/Helpers'
+import Constant from '../utils/Constant'
+import {saveAsyncStorage} from '../utils/Helpers'
 
-import {login_with_social} from '../Utils/Services'
+import {login_with_social} from '../utils/Services'
 
 export default class FBButton extends Component {
 

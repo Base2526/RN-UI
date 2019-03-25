@@ -12,7 +12,7 @@ import {
 import { Header } from 'react-navigation';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import FastImage from 'react-native-fast-image'
-import {getStatusBarHeight} from '../Utils/Helpers'
+import {getStatusBarHeight} from '../utils/Helpers'
 
 
 // https://thekevinscott.com/background-images-in-react-native/
@@ -45,7 +45,7 @@ export default class BackgroundImage extends React.Component {
       <View style={{flex:1, paddingTop: this.getHeaderInset(), flexDirection:'row'}}>
         <FastImage
           style={StyleSheet.absoluteFill}
-          source={require('../Images/boxpink.png')}
+          source={require('../images/boxpink.png')}
           resizeMode={FastImage.resizeMode.cover}
         />
         <View style={{flexDirection:'row', margin:20}}>

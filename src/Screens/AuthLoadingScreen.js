@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import firebase from 'react-native-firebase';
 import SplashScreen from 'react-native-splash-screen'
 
-import * as actions from '../Actions';
+import * as actions from '../actions';
 import {makeUidState, 
         makeProfileState,
         makePhonesState, 
@@ -25,7 +25,7 @@ import {makeUidState,
         makeGroupProfilesState,
         makeGroupMembersState,
         makeFriendsState,
-        makeFriendProfilesState,} from '../Reselect'
+        makeFriendProfilesState,} from '../reselect'
 
 class AuthLoadingScreen extends React.Component {
     static navigationOptions = {

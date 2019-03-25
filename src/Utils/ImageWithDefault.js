@@ -4,7 +4,7 @@ import * as Progress from 'react-native-progress';
 import FastImage from 'react-native-fast-image'
 import { createImageProgress } from 'react-native-image-progress';
 
-import Constant from '../Utils/Constant'
+import Constant from '../utils/Constant'
 
 let Image = createImageProgress(FastImage);
 

@@ -3,12 +3,12 @@ var _ = require('lodash');
 import {ADDED_PRESENCE,
         CHANGED_PRESENCE,
         REMOVED_PRESENCE,
-        USER_LOGOUT}  from '../Actions/types'
+        USER_LOGOUT}  from '../actions/types'
 
 const INITIAL_STATE = {user_presences:null}
 
-import Constant from '../Utils/Constant'
-import {isEmpty} from '../Utils/Helpers'
+import Constant from '../utils/Constant'
+import {isEmpty} from '../utils/Helpers'
 export default (state= INITIAL_STATE, action)=>{
     // console.log(action)
 

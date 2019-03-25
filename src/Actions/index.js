@@ -127,8 +127,8 @@ import {USER_LOGIN_SUCCESS,
         REMOVED_PEOPLE_YOU_MAY_KHOW,
         } from './types'
 
-import {randomKey} from '../Utils/Helpers'
-import Constant from '../Utils/Constant'
+import {randomKey} from '../utils/Helpers'
+import Constant from '../utils/Constant'
 
 import {login, 
         people_you_may_khow, 
@@ -147,9 +147,9 @@ import {login,
         friend_profile_99,
         friend_profile_multi_99,
         add_new_post,
-        recreate_qrcode} from '../Utils/Services'
+        recreate_qrcode} from '../utils/Services'
 
-import {makeMyAppicationsPostsState} from '../Reselect'
+import {makeMyAppicationsPostsState} from '../reselect'
 
 import configureStore from '../configureStore'
 const { persistor, store } = configureStore()

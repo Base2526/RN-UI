@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { ActivityIndicator, View, StyleSheet, Image} from 'react-native'
 import FastImage from 'react-native-fast-image'
 
-import Constant from '../Utils/Constant'
+import Constant from '../utils/Constant'
 
 // https://gist.github.com/codingwaysarg/1115a6365eff654800b9dd3428104512
 export default class PlaceHolderFastImage extends Component {
@@ -29,7 +29,7 @@ export default class PlaceHolderFastImage extends Component {
             <View 
               style={this.state.loaded ? {width: 0, height: 0} : {} } >
               <Image 
-                source={require('../Images/icon-error.png')}
+                source={require('../images/icon-error.png')}
                 style={this.props.style}
               />
               <View style={{

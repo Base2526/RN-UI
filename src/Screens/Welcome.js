@@ -23,9 +23,9 @@ const { LoginButton, AccessToken, LoginManager } = FBSDK;
 
 import firebase from 'react-native-firebase'
 
-import Constant from '../Utils/Constant'
-import {saveAsyncStorage} from '../Utils/Helpers'
-import * as actions from '../Actions'
+import Constant from '../utils/Constant'
+import {saveAsyncStorage} from '../utils/Helpers'
+import * as actions from '../actions'
 
 // import {watchTaskEvent} from '../Actions'
 

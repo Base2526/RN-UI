@@ -1,5 +1,5 @@
 import db from './manager'
-import {currentTimestamp} from '../../Utils/Helpers'
+import {currentTimestamp} from '../../utils/Helpers'
 
 const friendProfile_get = (friend_id, callback) => {
     var t0 = performance.now();

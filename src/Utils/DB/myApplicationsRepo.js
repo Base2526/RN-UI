@@ -1,5 +1,5 @@
 import db from './manager'
-import {currentTimestamp} from '../../Utils/Helpers'
+import {currentTimestamp} from '../../utils/Helpers'
 
 const myApplication_get = (app_id, callback) => {
     var t0 = performance.now();

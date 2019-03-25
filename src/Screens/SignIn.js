@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 
 import firebase from 'react-native-firebase';
 
-import * as actions from '../Actions'
+import * as actions from '../actions'
 
 class SignIn extends React.Component{
   constructor(props){

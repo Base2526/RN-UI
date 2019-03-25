@@ -9,8 +9,8 @@ import {
   NativeModules,
   TouchableOpacity } from "react-native"
 
-import Constant from '../Utils/Constant'
-import {saveAsyncStorage} from '../Utils/Helpers'
+import Constant from '../utils/Constant'
+import {saveAsyncStorage} from '../utils/Helpers'
 
 const { RNTwitterSignIn } = NativeModules
 

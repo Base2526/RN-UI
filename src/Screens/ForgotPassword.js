@@ -4,8 +4,8 @@ import { Card, Button, FormLabel, FormInput } from "react-native-elements";
 
 import Spinner from 'react-native-loading-spinner-overlay';
 
-import {forget_password} from '../Utils/Services'
-import {validateEmail} from '../Utils/Helpers'
+import {forget_password} from '../utils/Services'
+import {validateEmail} from '../utils/Helpers'
 
 export default class ForgotPassword extends React.Component{
 

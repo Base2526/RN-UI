@@ -104,7 +104,7 @@ export * from './groupDetailRepo'
 /** 
  * use
  * 
- * import Database from '../Utils/DB'
+ * import Database from '../utils/DB'
  * 
  * Database.getConnection().transaction((tx) => {
  *      ...query
