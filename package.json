@@ -48,7 +48,6 @@
     "react-native-share": "^1.1.3",
     "react-native-splash-screen": "^3.2.0",
     "react-native-sqlite-storage": "^3.3.9",
-    "react-native-submit-button": "file:src/library/react-native-submit-button",
     "react-native-swipeout": "^2.3.6",
     "react-native-tableview-simple": "^1.0.0",
     "react-native-vector-icons": "^6.1.0",
