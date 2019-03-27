@@ -1,0 +1,24 @@
+export const TEST = 'TEST';
+export const UUID = 'UUID';
+
+export const MESSAGE_FETCHED_RESET = 'MESSAGE_FETCHED_RESET';
+export const MESSAGE_FETCHING = 'MESSAGE_FETCHING';
+export const MESSAGE_FETCHED = 'MESSAGE_FETCHED';
+export const MESSAGE_APPEND = 'MESSAGE_APPEND';
+export const MESSAGE_PREPEND = 'MESSAGE_PREPEND';
+export const MESSAGE_ERROR = 'MESSAGE_ERROR';
+
+export const GROUP_FETCHING = 'GROUP_FETCHING';
+export const GROUP_FETCHED = 'GROUP_FETCHED';
+export const GROUP_APPEND = 'GROUP_APPEND';
+export const GROUP_PREPEND = 'GROU_PREPEND';
+export const GROUP_ERROR = 'GROUP_ERROR';
+export const GROUP_LAST_MESSAGE = 'GROUP_LAST_MESSAGE';
+
+export const CONTACT_FETCHING = 'USER_FETCHING';
+export const CONTACT_FETCHED = 'USER_FETCHED';
+export const CONTACT_APPEND = 'USER_APPEND';
+export const CONTACT_PREPEND = 'USER_PREPEND';
+export const CONTACT_POP = 'USER_POP';
+export const CONTACT_ERROR = 'USER_ERROR';
+

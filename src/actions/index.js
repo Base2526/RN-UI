@@ -157,7 +157,7 @@ import {makeMyAppicationsPostsState} from '../reselect'
 import configureStore from '../configureStore'
 const { persistor, store } = configureStore()
 
-export const actionApplicationCategory = () =>dispatch =>{
+const actionApplicationCategory = () =>dispatch =>{
     return application_category().then(data=>{
         if(data.result){
             dispatch({ type: ADD_APPLICATION_CATEGORY, data_category: data.data});
@@ -168,7 +168,7 @@ export const actionApplicationCategory = () =>dispatch =>{
     })
 }
 
-export const actionGetPostFeelingsAndPrivacy = () =>dispatch =>{
+const actionGetPostFeelingsAndPrivacy = () =>dispatch =>{
     return get_post_feelings_and_privacy().then(data=>{
         console.log(data)
         if(data.result){
@@ -180,7 +180,7 @@ export const actionGetPostFeelingsAndPrivacy = () =>dispatch =>{
     })
 }
 
-export const actionRecreateQRcode = (uid) =>dispatch=>{
+const actionRecreateQRcode = (uid) =>dispatch=>{
     return recreate_qrcode(uid).then(data=>{
         console.log(data)
         if(data.result){
@@ -192,7 +192,7 @@ export const actionRecreateQRcode = (uid) =>dispatch=>{
 }
 
 // uid, group_name, members, uri
-export const actionCreateMyApplication = (uid, application_name, category, subcategory, uri) =>dispatch =>{
+const actionCreateMyApplication = (uid, application_name, category, subcategory, uri) =>dispatch =>{
     // 
     return create_my_application(uid, application_name, category, subcategory, uri).then(data=>{
         if(data.result){
@@ -203,7 +203,7 @@ export const actionCreateMyApplication = (uid, application_name, category, subca
     })
 }
 
-export const actionMyApplicationEmail = (uid, application_id, emails, callback) => dispatch =>{
+const actionMyApplicationEmail = (uid, application_id, emails, callback) => dispatch =>{
 
     // console.log(intereste_in)
     // dispatch({ type: INTERESTE_IN_PROFILE, intereste_in});
@@ -217,8 +217,7 @@ export const actionMyApplicationEmail = (uid, application_id, emails, callback) 
     callback({'status':true})
 }
 
-
-export const actionMyApplicationPhone = (uid, application_id, phones, callback) => dispatch =>{
+const actionMyApplicationPhone = (uid, application_id, phones, callback) => dispatch =>{
 
     // console.log(intereste_in)
     // dispatch({ type: INTERESTE_IN_PROFILE, intereste_in});
@@ -232,7 +231,7 @@ export const actionMyApplicationPhone = (uid, application_id, phones, callback) 
     callback({'status':true})
 }
 
-export const actionLogin = ({email, password}) => dispatch => {
+const actionLogin = ({email, password}) => dispatch => {
     return login(email, password).then(data => {
         if((data instanceof Array)){
             dispatch({ type: USER_LOGIN_FAIL, provider: Constant.PROVIDERS.USER, error: data[0] });
@@ -251,7 +250,7 @@ export const actionLogin = ({email, password}) => dispatch => {
     })
 }
 
-export const loginWithFacebook = () => {
+const loginWithFacebook = () => {
     return (dispatch) => {
         LoginManager.logInWithReadPermissions(["public_profile"]).then(
             (result) => {
@@ -272,7 +271,7 @@ export const loginWithFacebook = () => {
     }
 }
 
-export const actionLogout = (uid, dispatch, callback) => {
+const actionLogout = (uid, dispatch, callback) => {
     firebase.database().ref("user_presence/" + uid + "/"+ DeviceInfo.getUniqueID() +"/").update({
         'status':'offline'
     });
@@ -281,7 +280,7 @@ export const actionLogout = (uid, dispatch, callback) => {
     callback({'status':true})
 }
 
-export const actionTestUsers = () => dispatch=>{
+const actionTestUsers = () => dispatch=>{
     return test_users().then(data => {
         // console.log(data)
         if((data instanceof Array)){
@@ -303,7 +302,7 @@ export const actionTestUsers = () => dispatch=>{
     })
 }
 
-export const actionPeopleYouMayKhow = (uid) => dispatch=>{
+const actionPeopleYouMayKhow = (uid) => dispatch=>{
     return people_you_may_khow(uid).then(data => {
         console.log(data)
         if((data instanceof Array)){
@@ -326,12 +325,12 @@ export const actionPeopleYouMayKhow = (uid) => dispatch=>{
 }
 
 // REMOVED_PEOPLE_YOU_MAY_KHOW
-export const actionRemovedPeopleYouMayKhow = (uid, friend_id, callback) => dispatch =>{
+const actionRemovedPeopleYouMayKhow = (uid, friend_id, callback) => dispatch =>{
     dispatch({ type: REMOVED_PEOPLE_YOU_MAY_KHOW, friend_id});
     callback({'status':true})
 }
 
-export const actionInviteFriend = (uid, friend_id,  user_data, friend_data, callback) => dispatch =>{
+const actionInviteFriend = (uid, friend_id,  user_data, friend_data, callback) => dispatch =>{
     let batch = firebase.firestore().batch();
 
     let userRef = firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
@@ -355,13 +354,13 @@ export const actionInviteFriend = (uid, friend_id,  user_data, friend_data, call
     });
 }
 
-export const actionAddFriend = (uid, friend_id, data, profile, callback) => dispatch =>{
+const actionAddFriend = (uid, friend_id, data, profile, callback) => dispatch =>{
     // dispatch({ type: ADD_FRIEND, friend_id,  friend_data:data, profile})
     callback({'status':true, friend_id, data, profile})
 }
 
 // create_group
-export const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
+const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
     return create_group(uid, group_name, members, uri).then(data => {
         console.log(data)
         if((data instanceof Array)){
@@ -403,7 +402,7 @@ export const actionCreateGroup = (uid, group_name, members, uri) => dispatch =>{
 //  เป็นการ cancel การ invite โดยผู้เชิญ(admin)
 CANCELED_GROUP_MEMBER  = "canceled_group_member"
 */
-export const actionCanceledGroupMember = (uid, group_id, friend_id, member_key, callback) => dispatch =>{
+const actionCanceledGroupMember = (uid, group_id, friend_id, member_key, callback) => dispatch =>{
     let batch = firebase.firestore().batch();
     let usersRef = firebase.firestore().collection('users').doc(friend_id).collection('groups').doc(group_id)
     batch.delete(usersRef);
@@ -421,7 +420,7 @@ export const actionCanceledGroupMember = (uid, group_id, friend_id, member_key, 
     callback({'status':true})
 }
 
-export const actionUpdateGroupPictureProfile = (uid, group_id, image_uri) => dispatch =>{
+const actionUpdateGroupPictureProfile = (uid, group_id, image_uri) => dispatch =>{
 
     return update_group_picture_profile(uid, group_id, image_uri).then(data => {
         console.log(data)
@@ -439,7 +438,7 @@ export const actionUpdateGroupPictureProfile = (uid, group_id, image_uri) => dis
 }
 
 // EDIT_GROUP_NAME_PROFILE
-export const actionEditGroupNameProfile = (uid, group_id, group_name, callback) => dispatch =>{
+const actionEditGroupNameProfile = (uid, group_id, group_name, callback) => dispatch =>{
     firebase.firestore().collection('groups').doc(group_id).set({
         name:group_name,
     }, { merge: true});
@@ -450,7 +449,7 @@ export const actionEditGroupNameProfile = (uid, group_id, group_name, callback) 
 }
 
 // favorites group
-export const actionFavoritesGroup = (uid, group_id, favorite_status, callback) => dispatch => {
+const actionFavoritesGroup = (uid, group_id, favorite_status, callback) => dispatch => {
     dispatch({ type: FAVORITES_GROUP, group_id, favorite_status});
     firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).set({
         is_favorites: favorite_status,
@@ -466,7 +465,7 @@ export const actionFavoritesGroup = (uid, group_id, favorite_status, callback) =
     - update status GROUP_STATUS_MEMBER_JOINED : users/{user_id}/groups/{group_id}/status = GROUP_STATUS_MEMBER_JOINED
     - update status == GROUP_STATUS_MEMBER_JOINED groups/{group_id}/members/{item_id}/status = GROUP_STATUS_MEMBER_JOINED
 */
-export const actionMemberJoinGroup = (uid, group_id, member_key, callback) => dispatch => {
+const actionMemberJoinGroup = (uid, group_id, member_key, callback) => dispatch => {
     let batch = firebase.firestore().batch();
     let usersRef = firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id)
     batch.set(usersRef, {status: Constant.GROUP_STATUS_MEMBER_JOINED}, { merge: true})
@@ -486,7 +485,7 @@ export const actionMemberJoinGroup = (uid, group_id, member_key, callback) => di
 }
 
 // Leave Group
-export const actionMemberLeaveGroup = (uid, group_id, member_item_id, callback) => dispatch => {
+const actionMemberLeaveGroup = (uid, group_id, member_item_id, callback) => dispatch => {
     
     // console.log(uid, group_id, member_item_id)
     firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).delete()
@@ -505,7 +504,7 @@ export const actionMemberLeaveGroup = (uid, group_id, member_item_id, callback) 
     - ลบกลุ่มออกจาก  users/{user_id}/groups/{group_id} และ remove group redux local
     - update status == GROUP_STATUS_MEMBER_DECLINE groups/{group_id}/members/{item_id}/status = GROUP_STATUS_MEMBER_DECLINE
 */
-export const actionMemberDeclineGroup = (uid, group_id, member_key, callback) => dispatch => {
+const actionMemberDeclineGroup = (uid, group_id, member_key, callback) => dispatch => {
     /*
     firebase.firestore().collection('users').doc(uid).collection('groups').doc(group_id).delete()
     firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_key).set({
@@ -533,7 +532,7 @@ export const actionMemberDeclineGroup = (uid, group_id, member_key, callback) =>
 /* 
  การ invite again (กรณีที่เพือนกด decline แล้วเราจะทำการ invite อีกครั้ง)
 */
-export const actionMemberInviteAgainGroup = (uid, group_id, friend_id, member_key, callback) => dispatch => {
+const actionMemberInviteAgainGroup = (uid, group_id, friend_id, member_key, callback) => dispatch => {
     /*
     firebase.firestore().collection('users').doc(friend_id).collection('groups').doc(group_id).set({
         item_id: item_id,
@@ -564,7 +563,7 @@ export const actionMemberInviteAgainGroup = (uid, group_id, friend_id, member_ke
     callback({'status':true, uid, friend_id, group_id, member_key})
 }
 
-export const actionDeleteGroup = (uid, group_id, callback) => dispatch =>{
+const actionDeleteGroup = (uid, group_id, callback) => dispatch =>{
     let batch = firebase.firestore().batch();
     
     // /groups/1337
@@ -586,7 +585,7 @@ export const actionDeleteGroup = (uid, group_id, callback) => dispatch =>{
 }
 
 // Invite Member to group
-export const actionGroupInviteMember = (uid, group_id, members, callback) => dispatch =>{
+const actionGroupInviteMember = (uid, group_id, members, callback) => dispatch =>{
     let batch = firebase.firestore().batch();
     members.map(function(v, k) {
         let groupsRef = firebase.firestore().collection('groups').doc(group_id).collection('members').doc(v.member_key);
@@ -605,7 +604,7 @@ export const actionGroupInviteMember = (uid, group_id, members, callback) => dis
 }
 
 // Group MakeAdmin
-export const actionMakeAdminGroup = (uid, group_id, frind_id, member_key, callback) => dispatch =>{
+const actionMakeAdminGroup = (uid, group_id, frind_id, member_key, callback) => dispatch =>{
     firebase.firestore().collection('groups').doc(group_id).collection('members').doc(member_key).set({
         is_admin: true
     }, { merge: true});
@@ -613,7 +612,7 @@ export const actionMakeAdminGroup = (uid, group_id, frind_id, member_key, callba
 }
 
 // Remove as admin
-export const actionRemoveAsAdminGroup = (uid, group_id, frind_id, member_key, callback) => dispatch =>{
+const actionRemoveAsAdminGroup = (uid, group_id, frind_id, member_key, callback) => dispatch =>{
     // firebase.firestore().collection('groups').doc(group_id).collection('members').where('friend_id', '==', frind_id).get().then(snapshot => {
     //     console.log(snapshot)
     //     if(snapshot.size == 0){
@@ -635,7 +634,7 @@ export const actionRemoveAsAdminGroup = (uid, group_id, frind_id, member_key, ca
     callback({'status':true})
 }
 
-export const actionCreateClass = (uid, class_name, members, uri) => dispatch =>{
+const actionCreateClass = (uid, class_name, members, uri) => dispatch =>{
     return create_class(uid, class_name, members, uri).then(data => {
         console.log(data)
         if((data instanceof Array)){
@@ -663,7 +662,7 @@ export const actionCreateClass = (uid, class_name, members, uri) => dispatch =>{
 }
 
 // favorites class
-export const actionFavoritesClass = (uid, class_id, favorite_status, callback) => dispatch => {
+const actionFavoritesClass = (uid, class_id, favorite_status, callback) => dispatch => {
     
     dispatch({ type: FAVORITES_CLASS, class_id, favorite_status});
     firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).set({
@@ -673,14 +672,14 @@ export const actionFavoritesClass = (uid, class_id, favorite_status, callback) =
 }
 
 // delete class
-export const actionDeleteClass = (uid, class_id, callback) => dispatch =>{
+const actionDeleteClass = (uid, class_id, callback) => dispatch =>{
     firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).delete()
     dispatch({ type: REMOVED_CLASS, class_id});
     callback({'status':true, uid, class_id})
 }
 
 // Classs add member 
-export const actionClassAddMember = (uid, class_id, members, callback) => dispatch =>{
+const actionClassAddMember = (uid, class_id, members, callback) => dispatch =>{
     
     let batch = firebase.firestore().batch();
     members.map((v, k)=>{
@@ -702,7 +701,7 @@ export const actionClassAddMember = (uid, class_id, members, callback) => dispat
 }
 
 // REMOVED_CLASS_MEMBER
-export const actionDeleteClassMember = (uid, class_id, member_key, callback) => dispatch =>{
+const actionDeleteClassMember = (uid, class_id, member_key, callback) => dispatch =>{
     // users/{userId}/classs/{classId}/members/{key}
 
     dispatch({type: REMOVED_CLASS_MEMBER, class_id, member_key})
@@ -710,7 +709,7 @@ export const actionDeleteClassMember = (uid, class_id, member_key, callback) => 
     callback({'status':true})
 }
 
-export const actionUpdateClassPictureProfile = (uid, class_id, image_uri) => dispatch =>{
+const actionUpdateClassPictureProfile = (uid, class_id, image_uri) => dispatch =>{
     return update_class_picture_profile(uid, class_id, image_uri).then(data => {
         console.log(data)
         if((data instanceof Array)){
@@ -728,7 +727,7 @@ export const actionUpdateClassPictureProfile = (uid, class_id, image_uri) => dis
 }
 
 // export const add_new_post = (uid, app_id, feelings, privacy, images, text) 
-export const actionAddNewPost = (uid, app_id, feelings, privacy, images, text, location) => dispatch =>{
+const actionAddNewPost = (uid, app_id, feelings, privacy, images, text, location) => dispatch =>{
     return add_new_post(uid, app_id, feelings, privacy, images, text, location).then(data => {
         console.log(data)
         if((data instanceof Array)){
@@ -746,7 +745,7 @@ export const actionAddNewPost = (uid, app_id, feelings, privacy, images, text, l
     })
 }
 
-export const actionDeletePost = (uid, app_id, post_id, callback) => dispatch =>{
+const actionDeletePost = (uid, app_id, post_id, callback) => dispatch =>{
     firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(app_id).collection('my_applications_posts').doc(post_id).delete()
     callback({'status':true})
     /*
@@ -768,7 +767,7 @@ export const actionDeletePost = (uid, app_id, post_id, callback) => dispatch =>{
     */
 }
 
-export const actionLikePost = (creator, uid, app_id, post_id, status, callback) => dispatch =>{
+const actionLikePost = (creator, uid, app_id, post_id, status, callback) => dispatch =>{
     // firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).set({
     //     name,
     // }, { merge: true});
@@ -794,14 +793,14 @@ export const actionModifiedClass = (uid, class_name, callback) => dispatch =>{
 }
 */
 
-export const actionEditClassNameProfile = (uid, class_id, class_data, callback) => dispatch =>{
+const actionEditClassNameProfile = (uid, class_id, class_data, callback) => dispatch =>{
     dispatch({type: MODIFIED_CLASS, class_id, class_data })
 
     firebase.firestore().collection('users').doc(uid).collection('classs').doc(class_id).set(class_data, { merge: true});
     callback({'status':true})
 }
 
-export const actionUpdateStatusFriend = (uid, friend_id, status, callback) => dispatch=>{
+const actionUpdateStatusFriend = (uid, friend_id, status, callback) => dispatch=>{
     let batch = firebase.firestore().batch();
 
     // update status เพือ่นของเรา
@@ -823,7 +822,7 @@ export const actionUpdateStatusFriend = (uid, friend_id, status, callback) => di
 }
 
 // กรณี ค้นหาเพือนที่ มีการ block และ remove ดังนั้นเราจึงต้องทำการ unblock และ set friend status = Constant.FRIEND_STATUS_FRIEND
-export const actionFriendUnremove_Unblock = (uid, friend_id, callback) => dispatch=>{
+const actionFriendUnremove_Unblock = (uid, friend_id, callback) => dispatch=>{
 
     dispatch({ type: UPDATE_STATUS_FRIEND, friend_id, status:Constant.FRIEND_STATUS_FRIEND});
     dispatch({ type: FRIEND_BLOCK, friend_id, block:false});
@@ -842,7 +841,7 @@ export const actionFriendUnremove_Unblock = (uid, friend_id, callback) => dispat
 }
 
 // กรณี ค้นหาเพือนที่ มีการ hide และ remove ดังนั้นเราจึงต้องทำการ unhide และ set friend status = Constant.FRIEND_STATUS_FRIEND
-export const actionFriendUnremove_Chat = (uid, friend_id, callback) => dispatch=>{
+const actionFriendUnremove_Chat = (uid, friend_id, callback) => dispatch=>{
 
     dispatch({ type: UPDATE_STATUS_FRIEND, friend_id, status:Constant.FRIEND_STATUS_FRIEND});
     dispatch({ type: FRIEND_BLOCK, friend_id, hide:false});
@@ -862,7 +861,7 @@ export const actionFriendUnremove_Chat = (uid, friend_id, callback) => dispatch=
 
 
 // key, this.props.uid, friend.friend_id
-export const actionSelectClassMember = (uid, friend_id, class_id, member_key, status,callback) => dispatch=> {
+const actionSelectClassMember = (uid, friend_id, class_id, member_key, status,callback) => dispatch=> {
 
     // callback({'status':true, uid, friend_id, class_id, member_key, status})
     dispatch({type: ADDED_CLASS_MEMBER, class_id, class_member_id:member_key, class_member_data:{friend_id, status} })
@@ -909,7 +908,7 @@ export const actionSelectClassMember = (uid, friend_id, class_id, member_key, st
 }
 
 // Change friend's name
-export const actionChangeFriendsName = (uid, friend_id, name, callback) => dispatch=> {
+const actionChangeFriendsName = (uid, friend_id, name, callback) => dispatch=> {
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         change_friend_name: name,
     }, { merge: true}).then(result => {
@@ -922,7 +921,7 @@ export const actionChangeFriendsName = (uid, friend_id, name, callback) => dispa
 }
 
 // friend hide
-export const actionFriendHide = (uid, friend_id, hide, callback) => dispatch=> {
+const actionFriendHide = (uid, friend_id, hide, callback) => dispatch=> {
     dispatch({ type: FRIEND_HIDE, friend_id, hide});
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         hide,
@@ -936,7 +935,7 @@ export const actionFriendHide = (uid, friend_id, hide, callback) => dispatch=> {
 }
 
 // friend block
-export const actionFriendBlock = (uid, friend_id, block, callback) => dispatch=> {
+const actionFriendBlock = (uid, friend_id, block, callback) => dispatch=> {
     dispatch({ type: FRIEND_BLOCK, friend_id, block});
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         block, 
@@ -950,7 +949,7 @@ export const actionFriendBlock = (uid, friend_id, block, callback) => dispatch=>
 }
 
 // friend mute/unmute
-export const actionFriendMute = (uid, friend_id, mute, callback) => dispatch=> {
+const actionFriendMute = (uid, friend_id, mute, callback) => dispatch=> {
     dispatch({ type: FRIEND_MUTE, friend_id, mute});
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         mute,
@@ -963,7 +962,7 @@ export const actionFriendMute = (uid, friend_id, mute, callback) => dispatch=> {
 }
 
 // friend favorite
-export const actionFriendFavirite = (uid, friend_id, is_favorite, callback) => dispatch=> {
+const actionFriendFavirite = (uid, friend_id, is_favorite, callback) => dispatch=> {
     dispatch({ type: FRIEND_FAVORITE, friend_id, favorite_status:is_favorite});
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         is_favorite,
@@ -976,7 +975,7 @@ export const actionFriendFavirite = (uid, friend_id, is_favorite, callback) => d
 }
 
 // friend delete  'status':Constant.FRIEND_STATUS_FRIEND_REMOVE
-export const actionFriendDelete = (uid, friend_id, callback) => dispatch=> {
+const actionFriendDelete = (uid, friend_id, callback) => dispatch=> {
     dispatch({ type: REMOVED_FRIEND, friend_id});
     firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id).set({
         'status':Constant.FRIEND_STATUS_FRIEND_REMOVE
@@ -988,7 +987,7 @@ export const actionFriendDelete = (uid, friend_id, callback) => dispatch=> {
 }
 
 // My application published/unpublished 
-export const actionUpdateStatusMyApplication = (uid, my_application_id, status, callback) => dispatch =>{
+const actionUpdateStatusMyApplication = (uid, my_application_id, status, callback) => dispatch =>{
     firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(my_application_id).set({
         status,
     }, { merge: true});
@@ -997,7 +996,7 @@ export const actionUpdateStatusMyApplication = (uid, my_application_id, status, 
     callback({'status':true})
 }
 
-export const actionUpdatePictureProfile = (uid, image_uri, callback) => dispatch =>{
+const actionUpdatePictureProfile = (uid, image_uri, callback) => dispatch =>{
     return update_picture_profile(uid, image_uri).then(data => {
         if((data instanceof Array)){
             return {'status':false, 'message': data}
@@ -1013,7 +1012,7 @@ export const actionUpdatePictureProfile = (uid, image_uri, callback) => dispatch
 }
 
 // UPDATE_PICTURE_BG_PROFILE
-export const actionUpdatePictureBGProfile = (uid, image_uri, callback) => dispatch =>{
+const actionUpdatePictureBGProfile = (uid, image_uri, callback) => dispatch =>{
     return update_picture_bg_profile(uid, image_uri).then(data => {
         if((data instanceof Array)){
             return {'status':false, 'message': data}
@@ -1030,7 +1029,7 @@ export const actionUpdatePictureBGProfile = (uid, image_uri, callback) => dispat
 }
 
 // EDIT_DISPLAY_NAME_PROFILE
-export const actionEditDisplayNameProfile = (uid, name, callback) => dispatch =>{
+const actionEditDisplayNameProfile = (uid, name, callback) => dispatch =>{
     firebase.firestore().collection('profiles').doc(uid).set({
         name,
     }, { merge: true});
@@ -1041,7 +1040,7 @@ export const actionEditDisplayNameProfile = (uid, name, callback) => dispatch =>
 }
 
 // EDIT_STATUS_MESSAGE_PROFILE
-export const actionEditStatusMessageProfile = (uid, status_message, callback) => dispatch =>{
+const actionEditStatusMessageProfile = (uid, status_message, callback) => dispatch =>{
     firebase.firestore().collection('profiles').doc(uid).set({
         status_message,
     }, { merge: true});
@@ -1063,7 +1062,7 @@ export const actionEditStatusMessageProfile = (uid, status_message, callback) =>
 // }
 
 // Gender
-export const actionGenderProfile = (uid, gender_id, callback) => dispatch =>{
+const actionGenderProfile = (uid, gender_id, callback) => dispatch =>{
     // console.log('gender_id', gender_id)
     firebase.firestore().collection('profiles').doc(uid).set({
         gender:gender_id,
@@ -1075,7 +1074,7 @@ export const actionGenderProfile = (uid, gender_id, callback) => dispatch =>{
 }
 
 // InteresteIn
-export const actionInteresteInProfile = (uid, intereste_in, callback) => dispatch =>{
+const actionInteresteInProfile = (uid, intereste_in, callback) => dispatch =>{
     firebase.firestore().collection('profiles').doc(uid).set({
         intereste_in
     }, { merge: true});
@@ -1085,7 +1084,7 @@ export const actionInteresteInProfile = (uid, intereste_in, callback) => dispatc
 }
 
 // BIRTHDAY_PROFILE
-export const actionBirthdayProfile = (uid, date, callback) => dispatch =>{
+const actionBirthdayProfile = (uid, date, callback) => dispatch =>{
     firebase.firestore().collection('profiles').doc(uid).set({
         birthday:date,
     }, { merge: true});
@@ -1095,7 +1094,7 @@ export const actionBirthdayProfile = (uid, date, callback) => dispatch =>{
     callback({'status':true})
 }
 
-export const actionAddPhoneProfile = (uid, phone_number, callback) => dispatch =>{
+const actionAddPhoneProfile = (uid, phone_number, callback) => dispatch =>{
 
     let key = randomKey()
 
@@ -1115,7 +1114,7 @@ export const actionAddPhoneProfile = (uid, phone_number, callback) => dispatch =
     })
 }
 
-export const actionEditPhoneProfile = (uid, phone_key , newValue, callback) => dispatch =>{
+const actionEditPhoneProfile = (uid, phone_key , newValue, callback) => dispatch =>{
     firebase.firestore().collection('profiles').doc(uid).collection('phones').where("phone_number", "==", newValue.phone_number).get().then(snapshot => {
         if(snapshot.size == 0){
             firebase.firestore().collection('profiles').doc(uid).collection('phones').doc(phone_key).set({
@@ -1132,14 +1131,14 @@ export const actionEditPhoneProfile = (uid, phone_key , newValue, callback) => d
     })
 }
 
-export const actionRemovePhoneProfile = (uid, phone_key, callback) => dispatch =>{
+const actionRemovePhoneProfile = (uid, phone_key, callback) => dispatch =>{
     firebase.firestore().collection('profiles').doc(uid).collection('phones').doc(phone_key).delete()
     dispatch({ type: REMOVE_PHONE_PROFILE, phone_key});
     callback({'status':true})
 }
 
 // Address
-export const actionAddressProfile = (uid, address, callback) => dispatch =>{
+const actionAddressProfile = (uid, address, callback) => dispatch =>{
     firebase.firestore().collection('profiles').doc(uid).set({
         address,
     }, { merge: true});
@@ -1154,7 +1153,7 @@ ADD_WEBSITE_PROFILE,
 EDIT_WEBSITE_PROFILE,
 REMOVE_WEBSITE_PROFILE
 */
-export const actionAddWebsiteProfile = (uid, url, callback) => dispatch =>{
+const actionAddWebsiteProfile = (uid, url, callback) => dispatch =>{
 
     let key = randomKey()
 
@@ -1173,7 +1172,7 @@ export const actionAddWebsiteProfile = (uid, url, callback) => dispatch =>{
     })
 }
 
-export const actionEditWebsiteProfile = (uid, website_key ,url, callback) => dispatch =>{
+const actionEditWebsiteProfile = (uid, website_key ,url, callback) => dispatch =>{
     firebase.firestore().collection('profiles').doc(uid).collection('websites').where("url", "==", url).get().then(snapshot => {
         if(snapshot.size == 0){
             firebase.firestore().collection('profiles').doc(uid).collection('websites').doc(website_key).set({
@@ -1189,7 +1188,7 @@ export const actionEditWebsiteProfile = (uid, website_key ,url, callback) => dis
     })
 }
 
-export const actionRemoveWebsiteProfile = (uid, website_key, callback) => dispatch =>{
+const actionRemoveWebsiteProfile = (uid, website_key, callback) => dispatch =>{
     firebase.firestore().collection('profiles').doc(uid).collection('websites').doc(website_key).delete()
     dispatch({ type: REMOVE_WEBSITE_PROFILE, website_key});
     callback({'status':true})
@@ -1201,7 +1200,7 @@ ADD_EMAIL_PROFILE,
 EDIT_EMAIL_PROFILE,
 REMOVE_EMAIL_PROFILE,
 */
-export const actionAddEmailProfile = (uid, email, callback) => dispatch =>{
+const actionAddEmailProfile = (uid, email, callback) => dispatch =>{
 
     let key = randomKey()
 
@@ -1220,7 +1219,7 @@ export const actionAddEmailProfile = (uid, email, callback) => dispatch =>{
     })
 }
 
-export const actionEditEmailProfile = (uid, email_key, email, callback) => dispatch =>{
+const actionEditEmailProfile = (uid, email_key, email, callback) => dispatch =>{
     firebase.firestore().collection('profiles').doc(uid).collection('emails').where("email", "==", email).get().then(snapshot => {
         if(snapshot.size == 0){
             firebase.firestore().collection('profiles').doc(uid).collection('emails').doc(email_key).set({
@@ -1236,14 +1235,14 @@ export const actionEditEmailProfile = (uid, email_key, email, callback) => dispa
     })
 }
 
-export const actionRemoveEmailProfile = (uid, email_key, callback) => dispatch =>{
+const actionRemoveEmailProfile = (uid, email_key, callback) => dispatch =>{
     firebase.firestore().collection('profiles').doc(uid).collection('emails').doc(email_key).delete()
     dispatch({ type: REMOVE_EMAIL_PROFILE, email_key});
     callback({'status':true})
 }
 
 // my id
-export const actionAddMyIDProfile = (uid, id) => dispatch =>{
+const actionAddMyIDProfile = (uid, id) => dispatch =>{
     return check_my_id(uid, 'check', id).then(data => {
         // console.log(data)
         if((data instanceof Array)){
@@ -1269,13 +1268,13 @@ export const actionAddMyIDProfile = (uid, id) => dispatch =>{
     })
 }
 
-export const actionRemoveMyIDProfile = (uid, key, callback) => dispatch =>{
+const actionRemoveMyIDProfile = (uid, key, callback) => dispatch =>{
     firebase.firestore().collection('profiles').doc(uid).collection('my_ids').doc(key).delete()
     dispatch({ type: REMOVE_MY_ID_PROFILE, my_id_key:key});
     callback({'status':true})
 }
 
-export const actionSelectMyIDProfile = (uid, id, data, callback) => dispatch =>{
+const actionSelectMyIDProfile = (uid, id, data, callback) => dispatch =>{
     if(id == 0){
         firebase.firestore().collection('profiles').doc(uid).collection('my_ids').where('enable', '==', true).get().then(snapshot => {
             snapshot.docs.forEach(doc => {
@@ -1308,7 +1307,7 @@ export const actionSelectMyIDProfile = (uid, id, data, callback) => dispatch =>{
     }
 }
 
-export const actionFindMyID = (uid, type, id) => dispatch=>{
+const actionFindMyID = (uid, type, id) => dispatch=>{
     return check_my_id(uid, type, id).then(data => {
         // console.log(data)
         if((data instanceof Array)){
@@ -1336,7 +1335,7 @@ export const actionFindMyID = (uid, type, id) => dispatch=>{
     // callback({'status':true})
 }
 
-export const actionScanQRcode= (uid, qe) => dispatch=>{
+const actionScanQRcode= (uid, qe) => dispatch=>{
     return scan_qrcode(uid, qe).then(data => {
         console.log(data)
         if((data instanceof Array)){
@@ -1351,7 +1350,7 @@ export const actionScanQRcode= (uid, qe) => dispatch=>{
     })
 }
 
-export const actionFriendProfile99= (uid, friend_id) => dispatch=>{
+const actionFriendProfile99= (uid, friend_id) => dispatch=>{
     return friend_profile_99(uid, friend_id).then(data => {
         if((data instanceof Array)){
             return {'status':false, 'message': data.message}
@@ -1393,7 +1392,7 @@ export const actionFriendProfile99= (uid, friend_id) => dispatch=>{
     })
 }
 
-export const actionFriendProfileMulti99 = (uid, lost_profile) => dispatch=>{
+const actionFriendProfileMulti99 = (uid, lost_profile) => dispatch=>{
     return friend_profile_multi_99(uid, lost_profile).then(data => {
         if((data instanceof Array)){
             return {'status':false, 'message': data.message}
@@ -1441,7 +1440,7 @@ export const actionFriendProfileMulti99 = (uid, lost_profile) => dispatch=>{
 
 
 let unsubscribe = null;
-export const watchTaskEvent=(uid, fcmToken) => dispatch => {
+const watchTaskEvent=(uid, fcmToken) => dispatch => {
     console.log('-------------- watchTaskEvent : .info/connected')
 
     // track online/offline
@@ -1479,7 +1478,7 @@ export const watchTaskEvent=(uid, fcmToken) => dispatch => {
 }
 
 // track profiles
-export const trackProfiles=(uid, profiles)=> dispatch =>{
+const trackProfiles=(uid, profiles)=> dispatch =>{
     firebase.firestore().collection('profiles').doc(uid).onSnapshot((docSnapshot) => {
         // if(docSnapshot.data() === undefined){
         //     actionLogout(dispatch, ()=>{
@@ -1501,7 +1500,7 @@ export const trackProfiles=(uid, profiles)=> dispatch =>{
 }
 
 // track location
-export const trackLocation = (uid) => dispatch=>{
+const trackLocation = (uid) => dispatch=>{
     navigator.geolocation.getCurrentPosition((position) => {
         // this.setState({position: {longitude: position.longitude, latitude: position.latitude}});
         let presence_key = DeviceInfo.getUniqueID()
@@ -1526,7 +1525,7 @@ export const trackLocation = (uid) => dispatch=>{
 // }
 
 // track phones
-export const trackProfilesPhones=(uid, phones, callback)=> dispatch =>{
+const trackProfilesPhones=(uid, phones, callback)=> dispatch =>{
     let unsubscribe = firebase.firestore().collection('profiles').doc(uid).collection('phones').onSnapshot((querySnapshot) => {
         // querySnapshot.
         // console.log('fromCache > ', querySnapshot.metadata.fromCache)
@@ -1559,7 +1558,7 @@ export const trackProfilesPhones=(uid, phones, callback)=> dispatch =>{
 }
 
 // track websites
-export const trackProfileWebsites=(uid, websites, callback)=> dispatch =>{
+const trackProfileWebsites=(uid, websites, callback)=> dispatch =>{
 
     let unsubscribe = firebase.firestore().collection('profiles').doc(uid).collection('websites').onSnapshot((querySnapshot) => {
         querySnapshot.docChanges.forEach(function(change) {
@@ -1594,7 +1593,7 @@ export const trackProfileWebsites=(uid, websites, callback)=> dispatch =>{
 }
 
 // track emails
-export const trackProfileEmails=(uid, emails, callback)=> dispatch =>{
+const trackProfileEmails=(uid, emails, callback)=> dispatch =>{
     let unsubscribe = firebase.firestore().collection('profiles').doc(uid).collection('emails').onSnapshot((querySnapshot) => {
         querySnapshot.docChanges.forEach(function(change) {
 
@@ -1629,7 +1628,7 @@ export const trackProfileEmails=(uid, emails, callback)=> dispatch =>{
 }
 
 // track my_ids
-export const trackProfileMyIds=(uid, myIds, callback)=> dispatch =>{
+const trackProfileMyIds=(uid, myIds, callback)=> dispatch =>{
     let unsubscribe = firebase.firestore().collection('profiles').doc(uid).collection('my_ids').onSnapshot((querySnapshot) => {
         querySnapshot.docChanges.forEach(function(change) {
 
@@ -1666,7 +1665,7 @@ export const trackProfileMyIds=(uid, myIds, callback)=> dispatch =>{
 }
 
 // trach my applications
-export const trackMyApplications=(uid, my_applications, callback)=> dispatch =>{
+const trackMyApplications=(uid, my_applications, callback)=> dispatch =>{
     // console.log('trackMyApplications', my_applications, my_applications_posts)
     let unsubscribe = firebase.firestore().collection('users').doc(uid).collection('my_applications').onSnapshot((qSnapshot) => {
                         qSnapshot.docChanges.forEach(function(change) {
@@ -1703,7 +1702,7 @@ export const trackMyApplications=(uid, my_applications, callback)=> dispatch =>{
 }
 
 // track my applications posts
-export const trackMyApplicationsPosts=(uid, doc_id, my_applications_posts, callback)=> dispatch =>{
+const trackMyApplicationsPosts=(uid, doc_id, my_applications_posts, callback)=> dispatch =>{
  // /users/549099/my_applications/1363/my_applications_posts/1124668
     let unsubscribe =  firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(doc_id).collection('my_applications_posts').onSnapshot((postsSnapshot) => {
         postsSnapshot.docChanges.forEach(function(postsChange) {
@@ -1847,7 +1846,7 @@ export const trackMyApplicationsPosts=(uid, doc_id, my_applications_posts, callb
 }
 
 // track classs
-export const trackClasss=(uid, classs, class_members)=> dispatch =>{
+const trackClasss=(uid, classs, class_members)=> dispatch =>{
     console.log('classs? ', classs)
     firebase.firestore().collection('users').doc(uid).collection('classs').onSnapshot((classsSnapshot) => {
         classsSnapshot.docChanges.forEach(function(classsChange) {
@@ -1943,7 +1942,7 @@ export const trackClasss=(uid, classs, class_members)=> dispatch =>{
 }
 
 // track groups
-export const trackGroups=(uid, groups, group_profiles, group_members, callback)=> dispatch =>{
+const trackGroups=(uid, groups, group_profiles, group_members, callback)=> dispatch =>{
     // console.log("trackGroups", groups, uid)
 
     // /users/549127/groups
@@ -2067,7 +2066,7 @@ export const trackGroups=(uid, groups, group_profiles, group_members, callback)=
 }
 
 // track friends
-export const trackFriends=(uid, friends /*, friend_profiles*/ )=> dispatch =>{
+const trackFriends=(uid, friends /*, friend_profiles*/ )=> dispatch =>{
     firebase.firestore().collection('users').doc(uid).collection('friends').onSnapshot((querySnapshot) => {
         // console.log(querySnapshot)
         querySnapshot.docChanges.forEach(function(change) {
@@ -2157,7 +2156,7 @@ presenceFriend = (friend_id, dispatch)=>{
 กรณี group member ไม่ใช่เพือนของเรา เราต้องดึง  profile ลงมา save ที่เครื่อง
 */
 // export const trackProfileFriend = (friend_id, dispatch)=>{
-export const trackProfileFriend=(friend_id, callback)=> dispatch =>{
+const trackProfileFriend=(friend_id, callback)=> dispatch =>{
     
     let unsubscribes = []
     
@@ -2371,50 +2370,113 @@ export const trackProfileFriend=(friend_id, callback)=> dispatch =>{
     unsubscribes.push(unsubscribeProfilesMy_ids)
 
     callback({'status':true, unsubscribes})
-
-    // firebase.database().ref('user_presence/' + friend_id).on('child_added', function (snapshot) {
-    //     // console.log(change.doc.id, snapshot.key, snapshot.val())
-
-    //     let presenceKey = snapshot.key
-    //     let presenceData = snapshot.val()
-
-    //     let user_presence  = _.find(user_presences, (fpv, fpk)=>{
-    //                             return friend_id == fpk
-    //                         })
-
-    //     if(user_presence){
-    //         // console.log('> ', user_presences, user_presence, friend_id, snapshot.key, snapshot.val())
-
-    //         let presense =  _.find(user_presence, (v, k)=>{
-    //                             return k == presenceKey
-    //                         })
-
-    //         if(presense){
-
-    //             if(!_.isEqual(presense.status, presenceData.status)){
-    //                 console.log('user_presence > child_added', user_presence, presense, presenceData)
-    //                 dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
-    //             }
-    //         }else{
-    //             console.log('user_presence > child_added')
-    //             dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
-    //         }
-    //     }else{
-    //         console.log('user_presence > child_added')
-    //         dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
-    //     }
-        
-    // });
-
-    // firebase.database().ref('user_presence/' + friend_id).on('child_changed', function (snapshot) {
-    //     // console.log(change.doc.id, snapshot.key, snapshot.val())
-    //     console.log('user_presence > child_changed')
-    //     dispatch({ type: CHANGED_PRESENCE, userId:friend_id, presenceKey:snapshot.key, presenceData:snapshot.val()})
-    // });
-
-    // firebase.database().ref('user_presence/' + friend_id).on('child_removed', function (snapshot) {
-    //     // console.log(change.doc.id, snapshot.key, snapshot.val())
-    //     console.log('user_presence > child_removed')
-    //     dispatch({ type: REMOVED_PRESENCE, userId:friend_id, presenceKey:snapshot.key})
-    // });
 }
+
+
+/* Populated by react-webpack-redux:action */
+import test from '../actions/test.js';
+import uuid from '../actions/uuid.js';
+
+const messages = require('./messages');
+const groups = require('./groups');
+const contacts = require('./contacts');
+
+const actions = {
+    test,
+    uuid,
+    messages,
+    groups,
+    contacts,
+
+
+    trackProfiles,
+    trackFriends,
+    trackLocation,
+    watchTaskEvent,
+    actionLogin,
+    actionTestUsers,
+    trackProfileFriend,
+    trackGroups,
+    trackClasss,
+    trackMyApplicationsPosts,
+    trackMyApplications,
+    trackProfileMyIds,
+    trackProfileEmails,
+    trackProfileWebsites,
+    trackProfilesPhones,
+    actionFriendProfileMulti99,
+    actionFriendProfile99,
+    actionScanQRcode,
+    actionFindMyID,
+    actionSelectMyIDProfile,
+    actionRemoveMyIDProfile,
+    actionAddMyIDProfile,
+    actionRemoveEmailProfile,
+    actionEditEmailProfile,
+    actionAddEmailProfile,
+    actionRemoveWebsiteProfile,
+    actionEditWebsiteProfile,
+    actionAddWebsiteProfile,
+    actionAddressProfile,
+    actionRemovePhoneProfile,
+    actionEditPhoneProfile,
+    actionAddPhoneProfile,
+    actionBirthdayProfile,
+    actionInteresteInProfile,
+    actionGenderProfile,
+    actionEditStatusMessageProfile,
+    actionEditDisplayNameProfile,
+    actionUpdatePictureBGProfile,
+    actionUpdatePictureProfile,
+    actionUpdateStatusMyApplication,
+    actionFriendDelete,
+    actionFriendFavirite,
+    actionFriendMute,
+    actionFriendBlock,
+    actionFriendHide,
+    actionChangeFriendsName,
+    actionSelectClassMember,
+    actionFriendUnremove_Chat,
+    actionFriendUnremove_Unblock,
+    actionUpdateStatusFriend,
+    actionEditClassNameProfile,
+    actionLikePost,
+    actionDeletePost,
+    actionAddNewPost,
+    actionUpdateClassPictureProfile,
+    actionDeleteClassMember,
+    actionClassAddMember,
+    actionDeleteClass,
+    actionFavoritesClass,
+    actionCreateClass,
+    actionRemoveAsAdminGroup,
+    actionMakeAdminGroup,
+    actionGroupInviteMember,
+    actionDeleteGroup,
+    actionMemberInviteAgainGroup,
+    actionMemberDeclineGroup,
+    actionMemberLeaveGroup,
+    actionMemberJoinGroup,
+    actionFavoritesGroup,
+    actionEditGroupNameProfile,
+    actionUpdateGroupPictureProfile,
+    actionCanceledGroupMember,
+    actionCreateGroup,
+    actionAddFriend,
+    actionInviteFriend,
+    actionRemovedPeopleYouMayKhow,
+    actionPeopleYouMayKhow,
+    actionLogout,
+    loginWithFacebook,
+    actionMyApplicationPhone,
+    actionMyApplicationEmail,
+    actionCreateMyApplication,
+    actionRecreateQRcode,
+    actionGetPostFeelingsAndPrivacy,
+    actionApplicationCategory
+};
+
+module.exports = actions;
+
+
+

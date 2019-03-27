@@ -13,19 +13,7 @@ import SplashScreen from 'react-native-splash-screen'
 import * as actions from '../actions';
 import {makeUidState, 
         makeProfileState,
-        makePhonesState, 
-        makeWebsitesState,
-        makeEmailsState,
-        makeMyIdsState,
-        makeMyAppicationsState,
-        makeMyAppicationsPostsState,
-        makeClasssState,
-        makeClassMembersState,
-        makeGroupsState,
-        makeGroupProfilesState,
-        makeGroupMembersState,
-        makeFriendsState,
-        makeFriendProfilesState,} from '../reselect'
+        makeFriendsState,} from '../reselect'
 
 class AuthLoadingScreen extends React.Component {
     static navigationOptions = {
@@ -102,41 +90,11 @@ class AuthLoadingScreen extends React.Component {
         if(!is_login){
             this.props.navigation.navigate('Auth');
         }else{
-            let {uid, 
-                profiles,
-                phones,
-                friends, 
-                // friend_profiles,
-                websites,
-                emails,
-                myIds,
-                my_applications,
-                my_applications_posts,
-                classs,
-                class_members,
-                groups,
-                group_profiles,
-                group_members,
-                } = this.props
+            let {uid, profile,friends, } = this.props
 
-            this.props.trackProfiles(uid, profiles)
+            this.props.trackProfiles(uid, profile)
             this.props.trackFriends(uid, friends)
-            
-            /*
-            this.props.trackProfilesPhones(uid, phones)
-            this.props.trackProfileWebsites(uid, websites)
-            this.props.trackProfileEmails(uid, emails)
-            this.props.trackProfileMyIds(uid, myIds)
-
-            /*
-            this.props.trackMyApplications(uid, my_applications, my_applications_posts)
-            this.props.trackClasss(uid, classs, class_members)
-            this.props.trackGroups(uid, groups, group_profiles, group_members)
-            this.props.trackFriends(uid, friends, friend_profiles)
-            */
-
             this.props.trackLocation(uid)
-            
             AsyncStorage.getItem('fcmToken', null).then((fcmToken) => {
                 this.props.watchTaskEvent(uid, fcmToken)
                 this.props.navigation.navigate('App');
@@ -178,21 +136,8 @@ const mapStateToProps = (state, ownProps) => {
         return {
             is_login:true,
             uid: makeUidState(state, ownProps),
-            profiles: makeProfileState(state, ownProps),
-            phones: makePhonesState(state, ownProps),
-            websites: makeWebsitesState(state, ownProps),
-            emails:makeEmailsState(state, ownProps),
-            myIds:makeMyIdsState(state, ownProps),
-
-            my_applications:makeMyAppicationsState(state, ownProps),
-            my_applications_posts:makeMyAppicationsPostsState(state, ownProps),
-            classs:makeClasssState(state, ownProps),
-            class_members:makeClassMembersState(state, ownProps),
-            groups:makeGroupsState(state, ownProps),
-            group_profiles:makeGroupProfilesState(state, ownProps),
-            group_members:makeGroupMembersState(state, ownProps),
+            profile: makeProfileState(state, ownProps),
             friends:makeFriendsState(state, ownProps),
-            // friend_profiles:makeFriendProfilesState(state, ownProps),
         }
     }
 }

@@ -166,6 +166,11 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-view-shot')
+    compile project(':react-native-svg')
+    compile project(':react-native-sound')
+    compile project(':react-native-fetch-blob')
+    compile project(':react-native-audio-recorder-player')
     implementation project(':react-native-fs')
     implementation project(':react-native-splash-screen')
     implementation project(':react-native-qr-scanner')

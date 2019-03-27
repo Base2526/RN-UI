@@ -4,6 +4,11 @@ import android.app.Application;
 
 import com.facebook.CallbackManager;
 import com.facebook.react.ReactApplication;
+import fr.greweb.reactnativeviewshot.RNViewShotPackage;
+import com.horcrux.svg.SvgPackage;
+import com.zmxv.RNSound.RNSoundPackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
+import com.dooboolab.RNAudioRecorderPlayerPackage;
 import com.rnfs.RNFSPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.google.firebase.database.FirebaseDatabase;
@@ -60,6 +65,11 @@ public class MainApplication extends Application implements ShareApplication, Re
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNViewShotPackage(),
+            new SvgPackage(),
+            new RNSoundPackage(),
+            new RNFetchBlobPackage(),
+            new RNAudioRecorderPlayerPackage(),
             new RNFSPackage(),
             new SplashScreenReactPackage(),
             new RNMessageComposePackage(),
