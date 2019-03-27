@@ -26,6 +26,7 @@ import {randomKey, getHeaderInset, checkInternetDialog} from '../../utils/Helper
 import Constant from '../../utils/Constant'
 
 import {makeUidState, 
+        makeProfileState,
         makeFriendsState,
         makeIsConnectedState} from '../../reselect'
 
@@ -64,7 +65,6 @@ class FindFriendPage extends React.Component{
 
   componentDidMount() {
     setTimeout(() => {this.setState({renderContent: true})}, 0);
-
   }
 
   search = () => {
@@ -101,8 +101,12 @@ class FindFriendPage extends React.Component{
                 })
 
         this.setState({friends:__, isSearch:true})
+
+        console.log(__)
       }
     })
+
+    
   }
 
   renderSeparator = () => {
@@ -134,7 +138,7 @@ class FindFriendPage extends React.Component{
   }
 
   addFriend = (item, index) =>{
-    let {uid} = this.props
+    let {uid, profile} = this.props
     let {friends} = this.state
     /*
     let {uid, friends} = this.props
@@ -155,18 +159,13 @@ class FindFriendPage extends React.Component{
         chat_id = item.chat_id
     }
 
+    let friend_data = {...item, chat_id, status:Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND}
+
+    let user_data = {uid, ...profile, chat_id, status:Constant.FRIEND_STATUS_FRIEND_REQUEST}
   
-    // let new_friends = [...friends];
-    // new_friends[index] = {...new_friends[index], status: Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND}
-    // this.setState({available: newArray});
-
-    // console.log(item, chat_id, friends, new_friends)
-
-    // let {renderContent, friends, isSearch} = this.state;
-
-  
+    console.log(user_data, friend_data)
     this.setState({loading:true})
-    this.props.actionInviteFriend(uid, item.uid, chat_id, (result) => {
+    this.props.actionInviteFriend(uid, item.uid, user_data, friend_data, (result) => {
         this.setState({loading:false})
 
         // status:Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND
@@ -516,6 +515,7 @@ const mapStateToProps = (state, ownProps) => {
 
   return({
     uid: makeUidState(state, ownProps),
+    profile: makeProfileState(state, ownProps),
     friends: makeFriendsState(state, ownProps),
     is_connected: makeIsConnectedState(state, ownProps),
   })

@@ -67,31 +67,31 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
         /// check is friend_profile ครบหรือไม่  ถ้าไม่ครบเราต้องวิ่งไปดึงจาก server
         let lost_profile = []
-        _.each(group_profile.members, (v, k)=>{
-            var friend_profile = _.find(friend_profiles, function(fv, fk) {
-                return fk == v.friend_id;
-            });
+        // _.each(group_profile.members, (v, k)=>{
+        //     var friend_profile = _.find(friend_profiles, function(fv, fk) {
+        //         return fk == v.friend_id;
+        //     });
 
-            if(!friend_profile){
-                lost_profile.push(v.friend_id)
-            }
-        })
+        //     if(!friend_profile){
+        //         lost_profile.push(v.friend_id)
+        //     }
+        // })
 
-        console.log(group_profile.members, lost_profile)
-        if(!isEmpty(lost_profile)){
-            this.setState({loading:true})
-            this.props.actionFriendProfileMulti99(uid, lost_profile).then((result) => {
-                this.setState({loading:false})
+        // console.log(group_profile.members, lost_profile)
+        // if(!isEmpty(lost_profile)){
+        //     this.setState({loading:true})
+        //     this.props.actionFriendProfileMulti99(uid, lost_profile).then((result) => {
+        //         this.setState({loading:false})
 
-                this.setState({group_id}, ()=>{
-                    this.loadData(this.props)
-                })
-            })
-        }else{
+        //         this.setState({group_id}, ()=>{
+        //             this.loadData(this.props)
+        //         })
+        //     })
+        // }else{
             this.setState({group_id}, ()=>{
                 this.loadData(this.props)
             })
-        }
+        // }
         /// check is friend_profile ครบหรือไม่ 
     }
 
@@ -147,19 +147,19 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
             // friend_profiles
 
-            var friend_profile = _.find(friend_profiles, function(fv, fk) {
-                                    return fk == v.friend_id;
-                                });
+            // var friend_profile = _.find(friend_profiles, function(fv, fk) {
+            //                         return fk == v.friend_id;
+            //                     });
 
-            if(!friend_profile){
-                this.setState({loading:true})
-                this.props.actionFriendProfile99(uid, v.friend_id).then((result) => {
-                    this.setState({friend_id, loading:false}, ()=>{
-                        this.loadData(this.props)
-                    })
-                })
-            }else{
-                friend = {...friend, profile:friend_profile}
+            // if(!friend_profile){
+            //     this.setState({loading:true})
+            //     this.props.actionFriendProfile99(uid, v.friend_id).then((result) => {
+            //         this.setState({friend_id, loading:false}, ()=>{
+            //             this.loadData(this.props)
+            //         })
+            //     })
+            // }else{
+            //     friend = {...friend, profile:friend_profile}
 
                 switch(v.status){
                     case Constant.GROUP_STATUS_MEMBER_INVITED:{
@@ -248,7 +248,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                         break;
                     }
                 }
-            }
+            // }
         })
 
         // console.log(members)
@@ -564,7 +564,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                             // borderWidth:1
                                             }}
                                     source={{
-                                        uri: rowItem.friend.profile.image_url,
+                                        uri: '',
                                         headers:{ Authorization: 'someAuthToken' },
                                         priority: FastImage.priority.normal,
                                     }}
@@ -573,7 +573,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             </TouchableOpacity>
                             <View >
                                 <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                                <Text style={{fontSize:18}}>{rowItem.friend.change_friend_name !== undefined ?rowItem.friend.change_friend_name: rowItem.friend.profile.name}</Text>
+                                <Text style={{fontSize:18}}>{ /*rowItem.friend.change_friend_name !== undefined ?rowItem.friend.change_friend_name: rowItem.friend.profile.name*/ }x</Text>
                                     {this.checkInvitor(rowItem)}
                                 </View>
                             </View>
@@ -647,7 +647,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                             // borderWidth:1
                                             }}
                                     source={{
-                                        uri: rowItem.friend.profile.image_url,
+                                        uri: '',
                                         headers:{ Authorization: 'someAuthToken' },
                                         priority: FastImage.priority.normal,
                                     }}
@@ -656,7 +656,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             </TouchableOpacity>
                             <View >
                                 <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                                    <Text style={{fontSize:18}}>{rowItem.friend.change_friend_name !== undefined ?rowItem.friend.change_friend_name: rowItem.friend.profile.name}</Text>
+                                    <Text style={{fontSize:18}}>{ /*rowItem.friend.change_friend_name !== undefined ?rowItem.friend.change_friend_name: rowItem.friend.profile.name*/ }y</Text>
                                     {this.checkInvitor(rowItem)}
                                 </View>
                             </View>
@@ -710,7 +710,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                             // borderWidth:1
                                             }}
                                     source={{
-                                        uri: rowItem.friend.profile.image_url,
+                                        uri: '',
                                         headers:{ Authorization: 'someAuthToken' },
                                         priority: FastImage.priority.normal,
                                     }}
@@ -718,7 +718,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                 />
                             </TouchableOpacity>
                             <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                            <Text style={{fontSize:18}}>{rowItem.friend.change_friend_name !== undefined ?rowItem.friend.change_friend_name: rowItem.friend.profile.name}</Text>
+                            <Text style={{fontSize:18}}>{/*rowItem.friend.change_friend_name !== undefined ?rowItem.friend.change_friend_name: rowItem.friend.profile.name*/}x</Text>
                             </View>
 
                             {this.showMenuDeline(rowItem)} 

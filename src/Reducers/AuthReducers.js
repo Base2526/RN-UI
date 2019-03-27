@@ -1610,7 +1610,7 @@ export default (state= INITIAL_STATE, action)=>{
         }
 
         case ADD_FRIEND:{
-            if(state.user === null){
+            if(!state.user){
                 return state
             }
 
@@ -1619,7 +1619,7 @@ export default (state= INITIAL_STATE, action)=>{
                 return k == action.friend_id
             })
 
-            if(friend === undefined){
+            if(!friend){
                 let newState = {...state,
                                     user: {
                                         ...state.user,
@@ -1655,7 +1655,7 @@ export default (state= INITIAL_STATE, action)=>{
         }
 
         case MODIFIED_FRIEND:{
-            if(state.user === null){
+            if(!state.user){
                 return state
             }
 
@@ -1664,23 +1664,22 @@ export default (state= INITIAL_STATE, action)=>{
                 return k == action.friend_id
             })
 
-            if(friend === undefined){
+            if(!friend){
                 return state
             }
 
             if(!_.isEqual(friend, action.friend_data)){
-                let v = {
-                    ...state,
-                    user: {
-                        ...state.user,
-                        friends: {
-                            ...state.user.friends,
-                            [action.friend_id]:action.friend_data
-                        }
-                    }
-                }
+                let new_state = {...state,
+                                    user: {
+                                        ...state.user,
+                                        friends: {
+                                            ...state.user.friends,
+                                            [action.friend_id]:action.friend_data
+                                        }
+                                    }
+                                }
                 // console.log('MODIFIED_FRIEND', v, action)
-                return v;
+                return new_state;
             }
             return state;
         }
@@ -1696,9 +1695,7 @@ export default (state= INITIAL_STATE, action)=>{
                         })
 
             if(friend){
-                // let new_friends  = _.omit(friends, action.friend_id)
-                let new_friend  ={...friend, 'status':Constant.FRIEND_STATUS_FRIEND_REMOVE}
-                let new_friends = {...friends, [action.friend_id]:new_friend}
+                let new_friends = {...friends, [action.friend_id]:{...friend, 'status':Constant.FRIEND_STATUS_FRIEND_REMOVE}}
                 let new_state = {...state,
                                     user: {
                                         ...state.user,

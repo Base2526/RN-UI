@@ -29,6 +29,8 @@ import {makeUidState,
         makeClassMembersState,
         makeIsConnectedState} from '../../reselect'
 
+let unsubscribes = []
+
 class ClasssPage extends React.Component{
     constructor(props) {
       super(props);
@@ -41,7 +43,19 @@ class ClasssPage extends React.Component{
     }
 
     componentDidMount() {
+      let {uid, classs, class_members} = this.props
+
+      this.props.trackClasss(uid, classs, class_members, (data)=>{
+        unsubscribes.push(data.unsubscribe)
+      })
+
       this.loadData(this.props)
+    }
+
+    componentWillUnmount(){
+      unsubscribes.map((unsubscribe, k)=>{
+          unsubscribe()
+      })
     }
 
     componentWillReceiveProps(nextProps) {

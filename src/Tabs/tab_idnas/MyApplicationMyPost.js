@@ -40,6 +40,7 @@ let shareOptions = {
     subject: "Share Link" //  for email
 };
 
+let unsubscribes = []
 class MyApplicationMyPost extends Component {
     static navigationOptions = ({ navigation }) => ({
         title: "All post",
@@ -92,6 +93,11 @@ class MyApplicationMyPost extends Component {
         this.props.navigation.setParams({ handleAddpost: this.handleAddpost })
         const { navigation } = this.props;
         const app_id = navigation.getParam('app_id', null);
+
+        let {uid, my_applications_posts} = this.props
+        this.props.trackMyApplicationsPosts(uid, app_id, my_applications_posts, (data)=>{
+            unsubscribes.push(data.unsubscribe)
+        })
       
         this.setState({app_id}, ()=>{
             this.loadData(this.props)
@@ -100,6 +106,12 @@ class MyApplicationMyPost extends Component {
 
     componentWillReceiveProps(nextProps) {
         this.loadData(nextProps)
+    }
+
+    componentWillUnmount(){
+        unsubscribes.map((unsubscribe, k)=>{
+            unsubscribe()
+        })
     }
 
     loadData(props){

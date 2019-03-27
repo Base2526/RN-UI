@@ -32,11 +32,14 @@ let shareOptions = {
     subject: "Share Link" //  for email
 };
 
-import {makeProfileState, 
+import {makeUidState, 
+        makeProfileState, 
         makeMyIdsState,
         makePhonesState, 
         makeWebsitesState, 
         makeEmailsState } from '../../reselect'
+
+let unsubscribes = []
 
 class MyProfilePage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
@@ -82,6 +85,11 @@ class MyProfilePage extends React.Component{
         }
     }
 
+    // componentDidMount(){
+    //     console.log('componentDidMount')
+    //     // console.log(this.props.dispatch)
+    // }
+
     // https://github.com/react-navigation/react-navigation/blob/master/examples/NavigationPlayground/js/StackWithTranslucentHeader.js
     // Inset to compensate for navigation bar being transparent.
     // And improved abstraction for this will be built in to react-navigation
@@ -102,10 +110,32 @@ class MyProfilePage extends React.Component{
     }
 
     componentDidMount() {
+        let {uid, phones, websites, emails, myIds} = this.props
+
+        this.props.trackProfilesPhones(uid, phones, (data)=>{
+            unsubscribes.push(data.unsubscribe)
+        })
+        this.props.trackProfileWebsites(uid, websites, (data)=>{
+            unsubscribes.push(data.unsubscribe)
+        })
+        this.props.trackProfileEmails(uid, emails, (data)=>{
+            unsubscribes.push(data.unsubscribe)
+        })
+        this.props.trackProfileMyIds(uid, myIds, (data)=>{
+            unsubscribes.push(data.unsubscribe)
+        })
+
         setTimeout(() => {this.setState({renderContent: true})}, 0);
     
         this.props.navigation.setParams({handleEdit: this.handleEdit})
         this.props.navigation.setParams({handleShare: this.handleShare})
+    }
+
+    componentWillUnmount(){
+        console.log('componentWillUnmount')
+        // unsubscribes.map((unsubscribe, k)=>{
+        //     unsubscribe()
+        // })
     }
 
     handleShare = () => {
@@ -546,7 +576,7 @@ class MyProfilePage extends React.Component{
 }
 
 const mapStateToProps = (state, ownProps) => {
-    // console.log(state)
+    console.log(state)
   
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
     //_persist.rehydrated parameter is initially set to false
@@ -559,6 +589,7 @@ const mapStateToProps = (state, ownProps) => {
     }
 
     return{
+        uid:makeUidState(state, ownProps),
         profile: makeProfileState(state, ownProps),
         myIds: makeMyIdsState(state, ownProps),
         phones: makePhonesState(state, ownProps),
@@ -566,7 +597,5 @@ const mapStateToProps = (state, ownProps) => {
         emails: makeEmailsState(state, ownProps),
     }
 }
-
-
 
 export default connect(mapStateToProps, actions)(MyProfilePage);

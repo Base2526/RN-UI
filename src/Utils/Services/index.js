@@ -155,6 +155,23 @@ return fetch('/appointments/get_appos', data)
 } 
  */
 
+export const test_users = () => {
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({/* 'uid': uid, */}),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.TEST_USERS, data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            // console.log(responseJson)
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+        });
+}
+
 export const people_you_may_khow = (uid) => {
     let data = {
         method: 'POST',

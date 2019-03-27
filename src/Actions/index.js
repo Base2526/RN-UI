@@ -147,7 +147,10 @@ import {login,
         friend_profile_99,
         friend_profile_multi_99,
         add_new_post,
-        recreate_qrcode} from '../utils/Services'
+        recreate_qrcode,
+    
+    
+        test_users} from '../utils/Services'
 
 import {makeMyAppicationsPostsState} from '../reselect'
 
@@ -278,6 +281,28 @@ export const actionLogout = (uid, dispatch, callback) => {
     callback({'status':true})
 }
 
+export const actionTestUsers = () => dispatch=>{
+    return test_users().then(data => {
+        // console.log(data)
+        if((data instanceof Array)){
+            return {'status':false, 'message': data.message}
+        }else{
+            if(!data.result){
+                return {'status':false, 'message': data.message}
+            }else{
+                // เราจะเก็บ data ลง redux เป็น object เราจึงจำเป็นต้องแปลงก่อน
+                // let people_you_may_khow_data = {}
+                // data.data.map((v, k)=>{
+                //     people_you_may_khow_data = {...people_you_may_khow_data, [v.uid]:v}
+                // })
+
+                // dispatch({ type: ADDED_PEOPLE_YOU_MAY_KHOW, people_you_may_khow_data});
+                return {'status':true, 'users':data.users}
+            }
+        }
+    })
+}
+
 export const actionPeopleYouMayKhow = (uid) => dispatch=>{
     return people_you_may_khow(uid).then(data => {
         console.log(data)
@@ -306,20 +331,21 @@ export const actionRemovedPeopleYouMayKhow = (uid, friend_id, callback) => dispa
     callback({'status':true})
 }
 
-export const actionInviteFriend = (uid, friend_id, chat_id, callback) => dispatch =>{
+export const actionInviteFriend = (uid, friend_id,  user_data, friend_data, callback) => dispatch =>{
     let batch = firebase.firestore().batch();
 
     let userRef = firebase.firestore().collection('users').doc(uid).collection('friends').doc(friend_id);
-    batch.set(userRef, {chat_id, 
-                        status:Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND}, { merge: true})
+    batch.set(userRef, friend_data, { merge: true})
+
+    // FRIEND_STATUS_WAIT_FOR_A_FRIEND
 
     let friendRef = firebase.firestore().collection('users').doc(friend_id).collection('friends').doc(uid);
-    batch.set(friendRef, {  chat_id, 
-                            status:Constant.FRIEND_STATUS_FRIEND_REQUEST}, { merge: true})
+    batch.set(friendRef, user_data, { merge: true})
+
+    // FRIEND_STATUS_FRIEND_REQUEST
 
     batch.commit().then(function () {
-        // console.log("Transaction success: actionInviteFriend");
-
+        dispatch({ type: ADD_FRIEND, friend_id, friend_data});
         dispatch({ type: REMOVED_PEOPLE_YOU_MAY_KHOW, friend_id});
 
         callback({'status':true})
@@ -1337,12 +1363,13 @@ export const actionFriendProfile99= (uid, friend_id) => dispatch=>{
                 let friend_emails   = v.friend_emails
                 let friend_my_ids   = v.friend_my_ids
                 let friend_phones   = v.friend_phones
-                let friend_profile  = v.friend_profile
+                // let friend_profile  = v.friend_profile
                 let friend_websites = v.friend_websites
 
-                let friend_data = {'status':Constant.FRIEND_STATUS_FRIEND_99, }
-                dispatch({type: ADD_FRIEND, friend_id, friend_data});
-                dispatch({ type: ADDED_FRIEND_PROFILE, friend_id, friend_profile});
+                // let friend_data = {'status':Constant.FRIEND_STATUS_FRIEND_99, }
+                // dispatch({type: ADD_FRIEND, friend_id, friend_data});
+                
+                // dispatch({ type: ADDED_FRIEND_PROFILE, friend_id, friend_profile});
 
                 _.each(friend_emails, (ev, ek)=>{
                     dispatch({ type: ADDED_EMAIL_FRIEND, friend_id, friend_email_id:ek, friend_email_data:ev})
@@ -1360,7 +1387,7 @@ export const actionFriendProfile99= (uid, friend_id) => dispatch=>{
                     dispatch({ type: ADD_WEBSITE_FRIEND, friend_id, friend_website_id:wk, friend_website_data:wv})
                 })
                 
-                return {'status':true, friend_profile: v.friend_profile}
+                return {'status':true, data: data.data}
             }
         }
     })
@@ -1461,8 +1488,7 @@ export const trackProfiles=(uid, profiles)=> dispatch =>{
         //     })
         // }
         if(docSnapshot.data()){
-            // console.log('trackProfiles', profiles, docSnapshot.data())
-            
+            console.log('trackProfiles', profiles, docSnapshot.data())
             if(!_.isEqual(profiles, docSnapshot.data())){
                 dispatch({ type: UPDATE_PROFILE, profile_data:docSnapshot.data()});
             }
@@ -1492,9 +1518,16 @@ export const trackLocation = (uid) => dispatch=>{
     });
 }
 
+// export const trackText=(uid, callback)=> dispatch =>{
+//     let unsubscribe =firebase.firestore().collection('profiles').doc(uid).collection('phones').onSnapshot((querySnapshot) => {
+//         console.log('trackText')
+//     })
+//     callback({'status':true, unsubscribe, uid})
+// }
+
 // track phones
-export const trackProfilesPhones=(uid, phones)=> dispatch =>{
-    firebase.firestore().collection('profiles').doc(uid).collection('phones').onSnapshot((querySnapshot) => {
+export const trackProfilesPhones=(uid, phones, callback)=> dispatch =>{
+    let unsubscribe = firebase.firestore().collection('profiles').doc(uid).collection('phones').onSnapshot((querySnapshot) => {
         // querySnapshot.
         // console.log('fromCache > ', querySnapshot.metadata.fromCache)
         querySnapshot.docChanges.forEach(function(change) {
@@ -1521,12 +1554,14 @@ export const trackProfilesPhones=(uid, phones)=> dispatch =>{
             }
         })
     })
+
+    callback({'status':true, unsubscribe})
 }
 
 // track websites
-export const trackProfileWebsites=(uid, websites)=> dispatch =>{
+export const trackProfileWebsites=(uid, websites, callback)=> dispatch =>{
 
-    firebase.firestore().collection('profiles').doc(uid).collection('websites').onSnapshot((querySnapshot) => {
+    let unsubscribe = firebase.firestore().collection('profiles').doc(uid).collection('websites').onSnapshot((querySnapshot) => {
         querySnapshot.docChanges.forEach(function(change) {
 
             let doc_id   = change.doc.id
@@ -1555,11 +1590,12 @@ export const trackProfileWebsites=(uid, websites)=> dispatch =>{
             }
         })
     })
+    callback({'status':true, unsubscribe})
 }
 
 // track emails
-export const trackProfileEmails=(uid, emails)=> dispatch =>{
-    firebase.firestore().collection('profiles').doc(uid).collection('emails').onSnapshot((querySnapshot) => {
+export const trackProfileEmails=(uid, emails, callback)=> dispatch =>{
+    let unsubscribe = firebase.firestore().collection('profiles').doc(uid).collection('emails').onSnapshot((querySnapshot) => {
         querySnapshot.docChanges.forEach(function(change) {
 
             let doc_id   = change.doc.id
@@ -1588,11 +1624,13 @@ export const trackProfileEmails=(uid, emails)=> dispatch =>{
             }
         })
     })
+
+    callback({'status':true, unsubscribe})
 }
 
 // track my_ids
-export const trackProfileMyIds=(uid, myIds)=> dispatch =>{
-    firebase.firestore().collection('profiles').doc(uid).collection('my_ids').onSnapshot((querySnapshot) => {
+export const trackProfileMyIds=(uid, myIds, callback)=> dispatch =>{
+    let unsubscribe = firebase.firestore().collection('profiles').doc(uid).collection('my_ids').onSnapshot((querySnapshot) => {
         querySnapshot.docChanges.forEach(function(change) {
 
             let doc_id   = change.doc.id
@@ -1623,154 +1661,108 @@ export const trackProfileMyIds=(uid, myIds)=> dispatch =>{
             }
         })
     })
+
+    callback({'status':true, unsubscribe})
 }
 
-// trach my application
-export const trackMyApplications=(uid, my_applications, my_applications_posts)=> dispatch =>{
+// trach my applications
+export const trackMyApplications=(uid, my_applications, callback)=> dispatch =>{
     // console.log('trackMyApplications', my_applications, my_applications_posts)
-    firebase.firestore().collection('users').doc(uid).collection('my_applications').onSnapshot((qSnapshot) => {
-        qSnapshot.docChanges.forEach(function(change) {
-            // console.log(change.type, change.doc.id, change.doc.data());
+    let unsubscribe = firebase.firestore().collection('users').doc(uid).collection('my_applications').onSnapshot((qSnapshot) => {
+                        qSnapshot.docChanges.forEach(function(change) {
+                            // console.log(change.type, change.doc.id, change.doc.data());
 
-            let doc_id   = change.doc.id
-            let doc_data = change.doc.data()
+                            let doc_id   = change.doc.id
+                            let doc_data = change.doc.data()
 
-            switch(change.type){
-                case 'added':{
-                    let my_application = _.find(my_applications, (v, k)=>{
-                        return doc_id == k
+                            switch(change.type){
+                                case 'added':{
+                                    let my_application = _.find(my_applications, (v, k)=>{
+                                        return doc_id == k
+                                    })
+                                    
+                                    if(my_application === undefined){
+                                        // console.log('my_application > ', my_applications, my_application, doc_id )
+                                        dispatch({type: ADDED_MY_APPLICATION, my_application_id:doc_id, my_application_data:doc_data})
+                                    }
+                                    break;
+                                }
+                                case 'modified':{
+                                    dispatch({type: MODIFIED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
+                                    break;
+                                }
+                                case 'removed':{
+                                    dispatch({type: REMOVED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
+                                    break;
+                                }
+                            }
+                        })
                     })
-                    
-                    if(my_application === undefined){
-                        // console.log('my_application > ', my_applications, my_application, doc_id )
-                        dispatch({type: ADDED_MY_APPLICATION, my_application_id:doc_id, my_application_data:doc_data})
+
+    callback({'status':true, unsubscribe})
+}
+
+// track my applications posts
+export const trackMyApplicationsPosts=(uid, doc_id, my_applications_posts, callback)=> dispatch =>{
+ // /users/549099/my_applications/1363/my_applications_posts/1124668
+    let unsubscribe =  firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(doc_id).collection('my_applications_posts').onSnapshot((postsSnapshot) => {
+        postsSnapshot.docChanges.forEach(function(postsChange) {
+            let posts_doc_id   = postsChange.doc.id
+            let posts_doc_data = postsChange.doc.data()
+            switch(postsChange.type){
+                case 'added':{
+                    // console.log('trackMyApplications > my_applications > my_applications_posts : added ', doc_id, posts_doc_id, posts_doc_data)
+                
+                    let my_applications_post =  _.find(my_applications_posts, (v, k)=>{
+                                                    return doc_id == k
+                                                })
+                    if(my_applications_post){
+                        let post =  _.find(my_applications_post, (post_v, post_k)=>{
+                                        return posts_doc_id == post_k
+                                    })
+
+                        if(!post){
+                            dispatch({type:ADDED_MY_APPLICATIONS_POSTS, app_id:doc_id, post_id:posts_doc_id, my_applications_posts_data:posts_doc_data})
+                        }
+                    }else{
+                        dispatch({type:ADDED_MY_APPLICATIONS_POSTS, app_id:doc_id, post_id:posts_doc_id, my_applications_posts_data:posts_doc_data})
                     }
 
-                    // /users/549099/my_applications/1363/my_applications_posts/1124668
-                    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(doc_id).collection('my_applications_posts').onSnapshot((postsSnapshot) => {
-                        postsSnapshot.docChanges.forEach(function(postsChange) {
-                            let posts_doc_id   = postsChange.doc.id
-                            let posts_doc_data = postsChange.doc.data()
-                            switch(postsChange.type){
+                    // /users/549099/my_applications/1363/my_applications_posts/1124668/my_applications_posts_images/1124669
+                    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(doc_id).collection('my_applications_posts').doc(posts_doc_id).collection('my_applications_posts_images').onSnapshot((imagesSnapshot) => {
+                        imagesSnapshot.docChanges.forEach(function(imagesChange) {
+                            let image_doc_id   = imagesChange.doc.id
+                            let image_doc_data = imagesChange.doc.data()
+                            switch(imagesChange.type){
                                 case 'added':{
-                                    // console.log('trackMyApplications > my_applications > my_applications_posts : added ', doc_id, posts_doc_id, posts_doc_data)
-                                   
-                                    let my_applications_post =  _.find(my_applications_posts, (v, k)=>{
-                                                                    return doc_id == k
-                                                                })
-                                    if(my_applications_post){
-                                        let post =  _.find(my_applications_post, (post_v, post_k)=>{
-                                                        return posts_doc_id == post_k
+                                    let posts   =_.find(my_applications_posts, (v, k)=>{
+                                                    return doc_id == k
+                                                })
+
+                                    let post    =_.find(posts,(v, k)=>{
+                                                    return posts_doc_id == k
+                                                })
+
+                                    if(!post){
+                                        dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:posts_doc_id, image_doc_id, image_doc_data})
+                                        return;
+                                    }else{
+                                        // if (!post.hasOwnProperty("images")){
+                                        //     dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:posts_doc_id, image_doc_id, image_doc_data})
+                                        // }else{
+                                        // console.log('images----->', post)
+                                        let {images} = post
+
+                                        
+
+                                        let image = _.find(images,(v, k)=>{
+                                                        return image_doc_id == k
                                                     })
 
-                                        if(!post){
-                                            dispatch({type:ADDED_MY_APPLICATIONS_POSTS, app_id:doc_id, post_id:posts_doc_id, my_applications_posts_data:posts_doc_data})
+                                        if(!image){
+                                            dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:posts_doc_id, image_doc_id, image_doc_data})
                                         }
-                                    }else{
-                                        dispatch({type:ADDED_MY_APPLICATIONS_POSTS, app_id:doc_id, post_id:posts_doc_id, my_applications_posts_data:posts_doc_data})
                                     }
-
-                                    // /users/549099/my_applications/1363/my_applications_posts/1124668/my_applications_posts_images/1124669
-                                    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(doc_id).collection('my_applications_posts').doc(posts_doc_id).collection('my_applications_posts_images').onSnapshot((imagesSnapshot) => {
-                                        imagesSnapshot.docChanges.forEach(function(imagesChange) {
-                                            let image_doc_id   = imagesChange.doc.id
-                                            let image_doc_data = imagesChange.doc.data()
-                                            switch(imagesChange.type){
-                                                case 'added':{
-                                                    let posts   =_.find(my_applications_posts, (v, k)=>{
-                                                                    return doc_id == k
-                                                                })
-
-                                                    let post    =_.find(posts,(v, k)=>{
-                                                                    return posts_doc_id == k
-                                                                })
-
-                                                    if(!post){
-                                                        dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:posts_doc_id, image_doc_id, image_doc_data})
-                                                        return;
-                                                    }else{
-                                                        // if (!post.hasOwnProperty("images")){
-                                                        //     dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:posts_doc_id, image_doc_id, image_doc_data})
-                                                        // }else{
-                                                        // console.log('images----->', post)
-                                                        let {images} = post
-
-                                                        
-
-                                                        let image = _.find(images,(v, k)=>{
-                                                                        return image_doc_id == k
-                                                                    })
-
-                                                        if(!image){
-                                                            dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:posts_doc_id, image_doc_id, image_doc_data})
-                                                        }
-                                                    }
-                                                    break;
-                                                }
-                                                case 'modified':{
-                                                    
-                                                    break;
-                                                }
-                                                case 'removed':{
-                                                    
-                                                    break;
-                                                }
-                                            }
-                                        })
-                                    })
-
-                                    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(doc_id).collection('my_applications_posts').doc(posts_doc_id).collection('my_applications_posts_likes').onSnapshot((likesSnapshot) => {
-                                        likesSnapshot.docChanges.forEach(function(likesChange) {
-                                            let like_doc_id   = likesChange.doc.id
-                                            let like_doc_data = likesChange.doc.data()
-                                            switch(likesChange.type){
-                                                case 'added':{
-                                                    // console.log('my_applications_posts_likes', like_doc_id, like_doc_data)
-                                                    
-                                                    let posts   =_.find(my_applications_posts, (v, k)=>{
-                                                                    return doc_id == k
-                                                                })
-
-                                                    let post    =_.find(posts,(v, k)=>{
-                                                                    return posts_doc_id == k
-                                                                })
-
-                                                    if(!post){
-                                                        // console.log('ADDED_MY_APPLICATIONS_POSTS_LIKES', like_doc_id, like_doc_data)
-                                                        dispatch({type:ADDED_MY_APPLICATIONS_POSTS_LIKES, post_id:posts_doc_id, like_doc_id, like_doc_data})
-                                                        return;
-                                                    }else{
-                                                        // if (!post.hasOwnProperty("images")){
-                                                        //     dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:posts_doc_id, image_doc_id, image_doc_data})
-                                                        // }else{
-                                                        // console.log('likes----->', post)
-                                                        let {likes} = post
-
-                                                        let like = _.find(likes,(v, k)=>{
-                                                                        return like_doc_id == k
-                                                                    })
-
-                                                        if(!like){
-                                                            console.log('ADDED_MY_APPLICATIONS_POSTS_LIKES', like_doc_id, like_doc_data)
-                                                            dispatch({type:ADDED_MY_APPLICATIONS_POSTS_LIKES, post_id:posts_doc_id, like_doc_id, like_doc_data})
-                                                        }
-                                                    }
-                                                
-                                                    break;
-                                                }
-                                                case 'modified':{
-                                                    // var newState =store.getState();
-                                                    dispatch({type:MODIFIED_MY_APPLICATIONS_POSTS_LIKES, post_id:posts_doc_id, like_doc_id, like_doc_data})
-                                                    break;
-                                                }
-                                                case 'removed':{
-                                                    dispatch({type:REMOVED_MY_APPLICATIONS_POSTS_LIKES, post_id:posts_doc_id, like_doc_id})
-                                                    break;
-                                                }
-                                            }
-                                        })
-                                    })
-
                                     break;
                                 }
                                 case 'modified':{
@@ -1778,7 +1770,59 @@ export const trackMyApplications=(uid, my_applications, my_applications_posts)=>
                                     break;
                                 }
                                 case 'removed':{
-                                    dispatch({type:REMOVED_MY_APPLICATIONS_POSTS, app_id:doc_id, post_id:posts_doc_id})
+                                    
+                                    break;
+                                }
+                            }
+                        })
+                    })
+
+                    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(doc_id).collection('my_applications_posts').doc(posts_doc_id).collection('my_applications_posts_likes').onSnapshot((likesSnapshot) => {
+                        likesSnapshot.docChanges.forEach(function(likesChange) {
+                            let like_doc_id   = likesChange.doc.id
+                            let like_doc_data = likesChange.doc.data()
+                            switch(likesChange.type){
+                                case 'added':{
+                                    // console.log('my_applications_posts_likes', like_doc_id, like_doc_data)
+                                    
+                                    let posts   =_.find(my_applications_posts, (v, k)=>{
+                                                    return doc_id == k
+                                                })
+
+                                    let post    =_.find(posts,(v, k)=>{
+                                                    return posts_doc_id == k
+                                                })
+
+                                    if(!post){
+                                        // console.log('ADDED_MY_APPLICATIONS_POSTS_LIKES', like_doc_id, like_doc_data)
+                                        dispatch({type:ADDED_MY_APPLICATIONS_POSTS_LIKES, post_id:posts_doc_id, like_doc_id, like_doc_data})
+                                        return;
+                                    }else{
+                                        // if (!post.hasOwnProperty("images")){
+                                        //     dispatch({type:ADDED_MY_APPLICATIONS_POSTS_IMAGES, post_id:posts_doc_id, image_doc_id, image_doc_data})
+                                        // }else{
+                                        // console.log('likes----->', post)
+                                        let {likes} = post
+
+                                        let like = _.find(likes,(v, k)=>{
+                                                        return like_doc_id == k
+                                                    })
+
+                                        if(!like){
+                                            console.log('ADDED_MY_APPLICATIONS_POSTS_LIKES', like_doc_id, like_doc_data)
+                                            dispatch({type:ADDED_MY_APPLICATIONS_POSTS_LIKES, post_id:posts_doc_id, like_doc_id, like_doc_data})
+                                        }
+                                    }
+                                
+                                    break;
+                                }
+                                case 'modified':{
+                                    // var newState =store.getState();
+                                    dispatch({type:MODIFIED_MY_APPLICATIONS_POSTS_LIKES, post_id:posts_doc_id, like_doc_id, like_doc_data})
+                                    break;
+                                }
+                                case 'removed':{
+                                    dispatch({type:REMOVED_MY_APPLICATIONS_POSTS_LIKES, post_id:posts_doc_id, like_doc_id})
                                     break;
                                 }
                             }
@@ -1788,16 +1832,18 @@ export const trackMyApplications=(uid, my_applications, my_applications_posts)=>
                     break;
                 }
                 case 'modified':{
-                    dispatch({type: MODIFIED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
+                    
                     break;
                 }
                 case 'removed':{
-                    dispatch({type: REMOVED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
+                    dispatch({type:REMOVED_MY_APPLICATIONS_POSTS, app_id:doc_id, post_id:posts_doc_id})
                     break;
                 }
             }
         })
     })
+
+    callback({'status':true, unsubscribe})
 }
 
 // track classs
@@ -1897,11 +1943,11 @@ export const trackClasss=(uid, classs, class_members)=> dispatch =>{
 }
 
 // track groups
-export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch =>{
+export const trackGroups=(uid, groups, group_profiles, group_members, callback)=> dispatch =>{
     // console.log("trackGroups", groups, uid)
 
     // /users/549127/groups
-    firebase.firestore().collection('users').doc(uid).collection('groups').onSnapshot((querySnapshot) => {
+    let unsubscribe = firebase.firestore().collection('users').doc(uid).collection('groups').onSnapshot((querySnapshot) => {
         // console.log("trackGroups #1", querySnapshot)
         querySnapshot.docChanges.forEach(function(change) {
             // console.log("trackGroups #2")
@@ -1912,6 +1958,7 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
 
             switch(change.type){
                 case 'added':{
+                    console.log('trackGroups > added', group_id)
 
                     let group = _.find(groups, (v, k)=>{
                                     return group_id == k
@@ -1932,6 +1979,8 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
                     firebase.firestore().collection('groups').doc(group_id).onSnapshot((docSnapshot) => {
                         // console.log(docSnapshot.id) 
                         // doc.id จะมีค่าเท่ากันกับ  docSnapshot.id 
+
+                        console.log('track group profile')
 
                         let group_profile_data = docSnapshot.data()
         
@@ -2005,6 +2054,7 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
                     break;
                 }
                 case 'removed':{
+                    console.log('trackGroups > removed')
                     // dispatch({type: REMOVED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
                     dispatch({ type: DELETE_GROUP, group_id});
                     break;
@@ -2012,10 +2062,12 @@ export const trackGroups=(uid, groups, group_profiles, group_members)=> dispatch
             }
         });
     })
+
+    callback({'status':true, unsubscribe})
 }
 
 // track friends
-export const trackFriends=(uid, friends, friend_profiles)=> dispatch =>{
+export const trackFriends=(uid, friends /*, friend_profiles*/ )=> dispatch =>{
     firebase.firestore().collection('users').doc(uid).collection('friends').onSnapshot((querySnapshot) => {
         // console.log(querySnapshot)
         querySnapshot.docChanges.forEach(function(change) {
@@ -2035,22 +2087,79 @@ export const trackFriends=(uid, friends, friend_profiles)=> dispatch =>{
                     dispatch({ type: ADD_FRIEND, friend_id, friend_data});
                 }
 
-                // profileFriend(friend_id, dispatch)
+                presenceFriend(friend_id, dispatch)
             }
+
             if (change.type === 'modified') {
                 console.log('trackFriends > modified', friend_id, friend_data)
                 dispatch({ type: MODIFIED_FRIEND, friend_id, friend_data});
+            }
+
+            if (change.type === 'removed') {
+                console.log('trackFriends > removed', friend_id)
+                dispatch({ type: REMOVED_FRIEND, friend_id});
             }
         })
     })
 }
 
+presenceFriend = (friend_id, dispatch)=>{
+    var new_state =store.getState();
+    let {user_presences} = new_state.presence
+
+    firebase.database().ref('user_presence/' + friend_id).on('child_added', function (snapshot) {
+        // console.log(change.doc.id, snapshot.key, snapshot.val())
+
+        let presenceKey = snapshot.key
+        let presenceData = snapshot.val()
+
+        let user_presence  = _.find(user_presences, (fpv, fpk)=>{
+                                return friend_id == fpk
+                            })
+
+        if(user_presence){
+            // console.log('> ', user_presences, user_presence, friend_id, snapshot.key, snapshot.val())
+
+            let presense =  _.find(user_presence, (v, k)=>{
+                                return k == presenceKey
+                            })
+
+            if(presense){
+
+                if(!_.isEqual(presense.status, presenceData.status)){
+                    console.log('user_presence > child_added', user_presence, presense, presenceData)
+                    dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
+                }
+            }else{
+                console.log('user_presence > child_added')
+                dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
+            }
+        }else{
+            console.log('user_presence > child_added')
+            dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
+        }
+    });
+
+    firebase.database().ref('user_presence/' + friend_id).on('child_changed', function (snapshot) {
+        // console.log(change.doc.id, snapshot.key, snapshot.val())
+        console.log('user_presence > child_changed')
+        dispatch({ type: CHANGED_PRESENCE, userId:friend_id, presenceKey:snapshot.key, presenceData:snapshot.val()})
+    });
+
+    firebase.database().ref('user_presence/' + friend_id).on('child_removed', function (snapshot) {
+        // console.log(change.doc.id, snapshot.key, snapshot.val())
+        console.log('user_presence > child_removed')
+        dispatch({ type: REMOVED_PRESENCE, userId:friend_id, presenceKey:snapshot.key})
+    });
+}
+
 /* 
 กรณี group member ไม่ใช่เพือนของเรา เราต้องดึง  profile ลงมา save ที่เครื่อง
 */
-profileFriend = (friend_id, dispatch)=>{
-
-    return;
+// export const trackProfileFriend = (friend_id, dispatch)=>{
+export const trackProfileFriend=(friend_id, callback)=> dispatch =>{
+    
+    let unsubscribes = []
     
     var new_state =store.getState();
 
@@ -2062,11 +2171,12 @@ profileFriend = (friend_id, dispatch)=>{
 
     // console.log(new_state.auth.user)
 
-    var new_state =store.getState();
-    let {user_presences} = new_state.presence
+    // var new_state =store.getState();
+    // let {user_presences} = new_state.presence
 
+    // callback({'status':true, unsubscribe})
     // friend > profiles
-    firebase.firestore().collection('profiles').doc(friend_id).onSnapshot((friendProfileDocSnapshot) => {
+    let unsubscribeProfiles = firebase.firestore().collection('profiles').doc(friend_id).onSnapshot((friendProfileDocSnapshot) => {
         // console.log(change.doc.id, friendDocSnapshot)
         if (!friendProfileDocSnapshot.exists) {
             console.log('No such document!', friend_id);
@@ -2085,9 +2195,11 @@ profileFriend = (friend_id, dispatch)=>{
             }
         }
     })
+
+    unsubscribes.push(unsubscribeProfiles)
     
     // track friends > phones
-    firebase.firestore().collection('profiles').doc(friend_id).collection('phones').onSnapshot((phonesSnapshot) => {
+    let unsubscribeProfilesPhones = firebase.firestore().collection('profiles').doc(friend_id).collection('phones').onSnapshot((phonesSnapshot) => {
         phonesSnapshot.docChanges.forEach(function(phonesChange) {
             // console.log(phonesChange.type)
 
@@ -2124,8 +2236,10 @@ profileFriend = (friend_id, dispatch)=>{
         })
     })
 
+    unsubscribes.push(unsubscribeProfilesPhones)
+
     // track friends > websites
-    firebase.firestore().collection('profiles').doc(friend_id).collection('websites').onSnapshot((websitesSnapshot) => {
+    let unsubscribeProfilesWebsites = firebase.firestore().collection('profiles').doc(friend_id).collection('websites').onSnapshot((websitesSnapshot) => {
         websitesSnapshot.docChanges.forEach(function(websitesChange) {
             // console.log(websitesChange.type)
 
@@ -2162,8 +2276,10 @@ profileFriend = (friend_id, dispatch)=>{
         })
     })
 
+    unsubscribes.push(unsubscribeProfilesWebsites)
+
     // track friends > emails
-    firebase.firestore().collection('profiles').doc(friend_id).collection('emails').onSnapshot((emailsSnapshot) => {
+    let unsubscribeProfilesEmails = firebase.firestore().collection('profiles').doc(friend_id).collection('emails').onSnapshot((emailsSnapshot) => {
         emailsSnapshot.docChanges.forEach(function(emailsChange) {
             // console.log(emailsChange.type)
             let friend_email_id   = emailsChange.doc.id
@@ -2208,8 +2324,10 @@ profileFriend = (friend_id, dispatch)=>{
         })
     })
 
+    unsubscribes.push(unsubscribeProfilesEmails)
+
     // track friends > my_ids
-    firebase.firestore().collection('profiles').doc(friend_id).collection('my_ids').onSnapshot((my_idsSnapshot) => {
+    let unsubscribeProfilesMy_ids = firebase.firestore().collection('profiles').doc(friend_id).collection('my_ids').onSnapshot((my_idsSnapshot) => {
        
         my_idsSnapshot.docChanges.forEach(function(my_idsChange) {
             let friend_my_id_id   = my_idsChange.doc.id
@@ -2250,49 +2368,53 @@ profileFriend = (friend_id, dispatch)=>{
         })
     })
 
-    firebase.database().ref('user_presence/' + friend_id).on('child_added', function (snapshot) {
-        // console.log(change.doc.id, snapshot.key, snapshot.val())
+    unsubscribes.push(unsubscribeProfilesMy_ids)
 
-        let presenceKey = snapshot.key
-        let presenceData = snapshot.val()
+    callback({'status':true, unsubscribes})
 
-        let user_presence  = _.find(user_presences, (fpv, fpk)=>{
-                                return friend_id == fpk
-                            })
+    // firebase.database().ref('user_presence/' + friend_id).on('child_added', function (snapshot) {
+    //     // console.log(change.doc.id, snapshot.key, snapshot.val())
 
-        if(user_presence){
-            // console.log('> ', user_presences, user_presence, friend_id, snapshot.key, snapshot.val())
+    //     let presenceKey = snapshot.key
+    //     let presenceData = snapshot.val()
 
-            let presense =  _.find(user_presence, (v, k)=>{
-                                return k == presenceKey
-                            })
+    //     let user_presence  = _.find(user_presences, (fpv, fpk)=>{
+    //                             return friend_id == fpk
+    //                         })
 
-            if(presense){
+    //     if(user_presence){
+    //         // console.log('> ', user_presences, user_presence, friend_id, snapshot.key, snapshot.val())
 
-                if(!_.isEqual(presense.status, presenceData.status)){
-                    console.log('user_presence > child_added', user_presence, presense, presenceData)
-                    dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
-                }
-            }else{
-                console.log('user_presence > child_added')
-                dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
-            }
-        }else{
-            console.log('user_presence > child_added')
-            dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
-        }
+    //         let presense =  _.find(user_presence, (v, k)=>{
+    //                             return k == presenceKey
+    //                         })
+
+    //         if(presense){
+
+    //             if(!_.isEqual(presense.status, presenceData.status)){
+    //                 console.log('user_presence > child_added', user_presence, presense, presenceData)
+    //                 dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
+    //             }
+    //         }else{
+    //             console.log('user_presence > child_added')
+    //             dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
+    //         }
+    //     }else{
+    //         console.log('user_presence > child_added')
+    //         dispatch({ type: ADDED_PRESENCE, userId:friend_id, presenceKey, presenceData})
+    //     }
         
-    });
+    // });
 
-    firebase.database().ref('user_presence/' + friend_id).on('child_changed', function (snapshot) {
-        // console.log(change.doc.id, snapshot.key, snapshot.val())
-        console.log('user_presence > child_changed')
-        dispatch({ type: CHANGED_PRESENCE, userId:friend_id, presenceKey:snapshot.key, presenceData:snapshot.val()})
-    });
+    // firebase.database().ref('user_presence/' + friend_id).on('child_changed', function (snapshot) {
+    //     // console.log(change.doc.id, snapshot.key, snapshot.val())
+    //     console.log('user_presence > child_changed')
+    //     dispatch({ type: CHANGED_PRESENCE, userId:friend_id, presenceKey:snapshot.key, presenceData:snapshot.val()})
+    // });
 
-    firebase.database().ref('user_presence/' + friend_id).on('child_removed', function (snapshot) {
-        // console.log(change.doc.id, snapshot.key, snapshot.val())
-        console.log('user_presence > child_removed')
-        dispatch({ type: REMOVED_PRESENCE, userId:friend_id, presenceKey:snapshot.key})
-    });
+    // firebase.database().ref('user_presence/' + friend_id).on('child_removed', function (snapshot) {
+    //     // console.log(change.doc.id, snapshot.key, snapshot.val())
+    //     console.log('user_presence > child_removed')
+    //     dispatch({ type: REMOVED_PRESENCE, userId:friend_id, presenceKey:snapshot.key})
+    // });
 }

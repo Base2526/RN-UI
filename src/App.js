@@ -11,6 +11,7 @@ import SignUp from "./screens/SignUp";
 import SignIn from "./screens/SignIn";
 import ForgotPassword from "./screens/ForgotPassword"
 import Welcome from "./screens/Welcome"
+import TestUsers from './screens/TestUsers'
 
 import DrawerMenu from './drawer_menu'
 
@@ -30,9 +31,9 @@ export const AuthStack = createStackNavigator({
     SignIn: {
       screen: SignIn,
       navigationOptions: {
-          title: "Sign In"
+          // title: "Sign In >>"
       }
-  },
+    },
     SignUp: {
         screen: SignUp,
         navigationOptions: {
@@ -44,6 +45,12 @@ export const AuthStack = createStackNavigator({
       screen: ForgotPassword,
       navigationOptions:{
         title: "Forgot Password"
+      }
+    },
+    TestUsers:{
+      screen: TestUsers,
+      navigationOptions:{
+        title: "Test Users"
       }
     }
 });

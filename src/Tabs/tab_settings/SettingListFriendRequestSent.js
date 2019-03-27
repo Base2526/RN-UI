@@ -25,8 +25,8 @@ import {getUid, getHeaderInset} from '../../utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState, 
-        makeFriendsState,
-        makeFriendProfilesState} from '../../reselect'
+        makeFriendsState
+        } from '../../reselect'
 // import console = require('console');
 
   //       const {state} = navigation;
@@ -67,25 +67,27 @@ class SettingListFriendRequestSent extends React.Component{
   }
 
   loadData = (props) =>{
-    let {friends, friend_profiles} = props
+    let {friends} = props
 
     let data = []
     for (var key in friends) {
         let friend = friends[key]
         switch(friend.status){
           case Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND:{
-            let friend_profile =_.find(friend_profiles, (v, k)=>{
-                                  return k == key
-                                })
-            if(friend_profile !== undefined){
-              data.push({...friend, friend_id:key, profile:friend_profile});
-            } 
+            // let friend_profile =_.find(friend_profiles, (v, k)=>{
+            //                       return k == key
+            //                     })
+            // if(friend_profile !== undefined){
+            //   data.push({...friend, friend_id:key, profile:friend_profile});
+            // } 
+
+            data.push({...friend, friend_id:key});
             break
           }            
         }
     }
 
-    // console.log(data.length)
+    console.log(data, friends)
 
     if(!_.isEqual(data, this.state.data)){
       const {setParams} = props.navigation;
@@ -162,7 +164,7 @@ class SettingListFriendRequestSent extends React.Component{
                               borderRadius: 10,
                             }}
                       source={{
-                        uri: item.profile.image_url,
+                        uri: item.image_url,
                         headers:{ Authorization: 'someAuthToken' },
                         priority: FastImage.priority.normal,
                       }}
@@ -176,12 +178,12 @@ class SettingListFriendRequestSent extends React.Component{
                                 paddingLeft: 10, 
                                 paddingBottom:5}}>
 
-                        {item.hasOwnProperty('change_friend_name') ? item.change_friend_name : item.profile.name}
+                        {item.hasOwnProperty('change_friend_name') ? item.change_friend_name : item.name}
                   </Text>
                   <Text style={{fontSize: 13, 
                               color: '#222',
                               paddingLeft: 10}}>
-                        {item.profile.status_message}
+                        {item.status_message}
                   </Text>
               </View>
               {this.showMenu(item)}
@@ -225,7 +227,7 @@ const mapStateToProps = (state, ownProps) => {
   return{
     uid: makeUidState(state, ownProps),
     friends: makeFriendsState(state, ownProps),
-    friend_profiles:makeFriendProfilesState(state, ownProps),
+    // friend_profiles:makeFriendProfilesState(state, ownProps),
   }
 }
   

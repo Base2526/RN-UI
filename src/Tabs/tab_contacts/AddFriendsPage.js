@@ -20,10 +20,12 @@ import {
       } from 'react-native-popup-menu';
 var _ = require('lodash');
 
+import Constant from '../../utils/Constant'
 import * as actions from '../../actions'
-import {getHeaderInset, isEmpty, randomKey} from '../../utils/Helpers'
+import {getHeaderInset, isEmpty, randomKey, checkInternetDialog} from '../../utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 import {makeUidState, 
+        makeProfileState,
         makeIsConnectedState,
         makeFriendsState,
         makePeopleYouMayKhowState} from '../../reselect'
@@ -116,7 +118,8 @@ class AddFriendsPage extends React.Component{
   }
 
   showMenu = (item, index)=>{
-    // console.log(item)
+    let {is_connected} = this.props
+
     return( <View style={{flex:1,
                           position:'absolute', 
                           top:0,
@@ -137,29 +140,32 @@ class AddFriendsPage extends React.Component{
                         <Text style={{padding:10, fontSize:18}}>View profile</Text>
                     </MenuOption>
                     <MenuOption onSelect={() => {
+                      if(!is_connected){
+                        checkInternetDialog()
+                        return 
+                      }
 
-                      let {friends} = this.props
+                      let {uid, profile, friends} = this.props
 
-                      let find_friend = _.find(friends, (v, k)=>{
+                      let friend_data = _.find(friends, (v, k)=>{
                                           return k == item.uid
                                         })
-
+                                             
                       let chat_id = randomKey()
-                      if(find_friend){
-                        chat_id = find_friend.chat_id
+                      if(!friend_data){
+                        friend_data = {...item, chat_id, status:Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND}
+                      }else{
+                        chat_id = friend_data.chat_id
+                        friend_data = {...friend_data, status:Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND}
                       }
-                      console.log(find_friend)
-                      
+
+                      let user_data = {uid, ...profile, chat_id, status:Constant.FRIEND_STATUS_FRIEND_REQUEST}
+
                       this.setState({loading:true})
-                      this.props.actionInviteFriend(this.props.uid, item.uid, chat_id, (result) => {
+                      this.props.actionInviteFriend(this.props.uid, item.uid, user_data, friend_data, (result) => {
                         console.log(result)  
                         this.setState({loading:false})
-
-                        // let data = [...this.state.data];
-                        // data.splice(index, 1)
-                        // this.setState({data})
                       })
-                      
                     }}>
                         <Text style={{padding:10, fontSize:18}}>Add friend</Text>
                     </MenuOption>
@@ -262,7 +268,7 @@ class AddFriendsPage extends React.Component{
                     borderRadius: 10, 
                   }}
             source={{
-              uri: item.url_image,
+              uri: item.image_url,
               headers:{ Authorization: 'someAuthToken' },
               priority: FastImage.priority.normal,
             }}
@@ -322,6 +328,7 @@ const mapStateToProps = (state, ownProps) => {
 
   return({
       uid:makeUidState(state, ownProps),
+      profile: makeProfileState(state, ownProps),
       friends:makeFriendsState(state, ownProps),
       people_you_may_khows:makePeopleYouMayKhowState(state, ownProps),
       is_connected:makeIsConnectedState(state, ownProps),

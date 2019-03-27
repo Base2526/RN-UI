@@ -49,6 +49,9 @@ module.exports = {
 
     ADD_NEW_POST: API_URL + END_POINT + '/add_new_post',
 
+
+    TEST_USERS: API_URL + END_POINT + '/test_users',
+
     // 'Content-Type': 'multipart/form-data'
     FETCH_HEADERS: {
         'Accept': 'application/json',

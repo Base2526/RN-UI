@@ -114,6 +114,7 @@ const getFriends = (state, props) => {
 }
 
 const getFriendProfiles = (state, props) => {
+
     let friend_profiles = state.auth.user.friend_profiles
     let new_friend_profiles = {...friend_profiles}
 
@@ -157,9 +158,61 @@ const getFriendProfiles = (state, props) => {
     return new_friend_profiles
 }
 
-// const getFriendPhones = (state, props) => {
-//     return state.auth.user.friend_profiles
-// }
+const getFriendProfile = (state, props) => {
+    const { navigation } = props;
+    const friend_id = navigation.getParam('friend_id', null);
+    // console.log(friend_id)
+
+    // let friends = state.auth.user.friends
+    // let friend  = _.find(friends, (v, k)=>{
+    //                 return k == friend_id
+    //               })
+
+    let friend  ={}
+
+    let {friend_phones, 
+        friend_websites, 
+        friend_emails, 
+        friend_my_ids} = state.auth.user
+
+    let phones = _.find(friend_phones, (phone_v, phone_k)=>{
+        return friend_id == phone_k
+    })
+
+    let websites = _.find(friend_websites, (websites_v, websites_k)=>{
+        return friend_id == websites_k
+    })
+
+    let emails =_.find(friend_emails, (email_v, email_k)=>{
+        return friend_id == email_k
+    })
+
+    let my_ids =_.find(friend_my_ids, (my_id_v, my_id_k)=>{
+        return friend_id == my_id_k
+    })
+
+    /*
+    // let friend_emails   = v.friend_emails
+    // let friend_my_ids   = v.friend_my_ids
+    // let friend_phones   = v.friend_phones
+    // let friend_profile  = v.friend_profile
+    // let friend_websites = v.friend_websites  
+    */
+
+    if(phones){
+        friend = {...friend, friend_phones:phones}
+    }
+    if(websites){
+        friend = {...friend, friend_websites:websites}
+    }
+    if(emails){
+        friend = {...friend, friend_emails:emails}
+    }
+    // if(my_ids){
+    //     friend = {...friend, friend_my_ids:my_ids}
+    // }
+    return friend
+}
 
 const getPresences = (state, props) => {
     // console.log('getPresences', state.presence.user_presences)
@@ -288,6 +341,11 @@ export const makeFriendsState = createSelector(
 export const makeFriendProfilesState = createSelector(
     [ getFriendProfiles ],
     (friend_profiles) => friend_profiles
+)
+
+export const makeFriendProfileState = createSelector(
+    [ getFriendProfile ],
+    (friend_profile) => friend_profile
 )
 
 // export const makeFriendPhonesState = createSelector(

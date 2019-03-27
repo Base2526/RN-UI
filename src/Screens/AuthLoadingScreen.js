@@ -106,7 +106,7 @@ class AuthLoadingScreen extends React.Component {
                 profiles,
                 phones,
                 friends, 
-                friend_profiles,
+                // friend_profiles,
                 websites,
                 emails,
                 myIds,
@@ -120,11 +120,15 @@ class AuthLoadingScreen extends React.Component {
                 } = this.props
 
             this.props.trackProfiles(uid, profiles)
+            this.props.trackFriends(uid, friends)
+            
             /*
             this.props.trackProfilesPhones(uid, phones)
             this.props.trackProfileWebsites(uid, websites)
             this.props.trackProfileEmails(uid, emails)
             this.props.trackProfileMyIds(uid, myIds)
+
+            /*
             this.props.trackMyApplications(uid, my_applications, my_applications_posts)
             this.props.trackClasss(uid, classs, class_members)
             this.props.trackGroups(uid, groups, group_profiles, group_members)
@@ -179,6 +183,7 @@ const mapStateToProps = (state, ownProps) => {
             websites: makeWebsitesState(state, ownProps),
             emails:makeEmailsState(state, ownProps),
             myIds:makeMyIdsState(state, ownProps),
+
             my_applications:makeMyAppicationsState(state, ownProps),
             my_applications_posts:makeMyAppicationsPostsState(state, ownProps),
             classs:makeClasssState(state, ownProps),
@@ -187,7 +192,7 @@ const mapStateToProps = (state, ownProps) => {
             group_profiles:makeGroupProfilesState(state, ownProps),
             group_members:makeGroupMembersState(state, ownProps),
             friends:makeFriendsState(state, ownProps),
-            friend_profiles:makeFriendProfilesState(state, ownProps),
+            // friend_profiles:makeFriendProfilesState(state, ownProps),
         }
     }
 }

@@ -700,7 +700,7 @@ function friend_profile_99(){
 	$result['execution_times'] = $execution_times;
 	
 	$result['result'] = TRUE;
-	$result['data'] 	= array('friend_profile'=>(object)$friend_profile,
+	$result['data'] 	= array( /*'friend_profile'=>(object)$friend_profile,*/
 														'friend_emails'	=>(object)$friend_emails,
 														'friend_my_ids' =>(object)$friend_my_ids,
 														'friend_phones' =>(object)$friend_phones,

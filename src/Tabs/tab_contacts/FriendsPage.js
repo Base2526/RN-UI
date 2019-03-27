@@ -75,7 +75,7 @@ class FriendsPage extends React.Component{
       //   console.log('FriendsPage > loadData : this.setState({renderContent: true})')
       // }
       
-      let {presences, profile, friends, friend_profiles} = props
+      let {presences, profile, friends} = props
 
       // console.log(friends, friend_profiles)
       let my_profile = {
@@ -98,16 +98,16 @@ class FriendsPage extends React.Component{
 
         let friend = friends[key]
 
-        let friend_profile =_.find(friend_profiles, (fv, fk)=>{
-                              return fk == key
-                            })
+        // let friend_profile =_.find(friend_profiles, (fv, fk)=>{
+        //                       return fk == key
+        //                     })
         // console.log(friend, key, friend_profile)
 
-        if(friend_profile === undefined){
-          continue;
-        }
+        // if(friend_profile === undefined){
+        //   continue;
+        // }
         
-        friend = {...friend, profile:friend_profile}
+        // friend = {...friend, profile:friend_profile}
 
         switch(friend.status){
           case Constant.FRIEND_STATUS_FRIEND:{
@@ -278,7 +278,7 @@ class FriendsPage extends React.Component{
                           return 
                         }
 
-                        let name = rowItem.change_friend_name ? rowItem.change_friend_name : rowItem.profile.name
+                        let name = rowItem.change_friend_name ? rowItem.change_friend_name : rowItem.name
                         Alert.alert(
                           '',
                           'Hide '+ name +'?',
@@ -308,7 +308,7 @@ class FriendsPage extends React.Component{
                             return 
                           }
 
-                          let name = rowItem.change_friend_name ? rowItem.change_friend_name : rowItem.profile.name
+                          let name = rowItem.change_friend_name ? rowItem.change_friend_name : rowItem.name
                           Alert.alert(
                             '',
                             'Block '+ name + '?',
@@ -383,7 +383,7 @@ class FriendsPage extends React.Component{
 
     _renderRow = (rowItem, rowId, sectionId) => {
         if(rowId == 0 && sectionId == 0){
-          
+          console.log(rowItem)
           return (
             <TouchableOpacity 
               key={ rowId } 
@@ -433,9 +433,9 @@ class FriendsPage extends React.Component{
           )
         }
 
-        if(rowItem.profile === undefined){
-          return(<View></View>);
-        }
+        // if(rowItem.profile === undefined){
+        //   return(<View></View>);
+        // }
 
         switch(rowItem.status){
           case Constant.FRIEND_STATUS_FRIEND:{
@@ -468,7 +468,7 @@ class FriendsPage extends React.Component{
                       <FastImage
                             style={{width: 50, height: 50, borderRadius: 10, borderColor:'gray'}}
                             source={{
-                              uri: rowItem.profile.image_url,
+                              uri: rowItem.image_url,
                               headers:{ Authorization: 'someAuthToken' },
                               priority: FastImage.priority.normal,
                             }}
@@ -492,12 +492,12 @@ class FriendsPage extends React.Component{
                                       color: '#222',
                                       paddingLeft: 10, 
                                       paddingBottom:5}}>
-                            {rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.profile.name}
+                            {rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.name}
                         </Text>
                         <Text style={{fontSize: 13, 
                                     color: '#222',
                                     paddingLeft: 10}}>
-                            {rowItem.profile.status_message}
+                            {rowItem.status_message}
                         </Text>
                     </View>
                 </View>
@@ -535,7 +535,7 @@ class FriendsPage extends React.Component{
                   <FastImage
                         style={{width: 50, height: 50, borderRadius: 10, borderColor:'gray'}}
                         source={{
-                          uri: rowItem.profile.image_url,
+                          uri: rowItem.image_url,
                           headers:{ Authorization: 'someAuthToken' },
                           priority: FastImage.priority.normal,
                         }}
@@ -560,7 +560,7 @@ class FriendsPage extends React.Component{
                                     color: '#222',
                                     paddingLeft: 10, 
                                     paddingBottom:5}}>
-                          {rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.profile.name}
+                          {rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.name}
                       </Text>
                       {rowItem.mute?<View />:<MyIcon
                                       style={{paddingLeft:5}}
@@ -572,7 +572,7 @@ class FriendsPage extends React.Component{
                     <Text style={{fontSize: 13, 
                                 color: '#222',
                                 paddingLeft: 10}}>
-                        {rowItem.profile.status_message}
+                        {rowItem.status_message}
                     </Text>
                 </View>
             </View>
@@ -710,7 +710,7 @@ const mapStateToProps = (state, ownProps) => {
   return{
     uid: makeUidState(state, ownProps),
     friends:makeFriendsState(state, ownProps),
-    friend_profiles:makeFriendProfilesState(state, ownProps),
+    // friend_profiles:makeFriendProfilesState(state, ownProps),
     profile:makeProfileState(state, ownProps),
     presences:makePresencesState(state, ownProps),
 

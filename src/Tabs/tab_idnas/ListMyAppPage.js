@@ -29,6 +29,8 @@ import {getUid, getHeaderInset} from '../../utils/Helpers'
 
 import {makeUidState,
         makeMyAppicationsState} from '../../reselect'
+        
+let unsubscribes = []
 
 class ListMyAppPage extends React.Component{
     constructor(props) {
@@ -52,8 +54,11 @@ class ListMyAppPage extends React.Component{
     }
 
     componentDidMount() {
+      let {uid, my_applications} = this.props
 
-      // this.props.watchTaskMyApplicationEvent(this.props.uid)
+      this.props.trackMyApplications(uid, my_applications, (data)=>{
+        unsubscribes.push(data.unsubscribe)
+      })
       
       setTimeout(() => {this.setState({renderContent: true})}, 0);
 
@@ -64,7 +69,7 @@ class ListMyAppPage extends React.Component{
         refreshing: false
       });
 
-      let my_applications = this.props.my_applications
+      // let my_applications = this.props.my_applications
 
       // console.log(my_applications)
 
@@ -74,6 +79,12 @@ class ListMyAppPage extends React.Component{
       })
 
       this.setState({data:newValue})
+    }
+
+    componentWillUnmount(){
+      unsubscribes.map((unsubscribe, k)=>{
+          unsubscribe()
+      })
     }
  
     renderSeparator = () => {
@@ -415,7 +426,7 @@ class ListMyAppPage extends React.Component{
 }
 
 const mapStateToProps = (state, ownProps) => {
-  // console.log(state)
+  console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
   //_persist.rehydrated parameter is initially set to false

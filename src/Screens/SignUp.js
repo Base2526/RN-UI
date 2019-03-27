@@ -120,16 +120,6 @@ export default class SignUp extends React.Component{
             <Text style={{color:'white', fontSize: 18, fontWeight:'700'}}>SIGN UP</Text>
           </TouchableOpacity>
         </View>
-
-        {/* <Button
-          buttonStyle={{ marginTop: 20 }}
-          backgroundColor="transparent"
-          textStyle={{ color: "#bcbec1" }}
-          title="Sign In"
-          // onPress={() => alert("go to sign in screen")}
-          onPress={() => navigation.navigate("SignIn")}
-        /> */}
-      {/* </Card> */}
     </View>
     )
   }

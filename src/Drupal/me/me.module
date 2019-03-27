@@ -1688,6 +1688,16 @@ function me_services_resources()
       ),
     ),
 
+    'test_users'=>array(
+      'create' =>array(
+        'help'=>'Services Test user system',
+        'callback'=>'test_users',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+      ),
+    ),
+
     'check_my_id'=>array(
       'create' =>array(
         'help'=>'Services check my id is token',
@@ -6309,6 +6319,66 @@ function find_friend2(){
   return $result;
 }
 
+function test_users(){
+  $result = array();
+  if (!check_header()) {
+    $result['result'] = FALSE;
+    // $result['message']= "check_header()";
+    return $result;
+  }
+
+  $time_start = microtime(true);
+
+  $uid_friends = array('0', '1');
+
+  // เป้นการโหลดข้อมูลของ profile user ซึ่งจะได้รู้ว่า friend ของ user 
+  $uids = db_select('users', 'ur')
+        ->fields('ur', array('uid'))
+        // ->condition('ur.uid', $uid, '!=')
+        // ->condition('ur.uid', 0, '!=')
+        // ->condition('ur.uid', 1, '!=')
+        ->condition('ur.uid', $uid_friends, 'NOT IN')
+        ->orderBy("ur.uid", "ASC")
+        ->execute()
+        ->fetchCol();
+
+  $users =  user_load_multiple($uids);
+  $data = array();
+  foreach ($users as $user) {
+    # code...
+    $friend = array();
+    
+    // $friend['uid'] = $user->uid;
+    // $tmp['name'] = $user->name;
+    // $friend['mail'] = $user->mail;
+
+    $profile_friend = profile2_by_uid_load($user->uid, 'main');
+
+    $friend['name'] = $user->name;    
+    if(isset($profile_friend->field_profile_image[LANGUAGE_NONE])){
+      $friend['image_url'] = file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']));
+    }else{
+      $friend['image_url'] = getDefualtProfilePicture();
+    }
+
+    $friend['status_message'] = '';
+    if(isset($profile_friend->field_profile_status_message[LANGUAGE_NONE])){
+      $friend['status_message'] = $profile_friend->field_profile_status_message[LANGUAGE_NONE][0]['value'];
+    }
+
+    $data[] = $friend;
+  }
+
+
+  $time_end = microtime(true);
+  $execution_times = number_format(($time_end - $time_start), 2);
+  $result['execution_times'] = $execution_times;
+
+  $result['result'] = TRUE;
+  $result['users'] = $data;
+  return $result;
+}
+
 function people_you_may_know(){
   $result = array();
 
@@ -6375,10 +6445,16 @@ function people_you_may_know(){
     $friend['name'] = $friend_name;
     
     if(isset($profile_friend->field_profile_image[LANGUAGE_NONE])){
-      $friend['url_image'] = file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']));
+      $friend['image_url'] = file_create_url(image_style_url('medium', $profile_friend->field_profile_image[LANGUAGE_NONE][0]['uri']));
     }else{
-      $friend['url_image'] = getDefualtProfilePicture();
+      $friend['image_url'] = getDefualtProfilePicture();
     }
+
+    $friend['status_message'] = '';
+    if(isset($profile_friend->field_profile_status_message[LANGUAGE_NONE])){
+      $friend['status_message'] = $profile_friend->field_profile_status_message[LANGUAGE_NONE][0]['value'];
+    }
+
     $data[] = $friend;
   }
 
@@ -6667,10 +6743,13 @@ function scan_qrcode(){
             $friend_status = 0;
             $friends_block = FALSE;
             $friends_hide = FALSE;
+            $friend_chat_id = generateRandomString(LENGTH_CHAT_ID);
             foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $k => $v) {
               // จะได้ เพือนมาทั้งหมด
               $data_item_load = field_collection_item_load($v['value']);
               if($data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'] == $decrypt_id[1]){
+                
+                $friend_chat_id= $data_item_load->field_profile_friends_chat_id[LANGUAGE_NONE][0]['value'];
                 $friend_status = $data_item_load->field_friend_status[LANGUAGE_NONE][0]['tid'];
                 
                 $friends_block= $data_item_load->field_profile_friends_block[LANGUAGE_NONE][0]['value'] == 0 ? FALSE: TRUE;
@@ -6690,9 +6769,15 @@ function scan_qrcode(){
             }else{
               $v['image_url']  = getDefualtProfilePicture();
             }
+
+            $v['status_message'] = '';
+            if(isset($profile_friend->field_profile_status_message[LANGUAGE_NONE])){
+              $v['status_message'] = $profile_friend->field_profile_status_message[LANGUAGE_NONE][0]['value'];
+            }
            
             $v['status']        = $friend_status;
             $v['type']          = $decrypt_type[1];
+            $v['chat_id']       = $friend_chat_id;
             $v['is_block']      = $friends_block;
             $v['is_hide']       = $friends_hide;
 
@@ -15021,6 +15106,9 @@ function create_chat_group(){
 
   $m_profile = array();
   $m_profile['friend_id'] = $param_uid;
+  $m_profile['friend_name']=$user_name;
+  $m_profile['friend_image_url'] = '';
+  $m_profile['friend_bg_url'] = '';
   $m_profile['invitor']   = $param_uid;
   $m_profile['status']    = '36';
   $m_profile['item_id']   = $member_field_entity->item_id;
@@ -15075,7 +15163,6 @@ function create_chat_group(){
   
 
   // โหลดเพือนขึ้นมาเพือบันทึก field_chat_group
-
   $members_friend_profile = profile2_by_uid_load($param_uid, 'main');
 
   $members_friend_v = array();
@@ -15145,6 +15232,9 @@ function create_chat_group(){
 
     $m_profile = array();
     $m_profile['friend_id'] = $members_friend_id;
+    $m_profile['friend_name']='';
+    $m_profile['friend_image_url'] = '';
+    $m_profile['friend_bg_url'] = '';
     $m_profile['invitor'] = $param_uid;
     $m_profile['status'] = '35';
     $m_profile['item_id'] = $member_field_entity->item_id;

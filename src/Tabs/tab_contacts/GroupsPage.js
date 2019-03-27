@@ -30,6 +30,7 @@ import {makeUidState,
         makeGroupMembersState,
         makeIsConnectedState} from '../../reselect'
 
+let unsubscribes = []
 class GroupsPage extends React.Component{
     constructor(props) {
       super(props);
@@ -52,7 +53,21 @@ class GroupsPage extends React.Component{
         loading: false,
       });   
       
+      let {uid, groups, group_profiles, group_members} = this.props
+
+      // console.log(uid, groups, group_profiles, group_members)
+      this.props.trackGroups(uid, groups, group_profiles, group_members, (data)=>{
+        // console.log(data)
+        unsubscribes.push(data.unsubscribe)
+      })
+
       this.loadData(this.props)
+    }
+
+    componentWillUnmount(){
+      unsubscribes.map((unsubscribe, k)=>{
+          unsubscribe()
+      })
     }
 
     componentWillReceiveProps(nextProps) {    
@@ -63,7 +78,7 @@ class GroupsPage extends React.Component{
       // console.log(groups)
       let {groups, group_profiles, group_members} = props
 
-      // console.log('GroupsPage', groups, group_profiles)
+      console.log('GroupsPage', group_members)
 
       let group_invited = []
       let group_joined = []

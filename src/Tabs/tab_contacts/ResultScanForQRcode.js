@@ -14,6 +14,7 @@ import MyIcon from '../../config/icon-font.js';
 import Constant from '../../utils/Constant'
 
 import {makeUidState, 
+        makeProfileState,
         makeFriendsState,
         makeIsConnectedState,} from '../../reselect'
 
@@ -131,7 +132,8 @@ class ResultScanForQRcode extends Component {
         this.props.navigation.goBack(null)
     }
 
-    addFriend = (friend_id) =>{
+    addFriend = (friend_data) =>{
+        /*
         let {uid, friends} = this.props
         let find_friend = _.find(friends, (v, k)=>{
                             return k == friend_id
@@ -142,9 +144,34 @@ class ResultScanForQRcode extends Component {
             chat_id = find_friend.chat_id
         }
 
+        console.log(chat_id)
+
         this.setState({loading:true})
         this.props.actionInviteFriend(uid, friend_id, chat_id, (result) => {
             this.setState({loading:false})
+        })
+        */
+
+        let {uid, profile, friends} = this.props
+
+        let chat_id = friend_data.chat_id
+            
+        friend_data = {...friend_data, status:Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND}
+        
+        let user_data = {uid, ...profile, chat_id, status:Constant.FRIEND_STATUS_FRIEND_REQUEST}
+
+        // console.log(uid, friend_data.uid, user_data, friend_data)
+
+        this.setState({loading:true})
+        this.props.actionInviteFriend(uid, friend_data.uid, user_data, friend_data, (result) => {
+            // this.setState({loading:false})
+
+            // let new_friends = [...friends];
+            // new_friends[index] = {...new_friends[index], status: Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND}
+        
+            // this.setState({friends: new_friends});
+
+            this.setState({ loading:false, friend:{...friend_data, status: Constant.FRIEND_STATUS_WAIT_FOR_A_FRIEND} })
         })
     }
 
@@ -168,7 +195,7 @@ class ResultScanForQRcode extends Component {
                                                     // this.props.navigation.navigate("ChatPage")
                                                     // alert('add friend')
 
-                                                    this.addFriend(friend.uid)
+                                                    this.addFriend(friend)
                                                 }}>
                                 <Text>Add friend</Text>
                             </TouchableOpacity>
@@ -413,11 +440,9 @@ const mapStateToProps = (state, ownProps) => {
     }
 
     return{
-        // uid:getUid(state),
-        // friends:state.auth.users.friends
-
-        uid:makeUidState(state, ownProps),
-        friends:makeFriendsState(state, ownProps),
+        uid: makeUidState(state, ownProps),
+        profile: makeProfileState(state, ownProps),
+        friends: makeFriendsState(state, ownProps),
 
         is_connected: makeIsConnectedState(state, ownProps),
     }
