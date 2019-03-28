@@ -14,6 +14,7 @@ android :
   react-native run-ios or react-native run-android
   
   
+http://128.199.149.168/sites/default/files/ScreenRecording_03-28-2562%2015-04-51.MP4
   
 source code : 
 
