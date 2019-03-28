@@ -56,6 +56,10 @@ target 'RN_UI' do
 
     pod 'RNViewShot', :path => '../node_modules/react-native-view-shot'
 
+    pod 'react-native-maps', :path => '../node_modules/react-native-maps'
+
+    pod 'react-native-document-picker', :path => '../node_modules/react-native-document-picker'
+
   end
 
   target 'RN_UITests' do

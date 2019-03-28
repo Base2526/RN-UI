@@ -7,25 +7,23 @@ import {View,
         } from 'react-native'
 
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import Styles from '../../styles';
-
+import { connect } from 'react-redux';
 import { GiftedChat ,Actions} from 'react-native-gifted-chat'
 
+import * as actions from '../../actions'
 import CustomActions from './Chat/CustomActions';
 
-export default class ChatPage extends React.Component{
+import {makeUidState, 
+        makeProfileState, 
+        makeFriendsState, 
+        makePresencesState,
+        makeIsConnectedState} from '../../reselect'
 
+class ChatPage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
-        title: "Contacts",
+        title: `${navigation.state.params.title}`,
         headerTintColor: 'white',
         tabBarVisible: false,
-        // headerLeft: (
-        //     <TouchableOpacity
-        //         style={Styles.headerButton}
-        //         onPress={() => navigation.openDrawer()}>
-        //         <Icon name="bars" size={25} />
-        //     </TouchableOpacity>
-        // ),
         headerStyle: {
             backgroundColor: 'rgba(186, 53, 100, 1.0)',
         },
@@ -45,37 +43,33 @@ export default class ChatPage extends React.Component{
         messages: [],
     }
 
-    // 
     constructor(props){
         super(props)
     }
     
     componentWillMount() {
-        this.setState({
-            // messages: [
-            // {
-            //     _id: 1,
-            //     text: 'Hello developer',
-            //     createdAt: new Date(),
-            //     user: {
-            //     _id: 2,
-            //     name: 'React Native',
-            //     avatar: 'https://placeimg.com/140/140/any',
-            //     },
-            // },
-            // ],
-            messages: require('./Chat/messages.js'),
-        })
+      const { navigation } = this.props;
+      const params = navigation.getParam('params', null);
+      console.log(params)
 
-        this.props.navigation.setParams({ 
-            handleHeaderRight: this.handleHeaderRight,
-        })
+      if(params.type == 'private'){
+
+      }else if(params.type == 'group'){
+
+      }else{
+        // if type not private, group 
+        this.props.navigation.goBack(null);
+      }
+
+
+      // this.setState({
+      //     messages: require('./Chat/messages.js'),
+      // })
+      // this.props.navigation.setParams({ 
+      //     handleHeaderRight: this.handleHeaderRight,
+      // })
     }
     
-    // componentDidMount () {
-    //     this.props.navigation.setParams({ handleHeaderRight: this.handleHeaderRight })
-    // }
-
     onSend(messages = []) {
         this.setState(previousState => ({
           messages: GiftedChat.append(previousState.messages, messages),
@@ -113,7 +107,6 @@ export default class ChatPage extends React.Component{
       }
 
     render(){
-        // return(<View><Text>Chat Page</Text></View>)
         return (
             <SafeAreaView style={{flex:1}}>
                 <GiftedChat
@@ -129,3 +122,24 @@ export default class ChatPage extends React.Component{
         )
     }
 }
+
+const mapStateToProps = (state, ownProps) => {
+  // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
+  //_persist.rehydrated parameter is initially set to false
+  if(!state._persist.rehydrated){
+    return {}
+  }
+
+  if(!state.auth.isLogin){
+    return;
+  }
+
+  return{
+    uid:makeUidState(state, ownProps),
+    profile:makeProfileState(state, ownProps),
+    friends:makeFriendsState(state, ownProps),
+    presences:makePresencesState(state, ownProps),
+    is_connected: makeIsConnectedState(state, ownProps),
+  }
+}
+export default connect(mapStateToProps, actions)(ChatPage);

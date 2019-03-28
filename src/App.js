@@ -6,28 +6,16 @@ import { createDrawerNavigator, createStackNavigator, createSwitchNavigator, cre
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Tabs from './tabs';  //Tab Nav
 import Profile from './profile'; //Stack Nav
-
 import SignUp from "./screens/SignUp";
 import SignIn from "./screens/SignIn";
 import ForgotPassword from "./screens/ForgotPassword"
 import Welcome from "./screens/Welcome"
 import TestUsers from './screens/TestUsers'
-
 import DrawerMenu from './drawer_menu'
-
 import AuthLoadingScreen from './screens/AuthLoadingScreen'
 
 
-// var {height, width} = Dimensions.get('window');
-
-// Inbox: { screen: InboxScreen },
 export const AuthStack = createStackNavigator({
-    // Welcome: {
-    //     screen: Welcome,
-    //     navigationOptions: {
-    //         title: "Welcome to iDNA"
-    //     }
-    // },
     SignIn: {
       screen: SignIn,
       navigationOptions: {
@@ -40,7 +28,6 @@ export const AuthStack = createStackNavigator({
             title: "Sign Up"
         }
     },
-    
     ForgotPassword:{
       screen: ForgotPassword,
       navigationOptions:{
@@ -86,56 +73,7 @@ AppDrawer = createDrawerNavigator({
       drawerLabel: () => null
     }
   },
-//   AuthStack: {
-//     screen: AuthStack,
-  //   navigationOptions: {
-  //     drawerLabel: 'Profile',
-  //     drawerIcon: ({ tintColor }) => <Icon name="user-circle" size={17} />,
-  //   }
-//   },
 }, drawerNavigatorConfig);
-
-const defaultGetStateForAction = AppDrawer.router.getStateForAction;
-// AppDrawer.router.getStateForAction = (action, state) => {
-
-//     //use 'DrawerOpen' to capture drawer open event
-//     if (state && action.type === 'Navigation/NAVIGATE' && action.routeName === 'DrawerClose') {
-//         console.log('DrawerClose');
-//         //write the code you want to deal with 'DrawerClose' event
-//     }
-//     console.log('DrawerOpen')
-//     return defaultGetStateForAction(action, state);
-// };
-
-AppDrawer.router.getStateForAction = (action, state) => {
-    switch (action.type) {
-      case 'Navigation/OPEN_DRAWER':
-      case 'Navigation/DRAWER_OPENED':
-        // setDrawerStatus(true)
-        break;
-        
-      case 'Navigation/CLOSE_DRAWER':
-      case 'Navigation/DRAWER_CLOSED':
-        // setDrawerStatus(false)
-        break;
-    }
-  
-    return defaultGetStateForAction(action, state);
-};
-
-
-// export const createRootNavigator = (signedIn = false) => {
-//   return( createAppContainer(createSwitchNavigator(
-//       {
-//         Auth: AuthStack,
-//         App: AppDrawer,
-//       },
-//       {
-//         initialRouteName: signedIn ? "App" : "Auth"
-//       }
-//     )
-//   ))
-// };
 
 export const AppNavigator = createAppContainer(createSwitchNavigator(
   {

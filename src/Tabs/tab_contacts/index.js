@@ -61,6 +61,16 @@ import ResultScanForQRcode from './ResultScanForQRcode'
 
 import testPushNotifications from './testPushNotifications'
 
+import Message from '../../chat/Message';
+import VideoPlayer from '../../chat/VideoPlayer';
+import ImagePicker from '../../chat/ImagePicker';
+import VoiceRecord from '../../chat/Modals/VoiceRecord';
+import Option from '../../chat/Modals/Option';
+import MuteOption from '../../chat/Modals/MuteOption';
+import Toast from '../../chat/Modals/Toast';
+import MapPicker from '../../chat/Modals/MapPicker';
+import Temp from '../../chat/Temp';
+
 const index = createStackNavigator({
     'Home': {
         screen: home,
@@ -161,7 +171,7 @@ const index = createStackNavigator({
     'ChatPage': {
       screen: ChatPage,
       navigationOptions: {
-        title: 'Chat Page',
+        // title: 'Chat Page',
       }
     },
     'ContactsSearch': {
@@ -187,40 +197,25 @@ const index = createStackNavigator({
       screen: testPushNotifications
     },
     
+
+
+    VideoPlayer: {
+      screen: VideoPlayer
+    },
+    ImagePicker: {
+      screen: ImagePicker,
+    },
+    Option,
+    VoiceRecord,
+    MapPicker,
+    Toast,
+    MuteOption,
+    Temp: {
+        screen: Temp
+    }
+
 },{
-//   initialRouteName: 'Base',
-// headerMode: "screen",
-  // transitionConfig: TransitionConfiguration
-  
-    // mode: 'modal',
-    // headerMode: 'none',
-  
 });
-
-// index.navigationOptions = ({ navigation }) => {
-//     let { routeName } = navigation.state.routes[navigation.state.index];
-//     let navigationOptions = {};
-  
-//     // set tabbar visible
-//     if (routeName === 'AddFriendsPage' || 
-//         routeName === 'AddClasssPage' || 
-//         routeName === 'AddGroupsPage' ||
-//         routeName === 'MyProfilePage' ||
-//         routeName === 'FriendProfilePage' ||
-//         routeName === 'ManageGroupPage' ||
-//         routeName === 'ListClassUserPage' ||
-//         routeName === 'QRCodeReaderPage' ||
-//         routeName === 'FindFriendPage' ||
-//         routeName === 'InviteFriendForContactPage' ||
-//         routeName === 'ChatPage' ||
-//         routeName === 'ContactsSearch' ||
-//         routeName === 'ListGroupMemberPage'
-//         ) {
-//       navigationOptions.tabBarVisible = false;
-//     }
-
-//     return navigationOptions;
-// };
 
 // EditBasicInfoPage
 const BasicInfoNavigator = createStackNavigator(
@@ -278,9 +273,6 @@ const ListGroupMemberNavigator = createStackNavigator(
         // title: 'Friend Profile',
       }
     },
-
-
-
   },
   {
     // headerMode: 'none',
@@ -317,16 +309,6 @@ const GroupSettingsNavigator = createStackNavigator(
   },
 );
 
-// const ContactInfoNavigator = createStackNavigator(
-// {
-//   // 'MyProfileEditContactInfoPage': {screen: MyProfileEditContactInfoPage},
-//   'AddAnotherPhone': {screen: AddAnotherPhone},
-//   'AddAnotherWebsite': {screen: AddAnotherWebsite},
-//   'AddAnotherEmail': {screen: AddAnotherEmail},
-// },
-// {
-//   // headerMode: 'none',
-// },);
 const testPushNotificationsNavigator = createStackNavigator(
   {
     'testPushNotifications': {
@@ -344,10 +326,6 @@ const MainModalNavigator = createStackNavigator(
     'index': { screen: index },
     'GroupsQRcode': { screen: GroupsQRcode },
     'ListGroupMemberNavigator': { screen: ListGroupMemberNavigator,},
-    // 'ListClassUserPageX': {
-    //   screen: ListClassUserPage,
-      
-    // },
     'GroupSettingsNavigator': {screen: GroupSettingsNavigator},
     'ClasssSettingsNavigator': {screen: ClasssSettingsNavigator},
     'ListClassMemberNavigator': {screen: ListClassMemberNavigator},

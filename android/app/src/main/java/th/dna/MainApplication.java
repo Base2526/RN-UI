@@ -4,6 +4,8 @@ import android.app.Application;
 
 import com.facebook.CallbackManager;
 import com.facebook.react.ReactApplication;
+import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
+import com.airbnb.android.react.maps.MapsPackage;
 import fr.greweb.reactnativeviewshot.RNViewShotPackage;
 import com.horcrux.svg.SvgPackage;
 import com.zmxv.RNSound.RNSoundPackage;
@@ -65,6 +67,8 @@ public class MainApplication extends Application implements ShareApplication, Re
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ReactNativeDocumentPicker(),
+            new MapsPackage(),
             new RNViewShotPackage(),
             new SvgPackage(),
             new RNSoundPackage(),

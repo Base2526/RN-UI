@@ -101,14 +101,14 @@ class GroupsPage extends React.Component{
 
         switch(group.status){ // GROUP_STATUS_MEMBER_INVITED
           case Constant.GROUP_STATUS_MEMBER_INVITED:{
-            group_invited.push({...group, group_id:key, profile:group_profile})
+            group_invited.push({...group, group_id:key, ...group_profile})
             break;
           }
           case Constant.GROUP_STATUS_MEMBER_JOINED:{
-            group_joined.push({...group, group_id:key, profile:group_profile})
+            group_joined.push({...group, group_id:key, ...group_profile})
 
             if(group.is_favorites !== undefined && group.is_favorites){
-              group_favorites.push({...group, group_id:key, profile:group_profile})
+              group_favorites.push({...group, group_id:key, ...group_profile})
             }
             break;
           }
@@ -153,9 +153,9 @@ class GroupsPage extends React.Component{
 
     showMenuInvited = (rowItem)=>{
       let {uid, is_connected} = this.props
-      let {profile, group_id} = rowItem
+      let {members, group_id} = rowItem
 
-      let member_key = _.findKey(profile.members,  function(v, k) { 
+      let member_key = _.findKey(members,  function(v, k) { 
         return v.friend_id == uid
       })
 
@@ -224,9 +224,9 @@ class GroupsPage extends React.Component{
       let {is_connected} = this.props
 
       // console.log('showMenuGroup', rowItem)
-      let {group_id, profile} = rowItem
+      let {group_id, members} = rowItem
 
-      let is_admin = _.find(profile.members, (v, k)=>{
+      let is_admin = _.find(members, (v, k)=>{
                       // console.log('showMenuGroup', v, k, this.props.uid, v.friend_id)
                       return v.is_admin && this.props.uid == v.friend_id
                     })
@@ -236,7 +236,7 @@ class GroupsPage extends React.Component{
         menu_delete_group =  <MenuOption onSelect={() => {
                           Alert.alert(
                             'Delete group',
-                            'Are you sure group '+ rowItem.profile.name +'?',
+                            'Are you sure group '+ rowItem.name +'?',
                             [
                               // {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
                               {text: 'Cancel', 
@@ -282,7 +282,10 @@ class GroupsPage extends React.Component{
                   </MenuTrigger>
                   <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
                       <MenuOption onSelect={() => {
-                        this.props.params.navigation.navigate("ChatPage")
+
+                        let params = {'type':'group', 'data':rowItem}
+                        this.props.params.navigation.navigate("ChatPage", {'title':'Group ' + rowItem.name, params})
+                           
                       }}>
                           <Text style={{padding:10, fontSize:18}}>Group Chat</Text>
                       </MenuOption>
@@ -366,7 +369,7 @@ class GroupsPage extends React.Component{
 
     _renderRow = (rowItem, rowId, sectionId) => {
       console.log(rowItem)
-      let {group_id, profile} = rowItem
+      let {group_id, members} = rowItem
 
       switch(sectionId){
         // favorites
@@ -400,7 +403,7 @@ class GroupsPage extends React.Component{
                                       // borderColor:'gray'
                                     }}
                               source={{
-                                uri: rowItem.profile.image_url,
+                                uri: rowItem.image_url,
                                 headers:{ Authorization: 'someAuthToken' },
                                 priority: FastImage.priority.normal,
                               }}
@@ -412,7 +415,7 @@ class GroupsPage extends React.Component{
                                         fontWeight: '600', 
                                         paddingBottom:5
                                       }}>
-                              {rowItem.profile.name} { rowItem.profile.members === undefined ? '' : "(" + this.countMembers(rowItem.profile.members)+")" }
+                              {rowItem.name} { rowItem.members === undefined ? '' : "(" + this.countMembers(rowItem.members)+")" }
                           </Text>
                         </View>
                         {this.showMenuInvited(rowItem)} 
@@ -453,7 +456,7 @@ class GroupsPage extends React.Component{
                               // borderColor:'gray'
                             }}
                       source={{
-                        uri: profile.image_url,
+                        uri: rowItem.image_url,
                         headers:{ Authorization: 'someAuthToken' },
                         priority: FastImage.priority.normal,
                       }}
@@ -465,7 +468,7 @@ class GroupsPage extends React.Component{
                                 fontWeight: '600', 
                                 paddingBottom:5
                               }}>
-                      {profile.name} { profile.members === undefined ? '' : "(" + this.countMembers(profile.members) +")" }
+                      {rowItem.name} { members === undefined ? '' : "(" + this.countMembers(members) +")" }
                   </Text>
                 </View>
                 {this.showMenuGroup(rowItem)} 

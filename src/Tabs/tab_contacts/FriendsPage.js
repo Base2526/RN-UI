@@ -32,7 +32,6 @@ import {checkInternetDialog} from '../../utils/Helpers'
 import {makeUidState, 
         makeProfileState, 
         makeFriendsState, 
-        makeFriendProfilesState, 
         makePresencesState,
         makeIsConnectedState} from '../../reselect'
 
@@ -230,7 +229,10 @@ class FriendsPage extends React.Component{
                   </MenuTrigger>
                   <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
                       <MenuOption onSelect={() => {
-                        this.props.params.navigation.navigate("ChatPage")
+
+                        let params = {'type':'private', 'data':rowItem}
+                        this.props.params.navigation.navigate("ChatPage", {'title':rowItem.name, params})
+                      
                       }}>
                           <Text style={{padding:10, fontSize:18}}>Chat</Text>
                       </MenuOption>
@@ -709,11 +711,9 @@ const mapStateToProps = (state, ownProps) => {
 
   return{
     uid: makeUidState(state, ownProps),
-    friends:makeFriendsState(state, ownProps),
-    // friend_profiles:makeFriendProfilesState(state, ownProps),
     profile:makeProfileState(state, ownProps),
+    friends:makeFriendsState(state, ownProps),
     presences:makePresencesState(state, ownProps),
-
     is_connected: makeIsConnectedState(state, ownProps),
   }
 }

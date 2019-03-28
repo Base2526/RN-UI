@@ -3,7 +3,7 @@ import {Bubble as GiftedBubble} from 'react-native-gifted-chat';
 import {Image, View, Animated, Easing, Linking, Platform, Alert} from 'react-native';
 import {Icon, Touchable, ActivityIndicator, Text} from '../components';
 import MapView, {Marker} from 'react-native-maps';
-import MessageHeader from "../screens/Message";
+import MessageHeader from "../chat/Message";
 import {SafeAreaView} from "react-navigation";
 import TouchableToUser from '../blocks/TouchableToUser';
 import FileTypeIcon from "./FileTypeIcon";
