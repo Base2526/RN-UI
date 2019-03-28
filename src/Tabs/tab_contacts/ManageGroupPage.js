@@ -92,7 +92,6 @@ class ManageGroupPage extends React.Component{
     }
 
     componentDidMount() {
-
         this.props.navigation.setParams({handleChat: this.handleChat})
         this.props.navigation.setParams({handleSettings: this.handleSettings})
         setTimeout(() => {this.setState({renderContent: true})}, 0);
@@ -234,16 +233,20 @@ class ManageGroupPage extends React.Component{
             }
         }
 
-        let newGroup = {...group, profile:group_profile, members}
+        let newGroup = {...group, ...group_profile, members}
 
         // console.log(friends)
-        // console.log(newGroup)
+        console.log(newGroup)
 
         this.setState({group: newGroup, member_is_join, group_member})
     }
 
     handleChat = () => {
-        this.props.navigation.navigate("ChatPage")
+        let {group} = this.state
+
+        // @work
+        let params = {'type':'group', 'data':group}
+        this.props.navigation.navigate("ChatPage", {'title':'Group ' + group.name, params})
     }
 
     handleSettings = () => {
@@ -496,7 +499,7 @@ class ManageGroupPage extends React.Component{
                             <FastImage
                                 style={{width: 120, height: 120, borderRadius: 60, borderWidth:4, borderColor:'#BCD1D5'}}
                                 source={{
-                                uri: group.profile.image_url,
+                                uri: group.image_url,
                                 headers:{ Authorization: 'someAuthToken' },
                                 priority: FastImage.priority.normal,
                                 }}
@@ -506,7 +509,7 @@ class ManageGroupPage extends React.Component{
                         <View style={{padding:5, flexDirection:'row'}}>
                             {button_favorites}
                             <View style={{paddingLeft:5}}>
-                                <Text style={{fontSize:26, fontWeight:'bold', textAlignVertical: 'bottom', color:'#BCD1D5'}}>{group.profile.name}</Text>
+                                <Text style={{fontSize:26, fontWeight:'bold', textAlignVertical: 'bottom', color:'#BCD1D5'}}>{group.name}</Text>
                             </View>
                         </View>
                         <View style={{padding:5, flexDirection:'row'}}>

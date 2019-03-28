@@ -283,6 +283,7 @@ class GroupsPage extends React.Component{
                   <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
                       <MenuOption onSelect={() => {
 
+                        // @work
                         let params = {'type':'group', 'data':rowItem}
                         this.props.params.navigation.navigate("ChatPage", {'title':'Group ' + rowItem.name, params})
                            

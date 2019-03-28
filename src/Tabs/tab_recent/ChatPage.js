@@ -1,15 +1,11 @@
 import React from 'react'
-import {View, 
-        Text, 
-        TouchableOpacity, 
+import {TouchableOpacity, 
         SafeAreaView,
-        Platform,
         } from 'react-native'
 
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { connect } from 'react-redux';
 import { GiftedChat ,Actions} from 'react-native-gifted-chat'
-
 import * as actions from '../../actions'
 import CustomActions from './Chat/CustomActions';
 
@@ -50,11 +46,14 @@ class ChatPage extends React.Component{
     componentWillMount() {
       const { navigation } = this.props;
       const params = navigation.getParam('params', null);
-      console.log(params)
+      console.log(params, this.props)
 
       if(params.type == 'private'){
+        // chat_id: "xxxx"
 
       }else if(params.type == 'group'){
+        // chat_id: "xxxx"
+        // members
 
       }else{
         // if type not private, group 
@@ -110,14 +109,12 @@ class ChatPage extends React.Component{
         return (
             <SafeAreaView style={{flex:1}}>
                 <GiftedChat
-                messages={this.state.messages}
-                onSend={messages => this.onSend(messages)}
-                user={{
-                    _id: 1,
-                }}
-
-                renderActions={this.renderCustomActions}
-                />
+                  messages={this.state.messages}
+                  onSend={messages => this.onSend(messages)}
+                  user={{
+                      _id: 1,
+                  }}
+                  renderActions={this.renderCustomActions}/>
             </SafeAreaView>
         )
     }
@@ -135,11 +132,11 @@ const mapStateToProps = (state, ownProps) => {
   }
 
   return{
-    uid:makeUidState(state, ownProps),
-    profile:makeProfileState(state, ownProps),
-    friends:makeFriendsState(state, ownProps),
-    presences:makePresencesState(state, ownProps),
-    is_connected: makeIsConnectedState(state, ownProps),
+    uid:makeUidState(state, ownProps),                  /// current user login
+    profile:makeProfileState(state, ownProps),          /// user profile
+    friends:makeFriendsState(state, ownProps),          /// friends all
+    presences:makePresencesState(state, ownProps),      /// track all user online/offline
+    is_connected: makeIsConnectedState(state, ownProps),/// track internet connection
   }
 }
 export default connect(mapStateToProps, actions)(ChatPage);

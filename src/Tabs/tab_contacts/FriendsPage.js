@@ -230,8 +230,9 @@ class FriendsPage extends React.Component{
                   <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
                       <MenuOption onSelect={() => {
 
+                        // @work
                         let params = {'type':'private', 'data':rowItem}
-                        this.props.params.navigation.navigate("ChatPage", {'title':rowItem.name, params})
+                        this.props.params.navigation.navigate("ChatPage", {'title': 'Private ' + rowItem.name, params})
                       
                       }}>
                           <Text style={{padding:10, fontSize:18}}>Chat</Text>
