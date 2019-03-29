@@ -96,7 +96,7 @@ class ClasssMemberAddFriend extends React.Component{
 
     loadData = (props) =>{
         let {class_id} = this.state
-        let {friends, friend_profiles, classs, class_members} = props
+        let {friends, classs, class_members} = props
 
         let class_member =  _.find(class_members, (v, k)=>{
                                 return k == class_id
@@ -122,17 +122,17 @@ class ClasssMemberAddFriend extends React.Component{
                                             return key_v.friend_id == k
                                         })
 
-                        let friend_profile  =_.find(friend_profiles, (fv, fk)=>{
-                                                return fk == k
-                                            })
+                        // let friend_profile  =_.find(friend_profiles, (fv, fk)=>{
+                        //                         return fk == k
+                        //                     })
                                         
-                        data.push({friend_id:k, member_key, friend_profile})
+                        data.push({friend_id:k, member_key, friend_profile:v})
                     }
                 }else{
-                    let friend_profile  =_.find(friend_profiles, (fv, fk)=>{
-                        return fk == k
-                    })
-                    data.push({friend_id:k, member_key, friend_profile})
+                    // let friend_profile  =_.find(friend_profiles, (fv, fk)=>{
+                    //     return fk == k
+                    // })
+                    data.push({friend_id:k, member_key, friend_profile:v})
                 }
             } 
         })
@@ -316,7 +316,7 @@ const mapStateToProps = (state, ownProps) => {
     return{
         uid:makeUidState(state, ownProps),
         friends:makeFriendsState(state, ownProps),
-        friend_profiles:makeFriendProfilesState(state, ownProps),
+        // friend_profiles:makeFriendProfilesState(state, ownProps),
         classs:makeClasssState(state, ownProps),
         class_members:makeClassMembersState(state, ownProps),
     }

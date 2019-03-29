@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import Spinner from 'react-native-loading-spinner-overlay';
 
 import * as actions from '../../actions'
-import {getUid} from '../../utils/Helpers'
+import {isEmpty} from '../../utils/Helpers'
 
 import {makeUidState} from '../../reselect'
 
@@ -58,19 +58,19 @@ class ChangeFriendsName extends React.Component{
         const { navigation } = this.props;
         const friend = navigation.getParam('friend', null);
 
-        if(friend.change_friend_name === undefined){
-            this.setState({friend, text:friend.profile.name}) 
+        if(isEmpty(friend.change_friend_name)){
+            this.setState({friend, text:friend.name}) 
         }else{
             this.setState({friend, text:friend.change_friend_name})
         }
     }
 
     handleSave = () => {
-        if(this.state.text.length == 0){
-            alert('Name is empty?')
-        }else{
+        // if(this.state.text.length == 0){
+        //     alert('Name is empty?')
+        // }else{
             if(this.state.friend.change_friend_name === undefined){
-                if(this.state.text === this.state.friend.profile.name){
+                if(this.state.text === this.state.friend.name){
                     this.props.navigation.goBack()
                     return;
                 }
@@ -82,7 +82,7 @@ class ChangeFriendsName extends React.Component{
             }
 
             this.setState({loading:true})
-            this.props.actionChangeFriendsName(this.props.uid, this.state.friend.friend_id, this.state.text, (result)=>{
+            this.props.actionChangeFriendsName(this.props.uid, this.state.friend.uid, this.state.text, (result)=>{
                 console.log(result)
                 this.setState({loading:false})
                 if(result.status){
@@ -93,7 +93,7 @@ class ChangeFriendsName extends React.Component{
                     }, 100);
                 }
             })
-        }
+        // }
     }
 
     render(){

@@ -19,7 +19,7 @@ import Share, {ShareSheet, Button} from 'react-native-share';
 import Moment from 'moment'
 var _ = require('lodash');
 
-import {getStatusBarHeight} from '../../utils/Helpers'
+import {getStatusBarHeight, isEmpty} from '../../utils/Helpers'
 import * as actions from '../../actions'
 
 import Constant from '../../utils/Constant'
@@ -156,7 +156,7 @@ class MyProfilePage extends React.Component{
                     key={key}
                     cellStyle="Subtitle"
                     titleTextColor="#007AFF"
-                    hideSeparator={false} 
+                    hideSeparator={true} 
                     cellContentView={
                         <View style={{flexDirection:'row'}}>
                             <View style={{flex:1, flexDirection:'row'}}>
@@ -190,7 +190,7 @@ class MyProfilePage extends React.Component{
                     key={key}
                     cellStyle="Subtitle"
                     titleTextColor="#007AFF"
-                    hideSeparator={false} 
+                    hideSeparator={true} 
                     accessory="DisclosureIndicator"
                     cellContentView={
                     <View style={{flex:1,}}>
@@ -217,7 +217,7 @@ class MyProfilePage extends React.Component{
                     key={key}
                     cellStyle="Subtitle"
                     titleTextColor="#007AFF"
-                    hideSeparator={false} 
+                    hideSeparator={true} 
                     accessory="DisclosureIndicator"
                     cellContentView={
                     <View style={{flex:1}}>
@@ -255,9 +255,12 @@ class MyProfilePage extends React.Component{
         let emails =  this.props.emails
 
         // Status message
-        let textStatusMessage = <Text style={{ fontSize:18 }}>Not set</Text>
-        if(status_message.trim() != ""){
-            textStatusMessage = <Text style={{ fontSize:18 }}>{status_message}</Text>
+        let textStatusMessage = <View />
+        if(!isEmpty(status_message.trim())){
+            textStatusMessage = <Text style={{  fontSize:16,
+                                                color:'white',
+                                                marginRight:100,
+                                                marginLeft:10}}>{status_message}</Text>
         }
 
         // MyId
@@ -361,7 +364,8 @@ class MyProfilePage extends React.Component{
                         </TouchableOpacity>
                         <View style = {{
                             justifyContent: 'flex-end',
-                            alignItems: 'center'}}>
+                            // alignItems: 'center'
+                            }}>
                             <Text style={{alignSelf:'center',
                                         fontSize:22,
                                         color:'white',
@@ -371,6 +375,7 @@ class MyProfilePage extends React.Component{
                                         marginLeft:10}}>
                                 {name}
                             </Text>
+                            {textStatusMessage}
                         </View>
                         </View>
                     </View>
@@ -391,8 +396,7 @@ class MyProfilePage extends React.Component{
                                     </View>
                                 }
                             />
-                            
-                            <Cell
+                            {/* <Cell
                                 cellStyle="Basic"
                                 contentContainerStyle={{ padding:10 }} 
                                 hideSeparator={true} 
@@ -406,26 +410,8 @@ class MyProfilePage extends React.Component{
                                         </View>
                                     </View>
                                 }
-                            />
-                            <Cell
-                                cellStyle="Basic"
-                                accessory="DisclosureIndicator"
-                                contentContainerStyle={{ padding:10 }} 
-                                hideSeparator={true} 
-                                cellContentView={
-                                    <View style={{flex:1}}>
-                                        <View >
-                                            <Text style={{ fontSize:18 }}>
-                                                My QR code
-                                            </Text>
-                                        </View>
-                                    </View>
-                                }
-                                onPress={()=>{
-                                    this.props.navigation.navigate("MyQRcodeNavigator")
-                                }}
-                            />
-                            <Cell
+                            /> */}
+                             <Cell
                                 cellStyle="Basic"
                                 contentContainerStyle={{ padding:10 }} 
                                 hideSeparator={true} 
@@ -485,6 +471,24 @@ class MyProfilePage extends React.Component{
                                         </View>
                                     </View>
                                 }
+                            />
+                            <Cell
+                                cellStyle="Basic"
+                                accessory="DisclosureIndicator"
+                                contentContainerStyle={{ padding:10 }} 
+                                hideSeparator={true} 
+                                cellContentView={
+                                    <View style={{flex:1}}>
+                                        <View >
+                                            <Text style={{ fontSize:18 }}>
+                                                My QR code
+                                            </Text>
+                                        </View>
+                                    </View>
+                                }
+                                onPress={()=>{
+                                    this.props.navigation.navigate("MyQRcodeNavigator")
+                                }}
                             />
                         </Section>
 

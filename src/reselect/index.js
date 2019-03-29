@@ -158,6 +158,22 @@ const getFriendProfiles = (state, props) => {
     return new_friend_profiles
 }
 
+const getFriendProfilePhones = (state, props) => {
+    return state.auth.user.friend_phones
+}
+
+const getFriendProfileWebsites = (state, props) => {
+    return state.auth.user.friend_websites
+}
+
+const getFriendProfileEmails = (state, props) => {
+    return state.auth.user.friend_emails
+}
+
+const getFriendProfileMyids = (state, props) => {
+    return state.auth.user.friend_my_ids
+}
+
 const getFriendProfile = (state, props) => {
     const { navigation } = props;
     const friend_id = navigation.getParam('friend_id', null);
@@ -341,6 +357,27 @@ export const makeFriendsState = createSelector(
 export const makeFriendProfilesState = createSelector(
     [ getFriendProfiles ],
     (friend_profiles) => friend_profiles
+)
+
+export const makeFriendProfilePhonesState = createSelector(
+    [ getFriendProfilePhones ],
+    (friend_profile_phones) => friend_profile_phones
+)
+
+export const makeFriendProfileWebsitesState = createSelector(
+    [ getFriendProfileWebsites ],
+    (friend_profile_websites) => friend_profile_websites
+)
+
+// friend_emails
+export const makeFriendProfileEmailsState = createSelector(
+    [ getFriendProfileEmails ],
+    (friend_profile_emails) => friend_profile_emails
+)
+
+export const makeFriendProfileMyidsState  = createSelector(
+    [ getFriendProfileMyids ],
+    (friend_profile_my_ids) => friend_profile_my_ids
 )
 
 export const makeFriendProfileState = createSelector(

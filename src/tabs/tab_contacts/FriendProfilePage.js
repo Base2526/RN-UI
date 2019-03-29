@@ -11,7 +11,8 @@ import {FlatList,
         Dimensions,
         StatusBar,
         ActivityIndicator,
-        Linking} from 'react-native'
+        Linking,
+        TextInput} from 'react-native'
 
 import firebase from 'react-native-firebase';
 import { Header } from 'react-navigation';
@@ -32,17 +33,15 @@ import * as actions from '../../actions'
 import Constant from '../../utils/Constant'
 import MyIcon from '../../config/icon-font.js';
 
-let shareOptions = {
-    title: "React Native",
-    message: "Hola mundo",
-    url: "http://facebook.github.io/react-native/",
-    subject: "Share Link" //  for email
-};
+
 
 import {makeUidState, 
         makeProfileState, 
         makeFriendsState, 
-        makeFriendProfilesState, 
+        makeFriendProfilePhonesState, 
+        makeFriendProfileWebsitesState, 
+        makeFriendProfileEmailsState, 
+        // makeFriendProfileMyidsState,
         makePresencesState,
         makeFriendProfileState,
         makeClasssState,
@@ -70,8 +69,13 @@ class FriendProfilePage extends React.Component{
 
             classs:[],
 
-            renderContent_ContactInfo: false,
+            // renderContent_ContactInfo: false,
             contact_info:{},
+            is_online:false,
+
+            friend_phone:{}, 
+            friend_website:{}, 
+            friend_email:{}
         }
     }
 
@@ -178,7 +182,7 @@ class FriendProfilePage extends React.Component{
     }
 
     componentWillUnmount(){
-        console.log('componentWillUnmount')
+        // console.log('componentWillUnmount')
         unsubscribes.map((unsubscribe, k)=>{
             unsubscribe()
         })
@@ -190,15 +194,78 @@ class FriendProfilePage extends React.Component{
 
     loadData = (props) =>{
         let {friend_id} = this.state
-        let {friends} = props
+        let {friends, 
+            classs, 
+            class_members, 
+            presences, 
+            friend_phones, 
+            friend_websites, 
+            friend_emails} = props
+
+        console.log(friend_phones, 
+                    friend_websites, 
+                    friend_emails,)
 
         let friend =_.find(friends, (v,k)=>{
                         return k == friend_id
                     })
 
-        this.setState({friend})
-    }
+        let new_classs =_.map(classs, (v, k)=>{
+                            let members =   _.find(class_members, (mv, mk)=>{
+                                                return k == mk
+                                            })
+                            if(members){
+                                return {class_id:k, ...v, members}
+                            }else{
+                                return {class_id:k, ...v}
+                            }
+                        })
 
+        // phones, websites, emails, my_ids
+        let friend_phone = {}
+        if(!isEmpty(friend_phones)){
+            friend_phone =  _.find(friend_phones, (v, k)=>{
+                                return k == friend_id
+                            })
+        }
+
+        let friend_website = {}
+        if(!isEmpty(friend_websites)){
+            friend_website =_.find(friend_websites, (v, k)=>{
+                                return k == friend_id
+                            })
+        }
+
+        let friend_email = {}
+        if(!isEmpty(friend_emails)){
+            friend_email =  _.find(friend_emails, (v, k)=>{
+                                return k == friend_id
+                            })
+        }
+
+        console.log(friend_phone, friend_website, friend_email)
+        // phone, website, email
+
+        /// check is online
+        let presence =  _.find(presences, (v, k)=>{
+                            return k == friend_id
+                        })
+        console.log(presence)
+        let is_online = false
+        if(!isEmpty(presence)){
+            let __ =_.find(presence, (presence_v, presence_k)=>{
+                return presence_v.status == 'online'
+            })
+            if(!isEmpty(__) ){
+                is_online = true
+            }
+        }
+        /// check is online
+
+        console.log(is_online)
+
+        this.setState({friend, classs:new_classs, is_online, friend_phone, friend_website, friend_email})
+    }
 
     // loadData = (contact_info) =>{
     //     console.log(contact_info)
@@ -292,6 +359,15 @@ class FriendProfilePage extends React.Component{
     }
 
     handleShare = () => {
+        let {uid, name} = this.state.friend
+
+        let shareOptions = {
+            title: "iDNA",
+            message: "Profile " + name,
+            url: Constant.API_URL +  '/profile-main/' + uid,
+            subject: "Share Link" //  for email
+        };
+
         Share.open(shareOptions);
     }
 
@@ -316,10 +392,12 @@ class FriendProfilePage extends React.Component{
     }
 
     isSelectClass = (classs, friend, key) =>{
+
         let members = classs[key].members
-        let select = _.find(members, (v, k)=>{
-            return friend.friend_id === v.friend_id && v.status
-        })
+        console.log('members ', members, friend)
+        let select =_.find(members, (v, k)=>{
+                        return friend.uid === v.friend_id && v.status
+                    })
 
         if(select){
             return(<MyIcon
@@ -413,27 +491,26 @@ class FriendProfilePage extends React.Component{
         // return list;
         */
 
-        return  classs.map((value, key)=>{
+        return _.map(classs, (value, key)=>{
                     return(
                         <TouchableOpacity 
                             key={ key } 
                             onPress={() => {
                                 let members = classs[key].members
                                 let select = _.find(members, (v, k)=>{
-                                    return friend.friend_id === v.friend_id
+                                    return friend.uid === v.friend_id
                                 })
 
-    
                                 let status = true
                                 if(select){
                                     status = !select.status
 
                                     let member_key = _.findKey(members,  function(v, k) { 
-                                        return friend.friend_id === v.friend_id
+                                        return friend.uid === v.friend_id
                                     })
 
                                     this.setState({loading:true})
-                                    this.props.actionSelectClassMember(this.props.uid, friend.friend_id, value.class_id, member_key, status, (result)=>{
+                                    this.props.actionSelectClassMember(this.props.uid, friend.uid, value.class_id, member_key, status, (result)=>{
                                         console.log(result)
 
                                         this.setState({loading:false})
@@ -442,7 +519,7 @@ class FriendProfilePage extends React.Component{
 
                                     let member_key = randomKey()
                                     this.setState({loading:true})
-                                    this.props.actionSelectClassMember(this.props.uid, friend.friend_id, value.class_id, member_key, status, (result)=>{
+                                    this.props.actionSelectClassMember(this.props.uid, friend.uid, value.class_id, member_key, status, (result)=>{
                                         console.log(result)
 
                                         this.setState({loading:false})
@@ -504,7 +581,8 @@ class FriendProfilePage extends React.Component{
         let {friend_id} = this.state
     
         let n = []
-        classs.map((v, _k)=>{
+        // classs.map((v, _k)=>{
+        _.map(classs, (v, _k)=>{
             if(v.members){
                 let class_name = v.name
                 _.each(v.members, function(_v, _k) { 
@@ -527,36 +605,35 @@ class FriendProfilePage extends React.Component{
         }
     }
 
-    phonesList(phones){
-        if(!phones){
+    phonesList(phone){
+        if( isEmpty(phone) ){
             return;
         }
 
-        return Object.entries(phones).map(([key, value]) => {
-            return( <Cell
-                        key={key}
-                        cellStyle="Basic"
-                        title={value.phone_number} 
-                        cellAccessoryView={<TouchableOpacity
-                                            onPress={()=>{
-                                                Linking.openURL(`tel:${value.phone_number}`)
-                                            }}>
-                                                <MyIcon
-                                                    name={'call'}
-                                                    size={25}
-                                                    color={'gray'}/>
-                                            </TouchableOpacity>}
-                        hideSeparator={true}/>)
+        return _.map(phone, (value, key)=>{
+            return <Cell
+                key={key}
+                cellStyle="Basic"
+                title={value.phone_number} 
+                cellAccessoryView={<TouchableOpacity
+                                    onPress={()=>{
+                                        Linking.openURL(`tel:${value.phone_number}`)
+                                    }}>
+                                        <MyIcon
+                                            name={'call'}
+                                            size={25}
+                                            color={'gray'}/>
+                                    </TouchableOpacity>}
+                hideSeparator={true}/>
         })
     }
 
-    websitesList(websites){
-        
-        if(!websites){
+    websitesList(website){
+        if(isEmpty(website) ){
             return;
         }
 
-        return Object.entries(websites).map(([key, value]) => {
+        return _.map(website, (value, key)=>{
             return( <Cell
                 key={key}
                 cellStyle="Basic"
@@ -569,12 +646,12 @@ class FriendProfilePage extends React.Component{
         })
     }
 
-    emailsList(emails){
-        if(!emails){
+    emailsList(email){
+        if( isEmpty(email) ){
             return;
         }
 
-        return Object.entries(emails).map(([key, value]) => {
+        return _.map(email, (value, key)=>{
             return( <Cell
                 key={key}
                 cellStyle="Basic"
@@ -588,6 +665,7 @@ class FriendProfilePage extends React.Component{
     }
 
     viewModalClasss = (friend, classs) =>{
+        console.log(friend, classs)
         return( <Modal 
                     style={{zIndex:10, height:this.getHeightListClasss()}} 
                     position={"bottom"} 
@@ -605,22 +683,34 @@ class FriendProfilePage extends React.Component{
     }
 
     render() {
-        let {friend, renderContent_ContactInfo} = this.state
+        let {friend, is_online, } = this.state
         if(!friend){
             return(<View style={{flex:1}}></View>)
         }
         console.log(friend)
 
-        let {status_message, 
+        let {
+            name,
+            change_friend_name,
+            status_message, 
             image_url, 
             bg_url, 
             is_favorite, 
             status, 
             gender,
             birthday,
-            intereste_in,} = friend
+            address,
+            intereste_in} = friend
 
-        let {friend_id, renderContent, classs} = this.state
+        console.log(name,
+            change_friend_name,)
+
+        let {friend_id, 
+            renderContent, 
+            classs, 
+            friend_phone, 
+            friend_website, 
+            friend_email} = this.state
 
         let button_arrow_back = <View style={{flexDirection:'row', justifyContent:'center', alignItems:'center'}}>
                                     <MyIcon
@@ -641,7 +731,7 @@ class FriendProfilePage extends React.Component{
             edit_name =<TouchableOpacity
                             style={{padding:5}}
                             onPress={()=>{
-                                // this.props.navigation.navigate('ChangeFriendsName', {"friend": friend})
+                                this.props.navigation.navigate('ChangeFriendsName', {"friend": friend})
                             }}>
                             <MyIcon
                                 name={'edit'}
@@ -731,36 +821,79 @@ class FriendProfilePage extends React.Component{
                                     detail={reste_in.join(", ")}/>
         }
 
-        let section_contact_info =  <Section
-                                        sectionPaddingTop={5}
-                                        sectionPaddingBottom={0}
-                                        separatorInsetLeft={0}
-                                        hideSeparator={true}>
-                                        <Cell
-                                            cellStyle="Basic"
-                                            hideSeparator={true} 
-                                            cellContentView={
-                                                <View style={{  flex:1, 
-                                                                justifyContent:'center',
-                                                                alignItems:'center'}}>
-                                                    <ActivityIndicator animating size="small" />
-                                                </View>
-                                            }/>
-                                    </Section>
+        /** 
+         
+          
+        */
 
-        if(renderContent_ContactInfo){
+        let cell_address =<Cell
+                                cellStyle="Subtitle"
+                                title="Address"
+                                hideSeparator={true} 
+                                detail={'Not set'}/>
+
+        if(address){
+            cell_address =<Cell
+                            cellStyle="Basic"
+                            title="Address"
+                            hideSeparator={true} 
+                            cellContentView={
+                                <View>
+                                    <Text style={{fontSize:18}}>Address</Text>
+                                <TextInput
+                                    style={{fontSize: 16, 
+                                            paddingBottom:10, 
+                                            // borderColor:'gray', 
+                                            // borderWidth:.5,
+                                            // backgroundColor:'red',
+                                            // minHeight:150,
+                                            color:'back',
+                                            textAlignVertical: 'top'}}
+                                    // onChangeText={(text) => this.setState({text})}
+                                    value={address}
+                                    clearButtonMode='while-editing'
+                                    maxLength={500}
+                                    multiline = {true}
+                                    editable={false} 
+                                            // multiline = {true}
+                                    pointerEvents="none"
+                                    // placeholder= {this.state.text}
+                                />
+                                </View>
+                              }
+                            />
+        }
+
+        // let section_contact_info =  <Section
+        //                                 sectionPaddingTop={5}
+        //                                 sectionPaddingBottom={0}
+        //                                 separatorInsetLeft={0}
+        //                                 hideSeparator={true}>
+        //                                 <Cell
+        //                                     cellStyle="Basic"
+        //                                     hideSeparator={true} 
+        //                                     cellContentView={
+        //                                         <View style={{  flex:1, 
+        //                                                         justifyContent:'center',
+        //                                                         alignItems:'center'}}>
+        //                                             <ActivityIndicator animating size="small" />
+        //                                         </View>
+        //                                     }/>
+        //                             </Section>
+
+        // if(renderContent_ContactInfo){
             // section_contact_info
 
-            let {friend_emails, friend_phones, friend_websites} = this.state.contact_info
+            // let {friend_emails, friend_phones, friend_websites} = this.state.contact_info
 
-            console.log(friend_emails, friend_phones, friend_websites, this.state.contact_info)
+            // console.log(friend_emails, friend_phones, friend_websites, this.state.contact_info)
             
             let cell_phones =  <Cell
                             cellStyle="Subtitle"
                             title="Mobile phones"
                             hideSeparator={true} 
                             detail={'Not set'}/>
-            if(!isEmpty(friend_phones)){
+            if(!isEmpty(friend_phone)){
                 cell_phones =  <Cell
                                 cellStyle="Basic"
                                 contentContainerStyle={{  }} 
@@ -780,7 +913,7 @@ class FriendProfilePage extends React.Component{
                                 title="Website"
                                 hideSeparator={true} 
                                 detail={'Not set'}/>
-            if(!isEmpty(friend_websites)){
+            if(!isEmpty(friend_website)){
                 cell_website =  <Cell
                                 cellStyle="Basic"
                                 contentContainerStyle={{  }} 
@@ -799,7 +932,7 @@ class FriendProfilePage extends React.Component{
                                 title="Email"
                                 hideSeparator={true} 
                                 detail={'Not set'}/>
-            if(!isEmpty(friend_emails)){
+            if(!isEmpty(friend_email)){
                 cell_email =  <Cell
                                 cellStyle="Basic"
                                 contentContainerStyle={{  }} 
@@ -813,7 +946,7 @@ class FriendProfilePage extends React.Component{
                                 }/>
             }
 
-            section_contact_info =  <Section
+            let section_contact_info =  <Section
                                         sectionPaddingTop={5}
                                         sectionPaddingBottom={0}
                                         separatorInsetLeft={0}>
@@ -824,18 +957,41 @@ class FriendProfilePage extends React.Component{
                                             hideSeparator={false}/>
                                         
                                         {cell_phones}
-                                        {this.phonesList(friend_phones)}
+                                        {this.phonesList(friend_phone)}
 
                                         {/* 
                                         {cell_address}
                                         */}
 
                                         {cell_website}
-                                        {this.websitesList(friend_websites)} 
+                                        {this.websitesList(friend_website)} 
 
                                         {cell_email}
-                                        {this.emailsList(friend_emails)}
+                                        {this.emailsList(friend_email)}
+
+                                        
                                     </Section>
+        // }
+
+        let view_name = <View style={{ }}>
+                            <View style={{flexDirection:'row', justifyContent:'flex-end'}}>
+                                <Text style={{fontSize:22, marginLeft:10, color:'white'}}>{name}</Text>
+                                {edit_name}
+                            </View>
+                            {view_status_message}
+                        </View>
+
+        if(!isEmpty(change_friend_name)){
+            view_name = <View style={{}}>
+                            <View style={{flexDirection:'row', }}>
+                                <Text style={{fontSize:22, marginLeft:10, color:'white'}}>{  change_friend_name  }</Text>
+                                {edit_name}
+                            </View>
+                            <View style={{flexDirection:'row'}}>
+                                <Text style={{fontSize:12, marginLeft:10, color:'white'}}>{ name }</Text>
+                            </View>
+                            {view_status_message}
+                        </View>
         }
 
         return( <View style={{flex:1}}>
@@ -905,10 +1061,13 @@ class FriendProfilePage extends React.Component{
                             />
                             <View style={{flexDirection:'row', margin:20}}>
                             <TouchableOpacity>
+                                {/* backgroundColor: '#00ff80',  */}
                                 <FastImage
                                     style={{width: 80, 
                                             height: 80, 
                                             borderRadius: 10, 
+                                            // borderWidth:1,
+                                            // borderColor: is_online ? '#00ff80' : 'white'
                                         }}
                                     source={{
                                         uri: image_url,
@@ -917,23 +1076,28 @@ class FriendProfilePage extends React.Component{
                                     }}
                                     resizeMode={FastImage.resizeMode.cover}
                                 />
+                                {is_online ? <View style={{ width: 12, 
+                                                            height: 12, 
+                                                            backgroundColor: '#00ff80', 
+                                                            position: 'absolute',
+                                                            borderWidth: 2,
+                                                            borderColor: 'white',
+                                                            borderRadius: 6,
+                                                            right: -3,
+                                                            top: -3
+                                                            }} /> : <View />}
                             </TouchableOpacity>
-                                <View style={{justifyContent: 'flex-end', }}>
-                                    <View style={{flexDirection:'row', justifyContent: 'flex-end', }}>
-                                        <Text style={{fontSize:22, marginLeft:10, color:'white'}}>{friend.hasOwnProperty('change_friend_name') ? friend.change_friend_name : friend.name }</Text>
-                                        {edit_name}
-                                    </View>
-                                    {view_status_message}
-                                </View>
+                                {view_name}
+                                
                             </View>
                         </View>
 
                         <View style={{ flex:1}}>
                             <TableView>
                                 <Section
-                                sectionPaddingTop={5}
-                                sectionPaddingBottom={0}
-                                separatorInsetLeft={0}>
+                                    sectionPaddingTop={5}
+                                    sectionPaddingBottom={0}
+                                    separatorInsetLeft={0}>
                                     <Cell
                                         cellStyle="Basic"
                                         title="Basic Info"
@@ -946,9 +1110,11 @@ class FriendProfilePage extends React.Component{
                                     {cell_birthday}
                                     {cell_intereste_in}
 
+                                    {cell_address}
+
                                 </Section>
 
-                                {/* {section_contact_info} */}
+                                {section_contact_info}
 
                                 {/* <Section
                                     sectionPaddingTop={5}
@@ -1015,12 +1181,12 @@ class FriendProfilePage extends React.Component{
         // let {change_friend_name, status, is_favorite} = friend
 
         let {
-            name,
+            // name,
             // status_message,
             // gender,
             // birthday,
             // intereste_in,
-            address,
+            // address,
             // image_url,
             // bg_url,
             phones,
@@ -1093,7 +1259,8 @@ class FriendProfilePage extends React.Component{
                                         }
                                         onPress={()=>{
                                             this.props.navigation.navigate('ChangeFriendsName', {"friend": friend})
-                                        }}/>
+                                        }}
+                                        />
 
             }else{
                 cell_name_subname = <Cell
@@ -1240,38 +1407,38 @@ class FriendProfilePage extends React.Component{
         //                             detail={reste_in.join(", ")}/>
         // }
  
-        let cell_address =  <Cell
-                                cellStyle="Subtitle"
-                                title="Address"
-                                hideSeparator={true} 
-                                detail={'Not set'}/>
-        if(address){
-            cell_address =  <Cell
-                                cellStyle="Subtitle"
-                                title="Address"
-                                hideSeparator={true} 
-                                detail={address}/>
-        }
+        // let cell_address =  <Cell
+        //                         cellStyle="Subtitle"
+        //                         title="Address"
+        //                         hideSeparator={true} 
+        //                         detail={'Not set'}/>
+        // if(address){
+        //     cell_address =  <Cell
+        //                         cellStyle="Subtitle"
+        //                         title="Address"
+        //                         hideSeparator={true} 
+        //                         detail={address}/>
+        // }
  
-        let cell_phones =  <Cell
-                            cellStyle="Subtitle"
-                            title="Mobile phones"
-                            hideSeparator={true} 
-                            detail={'Not set'}/>
-        if(phones){
-            cell_phones =  <Cell
-                            cellStyle="Basic"
-                            contentContainerStyle={{  }} 
-                            hideSeparator={true}
-                            cellContentView={
-                                <View>
-                                    <Text style={{fontSize:16 }}>
-                                    Mobile phones
-                                    </Text>
-                                </View>
-                            }
-                        />
-        }
+        // let cell_phones =  <Cell
+        //                     cellStyle="Subtitle"
+        //                     title="Mobile phones"
+        //                     hideSeparator={true} 
+        //                     detail={'Not set'}/>
+        // if(phones){
+        //     cell_phones =  <Cell
+        //                     cellStyle="Basic"
+        //                     contentContainerStyle={{  }} 
+        //                     hideSeparator={true}
+        //                     cellContentView={
+        //                         <View>
+        //                             <Text style={{fontSize:16 }}>
+        //                             Mobile phones
+        //                             </Text>
+        //                         </View>
+        //                     }
+        //                 />
+        // }
 
         // let cell_website =  <Cell
         //                         cellStyle="Subtitle"
@@ -1542,12 +1709,18 @@ const mapStateToProps = (state, ownProps) => {
     return{
         uid:makeUidState(state, ownProps),
         friends:makeFriendsState(state, ownProps),
-        // friend_profiles:makeFriendProfilesState(state, ownProps),
-        classs:makeClasssState(state, ownProps),
 
+        friend_phones: makeFriendProfilePhonesState(state, ownProps),
+        friend_websites: makeFriendProfileWebsitesState(state, ownProps),
+        friend_emails: makeFriendProfileEmailsState(state, ownProps),
+        // friend_myids: makeFriendProfileMyidsState(state, ownProps),
+
+        presences:makePresencesState(state, ownProps),
+
+        classs:makeClasssState(state, ownProps),
         class_members:makeClassMembersState(state, ownProps),
 
-        friend_profile:makeFriendProfileState(state, ownProps),
+        // friend_profile:makeFriendProfileState(state, ownProps),
     }
 }
 

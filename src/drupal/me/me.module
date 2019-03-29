@@ -6455,6 +6455,15 @@ function people_you_may_know(){
       $friend['status_message'] = $profile_friend->field_profile_status_message[LANGUAGE_NONE][0]['value'];
     }
 
+    $bg_url;
+    if(isset($profile->field_picture_bg[LANGUAGE_NONE])){
+      $bg_url = file_create_url(image_style_url('medium', $profile->field_picture_bg[LANGUAGE_NONE][0]['uri']));
+    }else{
+      $bg_url = getDefualtBackgroundCardPicture();
+    }
+
+    $friend['bg_url'] = $bg_url;
+
     $data[] = $friend;
   }
 
@@ -10064,15 +10073,15 @@ function update_picture_profile(){
 
   if (!check_header()) {
     $result['result']   = FALSE;
-    $result['message']  = "check_header()";
+    // $result['message']  = "check_header()";
     return $result;
   }
   
   if (empty($_REQUEST['uid']) || empty($_FILES["idna"])) {
     $result['result']   = FALSE;
-    $result['message']  = "function : update_picture_profile, parameter";
-    $result['_REQUEST'] = $_REQUEST;
-    $result['_FILES']   = $_FILES;
+    // $result['message']  = "function : update_picture_profile, parameter";
+    // $result['_REQUEST'] = $_REQUEST;
+    // $result['_FILES']   = $_FILES;
     return $result;
   }
 
@@ -10107,64 +10116,10 @@ function update_picture_profile(){
   // $url = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
 
   // Firebase : update image url profile
-  $data_update = array(
-      "image_url"  =>$url
-  );
   
-  // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/profiles/", $data_update);
-  
-  firestore_db()->collection(FIRESTORE_PROFILES)->document($uid)->set($data_update, ['merge' => true]);
-  
-  // Firebase : update image url profile
+  firestore_db()->collection(FIRESTORE_PROFILES)->document($uid)->set(array("image_url"  =>$url), ['merge' => true]);
 
-  /*
-  $profile = profile2_by_uid_load($uid, 'main');
-  // update chat group
-  if(isset($profile->field_chat_group[LANGUAGE_NONE])){
-    foreach ($profile->field_chat_group[LANGUAGE_NONE] as $chat_group_k => $chat_group_v) {
-      $chat_group_item = field_collection_item_load($chat_group_v['value']);
-
-      $chat_group_item_group_id = $chat_group_item->field_group_id[LANGUAGE_NONE][0]['value'];
-
-      $chat_group_node         = node_load($chat_group_item_group_id);  
-      // $chat_group_node_wrapper = entity_metadata_wrapper('node', $chat_group_node);
-
-      // if (strcasecmp($chat_group_node_wrapper->title->value(), $data['name']) != 0) {
-        // $chat_group_node_wrapper->title->set($data['name']);
-        // $chat_group_node_wrapper->save();
-      // }
-
-      // watchdog(TAG, '1. > update_profile: %v', array('%v'=> $chat_group_item_group_id ), WATCHDOG_INFO);
-      // field_members_group
-      // watchdog(TAG, '1. update_profile: %v', array('%v'=> serialize($chat_group_node) ), WATCHDOG_INFO);
-      if (isset($chat_group_node->field_members_group[LANGUAGE_NONE])) {
-        # code...
-
-        foreach ($chat_group_node->field_members_group[LANGUAGE_NONE] as $members_group_k => $members_group_v) {
-          $members_group_item = field_collection_item_load($members_group_v['value']);
-          
-          $__friend_id = $members_group_item->field_members_group_friend_id[LANGUAGE_NONE][0]['value'];
-          watchdog(TAG, '> update_profile: %v', array('%v'=> $__friend_id), WATCHDOG_INFO);
-          if (strcasecmp($members_group_item->field_members_group_friend_id[LANGUAGE_NONE][0]['value'], $uid) == 0) {
-            $chat_group_node_wrapper = entity_metadata_wrapper('field_collection_item', $members_group_item);
-            $chat_group_node_wrapper->field_path_uri->set($url);
-            $chat_group_node_wrapper->save();
-
-            $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_CHAT_GROUPS . '/' . $chat_group_item_group_id .'/members/'. $members_group_v['value'] . '/' , array('friend_image_url'=>$url));
-
-            break;
-          }
-        }
-      }
-    }
-  }
-  // update chat group
-  */
-
-  // update_creator_image_url_post($uid, $url);
-
-
-  background_process_start('___update_image_url_of_user', $uid, $url);
+  background_process_start('___update_image_url_friend_of_user', $uid, $url);
 
   $time_end       = microtime(true);
   $execution_time = number_format(($time_end - $time_start), 2);
@@ -10444,117 +10399,46 @@ function chat_upload_video(){
   return $result; 
 }
 
-
 function update_picture_bg_profile(){
   $result = array();
 
   if (!check_header()) {
     $result['result']   = FALSE;
-    $result['message']  = "check_header()";
     return $result;
   }
-
-  // $param = json_decode(file_get_contents('php://input'), true);
-
-  // $result['result'] = TRUE;
-  // $result['_REQUEST']  = $_REQUEST;
-  // $result['_FILES']  = $_FILES;
-  // $result['param']  = $param;
-
-  // return $result;
 
   if (empty($_REQUEST['uid']) || empty($_FILES["idna"])) {
     $result['result'] = FALSE;
-    $result['message']  = "function : update_picture_bg_profile, parameter";
-    // $result['_REQUEST']  = $_REQUEST;
     return $result;
   }
 
-  global $firebase;
-
   $uid   = $_REQUEST['uid'];
-  // $image = $_REQUEST['image'];
-
   $profile = profile2_by_uid_load($uid, 'main');
 
-  // if($image != ""){
-
-    /*
-    // http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
-    $binary = base64_decode($image);
-
-    // $binary = file_get_contents($image['tmp_name']);
-
-    //Create the directory if it does not already exist, otherwise check the permissions
-    $directory = 'public://';
-    file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
-
-    $currentDate = date("Ymd");
-    $name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
-    
-    //Saves a file to the specified destination and creates a database entry.
-    $image_url = (array)klovers_file_save_data($uid, $binary, $directory. '/' . $name, FILE_EXISTS_RENAME);
-
-    // save รูป profile
-    $profile->field_picture_bg[LANGUAGE_NONE][0] = $image_url;
-
-    profile2_save($profile);
-   
-    // $url = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
-    $url = file_create_url(image_style_url('medium', $image_url['uri']));
-
-    // Firebase : update image url profile
-    $data_update = array(
-        "bg_url"  =>$url
-    );
-    $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/profiles/", $data_update);
-    // Firebase : update image url profile
-    */
-
-    // $binary =  file_get_contents($_FILES["idna"]["tmp_name"]);
-
-    $profile = profile2_by_uid_load($uid, 'main');
-
-    // http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
-    $binary =  file_get_contents($_FILES["idna"]["tmp_name"]);//base64_decode($image);
+  // http://stackoverflow.com/questions/8241242/drupal-7-upload-image-programatically
+  $binary =  file_get_contents($_FILES["idna"]["tmp_name"]);//base64_decode($image);
+  //Create the directory if it does not already exist, otherwise check the permissions
+  $directory = 'public://';
+  file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+  $currentDate = date("Ymd");
+  $file_name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
   
-    //Create the directory if it does not already exist, otherwise check the permissions
-    $directory = 'public://';
-    file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+  //Saves a file to the specified destination and creates a database entry.
+  $image_url = (array)klovers_file_save_data($uid, $binary, $directory. '/' . $file_name, FILE_EXISTS_RENAME);
   
-    $currentDate = date("Ymd");
-    $file_name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
-    
-    //Saves a file to the specified destination and creates a database entry.
-    $image_url = (array)klovers_file_save_data($uid, $binary, $directory. '/' . $file_name, FILE_EXISTS_RENAME);
-    
-    // save รูป profile
-    $profile->field_picture_bg[LANGUAGE_NONE][0] = $image_url;
-    profile2_save($profile);
+  // save รูป profile
+  $profile->field_picture_bg[LANGUAGE_NONE][0] = $image_url;
+  profile2_save($profile);
+
+  $bg_url = file_create_url(image_style_url('medium', $image_url['uri']));
   
-    // $image_url['uri']
-    //   // dpm(image_style_url('medium',$uri));
-    // $url = substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']));
-    $bg_url = file_create_url(image_style_url('medium', $image_url['uri']));
-    // $url = substr(file_create_url($image_url['uri']), strlen($GLOBALS['base_url']));
-  
-    // Firebase : update image url profile
-    $data_update = array(
-        "bg_url"  =>$bg_url
-    );
-    
-    // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/profiles/", $data_update);
-    
-    firestore_db()->collection(FIRESTORE_PROFILES)->document($uid)->set($data_update, ['merge' => true]);
-  
-    $result['result'] = TRUE;  
-    $result['bg_url'] = $bg_url;
-    // $result['uri']    = $uri;
-    return $result;
-  // }else{
-  //   $result['result'] = FALSE; 
-  //   return $result; 
-  // }  
+  firestore_db()->collection(FIRESTORE_PROFILES)->document($uid)->set(array("bg_url"  =>$bg_url), ['merge' => true]);
+
+  background_process_start('___update_bg_url_friend_of_user', $uid, $bg_url);
+
+  $result['result'] = TRUE;  
+  $result['bg_url'] = $bg_url;
+  return $result;
 }
 
 function update_group_picture_profile(){
@@ -10994,11 +10878,24 @@ function ___update_image_url_of_my_application($uid, $node_id,$image_url){
 }
 
 /*
-  function ใช้สำหรับ update image_url ของ user : members chat_groups | creator post, comment, reply
+  function ใช้สำหรับ update image_url ของ friend ที่เราเป็นเพือน
 */
-function ___update_image_url_of_user($uid, $image_url){
-  global $firebase;
+function ___update_image_url_friend_of_user($uid, $image_url){
 
+  $profile = profile2_by_uid_load($uid, 'main');
+  foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
+    // ดึงเพือนมาทั้งหมด
+    $data_item_load = field_collection_item_load($value['value']);
+
+    // load uid ของ friend ที่เป็นเพือนของเรา เพือ่เราจะไปลบเรา ออกจากเพือนด้วย
+    $friend_id = $data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'];
+  
+    firestore_db()->collection(FIRESTORE_USERS)->document($friend_id)->collection(FIRESTORE_FRIENDS)->document($uid)->set(array("image_url"  =>$image_url), ['merge' => true]);
+  }
+
+  // global $firebase;
+
+  /*
   // update members chat_groups
   $chat_groups_profile = profile2_by_uid_load($uid, 'main');
   if(isset($chat_groups_profile->field_chat_group[LANGUAGE_NONE])){
@@ -11163,7 +11060,122 @@ function ___update_image_url_of_user($uid, $image_url){
       }
     }
   }
+  */
   // การ query creator ทั้งระบบของ uid ขึ้นมาเพือทำการ update field_creator_image_uri, และข้อมูลที่ firebase ด้วย
+}
+
+/*
+  function ใช้สำหรับ update bg_url ของ friend ที่เราเป็นเพือน
+*/
+function ___update_bg_url_friend_of_user($uid, $bg_url){
+  $profile = profile2_by_uid_load($uid, 'main');
+  foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
+    // ดึงเพือนมาทั้งหมด
+    $data_item_load = field_collection_item_load($value['value']);
+
+    // load uid ของ friend ที่เป็นเพือนของเรา เพือ่เราจะไปลบเรา ออกจากเพือนด้วย
+    $friend_id = $data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'];
+  
+    firestore_db()->collection(FIRESTORE_USERS)->document($friend_id)->collection(FIRESTORE_FRIENDS)->document($uid)->set(array("bg_url"  =>$bg_url), ['merge' => true]);
+  }
+}
+
+/*
+  function ใช้สำหรับ update name ของ friend ที่เราเป็นเพือน
+
+   background_process_start('___update_name_friend_of_user', $uid, $name);
+*/
+function ___update_name_friend_of_user($uid, $name){
+  $profile = profile2_by_uid_load($uid, 'main');
+  foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
+    // ดึงเพือนมาทั้งหมด
+    $data_item_load = field_collection_item_load($value['value']);
+
+    // load uid ของ friend ที่เป็นเพือนของเรา เพือ่เราจะไปลบเรา ออกจากเพือนด้วย
+    $friend_id = $data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'];
+  
+    firestore_db()->collection(FIRESTORE_USERS)->document($friend_id)->collection(FIRESTORE_FRIENDS)->document($uid)->set(array("name"  =>$name), ['merge' => true]);
+  }
+}
+
+/*
+  function ใช้สำหรับ update gender ของ friend ที่เราเป็นเพือน
+*/
+function ___update_gender_friend_of_user($uid, $gender){
+  $profile = profile2_by_uid_load($uid, 'main');
+  foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
+    // ดึงเพือนมาทั้งหมด
+    $data_item_load = field_collection_item_load($value['value']);
+
+    // load uid ของ friend ที่เป็นเพือนของเรา เพือ่เราจะไปลบเรา ออกจากเพือนด้วย
+    $friend_id = $data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'];
+  
+    firestore_db()->collection(FIRESTORE_USERS)->document($friend_id)->collection(FIRESTORE_FRIENDS)->document($uid)->set(array("gender"=>$gender), ['merge' => true]);
+  }
+}
+
+/*
+  function ใช้สำหรับ update status_message ของ friend ที่เราเป็นเพือน
+*/
+function ___update_status_message_friend_of_user($uid, $status_message){
+  $profile = profile2_by_uid_load($uid, 'main');
+  foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
+    // ดึงเพือนมาทั้งหมด
+    $data_item_load = field_collection_item_load($value['value']);
+
+    // load uid ของ friend ที่เป็นเพือนของเรา เพือ่เราจะไปลบเรา ออกจากเพือนด้วย
+    $friend_id = $data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'];
+  
+    firestore_db()->collection(FIRESTORE_USERS)->document($friend_id)->collection(FIRESTORE_FRIENDS)->document($uid)->set(array("status_message"=>$status_message), ['merge' => true]);
+  }
+}
+
+/*
+  function ใช้สำหรับ update birthday ของ friend ที่เราเป็นเพือน
+*/
+function ___update_birthday_friend_of_user($uid, $birthday){
+  $profile = profile2_by_uid_load($uid, 'main');
+  foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
+    // ดึงเพือนมาทั้งหมด
+    $data_item_load = field_collection_item_load($value['value']);
+
+    // load uid ของ friend ที่เป็นเพือนของเรา เพือ่เราจะไปลบเรา ออกจากเพือนด้วย
+    $friend_id = $data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'];
+  
+    firestore_db()->collection(FIRESTORE_USERS)->document($friend_id)->collection(FIRESTORE_FRIENDS)->document($uid)->set(array("birthday"=>$birthday), ['merge' => true]);
+  }
+}
+
+/*
+  function ใช้สำหรับ update intereste_in ของ friend ที่เราเป็นเพือน
+*/
+function ___update_intereste_in_friend_of_user($uid, $intereste_in){
+  $profile = profile2_by_uid_load($uid, 'main');
+  foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
+    // ดึงเพือนมาทั้งหมด
+    $data_item_load = field_collection_item_load($value['value']);
+
+    // load uid ของ friend ที่เป็นเพือนของเรา เพือ่เราจะไปลบเรา ออกจากเพือนด้วย
+    $friend_id = $data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'];
+  
+    firestore_db()->collection(FIRESTORE_USERS)->document($friend_id)->collection(FIRESTORE_FRIENDS)->document($uid)->set(array("intereste_in"=>$intereste_in), ['merge' => true]);
+  }
+}
+
+/*
+  function ใช้สำหรับ update address ของ friend ที่เราเป็นเพือน
+*/
+function ___update_address_friend_of_user($uid, $address){
+  $profile = profile2_by_uid_load($uid, 'main');
+  foreach ($profile->field_profile_friends[LANGUAGE_NONE] as $key => $value) {
+    // ดึงเพือนมาทั้งหมด
+    $data_item_load = field_collection_item_load($value['value']);
+
+    // load uid ของ friend ที่เป็นเพือนของเรา เพือ่เราจะไปลบเรา ออกจากเพือนด้วย
+    $friend_id = $data_item_load->field_friend_uid[LANGUAGE_NONE][0]['value'];
+  
+    firestore_db()->collection(FIRESTORE_USERS)->document($friend_id)->collection(FIRESTORE_FRIENDS)->document($uid)->set(array("address"=>$address), ['merge' => true]);
+  }
 }
 
 /*
@@ -11195,13 +11207,14 @@ function update_profile(){
   // Load Profile ขึ้นมาเพือจะทำการแก้ไข
   $profile = profile2_by_uid_load($uid, 'main');
 
-  // watchdog(TAG, 'Firestore : update_profile: %uid - %data', array('%uid'=>$uid, '%data'=>serialize($data) ), WATCHDOG_INFO);
-
   $check = 0;
   // Profile name
   if (array_key_exists('name', $data)) {
-    if (strcmp($profile->field_profile_name[LANGUAGE_NONE][0]['value'], $data['name']) != 0) {
-      $profile->field_profile_name[LANGUAGE_NONE][0]['value'] = $data['name'] ;//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['name']) ;
+    $name = $data['name'];
+    if (strcmp($profile->field_profile_name[LANGUAGE_NONE][0]['value'], $name) != 0) {
+      $profile->field_profile_name[LANGUAGE_NONE][0]['value'] = $name;//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['name']) ;
+      
+      background_process_start('___update_name_friend_of_user', $uid, $name);
       
       /*
       // เราต้องวิ่งไป update chat_group ด้วย
@@ -11280,8 +11293,12 @@ function update_profile(){
 
   // Profile status message
   if (array_key_exists('status_message', $data)) {
-    if (strcmp($profile->field_profile_status_message[LANGUAGE_NONE][0]['value'], $data['status_message']) != 0) {
-      $profile->field_profile_status_message[LANGUAGE_NONE][0]['value'] = $data['status_message'];
+    $status_message = $data['status_message'];
+    if (strcmp($profile->field_profile_status_message[LANGUAGE_NONE][0]['value'], $status_message) != 0) {
+      $profile->field_profile_status_message[LANGUAGE_NONE][0]['value'] = $status_message;
+      
+      background_process_start('___update_status_message_friend_of_user', $uid, $status_message);
+
       $check++;
     }
   }
@@ -11420,9 +11437,12 @@ function update_profile(){
   // address
   if (array_key_exists('address', $data)) {
     // if (isset($profile->field_profile_address[LANGUAGE_NONE])) {
-    if (strcmp($profile->field_profile_address[LANGUAGE_NONE][0]['value'], $data['address']) != 0) {
+    $address =  $data['address'];
+    if (strcmp($profile->field_profile_address[LANGUAGE_NONE][0]['value'], $address) != 0) {
       # code...
-      $profile->field_profile_address[LANGUAGE_NONE][0]['value'] = $data['address'];//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['address']);
+      $profile->field_profile_address[LANGUAGE_NONE][0]['value'] = $address;//preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $data['address']);
+      
+      background_process_start('___update_address_friend_of_user', $uid, $address);
       $check++;
     }
     // }
@@ -11430,17 +11450,18 @@ function update_profile(){
 
   // gender 
   if (array_key_exists('gender', $data)) {
-    // if (isset($profile->field_profile_gender[LANGUAGE_NONE])) {
-      if (strcmp($profile->field_profile_gender[LANGUAGE_NONE][0]['tid'], $data['gender']) != 0) {
-        # code...
-        $profile->field_profile_gender[LANGUAGE_NONE][0]['tid'] = $data['gender'];
+    $gender = $data['gender'];
+    if (strcmp($profile->field_profile_gender[LANGUAGE_NONE][0]['tid'], $gender) != 0) {
+      # code...
+      $profile->field_profile_gender[LANGUAGE_NONE][0]['tid'] = $gender;
 
-        $check++;
-      }
-    // }
+      background_process_start('___update_gender_friend_of_user', $uid, $gender);
+      $check++;
+    }
   }
 
   // intereste_in
+  
   if (array_key_exists('intereste_in', $data)) {
     $profile->field_profile_intereste_in[LANGUAGE_NONE] = '_none';
     $intereste_in = array();
@@ -11450,6 +11471,10 @@ function update_profile(){
       $check++;
     }
     $profile->field_profile_intereste_in[LANGUAGE_NONE] = $intereste_in;
+
+    background_process_start('___update_intereste_in_friend_of_user', $uid, $data['intereste_in']);
+  }else{
+    background_process_start('___update_intereste_in_friend_of_user', $uid, []);
   }
 
   // field_profile_school
@@ -11478,13 +11503,13 @@ function update_profile(){
 
   // birthday
   if (array_key_exists('birthday', $data)) {
-    // if (isset($profile->field_profile_birthday[LANGUAGE_NONE])) {
-    if (strcmp($profile->field_profile_birthday[LANGUAGE_NONE][0]['value'], $data['birthday']) != 0) {
-      # code...
-      $profile->field_profile_birthday[LANGUAGE_NONE][0]['value'] = $data['birthday'];
+    $birthday = $data['birthday'];
+    if (strcmp($profile->field_profile_birthday[LANGUAGE_NONE][0]['value'], $birthday) != 0) {
+      $profile->field_profile_birthday[LANGUAGE_NONE][0]['value'] = $birthday;
+      
+      background_process_start('___update_birthday_friend_of_user', $uid, $birthday);
       $check++;
     }
-    // }
   }
 
   // line_id

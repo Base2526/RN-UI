@@ -25,8 +25,7 @@ import MyIcon from '../../config/icon-font.js';
 import {makeUidState, 
         makeClasssState,
         makeClassMembersState,
-        makeFriendProfilesState,
-    
+        makeFriendsState,
         makeIsConnectedState} from '../../reselect'
 
 class ListClassMemberPage extends React.Component{
@@ -93,7 +92,7 @@ class ListClassMemberPage extends React.Component{
 
     loadData = (props) =>{
         let {class_id} = this.state
-        let {friend_profiles, classs, class_members} = props
+        let {friends, classs, class_members} = props
 
         let cla = _.find(classs,  function(v, k) { 
             return k == class_id; 
@@ -111,9 +110,9 @@ class ListClassMemberPage extends React.Component{
         let data = []
         _.map(class_member, (v, k)=>{
             if(v.status){
-                let friend_profile =_.find(friend_profiles, (fv, fk)=>{
-                        return v.friend_id == fk
-                    })  
+                let friend_profile =_.find(friends, (fv, fk)=>{
+                                        return v.friend_id == fk
+                                    })  
                 data.push({friend_id:v.friend_id, member_key:k, friend_profile})
             }
         })
@@ -247,7 +246,8 @@ const mapStateToProps = (state, ownProps) => {
   
     return{
         uid:makeUidState(state, ownProps),
-        friend_profiles:makeFriendProfilesState(state, ownProps),
+        // friend_profiles:makeFriendProfilesState(state, ownProps),
+        friends:makeFriendsState(state, ownProps),
         classs:makeClasssState(state, ownProps),
         class_members:makeClassMembersState(state, ownProps),
 

@@ -25,7 +25,7 @@ var _ = require('lodash');
 
 import * as actions from '../../actions'
 import Constant from '../../utils/Constant'
-import {getHeaderInset} from '../../utils/Helpers'
+import {getHeaderInset, isEmpty} from '../../utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 import {checkInternetDialog} from '../../utils/Helpers'
 
@@ -374,11 +374,11 @@ class FriendsPage extends React.Component{
                           <Text style={{padding:10, fontSize:18}}>Cancel</Text>
                       </MenuOption>
 
-                      <MenuOption onSelect={() => {
+                      {/* <MenuOption onSelect={() => {
                         this.props.params.navigation.navigate("FriendProfilePage", {'friend_id': rowItem.friend_id})
                       }}>
                           <Text style={{padding:10, fontSize:18}}>View profile</Text>
-                      </MenuOption>
+                      </MenuOption> */}
                   </MenuOptions>
                   </Menu>
               </View>)
@@ -386,7 +386,7 @@ class FriendsPage extends React.Component{
 
     _renderRow = (rowItem, rowId, sectionId) => {
         if(rowId == 0 && sectionId == 0){
-          console.log(rowItem)
+          // console.log(rowItem)
           return (
             <TouchableOpacity 
               key={ rowId } 
@@ -495,7 +495,9 @@ class FriendsPage extends React.Component{
                                       color: '#222',
                                       paddingLeft: 10, 
                                       paddingBottom:5}}>
-                            {rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.name}
+                            {/* {rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.name} */}
+
+                            {isEmpty(rowItem.change_friend_name) ? rowItem.name : rowItem.change_friend_name}
                         </Text>
                         <Text style={{fontSize: 13, 
                                     color: '#222',
@@ -515,6 +517,8 @@ class FriendsPage extends React.Component{
           }
         }
 
+
+        // console.log(rowItem)
         return (
           <TouchableOpacity 
             key={rowId} 
@@ -563,7 +567,9 @@ class FriendsPage extends React.Component{
                                     color: '#222',
                                     paddingLeft: 10, 
                                     paddingBottom:5}}>
-                          {rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.name}
+                          {/* {  rowItem.hasOwnProperty('change_friend_name') ? rowItem.change_friend_name : rowItem.name} */}
+
+                          {isEmpty(rowItem.change_friend_name) ? rowItem.name: rowItem.change_friend_name}
                       </Text>
                       {rowItem.mute?<View />:<MyIcon
                                       style={{paddingLeft:5}}

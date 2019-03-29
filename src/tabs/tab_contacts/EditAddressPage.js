@@ -90,7 +90,6 @@ class EditAddressPage extends React.Component{
     }
 
     
-      
     render() {
         return (<KeyboardAwareScrollView><View style={{margin:10}}>
                     <Spinner
@@ -124,7 +123,7 @@ class EditAddressPage extends React.Component{
 }
 
 const mapStateToProps = (state, ownProps) => {
-    console.log(state)
+    // console.log(state)
 
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
     //_persist.rehydrated parameter is initially set to false
@@ -137,9 +136,6 @@ const mapStateToProps = (state, ownProps) => {
     }
 
     return{
-        // uid:getUid(state),
-        // profiles:state.auth.users.profiles
-
         uid: makeUidState(state, ownProps),
         profile: makeProfileState(state, ownProps),
     }
