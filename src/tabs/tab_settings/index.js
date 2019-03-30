@@ -19,6 +19,8 @@ import FriendProfilePage from '../tab_contacts/FriendProfilePage';
 
 import SettingListFriendOnlinePage from './SettingListFriendOnlinePage'
 
+import NameCardsPage from './NameCardsPage'
+
 const index =  createStackNavigator({
     'home': {
         screen: homeY,
@@ -95,6 +97,12 @@ const index =  createStackNavigator({
       },
     'SettingListFriendOnlinePage':{
       screen: SettingListFriendOnlinePage,
+    },
+    'name_cards':{
+      screen: NameCardsPage,
+        navigationOptions: {
+          // title: 'Friend Profile',
+        }
     }
 })
 
@@ -114,7 +122,8 @@ index.navigationOptions = ({ navigation }) => {
         routeName === 'google_search_company' ||
         routeName === 'google_search_company_detail' ||
         routeName === 'FriendProfilePage' ||
-        routeName === 'SettingListFriendOnlinePage') {
+        routeName === 'SettingListFriendOnlinePage' ||
+        routeName === 'name_cards') {
       navigationOptions.tabBarVisible = false;
     }
     return navigationOptions;

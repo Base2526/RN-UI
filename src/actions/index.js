@@ -127,7 +127,7 @@ import {USER_LOGIN_SUCCESS,
         REMOVED_PEOPLE_YOU_MAY_KHOW,
         } from './types'
 
-import {randomKey} from '../utils/Helpers'
+import {randomKey, isEmpty} from '../utils/Helpers'
 import Constant from '../utils/Constant'
 
 import {login, 
@@ -2041,7 +2041,6 @@ const trackGroups=(uid, groups, group_profiles, group_members, callback)=> dispa
                             }
                         })
                     })
-                    
                     break;
                 }
 
@@ -2063,6 +2062,69 @@ const trackGroups=(uid, groups, group_profiles, group_members, callback)=> dispa
     })
 
     callback({'status':true, unsubscribe})
+}
+
+const trackGroupMember_Profile=(uid, friends, group_id, group_members, callback)=> dispatch =>{
+    _.map(group_members, (v, k)=>{
+        if(v.friend_id == uid){
+            return
+        }
+
+        let friend =_.find(friends, (f, key)=>{
+                        return key == v.friend_id
+                    })
+
+        let friend_id = v.friend_id
+        if(isEmpty(friend)){
+            
+            let unsubscribe =   firebase.firestore().collection('profiles').doc(friend_id).onSnapshot((friendDocSnapshot) => {
+                                    if (!friendDocSnapshot.exists) {
+                                        console.log('No such document!', friend_id);
+                                    } else {
+                                        let friend_data = {uid:friend_id, ...friendDocSnapshot.data(), status:Constant.FRIEND_STATUS_FRIEND_99}
+                                        dispatch({ type: ADD_FRIEND, friend_id, friend_data});
+
+                                    }
+                                })
+        }
+
+        presenceFriend(friend_id, dispatch)
+    })
+
+    // // track group > members
+    // let unsubscribe 
+
+    /*
+    /// track friend กรณีไม่ใช่เพือนของเรา
+    let friend =_.find(friends, (v, k)=>{
+        // without current user login
+        return k == member_data.friend_id ||  member_data.friend_id == uid
+    })
+
+    console.log(member_data, friend)
+
+    if(isEmpty(friend)){
+
+        let unsubscribeProfiles = firebase.firestore().collection('profiles').doc(member_data.friend_id).onSnapshot((friendDocSnapshot) => {
+        // console.log(change.doc.id, friendDocSnapshot)
+            if (!friendDocSnapshot.exists) {
+                console.log('No such document!', member_data.friend_id);
+            } else {
+                let friend_data = friendDocSnapshot.data()
+                console.log('friend profiles >', friend_data)
+
+                // let friend_profile =_.find(friend_profiles, (v, k)=>{
+                //                         return k == friend_id
+                //                     })
+
+                // if(!_.isEqual(friend_profile, friend_data) ){
+                //     console.log('friend profiles > added not equal')
+                //     dispatch({ type: ADDED_FRIEND_PROFILE, friend_id, friend_profile:friend_data });
+                // }
+            }
+        })
+    }
+    */
 }
 
 // track friends
@@ -2152,6 +2214,37 @@ presenceFriend = (friend_id, dispatch)=>{
     });
 }
 
+const trackNameCards = (uid, name_cards, callback) => dispatch =>{
+    let unsubscribe = firebase.firestore().collection('profiles').doc(uid).collection('name_card').onSnapshot((querySnapshot) => {
+                        querySnapshot.docChanges.forEach(function(change) {
+                            let doc_id   = change.doc.id
+                            // let doc_data = change.doc.data()
+                            if (change.type === 'added') {  
+                                // console.log(change.type, doc_id, doc_data)
+
+                                let name_card =  _.find(name_cards, (v, k)=>{
+                                                return doc_id == k
+                                            })
+                                
+                                            // ADD_WALLET_PROFILE, EDIT_WALLET_PROFILE , REMOVE_WALLET_PROFILE
+                                if( isEmpty(name_card) ){
+                                    console.log('wallet > ', )
+                                    // dispatch({ type: ADD_MY_ID_PROFILE, my_id_key:doc_id, my_id_data:doc_data});
+                                }
+                            }
+                            if (change.type === 'modified') {
+                                // dispatch({ type: EDIT_MY_ID_PROFILE, my_id_key:doc_id, my_id_data:doc_data});
+                            }
+
+                            if (change.type === 'removed') {
+                                // dispatch({ type: REMOVE_MY_ID_PROFILE, my_id_key:doc_id});
+                            }
+                        })
+                    })
+
+    callback({'status':true, unsubscribe})
+}
+
 /* 
 กรณี group member ไม่ใช่เพือนของเรา เราต้องดึง  profile ลงมา save ที่เครื่อง
 */
@@ -2175,6 +2268,7 @@ const trackProfileFriend=(friend_id, callback)=> dispatch =>{
 
     // callback({'status':true, unsubscribe})
     // friend > profiles
+    /*
     let unsubscribeProfiles = firebase.firestore().collection('profiles').doc(friend_id).onSnapshot((friendProfileDocSnapshot) => {
         // console.log(change.doc.id, friendDocSnapshot)
         if (!friendProfileDocSnapshot.exists) {
@@ -2196,6 +2290,7 @@ const trackProfileFriend=(friend_id, callback)=> dispatch =>{
     })
 
     unsubscribes.push(unsubscribeProfiles)
+    */
     
     // track friends > phones
     let unsubscribeProfilesPhones = firebase.firestore().collection('profiles').doc(friend_id).collection('phones').onSnapshot((phonesSnapshot) => {
@@ -2397,6 +2492,7 @@ const actions = {
     actionTestUsers,
     trackProfileFriend,
     trackGroups,
+    trackGroupMember_Profile,
     trackClasss,
     trackMyApplicationsPosts,
     trackMyApplications,
@@ -2473,7 +2569,11 @@ const actions = {
     actionCreateMyApplication,
     actionRecreateQRcode,
     actionGetPostFeelingsAndPrivacy,
-    actionApplicationCategory
+    actionApplicationCategory,
+
+
+
+    trackNameCards,
 };
 
 module.exports = actions;

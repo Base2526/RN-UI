@@ -34,12 +34,7 @@ import MyIcon from '../../config/icon-font.js';
 
 import {getUid, getHeaderInset} from '../../utils/Helpers'
 
-import {makeUidState, 
-        makeProfileState, 
-        makeFriendsState, 
-        makeFriendProfilesState, 
-        makePresencesState,
-        makeClasssState} from '../../reselect'
+import {makeUidState} from '../../reselect'
 
 class homeY extends React.Component {
 
@@ -208,7 +203,6 @@ class homeY extends React.Component {
               onPress={()=>{
                 this.props.navigation.navigate("manage_customize_tab_menus")
               }} />
-
             <Cell 
               cellStyle="Basic" 
               title="Google Search Company" 
@@ -216,6 +210,15 @@ class homeY extends React.Component {
               hideSeparator={true}
               onPress={()=>{
                 this.props.navigation.navigate("google_search_company")
+              }} />
+
+            <Cell 
+              cellStyle="Basic" 
+              title="Name Cards" 
+              accessory="DisclosureIndicator"
+              hideSeparator={true}
+              onPress={()=>{
+                this.props.navigation.navigate("name_cards")
               }} />
 
             <Cell 

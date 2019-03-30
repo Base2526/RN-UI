@@ -264,7 +264,13 @@ class FriendProfilePage extends React.Component{
 
         console.log(is_online)
 
-        this.setState({friend, classs:new_classs, is_online, friend_phone, friend_website, friend_email})
+        this.setState({ friend, 
+                        classs:new_classs, 
+                        is_online, 
+                        friend_phone, 
+                        friend_website, 
+                        friend_email,
+                        renderContent:true})
     }
 
     // loadData = (contact_info) =>{
@@ -683,11 +689,10 @@ class FriendProfilePage extends React.Component{
     }
 
     render() {
-        let {friend, is_online, } = this.state
-        if(!friend){
+        let {friend, is_online, renderContent} = this.state
+        if(!renderContent){
             return(<View style={{flex:1}}></View>)
         }
-        console.log(friend)
 
         let {
             name,
@@ -706,7 +711,7 @@ class FriendProfilePage extends React.Component{
             change_friend_name,)
 
         let {friend_id, 
-            renderContent, 
+            // renderContent, 
             classs, 
             friend_phone, 
             friend_website, 
@@ -821,11 +826,6 @@ class FriendProfilePage extends React.Component{
                                     detail={reste_in.join(", ")}/>
         }
 
-        /** 
-         
-          
-        */
-
         let cell_address =<Cell
                                 cellStyle="Subtitle"
                                 title="Address"
@@ -847,7 +847,7 @@ class FriendProfilePage extends React.Component{
                                             // borderWidth:.5,
                                             // backgroundColor:'red',
                                             // minHeight:150,
-                                            color:'back',
+                                            color:'black',
                                             textAlignVertical: 'top'}}
                                     // onChangeText={(text) => this.setState({text})}
                                     value={address}
@@ -864,114 +864,85 @@ class FriendProfilePage extends React.Component{
                             />
         }
 
-        // let section_contact_info =  <Section
-        //                                 sectionPaddingTop={5}
-        //                                 sectionPaddingBottom={0}
-        //                                 separatorInsetLeft={0}
-        //                                 hideSeparator={true}>
-        //                                 <Cell
-        //                                     cellStyle="Basic"
-        //                                     hideSeparator={true} 
-        //                                     cellContentView={
-        //                                         <View style={{  flex:1, 
-        //                                                         justifyContent:'center',
-        //                                                         alignItems:'center'}}>
-        //                                             <ActivityIndicator animating size="small" />
-        //                                         </View>
-        //                                     }/>
-        //                             </Section>
+        let cell_phones =  <Cell
+                                cellStyle="Subtitle"
+                                title="Mobile phones"
+                                hideSeparator={true} 
+                                detail={'Not set'}/>
+        if(!isEmpty(friend_phone)){
+            cell_phones =  <Cell
+                            cellStyle="Basic"
+                            contentContainerStyle={{  }} 
+                            hideSeparator={true}
+                            cellContentView={
+                                <View>
+                                    <Text style={{fontSize:16 }}>
+                                    Mobile phones
+                                    </Text>
+                                </View>
+                            }
+                        />
+        }
 
-        // if(renderContent_ContactInfo){
-            // section_contact_info
-
-            // let {friend_emails, friend_phones, friend_websites} = this.state.contact_info
-
-            // console.log(friend_emails, friend_phones, friend_websites, this.state.contact_info)
-            
-            let cell_phones =  <Cell
+        let cell_website =  <Cell
                             cellStyle="Subtitle"
-                            title="Mobile phones"
+                            title="Website"
                             hideSeparator={true} 
                             detail={'Not set'}/>
-            if(!isEmpty(friend_phone)){
-                cell_phones =  <Cell
-                                cellStyle="Basic"
-                                contentContainerStyle={{  }} 
-                                hideSeparator={true}
-                                cellContentView={
-                                    <View>
-                                        <Text style={{fontSize:16 }}>
-                                        Mobile phones
-                                        </Text>
-                                    </View>
-                                }
-                            />
-            }
+        if(!isEmpty(friend_website)){
+            cell_website =  <Cell
+                            cellStyle="Basic"
+                            contentContainerStyle={{  }} 
+                            hideSeparator={true}
+                            cellContentView={
+                                <View>
+                                    <Text style={{fontSize:16 }}>
+                                        Website
+                                    </Text>
+                                </View>
+                            }/>
+        }
 
-            let cell_website =  <Cell
-                                cellStyle="Subtitle"
-                                title="Website"
-                                hideSeparator={true} 
-                                detail={'Not set'}/>
-            if(!isEmpty(friend_website)){
-                cell_website =  <Cell
-                                cellStyle="Basic"
-                                contentContainerStyle={{  }} 
-                                hideSeparator={true}
-                                cellContentView={
-                                    <View>
-                                        <Text style={{fontSize:16 }}>
-                                            Website
-                                        </Text>
-                                    </View>
-                                }/>
-            }
+        let cell_email =  <Cell
+                            cellStyle="Subtitle"
+                            title="Email"
+                            hideSeparator={true} 
+                            detail={'Not set'}/>
+        if(!isEmpty(friend_email)){
+            cell_email =  <Cell
+                            cellStyle="Basic"
+                            contentContainerStyle={{  }} 
+                            hideSeparator={true}
+                            cellContentView={
+                                <View>
+                                    <Text style={{fontSize:16 }}>
+                                        Email
+                                    </Text>
+                                </View>
+                            }/>
+        }
 
-            let cell_email =  <Cell
-                                cellStyle="Subtitle"
-                                title="Email"
-                                hideSeparator={true} 
-                                detail={'Not set'}/>
-            if(!isEmpty(friend_email)){
-                cell_email =  <Cell
-                                cellStyle="Basic"
-                                contentContainerStyle={{  }} 
-                                hideSeparator={true}
-                                cellContentView={
-                                    <View>
-                                        <Text style={{fontSize:16 }}>
-                                            Email
-                                        </Text>
-                                    </View>
-                                }/>
-            }
+        let section_contact_info =  <Section
+                                    sectionPaddingTop={5}
+                                    sectionPaddingBottom={0}
+                                    separatorInsetLeft={0}>
+                                    <Cell
+                                        cellStyle="Basic"
+                                        title="Contact Info"
+                                        titleTextStyle={fontSize= 18}
+                                        hideSeparator={false}/>
+                                    
+                                    {cell_phones}
+                                    {this.phonesList(friend_phone)}
 
-            let section_contact_info =  <Section
-                                        sectionPaddingTop={5}
-                                        sectionPaddingBottom={0}
-                                        separatorInsetLeft={0}>
-                                        <Cell
-                                            cellStyle="Basic"
-                                            title="Contact Info"
-                                            titleTextStyle={fontSize= 18}
-                                            hideSeparator={false}/>
-                                        
-                                        {cell_phones}
-                                        {this.phonesList(friend_phone)}
+                                    {cell_website}
+                                    {this.websitesList(friend_website)} 
 
-                                        {/* 
-                                        {cell_address}
-                                        */}
+                                    {cell_email}
+                                    {this.emailsList(friend_email)}
 
-                                        {cell_website}
-                                        {this.websitesList(friend_website)} 
-
-                                        {cell_email}
-                                        {this.emailsList(friend_email)}
-
-                                        
-                                    </Section>
-        // }
+                                    
+                                </Section>
 
         let view_name = <View style={{ }}>
                             <View style={{flexDirection:'row', justifyContent:'flex-end'}}>
@@ -1039,8 +1010,6 @@ class FriendProfilePage extends React.Component{
                             </TouchableOpacity>
                         </View>    
                     </View>
-                    {/* <ActivityIndicator animating size="small" /> */}
-
                     <ScrollView style={{ }}>
                     <View style={{  flex:1, 
                                     backgroundColor:'gray', 
@@ -1116,580 +1085,12 @@ class FriendProfilePage extends React.Component{
 
                                 {section_contact_info}
 
-                                {/* <Section
-                                    sectionPaddingTop={5}
-                                    sectionPaddingBottom={0}
-                                    separatorInsetLeft={0}> */}
-                                    {/* <Cell
-                                        cellStyle="Basic"
-                                        title="Contact Info"
-                                        titleTextStyle={fontSize= 18}
-                                        hideSeparator={false}/> */}
-                                    {/* <Cell
-                                        cellStyle="Basic"
-                                        // title="Contact Info"
-                                        hideSeparator={true} 
-                                        onPress={() => console.log("Heyho!")}
-                                        cellContentView={
-                                            <View style={{  flex:1, 
-                                                            justifyContent:'center',
-                                                            alignItems:'center'}}>
-                                                <ActivityIndicator animating size="small" />
-                                            </View>
-                                        }/> */}
-                                    {/* <Cell
-                                        cellStyle="Basic"
-                                        // title="Contact Info"
-                                        hideSeparator={true} 
-                                        onPress={() => console.log("Heyho!")}
-                                        // cellContentView={
-                                        //     <ActivityIndicator animating size="small" />
-                                        // }
-                                        /> */}
-
-                                    {/* {cell_phones} */}
-                                    {/* {this.phonesList(phones)} */}
-
-                                    {/* {cell_address} */}
-
-                                    {/* {cell_website} */}
-                                    {/* {this.websitesList(websites)} */}
-
-                                    {/* {cell_email} */}
-                                    {/* {this.emailsList(emails)} */}
-                                {/* </Section> */}
                             </TableView>
                         </View>
 
                     </View>
                     </ScrollView>
                 </View>)
-
-        
-
-        if(!renderContent){
-            return(<View style={{flex:1}}>
-                        <Spinner
-                            visible={this.state.loading}
-                            textContent={'Wait...'}
-                            textStyle={{color: '#FFF'}}
-                            overlayColor={'rgba(0,0,0,0.5)'}
-                            />
-                    </View>)
-        }
-
-        // let {change_friend_name, status, is_favorite} = friend
-
-        let {
-            // name,
-            // status_message,
-            // gender,
-            // birthday,
-            // intereste_in,
-            // address,
-            // image_url,
-            // bg_url,
-            phones,
-            websites,
-            emails,
-            } = friend.profile
-
-        /* 
-        can edit friendName case is friend only
-        */
-        // let edit_changeFriendsName = <View />
-        // if(status == Constant.FRIEND_STATUS_FRIEND){
-        //     edit_changeFriendsName =<View style={{position:'absolute', right:0, bottom:0}}>
-        //                                 <TouchableOpacity
-        //                                     onPress={()=>{
-        //                                         this.props.navigation.navigate('ChangeFriendsName', {"friend": friend})
-        //                                     }}>
-        //                                     <MyIcon
-        //                                         name={'edit'}
-        //                                         size={20}
-        //                                         color={'gray'} />
-        //                                 </TouchableOpacity>
-        //                             </View>
-        // }
-
-        let cell_name_subname = <Cell
-                                    cellStyle="Basic"
-                                    contentContainerStyle={{ padding:10 }} 
-                                    hideSeparator={true} 
-                                    cellContentView={
-                                        <View style={{flex:1}}>
-                                            <View >
-                                                <View style={{flexDirection:'row'}}>
-                                                    <Text style={{fontSize:16 }}>
-                                                        Name Subname
-                                                    </Text>
-                                                </View>
-                                                
-                                            </View>
-                                            {edit_changeFriendsName}
-                                        </View>
-                                    }
-                                    onPress={()=>{
-                                        this.props.navigation.navigate('ChangeFriendsName', {"friend": friend})
-                                    }}/>
-        if(change_friend_name){
-
-            if(name){
-                cell_name_subname = <Cell
-                                        cellStyle="Basic"
-                                        contentContainerStyle={{ padding:10 }} 
-                                        hideSeparator={true} 
-                                        cellContentView={
-                                            <View style={{flex:1}}>
-                                                <View >
-                                                    <View style={{flexDirection:'row'}}>
-                                                        <Text style={{fontSize:16 }}>
-                                                            Name Subname
-                                                        </Text>
-                                                        <Text style={{ fontStyle:'italic', color:'gray' }}>
-                                                            {" (" + name + ")"}
-                                                        </Text>
-                                                    </View>
-                                                    <Text style={{ fontSize:12 }}>
-                                                        {change_friend_name}
-                                                    </Text>
-                                                </View>
-                                                {edit_changeFriendsName}
-                                            </View>
-                                        }
-                                        onPress={()=>{
-                                            this.props.navigation.navigate('ChangeFriendsName', {"friend": friend})
-                                        }}
-                                        />
-
-            }else{
-                cell_name_subname = <Cell
-                                    cellStyle="Basic"
-                                    contentContainerStyle={{ padding:10 }} 
-                                    hideSeparator={true} 
-                                    cellContentView={
-                                        <View style={{flex:1}}>
-                                            <View >
-                                                <View style={{flexDirection:'row'}}>
-                                                    <Text style={{fontSize:16 }}>
-                                                        Name Subname
-                                                    </Text>
-                                                    
-                                                </View>
-                                                <Text style={{ fontSize:12 }}>
-                                                    {change_friend_name}
-                                                </Text>
-                                            </View>
-                                            {edit_changeFriendsName}
-                                        </View>
-                                    }
-                                    onPress={()=>{
-                                        this.props.navigation.navigate('ChangeFriendsName', {"friend": friend})
-                                    }}/>
-            }
-
-        }else{
-            if(name){
-                cell_name_subname = <Cell
-                                    cellStyle="Basic"
-                                    contentContainerStyle={{ padding:10 }} 
-                                    hideSeparator={true} 
-                                    cellContentView={
-                                        <View style={{flex:1}}>
-                                            <View >
-                                                <View style={{flexDirection:'row'}}>
-                                                    <Text style={{fontSize:16 }}>
-                                                        Name Subname
-                                                    </Text>
-                                                </View>
-                                                <Text style={{ fontSize:18 }}>
-                                                    {name}
-                                                </Text>
-                                            </View>
-                                            {edit_changeFriendsName}
-                                        </View>
-                                    }
-                                    onPress={()=>{
-                                        this.props.navigation.navigate('ChangeFriendsName', {"friend": friend})
-                                    }}/>
-            }
-        }
-        
-        // let cell_status_message = <Cell
-        //                             cellStyle="Subtitle"
-        //                             title="Status message"
-        //                             detail={'Not set'}
-        //                             hideSeparator={true}/>
-
-        // if(status_message){
-        //     cell_status_message = <Cell
-        //                             cellStyle="Subtitle"
-        //                             title="Status message"
-        //                             detail={status_message}
-        //                             hideSeparator={true}/>
-        // }
-
-        /*
-        let cell_classs_name =  <Cell cellStyle="Subtitle"
-                                    title="Classs"
-                                    detail={this.getClasssName(classs)}
-                                    contentContainerStyle={{ paddingVertical: 10 }}
-                                    hideSeparator={true}/>
-
-        if(status == Constant.FRIEND_STATUS_FRIEND){
-            cell_classs_name = <Cell cellStyle="Subtitle"
-                                    title="Classs"
-                                    detail={this.getClasssName(classs)}
-                                    contentContainerStyle={{ paddingVertical: 10 }}
-                                    hideSeparator={true}
-                                    cellAccessoryView={ <View style={{}}>
-                                                            <MyIcon
-                                                                name={'edit'}
-                                                                size={20}
-                                                                color={'gray'} />
-                                                        </View>} 
-                                    onPress={()=>{
-                                        this.openListClasssModal()
-                                    }}/>
-        }
-        */
-        
-        // Gender
-        /*
-        let cell_gender = <Cell
-                            cellStyle="Subtitle"
-                            title="Gender"
-                            detail={'Not set'}
-                            hideSeparator={true} />
-        if(gender){     
-            let __ =Constant.gender.filter(function(item){
-                        return item.id == gender;
-                    })
-            
-            if(__.length > 0){
-                cell_gender = <Cell
-                                cellStyle="Subtitle"
-                                title="Gender"
-                                detail={__[0].name}
-                                hideSeparator={true} />
-            }
-        }
-        */
-
-        // let cell_birthday= <Cell
-        //                     cellStyle="Subtitle"
-        //                     title="Birthday"
-        //                     detail={'Not set'}
-        //                     hideSeparator={true} />
-        // if(birthday){
-        //     cell_birthday =  <Cell
-        //                         cellStyle="Subtitle"
-        //                         title="Birthday"
-        //                         detail={Moment(new Date(birthday)).format('MMMM DD, YYYY')}
-        //                         hideSeparator={true} />
-        // }
-
-        // let cell_intereste_in = <Cell
-        //                             cellStyle="Subtitle"
-        //                             title="Interested In"
-        //                             hideSeparator={true} 
-        //                             detail={'Not set'}/>
-        // if(intereste_in !== undefined){
-        //     let reste_in = []
-        //     intereste_in.forEach(function(key, v, arr){
-        //         let f = Constant.intereste_in.find(k => k.id==key)
-        //         reste_in.push(f.name)
-        //     });
-        //     cell_intereste_in = <Cell
-        //                             cellStyle="Subtitle"
-        //                             title="Interested In"
-        //                             hideSeparator={true} 
-        //                             detail={reste_in.join(", ")}/>
-        // }
- 
-        // let cell_address =  <Cell
-        //                         cellStyle="Subtitle"
-        //                         title="Address"
-        //                         hideSeparator={true} 
-        //                         detail={'Not set'}/>
-        // if(address){
-        //     cell_address =  <Cell
-        //                         cellStyle="Subtitle"
-        //                         title="Address"
-        //                         hideSeparator={true} 
-        //                         detail={address}/>
-        // }
- 
-        // let cell_phones =  <Cell
-        //                     cellStyle="Subtitle"
-        //                     title="Mobile phones"
-        //                     hideSeparator={true} 
-        //                     detail={'Not set'}/>
-        // if(phones){
-        //     cell_phones =  <Cell
-        //                     cellStyle="Basic"
-        //                     contentContainerStyle={{  }} 
-        //                     hideSeparator={true}
-        //                     cellContentView={
-        //                         <View>
-        //                             <Text style={{fontSize:16 }}>
-        //                             Mobile phones
-        //                             </Text>
-        //                         </View>
-        //                     }
-        //                 />
-        // }
-
-        // let cell_website =  <Cell
-        //                         cellStyle="Subtitle"
-        //                         title="Website"
-        //                         hideSeparator={true} 
-        //                         detail={'Not set'}/>
-        // if(websites){
-        //     cell_website =  <Cell
-        //                     cellStyle="Basic"
-        //                     contentContainerStyle={{  }} 
-        //                     hideSeparator={true}
-        //                     cellContentView={
-        //                         <View>
-        //                             <Text style={{fontSize:16 }}>
-        //                                 Website
-        //                             </Text>
-        //                         </View>
-        //                     }/>
-        // }
-
-        // let cell_email =  <Cell
-        //                         cellStyle="Subtitle"
-        //                         title="Email"
-        //                         hideSeparator={true} 
-        //                         detail={'Not set'}/>
-
-        // if(emails){
-        //     cell_email =  <Cell
-        //                     cellStyle="Basic"
-        //                     contentContainerStyle={{  }} 
-        //                     hideSeparator={true}
-        //                     cellContentView={
-        //                         <View>
-        //                             <Text style={{fontSize:16 }}>
-        //                                 Email
-        //                             </Text>
-        //                         </View>
-        //                     }/>
-        // }
-
-        
-        return (
-            <View style={{flex:1, }}>
-            <View style={{flex:1}}>
-                <Spinner
-                    visible={this.state.loading}
-                    textContent={'Wait...'}
-                    textStyle={{color: '#FFF'}}
-                    overlayColor={'rgba(0,0,0,0.5)'}
-                    />
-                <Modal 
-                    style={{zIndex:10, height:this.getHeightListClasss()}} 
-                    position={"bottom"} 
-                    ref={"modalListClasss"}
-                    // backdropPressToClose={false}
-                    swipeToClose={true}
-                    coverScreen={true}
-                    swipeArea={50}
-                    >
-                    <ScrollView>
-                        <View style={{marginBottom:20, marginTop:5, flex:1}}>
-                            {this.renderListClasss(friend, classs)}
-                        </View>
-                    </ScrollView>
-                </Modal>
-
-                <View style={{height:Header.HEIGHT +  (isIphoneX() ? 25 : 0), //- (Platform.OS == "ios" ? 20 : 0), 
-                              backgroundColor: 'rgba(186, 53, 100, 1.0)',
-                              justifyContent: Platform.OS == "ios" ?'flex-end':'center'}}>
-
-                    <View style={{flexDirection:'row', 
-                                position:'absolute', 
-                                }}>
-                        <TouchableOpacity
-                            style={{padding:10}}
-                            onPress={()=>{
-                                this.props.navigation.goBack(null)
-                            }}>
-                            {button_arrow_back}
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{
-                                    flexDirection:'row', 
-                                    position:'absolute', 
-                                    right:0,
-                                }}>
-                        <TouchableOpacity 
-                            style={{padding:10}}
-                            onPress={()=>{
-                                this.handleFriendFavorite()
-                            }}>
-
-                            <MyIcon
-                                name={is_favorite ? 'star' : 'star-empty'}
-                                size={25}
-                                color={'#C7D8DD'} />
-                        </TouchableOpacity>
-                        <TouchableOpacity style={{padding:10}}
-                            onPress={()=>{
-                                this.handleShare()
-                            }}>
-                            <MyIcon
-                                name={'share'}
-                                size={25}
-                                color={'#C7D8DD'} />
-                        </TouchableOpacity>
-                    </View>    
-                </View>
-                <ScrollView style={{ }}>
-                <View style={{flex:1, backgroundColor:'gray', ...ifIphoneX({
-                                                    marginBottom: 25
-                                                }, {
-                                                    marginBottom: 0
-                                                })}}>
-                    <View style={{flex:1, /*paddingTop: this.getHeaderInset(),*/ flexDirection:'row'}}>
-                        <FastImage
-                            style={StyleSheet.absoluteFill}
-                            source={{
-                                uri: bg_url,
-                                headers:{ Authorization: 'someAuthToken' },
-                                priority: FastImage.priority.normal,
-                            }}
-                            resizeMode={FastImage.resizeMode.cover}
-                        />
-                        <View style={{flexDirection:'row', margin:20}}>
-                        <TouchableOpacity>
-                            <FastImage
-                                style={{width: 80, 
-                                        height: 80, 
-                                        borderRadius: 10, 
-                                    }}
-                                source={{
-                                    uri: image_url,
-                                    headers:{ Authorization: 'someAuthToken' },
-                                    priority: FastImage.priority.normal,
-                                }}
-                                resizeMode={FastImage.resizeMode.cover}
-                            />
-                        </TouchableOpacity>
-                        <View style={{justifyContent: 'flex-end', }}>
-                            <Text style={{fontSize:22, marginLeft:10, color:'white'}}>{friend.hasOwnProperty('change_friend_name') ? friend.change_friend_name : friend.profile.name }</Text>
-                        </View>
-                        </View>
-                    </View>
-                    <View style={{ flex:1}}>
-                    <TableView >
-                        <Section
-                            sectionPaddingTop={5}
-                            sectionPaddingBottom={0}
-                            separatorInsetLeft={0}>
-                            <Cell
-                                // title="Help / FAQ"
-                                cellStyle="Subtitle"
-                                titleTextColor="#007AFF"
-                                onPress={() => console.log("open Help/FAQ")}
-                                cellContentView={
-                                    <View style={{flex:1, flexDirection:'row', justifyContent:'center', padding:5}}>
-                                        {friend.status === Constant.FRIEND_STATUS_FRIEND_99 ? <TouchableOpacity
-                                            style={{padding:5}}
-                                            onPress={()=>{
-                                                // this.setState({loading:true})
-                                                // this.props.actionInviteFriend(this.props.uid, friend_id, (result) => {
-                                                //     this.setState({loading:false})
-                                                // })
-                                            }}>
-                                            <MyIcon
-                                                name={'user-plus'}
-                                                size={40}
-                                                color={'#CE3B6E'}/>
-                                        </TouchableOpacity> : <View />}
-                                        
-                                        <TouchableOpacity
-                                            style={{padding:5}}
-                                            onPress={()=>{
-                                                alert('All application')
-                                            }}>
-                                            <MyIcon
-                                                name={'all-app'}
-                                                size={40}
-                                                color={'#CE3B6E'}/>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={{padding:5}}
-                                            onPress={()=>{
-                                                alert('Video call')
-                                            }}>
-                                            <MyIcon
-                                                name={'call'}
-                                                size={40}
-                                                color={'#CE3B6E'}/>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={{padding:5}}
-                                            onPress={()=>{
-                                                this.props.navigation.navigate("ChatPage")
-                                            }}>
-                                            <MyIcon
-                                                name={'friend-chat'}
-                                                size={40}
-                                                color={'#CE3B6E'}/> 
-                                        </TouchableOpacity>
-                                    </View>
-                                }
-                            />
-                        </Section>
-                        <Section
-                            sectionPaddingTop={5}
-                            sectionPaddingBottom={0}
-                            separatorInsetLeft={0}>
-                            <Cell
-                                cellStyle="Basic"
-                                title="Basic Info"
-                                titleTextStyle={fontSize= 18}
-                                hideSeparator={false}/>
-                            
-                            {cell_name_subname}
-                            {cell_status_message}
-                            {cell_classs_name}
-                            {cell_gender}
-                            {cell_birthday}
-                            {cell_intereste_in}
-                        </Section>
-
-                        <Section
-                            sectionPaddingTop={5}
-                            sectionPaddingBottom={0}
-                            separatorInsetLeft={0}>
-                            <Cell
-                                cellStyle="Basic"
-                                title="Contact Info"
-                                titleTextStyle={fontSize= 18}
-                                hideSeparator={false}/>
-                            
-                            {cell_phones}
-                            {this.phonesList(phones)}
-
-                            {cell_address}
-
-                            {cell_website}
-                            {this.websitesList(websites)}
-
-                            {cell_email}
-                            {this.emailsList(emails)}
-                        </Section>
-                    </TableView>
-                    </View>
-                </View>
-                </ScrollView> 
-            </View>
-            </View>
-       );
     }
 }
 

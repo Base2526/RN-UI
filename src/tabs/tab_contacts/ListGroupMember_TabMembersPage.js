@@ -32,7 +32,7 @@ import {getHeaderInset, isEmpty} from '../../utils/Helpers'
 import {makeUidState, 
         makeProfileState, 
         makeFriendsState, 
-        makeFriendProfilesState, 
+        makePresencesState, 
         makeGroupsState,
         makeGroupProfilesState,
         makeGroupMembersState} from '../../reselect'
@@ -54,7 +54,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
     componentWillMount(){
         let {group_id} = this.props.params
 
-        let {uid, group_profiles, friend_profiles, group_members} = this.props
+        let {uid, group_profiles, group_members} = this.props
         let group_profile = _.find(group_profiles, (v, k)=>{
                                 return k == group_id
                             })
@@ -66,7 +66,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
         group_profile = {...group_profile, members:group_member}
 
         /// check is friend_profile ครบหรือไม่  ถ้าไม่ครบเราต้องวิ่งไปดึงจาก server
-        let lost_profile = []
+        // let lost_profile = []
         // _.each(group_profile.members, (v, k)=>{
         //     var friend_profile = _.find(friend_profiles, function(fv, fk) {
         //         return fk == v.friend_id;
@@ -106,11 +106,11 @@ class ListGroupMember_TabMembersPage extends React.Component{
             return;
         }
 
-        let {uid, groups, group_profiles, group_members, friends, friend_profiles}    = props
+        let {uid, groups, group_profiles, group_members, friends, presences}    = props
 
         let group = _.find(groups,  function(v, k) { 
-            return k == group_id
-        })
+                        return k == group_id
+                    })
 
         console.log(group, groups, group_id)
         if(!group){
@@ -131,6 +131,8 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
         group = {...group, ...group_profile}
 
+        console.log(group)
+
         // console.log('2, ListGroupMember_TabMembersPage', group, group_profile)
 
         // let group_members = group.members
@@ -140,10 +142,16 @@ class ListGroupMember_TabMembersPage extends React.Component{
         let declines = []
 
         _.each(group.members, (v, k)=>{
-            console.log(v, k)
-            var friend = _.find(friends, function(fv, fk) {
-                return fk == v.friend_id;
-            });
+            // console.log(v, k)
+            var friend =_.find(friends, function(fv, fk) {
+                            return fk == v.friend_id;
+                        });
+
+            console.log(friend)
+
+            if(uid != v.friend_id && isEmpty(friend)){
+                return
+            }
 
             // friend_profiles
 
@@ -164,87 +172,105 @@ class ListGroupMember_TabMembersPage extends React.Component{
                 switch(v.status){
                     case Constant.GROUP_STATUS_MEMBER_INVITED:{
                         // console.log(friend_profile)
-                        if(friend === undefined ){
-                            if(uid === v.friend_id){
-                                pendings.push({...v, member_key:k})
-                            }else{
-                                // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
-                                firebase.firestore().collection('profiles').doc(v.friend_id).get()
-                                .then(doc => {
-                                    console.log('No such document!');
-                                    if (!doc.exists) {
-                                        console.log('No such document!');
-                                    } else {
-                                        console.log(doc.data())
+                        // if(friend === undefined ){
+                        //     if(uid === v.friend_id){
+                        //         pendings.push({...v, member_key:k})
+                        //     }else{
+                        //         // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
+                        //         firebase.firestore().collection('profiles').doc(v.friend_id).get()
+                        //         .then(doc => {
+                        //             console.log('No such document!');
+                        //             if (!doc.exists) {
+                        //                 console.log('No such document!');
+                        //             } else {
+                        //                 console.log(doc.data())
 
-                                        // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
-                                        //     console.log(result)
-                                        // })
-                                    }
-                                })
-                                .catch(err => {
-                                    console.log('Error getting document', err);
-                                });
-                            }
-                        }else{
-                            pendings.push({...v, member_key:k, friend})
-                        }
+                        //                 // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                        //                 //     console.log(result)
+                        //                 // })
+                        //             }
+                        //         })
+                        //         .catch(err => {
+                        //             console.log('Error getting document', err);
+                        //         });
+                        //     }
+                        // }else{
+                            pendings.push({...v, member_key:k, friend_profile:friend})
+                        // }
                         break;
                     }
                     case Constant.GROUP_STATUS_MEMBER_JOINED:{
-                        if(friend === undefined ){
-                            if(uid === v.friend_id){
-                                members.push({...v, member_key:k})
-                            }else{
-                                console.log('No such document!');
-                                // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
-                                firebase.firestore().collection('profiles').doc(v.friend_id).get()
-                                .then(doc => {
-                                    if (!doc.exists) {
-                                        console.log('No such document!');
-                                    } else {
-                                        console.log(doc.data())
+                        // if(friend === undefined ){
+                        //     if(uid === v.friend_id){
+                        //         members.push({...v, member_key:k})
+                        //     }else{
+                        //         console.log('No such document!');
+                        //         // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
+                        //         firebase.firestore().collection('profiles').doc(v.friend_id).get()
+                        //         .then(doc => {
+                        //             if (!doc.exists) {
+                        //                 console.log('No such document!');
+                        //             } else {
+                        //                 console.log(doc.data())
 
-                                        // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
-                                        //     console.log(result)
-                                        // })
-                                    }
-                                })
-                                .catch(err => {
-                                    console.log('Error getting document', err);
-                                });
+                        //                 // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                        //                 //     console.log(result)
+                        //                 // })
+                        //             }
+                        //         })
+                        //         .catch(err => {
+                        //             console.log('Error getting document', err);
+                        //         });
+                        //     }
+                        // }else{
+
+                        // check online/offline
+                        let presence =  _.find(presences, (presences_v, presences_k)=>{
+                                            return presences_k == v.friend_id
+                                        })
+
+                        let is_online = false
+                        if(presence !== undefined){
+                            let __ =_.find(presence, (presence_v, presence_k)=>{
+                                        return presence_v.status == 'online'
+                                    })
+                            if(__ !== undefined){
+                                is_online = true
                             }
-                        }else{
-                            members.push({...v, member_key:k, friend})
                         }
+                        // check online/offline
+                            
+                        members.push({...v, member_key:k, friend_profile:friend, is_online})
+                        // }
                         break;
                     }
                     case Constant.GROUP_STATUS_MEMBER_DECLINE:{
-                        if(friend === undefined ){
-                            if(uid === v.friend_id){
-                                declines.push({...v, member_key:k})
-                            }else{
-                                console.log('No such document!');
-                                // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
-                                firebase.firestore().collection('profiles').doc(v.friend_id).get()
-                                .then(doc => {
-                                    if (!doc.exists) {
-                                        console.log('No such document!');
-                                    } else {
-                                        console.log(doc.data())
+                        // if(friend === undefined ){
+                        //     if(uid === v.friend_id){
+                        //         declines.push({...v, member_key:k})
+                        //     }else{
+                        //         console.log('No such document!');
+                        //         // ไม่มีเพือนเราจะต้องดึง firestore โดยตรง
+                        //         firebase.firestore().collection('profiles').doc(v.friend_id).get()
+                        //         .then(doc => {
+                        //             if (!doc.exists) {
+                        //                 console.log('No such document!');
+                        //             } else {
+                        //                 console.log(doc.data())
 
-                                        // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
-                                        //     console.log(result)
-                                        // })
-                                    }
-                                })
-                                .catch(err => {
-                                    console.log('Error getting document', err);
-                                });
-                            }
-                        }else{
-                            declines.push({...v, member_key:k, friend})
-                        }
+                        //                 // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                        //                 //     console.log(result)
+                        //                 // })
+                        //             }
+                        //         })
+                        //         .catch(err => {
+                        //             console.log('Error getting document', err);
+                        //         });
+                        //     }
+                        // }else{
+                        
+                        declines.push({...v, member_key:k, friend_profile:friend})
+                        // }
                         break;
                     }
                 }
@@ -287,7 +313,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
     checkInvitor = (rowItem) =>{
 
-        let {uid, friend_profiles, groups} = this.props
+        let {uid, groups} = this.props
         // rowItem.friend_id === this.state.group_profile.creator_id?<Text style={{fontSize:12, color:'gray'}}>Group Creator</Text>:<View />
     
         // console.log('checkInvitor', rowItem)
@@ -308,15 +334,15 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
                 // console.log(member)
 
-                var friend_profile = _.find(friend_profiles, function(fv, fk) {
-                    return fk == member.friend_id;
-                });
+                // var friend_profile = _.find(friend_profiles, function(fv, fk) {
+                //     return fk == member.friend_id;
+                // });
 
                 // console.log('friend_profile', friend_profile)
                 let friend_name = ''
-                if(friend_profile){
-                    friend_name = friend_profile.name
-                }
+                // if(friend_profile){
+                //     friend_name = friend_profile.name
+                // }
 
                 return(<Text style={{fontSize:12, color:'gray'}}>Added by {friend_name}</Text>)
             }
@@ -502,6 +528,8 @@ class ListGroupMember_TabMembersPage extends React.Component{
     }
 
     _renderRow = (rowItem, rowId, sectionId) => {
+
+        console.log(rowItem)
         let {group_id} = this.state
         let {uid} = this.props
         switch(rowItem.status){
@@ -519,7 +547,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                 ]
 
                 if(rowItem.friend_id === uid){
-                    let {profiles} = this.props
+                    let {profile} = this.props
                     return( <View style={{flex:1, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                                 <TouchableOpacity>
                                     <FastImage
@@ -531,7 +559,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                                 // borderWidth:1
                                                 }}
                                         source={{
-                                            uri: profiles.image_url,
+                                            uri: profile.image_url,
                                             headers:{ Authorization: 'someAuthToken' },
                                             priority: FastImage.priority.normal,
                                         }}
@@ -541,7 +569,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                 <View >
                                     <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
                                         <View style={{flexDirection:'row', alignItems:'baseline'}}>
-                                            <Text style={{fontSize:18}}>{profiles.name}</Text>
+                                            <Text style={{fontSize:18}}>{profile.name}</Text>
                                             <Text style={{fontSize:12, fontStyle:'italic', color:'gray'}}>(You)</Text>
                                         </View>
                                         {this.checkInvitor(rowItem)}
@@ -564,16 +592,26 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                             // borderWidth:1
                                             }}
                                     source={{
-                                        uri: '',
+                                        uri: rowItem.friend_profile.image_url,
                                         headers:{ Authorization: 'someAuthToken' },
                                         priority: FastImage.priority.normal,
                                     }}
                                     resizeMode={FastImage.resizeMode.normal}
                                 />
+
+                                {rowItem.is_online ? <View style={{width: 10, 
+                                                                    height: 10, 
+                                                                    backgroundColor: '#00ff80', 
+                                                                    position: 'absolute',
+                                                                    borderWidth: 2,
+                                                                    borderColor: 'white',
+                                                                    borderRadius: 8,
+                                                                    right: -5,
+                                                                    top: -5}} /> : <View />}
                             </TouchableOpacity>
                             <View >
                                 <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                                <Text style={{fontSize:18}}>{ /*rowItem.friend.change_friend_name !== undefined ?rowItem.friend.change_friend_name: rowItem.friend.profile.name*/ }x</Text>
+                                <Text style={{fontSize:18}}>{ isEmpty(rowItem.friend_profile.change_friend_name)?rowItem.friend_profile.name: rowItem.friend_profile.change_friend_name }</Text>
                                     {this.checkInvitor(rowItem)}
                                 </View>
                             </View>
@@ -605,7 +643,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                 ]
 
                 if(rowItem.friend_id === uid){
-                    let {profiles} = this.props
+                    let {profile} = this.props
                     return( <View style={{flex:1, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                                 <TouchableOpacity>
                                     <FastImage
@@ -617,7 +655,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                                 // borderWidth:1
                                                 }}
                                         source={{
-                                            uri: profiles.image_url,
+                                            uri: profile.image_url,
                                             headers:{ Authorization: 'someAuthToken' },
                                             priority: FastImage.priority.normal,
                                         }}
@@ -626,7 +664,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                 </TouchableOpacity>
                                 <View >
                                     <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                                        <Text style={{fontSize:18}}>{profiles.name}(You)</Text>
+                                        <Text style={{fontSize:18}}>{profile.name}(You)</Text>
                                         {this.checkInvitor(rowItem)}
                                     </View>
                                 </View>
@@ -647,7 +685,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                             // borderWidth:1
                                             }}
                                     source={{
-                                        uri: '',
+                                        uri: rowItem.friend_profile.image_url,
                                         headers:{ Authorization: 'someAuthToken' },
                                         priority: FastImage.priority.normal,
                                     }}
@@ -656,7 +694,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                             </TouchableOpacity>
                             <View >
                                 <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                                    <Text style={{fontSize:18}}>{ /*rowItem.friend.change_friend_name !== undefined ?rowItem.friend.change_friend_name: rowItem.friend.profile.name*/ }y</Text>
+                                    <Text style={{fontSize:18}}>{isEmpty(rowItem.friend_profile.change_friend_name) ? rowItem.friend_profile.name:rowItem.friend_profile.change_friend_name} { /*rowItem.friend.change_friend_name !== undefined ?rowItem.friend.change_friend_name: rowItem.friend.profile.name*/ }</Text>
                                     {this.checkInvitor(rowItem)}
                                 </View>
                             </View>
@@ -668,7 +706,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
 
             case Constant.GROUP_STATUS_MEMBER_DECLINE:{
                 if(rowItem.friend_id === uid){
-                    let {profiles} = this.props
+                    let {profile} = this.props
                     return( <View style={{flex:1, padding:10, backgroundColor:'white', flexDirection:'row', alignItems:'center',}}>
                                 <TouchableOpacity>
                                     <FastImage
@@ -680,7 +718,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                                 // borderWidth:1
                                                 }}
                                         source={{
-                                            uri: profiles.image_url,
+                                            uri: profile.image_url,
                                             headers:{ Authorization: 'someAuthToken' },
                                             priority: FastImage.priority.normal,
                                         }}
@@ -689,7 +727,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                 </TouchableOpacity>
                                 <View >
                                     <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                                        <Text style={{fontSize:18}}>{profiles.name}(You)</Text>
+                                        <Text style={{fontSize:18}}>{profile.name}(You)</Text>
                                         {this.checkInvitor(rowItem)}
                                     </View>
                                 </View>
@@ -710,7 +748,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                             // borderWidth:1
                                             }}
                                     source={{
-                                        uri: '',
+                                        uri: rowItem.friend_profile.image_url,
                                         headers:{ Authorization: 'someAuthToken' },
                                         priority: FastImage.priority.normal,
                                     }}
@@ -718,7 +756,7 @@ class ListGroupMember_TabMembersPage extends React.Component{
                                 />
                             </TouchableOpacity>
                             <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                            <Text style={{fontSize:18}}>{/*rowItem.friend.change_friend_name !== undefined ?rowItem.friend.change_friend_name: rowItem.friend.profile.name*/}x</Text>
+                            <Text style={{fontSize:18}}>{ isEmpty(rowItem.friend_profile.change_friend_name)?rowItem.friend_profile.name: rowItem.friend_profile.profile.change_friend_name }</Text>
                             </View>
 
                             {this.showMenuDeline(rowItem)} 
@@ -862,12 +900,15 @@ const mapStateToProps = (state, ownProps) => {
   
     return{
         uid:makeUidState(state, ownProps),
-        profiles:makeProfileState(state, ownProps),
+        profile:makeProfileState(state, ownProps),
         friends:makeFriendsState(state, ownProps),
-        friend_profiles:makeFriendProfilesState(state, ownProps),
+        // friend_profiles:makeFriendProfilesState(state, ownProps),
         groups:makeGroupsState(state, ownProps),
         group_profiles:makeGroupProfilesState(state, ownProps),
         group_members:makeGroupMembersState(state, ownProps),
+
+
+        presences:makePresencesState(state, ownProps),
     }
 }
 

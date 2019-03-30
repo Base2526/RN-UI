@@ -15131,9 +15131,9 @@ function create_chat_group(){
 
   $m_profile = array();
   $m_profile['friend_id'] = $param_uid;
-  $m_profile['friend_name']=$user_name;
-  $m_profile['friend_image_url'] = '';
-  $m_profile['friend_bg_url'] = '';
+  // $m_profile['friend_name']=$user_name;
+  // $m_profile['friend_image_url'] = '';
+  // $m_profile['friend_bg_url'] = '';
   $m_profile['invitor']   = $param_uid;
   $m_profile['status']    = '36';
   $m_profile['item_id']   = $member_field_entity->item_id;
@@ -15338,6 +15338,7 @@ function create_chat_group(){
                   "image_url"  => file_create_url(image_style_url('medium', $image_url['uri'])),
                   // members: {1123737: {…}, 1123739: {…}, 1123741: {…}}
                   // "qrcode_url" => $qrcode_url["qrcode_url"],
+                  "member_count" => "1"
                 );
 
   // FIRESTORE_GROUPS

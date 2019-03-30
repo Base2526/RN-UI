@@ -21,7 +21,7 @@ import ActionButton from 'react-native-action-button';
 
 import Constant from '../../utils/Constant'
 import * as actions from '../../actions'
-import {getHeaderInset, checkInternetDialog} from '../../utils/Helpers'
+import {getHeaderInset, checkInternetDialog, isEmpty} from '../../utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState, 
@@ -55,7 +55,6 @@ class GroupsPage extends React.Component{
       
       let {uid, groups, group_profiles, group_members} = this.props
 
-      // console.log(uid, groups, group_profiles, group_members)
       this.props.trackGroups(uid, groups, group_profiles, group_members, (data)=>{
         // console.log(data)
         unsubscribes.push(data.unsubscribe)
@@ -76,30 +75,45 @@ class GroupsPage extends React.Component{
 
     loadData=(props)=>{
       // console.log(groups)
-      let {groups, group_profiles, group_members} = props
+      let {uid, groups, group_profiles, group_members} = props
 
-      console.log('GroupsPage', group_members)
+      console.log('GroupsPage', group_profiles)
 
       let group_invited = []
       let group_joined = []
       let group_favorites = []
-      for (var key in groups) {
-        let group = groups[key]
+      _.map(groups, (group, key)=>{
+      // for (var key in groups) {
+        // let group = groups[key]
 
         let group_profile = _.find(group_profiles, (v, k)=>{
                               return k == key
                             })
 
-        if(!group_profile){
-          continue
+        if( isEmpty(group_profile) ){
+          return
         }
 
         let group_member =_.find(group_members, (v, k)=>{
                             return k == key
                           })
+
+        if( isEmpty(group_member) ){
+          return 
+        }
+        
         group_profile = {...group_profile, members:group_member}
 
-        switch(group.status){ // GROUP_STATUS_MEMBER_INVITED
+        let member =  _.find(group_member, (v, k)=>{
+                        return uid == v.friend_id
+                      })
+
+        // console.log(member)
+        if(isEmpty(member)){
+          return
+        }
+
+        switch(member.status){ // GROUP_STATUS_MEMBER_INVITED
           case Constant.GROUP_STATUS_MEMBER_INVITED:{
             group_invited.push({...group, group_id:key, ...group_profile})
             break;
@@ -107,13 +121,13 @@ class GroupsPage extends React.Component{
           case Constant.GROUP_STATUS_MEMBER_JOINED:{
             group_joined.push({...group, group_id:key, ...group_profile})
 
-            if(group.is_favorites !== undefined && group.is_favorites){
+            if(!isEmpty(group.is_favorites) && group.is_favorites){
               group_favorites.push({...group, group_id:key, ...group_profile})
             }
             break;
           }
         }
-      }
+      })
 
       this.setState({
         favorites: {
@@ -174,12 +188,10 @@ class GroupsPage extends React.Component{
                   </MenuTrigger>
                   <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
                       <MenuOption onSelect={() => {
-
                             if(!is_connected){
                               checkInternetDialog()
                               return 
                             }
-                            
                             console.log(member_key)
                             if(member_key !== undefined){
                               this.setState({loading:true})
@@ -416,7 +428,8 @@ class GroupsPage extends React.Component{
                                         fontWeight: '600', 
                                         paddingBottom:5
                                       }}>
-                              {rowItem.name} { rowItem.members === undefined ? '' : "(" + this.countMembers(rowItem.members)+")" }
+
+                              {rowItem.name} { isEmpty(rowItem.members) ? '' : "(" + this.countMembers(rowItem.members)+")" }
                           </Text>
                         </View>
                         {this.showMenuInvited(rowItem)} 
@@ -469,7 +482,7 @@ class GroupsPage extends React.Component{
                                 fontWeight: '600', 
                                 paddingBottom:5
                               }}>
-                      {rowItem.name} { members === undefined ? '' : "(" + this.countMembers(members) +")" }
+                      {rowItem.name} { isEmpty(rowItem.members) ? '' : "(" + this.countMembers(rowItem.members) +")" }
                   </Text>
                 </View>
                 {this.showMenuGroup(rowItem)} 

@@ -143,7 +143,7 @@ class AddGroupsPage extends React.Component{
 
     loadData=(props)=>{
       let friend_member = []
-      let {friends, friend_profiles} = props
+      let {friends} = props
 
       // console.log(this.props.auth.users.friends)
       for (var key in friends) {
@@ -151,14 +151,14 @@ class AddGroupsPage extends React.Component{
         let friend =  friends[key]
         // let friend_profile = friend_profiles[key]
 
-        let profile = _.find(friend_profiles, (v, k)=>{
-                        return k == key
-                      })
+        // let profile = _.find(friend_profiles, (v, k)=>{
+        //                 return k == key
+        //               })
 
         // console.log(friend)
         switch(friend.status){
           case Constant.FRIEND_STATUS_FRIEND:{
-            friend_member.push({...friend, ...{'friend_id':key}, profile});
+            friend_member.push({...friend, ...{'friend_id':key}});
             break
           }
         }
@@ -416,7 +416,7 @@ class AddGroupsPage extends React.Component{
                           // borderWidth:1
                         }}
                   source={{
-                    uri: item.profile.image_url,
+                    uri: item.image_url,
                     headers:{ Authorization: 'someAuthToken' },
                     priority: FastImage.priority.normal,
                   }}
@@ -505,7 +505,7 @@ const mapStateToProps = (state, ownProps) => {
   return{
     uid:makeUidState(state, ownProps),
     friends:makeFriendsState(state, ownProps),
-    friend_profiles:makeFriendProfilesState(state, ownProps),
+    // friend_profiles:makeFriendProfilesState(state, ownProps),
 
     is_connected: makeIsConnectedState(state, ownProps),
   }

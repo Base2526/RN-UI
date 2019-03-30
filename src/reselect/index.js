@@ -33,6 +33,10 @@ const getMyIds= (state, props) => {
     return state.auth.user.my_ids
 }
 
+const getNameCards= (state, props) => {
+    return state.auth.user.name_cards
+}
+
 const getMyAppications= (state, props) => {
     let my_applications = state.auth.user.my_applications
     return my_applications
@@ -434,4 +438,9 @@ export const makePeopleYouMayKhowState = createSelector(
 export const makeIsConnectedState = createSelector(
     [ getIsConnected ],
     (is_connected) => is_connected
+)
+
+export const makeNameCardsState = createSelector(
+    [ getNameCards ],
+    (name_cards) => name_cards
 )

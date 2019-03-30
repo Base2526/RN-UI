@@ -17,7 +17,7 @@ import {randomKey} from '../../utils/Helpers'
 
 import {makeUidState, 
         makeFriendsState, 
-        makeFriendProfilesState, 
+        // makeFriendProfilesState, 
         makeGroupsState,
         makeGroupProfilesState,
         makeGroupMembersState} from '../../reselect'
@@ -78,7 +78,7 @@ class GroupMemberInvite extends React.Component{
     loadData = (props) =>{
 
       let {group_id} = this.state
-      let {group_profiles, group_members, friends, friend_profiles} = props
+      let {group_profiles, group_members, friends} = props
 
       let group_profile = _.find(group_profiles, (v, k)=>{
                             return k == group_id
@@ -94,19 +94,19 @@ class GroupMemberInvite extends React.Component{
                         return gv.friend_id == fk 
                       })
   
-          let friend_profile = _.find(friend_profiles, (fpv, fpk)=>{
-                                  return fk == fpk
-                               })
+          // let friend_profile = _.find(friend_profiles, (fpv, fpk)=>{
+          //                         return fk == fpk
+          //                      })
   
-          if(friend_profile){
-            fv = {...fv, profile:friend_profile}
+          // if(friend_profile){
+            // fv = {...fv, profile:friend_profile}
             // console.log('group_profile', fv)
             if(!member){
               data.push({...{friend_id:fk}, ...fv})
             }else if(member.status !=Constant.GROUP_STATUS_MEMBER_JOINED && member.status !=Constant.GROUP_STATUS_MEMBER_INVITED){
               data.push({...{friend_id:fk}, ...fv})
             }
-          }
+          // }
         }
       })
       this.setState({data, group_profile})
@@ -217,14 +217,14 @@ class GroupMemberInvite extends React.Component{
                             // borderWidth:1
                             }}
                     source={{
-                        uri: item.profile.image_url,
+                        uri: item.image_url,
                         headers:{ Authorization: 'someAuthToken' },
                         priority: FastImage.priority.normal,
                     }}
                     resizeMode={FastImage.resizeMode.normal}
                   />
                   <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                      <Text style={{fontSize:18}}>{item.change_friend_name?item.change_friend_name:item.profile.name}</Text>
+                      <Text style={{fontSize:18}}>{item.change_friend_name?item.change_friend_name:item.name}</Text>
                   </View>  
                 </View>
                 </TouchableOpacity>)
@@ -280,7 +280,7 @@ const mapStateToProps = (state, ownProps) => {
       // groups:state.auth.users.groups,
       uid:makeUidState(state, ownProps),
       friends:makeFriendsState(state, ownProps),
-      friend_profiles:makeFriendProfilesState(state, ownProps),
+      // friend_profiles:makeFriendProfilesState(state, ownProps),
       groups:makeGroupsState(state, ownProps),
       group_profiles:makeGroupProfilesState(state, ownProps),
       group_members:makeGroupMembersState(state, ownProps),

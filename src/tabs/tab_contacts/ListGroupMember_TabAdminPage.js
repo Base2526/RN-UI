@@ -21,7 +21,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 
 var _ = require('lodash');
 import * as actions from '../../actions'
-import {getUid, getHeaderInset} from '../../utils/Helpers'
+import {getUid, getHeaderInset, isEmpty} from '../../utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState, 
@@ -59,7 +59,7 @@ class ListGroupMember_TabAdminPage extends React.Component{
         let {group_id}  = this.state
         let {uid, 
             friends, 
-            friend_profiles, 
+            // friend_profiles, 
             groups, 
             group_profiles,
             group_members}    = props
@@ -84,44 +84,49 @@ class ListGroupMember_TabAdminPage extends React.Component{
 
         let members = []
         
-        console.log(group)
+        // console.log(group)
         _.each(group.members, (v, k)=>{
-            console.log(v.is_admin)
+            // console.log(v.is_admin)
             if(v.is_admin){
-                var friend = _.find(friends, function(fv, fk) {
-                    return fk == v.friend_id;
-                });
+                let friend =_.find(friends, function(fv, fk) {
+                                return fk == v.friend_id;
+                            })
                 
-                var friend_profile = _.find(friend_profiles, function(fv, fk) {
-                                        return fk == v.friend_id;
-                                    });
-    
-                friend = {...friend, profile:friend_profile}
-
-                if(!friend){
-                    if(v.friend_id == uid){
-                        members.push({...v, member_key:k})
-                    }else{
-                        // get from firestore
-                        firebase.firestore().collection('profiles').doc(v.friend_id).get()
-                        .then(doc => {
-                            if (!doc.exists) {
-                                console.log('No such document!');
-                            } else {
-                                console.log(doc.data())
-    
-                                // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
-                                //     console.log(result)
-                                // })
-                            }
-                        })
-                        .catch(err => {
-                            console.log('Error getting document', err);
-                        });
-                    }
-                }else{
-                    members.push({...v, member_key:k, friend})
+                if(isEmpty(friend)){
+                    return
                 }
+                // var friend_profile = _.find(friend_profiles, function(fv, fk) {
+                //                         return fk == v.friend_id;
+                //                     });
+    
+                // friend = {...friend, profile:friend_profile}
+
+                // if(!friend){
+                //     if(v.friend_id == uid){
+                //         members.push({...v, member_key:k})
+                //     }else{
+                //         // get from firestore
+                //         firebase.firestore().collection('profiles').doc(v.friend_id).get()
+                //         .then(doc => {
+                //             if (!doc.exists) {
+                //                 console.log('No such document!');
+                //             } else {
+                //                 console.log(doc.data())
+    
+                //                 // this.props.actionAddFriend(uid, friend_id, {'status':Constant.FRIEND_STATUS_FRIEND_99}, doc.data(), (result) => {
+                //                 //     console.log(result)
+                //                 // })
+                //             }
+                //         })
+                //         .catch(err => {
+                //             console.log('Error getting document', err);
+                //         });
+                //     }
+                // }else{
+                
+                members.push({...v, member_key:k, friend})
+                
+                // }
             }
         })
         this.setState({group, members})
@@ -223,7 +228,7 @@ class ListGroupMember_TabAdminPage extends React.Component{
 
     checkInvitor = (item) =>{
 
-        let {uid, friend_profiles, groups} = this.props
+        let {uid, groups} = this.props
 
         if(item.friend_id === groups.creator_id){
             return(<Text style={{fontSize:12, color:'gray'}}>Group Creator, Admin</Text>)
@@ -277,7 +282,7 @@ class ListGroupMember_TabAdminPage extends React.Component{
                                     // borderWidth:1
                                     }}
                             source={{
-                                uri: item.friend.profile.image_url,
+                                uri: item.friend.image_url,
                                 headers:{ Authorization: 'someAuthToken' },
                                 priority: FastImage.priority.normal,
                             }}
@@ -286,7 +291,7 @@ class ListGroupMember_TabAdminPage extends React.Component{
                     </TouchableOpacity>
                     <View style={{marginLeft:5}}>
                         <View style={{justifyContent:'center'}}>
-                            <Text style={{fontSize:18}}>{item.friend.profile.name}</Text>
+                            <Text style={{fontSize:18}}>{item.friend.name}</Text>
                             
                         </View>
                         {this.checkInvitor(item)}

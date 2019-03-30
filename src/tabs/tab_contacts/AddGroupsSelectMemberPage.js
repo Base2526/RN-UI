@@ -12,8 +12,7 @@ import MyIcon from '../../config/icon-font.js';
 
 import Constant from '../../utils/Constant'
 
-import {makeFriendsState, 
-        makeFriendProfilesState,} from '../../reselect'
+import {makeFriendsState} from '../../reselect'
 
 class AddGroupsSelectMemberPage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
@@ -52,7 +51,7 @@ class AddGroupsSelectMemberPage extends React.Component{
 
         // let friends = auth.users.friends
 
-        let {friends, friend_profiles} = this.props
+        let {friends} = this.props
 
         let key = []
         _.each(data, function(_v, _k) { 
@@ -63,16 +62,16 @@ class AddGroupsSelectMemberPage extends React.Component{
         _.each(friends, function(_v, _k) { 
             let find = key.find(k => k.friend_id==_k)
 
-            let profile = _.find(friend_profiles, (v, k)=>{
-                return k == _k
-            })
+            // let profile = _.find(friend_profiles, (v, k)=>{
+            //     return k == _k
+            // })
 
             if(!find){
                 if(_v.status == Constant.FRIEND_STATUS_FRIEND){
-                    newData.push({..._v, friend_id:_k, profile})
+                    newData.push({..._v, friend_id:_k})
                 }
             }else{
-                find = {...find, profile}
+                find = {...find}
                 newData.push(find)
             }
         });
@@ -165,7 +164,7 @@ class AddGroupsSelectMemberPage extends React.Component{
                                 // borderColor:'gray'
                         }}
                         source={{
-                        uri: item.profile.image_url,
+                        uri: item.image_url,
                         headers:{ Authorization: 'someAuthToken' },
                         priority: FastImage.priority.normal,
                         }}
@@ -173,7 +172,7 @@ class AddGroupsSelectMemberPage extends React.Component{
                     />
                 </TouchableOpacity>
                 <View style={{flex:1, justifyContent:'center', marginLeft:5}}>
-                    <Text style={{fontSize:18}}>{item.profile.name}</Text>
+                    <Text style={{fontSize:18}}>{item.name}</Text>
                 </View>
             </View>
             </TouchableOpacity>)
@@ -222,7 +221,7 @@ const mapStateToProps = (state, ownProps) => {
   
     return{
         friends:makeFriendsState(state, ownProps),
-        friend_profiles:makeFriendProfilesState(state, ownProps),
+        // friend_profiles:makeFriendProfilesState(state, ownProps),
     }
 }
 
