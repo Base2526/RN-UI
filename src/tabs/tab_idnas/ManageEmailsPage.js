@@ -15,8 +15,12 @@ var _ = require('lodash');
 
 import { connect } from 'react-redux';
 import * as actions from '../../actions'
-import {getUid} from '../../utils/Helpers'
+import {isEmpty} from '../../utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
+
+import {makeUidState, 
+        makeEmailsState,
+        makeMyAppicationsState } from '../../reselect'
 
 class ManageEmailsPage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
@@ -37,15 +41,17 @@ class ManageEmailsPage extends React.Component{
         super(props);
         this.state = {
             item_id: 0,
-            data:[]
+            application_id: 0,
+            data: [],
+            loading: false
         }
     }
 
     componentDidMount() {
         const { navigation } = this.props;
-        const item_id = navigation.getParam('item_id', null);
+        const application_id = navigation.getParam('application_id', null);
 
-        this.setState({item_id}, ()=>{
+        this.setState({application_id}, ()=>{
             this.loadData(this.props)
         })
     }  
@@ -56,6 +62,7 @@ class ManageEmailsPage extends React.Component{
 
     loadData = (props) =>{
         // console.log(props)
+        /*
         let {emails, my_applications} = props
         let {item_id} = this.state
 
@@ -80,21 +87,49 @@ class ManageEmailsPage extends React.Component{
                         return {...v, email_key:k, select:false}
                     })
         
-        console.log(data)
 
-        // _.each(item,  function(_v, _k) { 
-        //     console.log(_v, _k)
-        //     console.group(item)
-        //     // if()
-        // })
+        this.setState({data})
+        */
 
-        // console.log(data)
+        let {application_id} = this.state
+        let {emails, my_applications} = props
+
+        console.log(my_applications)
+
+        let my_application =_.find(my_applications, (v, k)=>{
+                                return k == application_id
+                            })
+
+        let data =  _.map(emails, (v, k)=>{
+                        if( !isEmpty(my_application.emails) ){
+                            let email =_.find(my_application.emails, (ev, ek)=>{
+                                        return k == ev
+                                    })
+
+                            if( !isEmpty(email) ){
+                                return {...v, email_key:k, select:true}
+                            }
+                        }
+
+                        return {...v, email_key:k, select:false}
+                    })
+
         this.setState({data})
     }
 
-    select = (item) =>{
-        console.log(item)
+    select = (item, index) =>{
+        console.log(item, index)
 
+        let {data} = this.state
+
+        let new_data = [...data];
+        new_data[index] = {...new_data[index], select: !item.select};
+
+        this.setState({data:new_data})
+
+        // console.log(item, new_data, index)
+        
+        /*
         let {emails, my_applications} = this.props
         let {item_id} = this.state
 
@@ -130,14 +165,15 @@ class ManageEmailsPage extends React.Component{
             })
 
         }
+        */
 
-        console.log(my_application)
+        // console.log(my_application)
     }
 
     renderItem = ({item, index}) => { 
         return( <TouchableOpacity
                     onPress={()=>{
-                        this.select(item)
+                        this.select(item, index)
                     }}>
                 <View style={{flex:1, 
                               padding:20, 
@@ -172,11 +208,11 @@ class ManageEmailsPage extends React.Component{
 
     render() {
 
-        let {data} = this.state
+        let {data, loading} = this.state
         
         return(<View style={{ flex:1}}>
                     <Spinner
-                        visible={this.state.loading}
+                        visible={loading}
                         textContent={'Wait...'}
                         textStyle={{color: '#FFF'}}
                         overlayColor={'rgba(0,0,0,0.5)'}/>
@@ -189,19 +225,26 @@ class ManageEmailsPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
-    console.log(state)
+const mapStateToProps = (state, ownProps) => {
+    // console.log(state)
   
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
     //_persist.rehydrated parameter is initially set to false
     if(!state._persist.rehydrated){
       return {}
     }
+
+    if(!state.auth.isLogin){
+        return;
+    }
   
     return{
-      uid:getUid(state),
-      emails:state.auth.users.profiles.emails,
-      my_applications:state.auth.users.my_applications
+        //   uid:getUid(state),
+        //   emails:state.auth.users.profiles.emails,
+        //   my_applications:state.auth.users.my_applications
+        uid: makeUidState(state, ownProps),
+        emails: makeEmailsState(state, ownProps),
+        my_applications: makeMyAppicationsState(state, ownProps),
     }
 }
   

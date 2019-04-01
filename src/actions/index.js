@@ -51,6 +51,7 @@ import {USER_LOGIN_SUCCESS,
         REMOVED_CLASS_MEMBER,
         FAVORITES_CLASS,
         UPDATE_CLASS_PICTURE_PROFILE,
+        
         FRIEND_MUTE,
         FRIEND_HIDE,
         FRIEND_BLOCK,
@@ -58,7 +59,12 @@ import {USER_LOGIN_SUCCESS,
         MODIFIED_MY_APPLICATION,
         REMOVED_MY_APPLICATION,
         UPDATE_STATUS_MY_APPLICATION,
+        UPDATE_PICTURE_MY_APPLICATION,
+        UPDATE_NAME_MY_APPLICATION,
         ADD_APPLICATION_CATEGORY,
+
+        UPDATE_CATEGORY_MY_APPLICATION,
+        UPDATE_SUBCATEGORY_MY_APPLICATION,
 
         ADDED_MY_APPLICATIONS_POSTS,
         MODIFIED_MY_APPLICATIONS_POSTS,
@@ -148,7 +154,7 @@ import {login,
         friend_profile_multi_99,
         add_new_post,
         recreate_qrcode,
-    
+        update_picture_my_application,
     
         test_users} from '../utils/Services'
 
@@ -201,6 +207,38 @@ const actionCreateMyApplication = (uid, application_name, category, subcategory,
         }
         return {'status':false}
     })
+}
+
+const actionUpdatePictureMyApplication = (uid, application_id, image_uri) => dispatch =>{
+    return update_picture_my_application(uid, application_id, image_uri).then(data => {
+        console.log(data)
+        if((data instanceof Array)){
+            return {'status':false, 'message': data}
+        }else{
+            if(!data.result){
+                return {'status':false, 'message': data}
+            }else{
+                dispatch({ type: UPDATE_PICTURE_MY_APPLICATION, application_id, image_url:data.image_url});
+                return {'status':true}
+            }
+        }
+    })
+}
+
+const actionUpdateNameMyApplication = (uid, application_id, application_name, callback) => dispatch =>{
+    // const actionEditGroupNameProfile = (uid, group_id, group_name, callback) => dispatch =>{
+    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(application_id).set({
+        name:application_name,
+    }, { merge: true});
+
+    // firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_MY_APPLIPATIONS)->document($application_id)->set(array('image_url'=>$image_url), ['merge' => true]);
+  
+    // dispatch({ type: EDIT_DISPLAY_NAME_PROFILE, name});
+
+    dispatch({ type: UPDATE_NAME_MY_APPLICATION, application_id, application_name});
+
+    callback({'status':true})
+    // }
 }
 
 const actionMyApplicationEmail = (uid, application_id, emails, callback) => dispatch =>{
@@ -996,6 +1034,25 @@ const actionUpdateStatusMyApplication = (uid, my_application_id, status, callbac
     callback({'status':true})
 }
 
+const actionUpdateCategoryMyApplication = (uid, my_application_id, category, callback) => dispatch =>{
+    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(my_application_id).set({
+        category,
+        subcategory:0,
+    }, { merge: true});
+
+    dispatch({ type: UPDATE_CATEGORY_MY_APPLICATION, my_application_id, my_application_category:category});
+    callback({'status':true})
+}
+
+const actionUpdateSubcategoryMyApplication = (uid, my_application_id, subcategory, callback) => dispatch =>{
+    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(my_application_id).set({
+        subcategory,
+    }, { merge: true});
+
+    dispatch({ type: UPDATE_SUBCATEGORY_MY_APPLICATION, my_application_id, my_application_subcategory:subcategory});
+    callback({'status':true})
+}
+
 const actionUpdatePictureProfile = (uid, image_uri, callback) => dispatch =>{
     return update_picture_profile(uid, image_uri).then(data => {
         if((data instanceof Array)){
@@ -1666,32 +1723,28 @@ const trackProfileMyIds=(uid, myIds, callback)=> dispatch =>{
 
 // trach my applications
 const trackMyApplications=(uid, my_applications, callback)=> dispatch =>{
-    // console.log('trackMyApplications', my_applications, my_applications_posts)
     let unsubscribe = firebase.firestore().collection('users').doc(uid).collection('my_applications').onSnapshot((qSnapshot) => {
                         qSnapshot.docChanges.forEach(function(change) {
-                            // console.log(change.type, change.doc.id, change.doc.data());
 
-                            let doc_id   = change.doc.id
-                            let doc_data = change.doc.data()
-
+                            let my_application_id   = change.doc.id
+                            let my_application_data = change.doc.data()
                             switch(change.type){
                                 case 'added':{
                                     let my_application = _.find(my_applications, (v, k)=>{
-                                        return doc_id == k
+                                        return my_application_id == k
                                     })
                                     
-                                    if(my_application === undefined){
-                                        // console.log('my_application > ', my_applications, my_application, doc_id )
-                                        dispatch({type: ADDED_MY_APPLICATION, my_application_id:doc_id, my_application_data:doc_data})
+                                    if( isEmpty(my_application) ){
+                                        dispatch({type: ADDED_MY_APPLICATION, my_application_id, my_application_data})
                                     }
                                     break;
                                 }
                                 case 'modified':{
-                                    dispatch({type: MODIFIED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
+                                    dispatch({type: MODIFIED_MY_APPLICATION, my_application_id, my_application_data})
                                     break;
                                 }
                                 case 'removed':{
-                                    dispatch({type: REMOVED_MY_APPLICATION, my_application_id:change.doc.id, my_application_data:change.doc.data()})
+                                    dispatch({type: REMOVED_MY_APPLICATION, my_application_id, my_application_data})
                                     break;
                                 }
                             }
@@ -2496,6 +2549,11 @@ const actions = {
     trackClasss,
     trackMyApplicationsPosts,
     trackMyApplications,
+    actionUpdatePictureMyApplication,
+    actionUpdateNameMyApplication,
+    actionUpdateCategoryMyApplication,
+    actionUpdateSubcategoryMyApplication,
+
     trackProfileMyIds,
     trackProfileEmails,
     trackProfileWebsites,

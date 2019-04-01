@@ -25,6 +25,7 @@ module.exports = {
     
     CREATE_MY_APPLICATION: API_URL + END_POINT + '/create_my_application',
     APPLICATION_CATEGORY: API_URL + END_POINT + '/application_category',
+    UPDATE_PICTURE_MY_APPLICATION: API_URL + END_POINT + '/update_picture_my_application',
 
     GET_POST_FEELINGS_AND_PRIVACY: API_URL + END_POINT + '/get_post_feelings_and_privacy',
     

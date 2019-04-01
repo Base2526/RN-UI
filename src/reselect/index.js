@@ -37,6 +37,10 @@ const getNameCards= (state, props) => {
     return state.auth.user.name_cards
 }
 
+const getApplicationCategory= (state, props) => {
+    return state.auth.application_category
+}
+
 const getMyAppications= (state, props) => {
     let my_applications = state.auth.user.my_applications
     return my_applications
@@ -443,4 +447,9 @@ export const makeIsConnectedState = createSelector(
 export const makeNameCardsState = createSelector(
     [ getNameCards ],
     (name_cards) => name_cards
+)
+
+export const makeApplicationCategoryState = createSelector(
+    [ getApplicationCategory ],
+    (application_category) => application_category
 )

@@ -18,6 +18,10 @@ import {getUid, isEquivalent2Object} from '../../utils/Helpers'
 
 import MyIcon from '../../config/icon-font.js';
 
+import {makeUidState,
+    makeApplicationCategoryState,
+    makeMyAppicationsState} from '../../reselect'
+
 // More info on all the options is below in the API Reference... just some common use cases shown here
 const options = {
     title: 'Select Picture',
@@ -153,167 +157,6 @@ class CreateApplicationPage extends React.Component{
         })
     };    
   
-    renderSeparator = () => {
-      return (
-        <View
-          style={{
-            height: 1,
-            width: "100%",
-            backgroundColor: "gray",
-          }}
-        />
-      );
-    };
-
-    renderFooter = () => {
-      if (!this.state.loading) return null;
-  
-      return (
-        <View
-          style={{
-            paddingVertical: 20,
-            borderTopWidth: 1,
-            borderColor: "#CED0CE"
-          }}
-        >
-          <ActivityIndicator animating size="large" />
-        </View>
-      );
-    };
-
-    renderItem = ({item, index}) => {
-        // return here
-        console.log("renderItem : " + index)
-        
-        switch(index){
-            case 0:{
-                return(
-                <View style={{flexDirection:'row', justifyContent:'center'}}>
-                    <TouchableOpacity 
-                        style={{height:80,
-                                width: 80,
-                                borderRadius: 10,
-                                margin:10}}
-                        onPress={()=>{
-                        
-                            /**
-                             * The first arg is the options object for customization (it can also be null or omitted for default options),
-                             * The second arg is the callback which sends object: response (more info in the API Reference)
-                             */
-                            ImagePicker.showImagePicker(options, (response) => {
-                            console.log('Response = ', response);
-
-                            if (response.didCancel) {
-                                console.log('User cancelled image picker');
-                            } else if (response.error) {
-                                console.log('ImagePicker Error: ', response.error);
-                            } else if (response.customButton) {
-                                console.log('User tapped custom button: ', response.customButton);
-                            } else {
-                                const source = { uri: response.uri };
-
-                                // You can also display the image using data:
-                                // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-
-                                this.setState({
-                                avatarSource: source,
-                                });
-
-                                console.log(this.state.avatarSource.uri)
-                            }
-                            });
-                        }}>
-                        <FastImage
-                            style={{width: 80, height: 80, borderRadius: 10}}
-                            source={{
-                            uri: this.state.avatarSource.uri,
-                            headers:{ Authorization: 'someAuthToken' },
-                            priority: FastImage.priority.normal,
-                            }}
-                            resizeMode={FastImage.resizeMode.contain}
-                        />
-                    </TouchableOpacity>
-                </View>)
-            }
-            break
-            case 1:
-            {
-                return(<View style={{height:60, flexDirection:'row'}}>
-                            <Text style={{flex:2, alignSelf:"center", textAlign:'right'}}>Application name :</Text>
-                            <TextInput style = {{
-                                            flex:3,
-                                            height: 40,
-                                            width:120,
-                                            borderColor: 'gray',
-                                            borderWidth: 1,
-                                            alignSelf:'center'}}
-                                underlineColorAndroid = "transparent"
-                                placeholder = "Name application"
-                                placeholderTextColor = "gray"
-                                autoCapitalize = "none"
-                                onChangeText = {this.handleEmail}
-                                />
-                        </View>)
-            }
-            break
-            case 2:{
-                return(<TouchableOpacity
-                    onPress={()=>{
-                        // ListAllCategory
-                        // alert('ListAllCategory')
-                        this.props.navigation.navigate("ListAllCategory", { handleCategoryBack: this.handleCategoryBack })
-                    }}
-                        >
-                        <View style={{height:60, flexDirection:'row'}}>
-                            <Text style={{flex:2, alignSelf:"center", textAlign:'right'}}>Category :</Text>
-                            <View style={{flex:3, flexDirection:'row', alignItems:'center'}}>
-                                <Text style={{}}>Select Category</Text>
-                                <FastImage
-                                    style={{width: 20, height: 20, position:'absolute', right:0}}
-                                    source={require('../../images/disclosure_indicator.png')}
-                                    resizeMode={FastImage.resizeMode.contain}
-                                />
-                            </View>
-                        </View>
-                    </TouchableOpacity>)
-            }
-            break
-            case 3:{
-
-                if(this.state.category_select == -99){
-                    return
-                }
-
-                return(<TouchableOpacity
-                        onPress={()=>{
-                            // ListAllCategory
-                            // alert('ListAllCategory')
-                            this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack })
-                        }}
-                            >
-                            <View style={{height:60, flexDirection:'row'}}>
-                                <Text style={{flex:2, alignSelf:"center", textAlign:'right'}}>Subcategory :</Text>
-                                <View style={{flex:3, flexDirection:'row', alignItems:'center'}}>
-                                    <Text style={{}}>Select Subcategory</Text>
-                                    <FastImage
-                                        style={{width: 20, height: 20, position:'absolute', right:0}}
-                                        source={require('../../images/disclosure_indicator.png')}
-                                        resizeMode={FastImage.resizeMode.contain}
-                                    />
-                                </View>
-                            </View>
-                        </TouchableOpacity>)
-            }
-            break
-
-            default:{
-              
-            }
-        }
-
-        
-    }
-
     handleApplicatonName = (text) => {
         this.setState({ applicatonName:text })
     }
@@ -438,7 +281,9 @@ class CreateApplicationPage extends React.Component{
                             accessory="DisclosureIndicator"
                             contentContainerStyle={{ padding:10}} 
                             onPress={()=>{
-                                this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select })
+
+                                // console.log(this.state.category_select)
+                                this.props.navigation.navigate("ListAllSubcategory", { handleSubcategoryBack: this.handleSubcategoryBack, category:this.state.category_select.tid })
                             }}/>
                         :null
                     }
@@ -450,7 +295,7 @@ class CreateApplicationPage extends React.Component{
       }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     console.log(state)
   
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
@@ -458,10 +303,15 @@ const mapStateToProps = (state) => {
     if(!state._persist.rehydrated){
       return {}
     }
+
+    if(!state.auth.isLogin){
+        return;
+    }
   
     return{
-      uid:getUid(state),
-      auth:state.auth
+        //   uid:getUid(state),
+        //   auth:state.auth
+        uid: makeUidState(state, ownProps),
     }
 }
   

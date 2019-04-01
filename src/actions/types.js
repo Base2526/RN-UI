@@ -72,7 +72,11 @@ export const FRIEND_FAVORITE        = "friend_favorite"
 export const ADDED_MY_APPLICATION    = "added_my_application"
 export const MODIFIED_MY_APPLICATION = "modified_my_application"
 export const REMOVED_MY_APPLICATION  = "removed_my_application"
-export const UPDATE_STATUS_MY_APPLICATION = "update_status_my_application"
+export const UPDATE_STATUS_MY_APPLICATION   = "update_status_my_application"
+export const UPDATE_PICTURE_MY_APPLICATION  = "update_picture_my_application"
+export const UPDATE_NAME_MY_APPLICATION     = "update_name_my_application"
+export const UPDATE_CATEGORY_MY_APPLICATION = "update_category_my_application"
+export const UPDATE_SUBCATEGORY_MY_APPLICATION = 'update_subcategory_my_application'
 
 export const ADD_APPLICATION_CATEGORY= "add_application_category"
 

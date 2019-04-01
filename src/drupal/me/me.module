@@ -2035,6 +2035,27 @@ function me_services_resources()
       ),
     ),
 
+    'update_picture_my_application'=>array(
+      'create' =>array(
+        'help'=>'Update my application picture',
+        'callback'=>'update_picture_my_application',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+        /* กรณีที่เราต้องการ pass parameter */
+        'args' => array(
+          array(
+           'name' => 'parameters',
+           'type' => 'array',
+           'description' => '',
+           'source' => 'param',
+           'optional' => TRUE,
+           'default value' => array(),
+          ),
+        ),
+      ),
+    ),
+
     'update_class_picture_profile'=>array(
       'create' =>array(
         'help'=>'Update class picture profile',
@@ -10498,6 +10519,60 @@ function update_group_picture_profile(){
   }
 }
 
+function update_picture_my_application(){
+  $result = array();
+
+  if (!check_header()) {
+    $result['result']   = FALSE;
+    // $result['message']  = "check_header()";
+    return $result;
+  }
+
+  $uid = $_REQUEST['uid'];
+  $application_id = $_REQUEST['application_id'];
+
+  if (empty($uid) || empty($application_id) || empty($_FILES["idna"])) {
+    $result['result'] = FALSE;
+    // $result['message']  = "function : update_picture_bg_profile, parameter";
+    // $result['_REQUEST']  = $_REQUEST;
+    return $result;
+  }
+
+  try{
+    $binary =  file_get_contents($_FILES["idna"]["tmp_name"]);//base64_decode($image);
+    
+    //Create the directory if it does not already exist, otherwise check the permissions
+    $directory = 'public://';
+    file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+
+    $currentDate = date("Ymd");
+    $file_name  = $currentDate .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
+    
+    //Saves a file to the specified destination and creates a database entry.
+    $image = (array)klovers_file_save_data($uid, $binary, $directory. '/' . $file_name, FILE_EXISTS_RENAME);
+
+    watchdog(TAG, 'update_picture_my_application: %application_id', array('%application_id'=>$application_id), WATCHDOG_INFO);
+
+    // บันทึกลง group
+    $node_group_wrapper = entity_metadata_wrapper('node', node_load($application_id));
+    $node_group_wrapper->field_my_app_picture->set($file);
+    $node_group_wrapper->save();
+
+    $image_url = file_create_url(image_style_url('medium', $image['uri']));
+
+    // update firestore image_url
+    firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_MY_APPLIPATIONS)->document($application_id)->set(array('image_url'=>$image_url), ['merge' => true]);
+  
+    $result['result'] = TRUE; 
+    $result['image_url'] = $image_url;
+    return $result;
+  } catch (Exception $e) {
+    $result['result']   = FALSE;
+    $result['message']    = $e->getMessage();
+    return $result;
+  }
+}
+
 function update_class_picture_profile(){
   $result = array();
 
@@ -12216,7 +12291,7 @@ function create_my_application(){
 
   // firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->set($f_item);
 
-  firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_MY_APPLIPATIONS)->document($node->nid)->set($data_update);
+  firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_MY_APPLIPATIONS)->document($node->nid)->set($data_update, ['merge' => true]);
 
   $result['result']   = TRUE;
   $result['item']     = $data_update;

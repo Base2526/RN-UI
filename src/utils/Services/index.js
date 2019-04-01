@@ -429,6 +429,29 @@ export const update_picture_bg_profile  = (uid, image_uri) =>{
     })
 }
 
+export const update_picture_my_application = (uid, application_id, image_uri) =>{
+    var data = new FormData();
+    data.append('idna', {
+        uri: image_uri, 
+        name: 'imageName.png',
+        type: 'image/png'
+    })
+    data.append("uid", uid)
+    data.append("application_id", application_id)
+
+    return fetch(Constant.UPDATE_PICTURE_MY_APPLICATION, {
+        headers: Constant.FETCH_HEADERS,
+        method: 'POST',
+        body: data
+    }).then((response) => {
+        return response.json()
+    }).then((responseJson) => {
+        return responseJson;
+    }).catch((error) => {
+        return {'status': false, 'message': error}
+    })
+}
+
 export const update_group_picture_profile = (uid, group_id, image_uri) =>{
     var data = new FormData();
     data.append('idna', {

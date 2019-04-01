@@ -8,13 +8,17 @@ import Spinner from 'react-native-loading-spinner-overlay';
 var _ = require('lodash');
 
 import * as actions from '../../actions'
-import {getUid} from '../../utils/Helpers'
+import {isEmpty} from '../../utils/Helpers'
+
+import {makeUidState, 
+        makeMyAppicationsState, 
+        makeApplicationCategoryState,} from '../../reselect'
 
 class EditNameMyApplicationPage extends React.Component{
 
     static navigationOptions = ({ navigation }) => {
         return {
-            title: "Edit display name",
+            title: "Edit my application name",
             headerTintColor: '#C7D8DD',
             headerStyle: {
                 backgroundColor: 'rgba(186, 53, 100, 1.0)',
@@ -44,7 +48,8 @@ class EditNameMyApplicationPage extends React.Component{
       super(props);
 
       this.state = {
-        item_id: 0,
+        application_id: 0,
+        my_application: {},
         text:'',
         loading:false
       }
@@ -54,9 +59,9 @@ class EditNameMyApplicationPage extends React.Component{
         this.props.navigation.setParams({handleSave: this.handleSave })
 
         const { navigation } = this.props;
-        const item_id = navigation.getParam('item_id', null);
+        const application_id = navigation.getParam('application_id', null);
 
-        this.setState({item_id}, ()=>{
+        this.setState({application_id}, ()=>{
             this.loadData(this.props)
         })
     }
@@ -67,33 +72,33 @@ class EditNameMyApplicationPage extends React.Component{
 
     loadData = (props) =>{
         // console.log(props)
-        let {emails, my_applications} = props
-        let {item_id} = this.state
+        let {my_applications} = props
+        let {application_id} = this.state
 
         let my_application =_.find(my_applications, (v, k)=>{
-            return k == item_id
-        })
+                                return k == application_id
+                            })
 
-        if(my_application === undefined){
+        if( isEmpty(my_application) ){
             this.props.navigation.goBack(null)
             return;
         }
 
-        this.setState({text:my_application.name})
+        this.setState({my_application, text:my_application.name})
     }
 
     handleSave = () => {
+
+        let {application_id, my_application, text} = this.state
         if(this.state.text.length == 0){
             alert('Name is empty?')
         }else{
-            if(this.props.profiles.name === this.state.text){
+            if(my_application.name === text){
                 const { navigation } = this.props;
                 navigation.goBack();
             }else{
                 this.setState({loading:true})
-                this.props.actionEditDisplayNameProfile(this.props.uid, this.state.text, (result) => {
-                    console.log(result)
-
+                this.props.actionUpdateNameMyApplication(this.props.uid, application_id, text, (result) => {
                     this.setState({loading:false})
 
                     const { navigation } = this.props;
@@ -129,19 +134,26 @@ class EditNameMyApplicationPage extends React.Component{
 }
 
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
 //   console.log(state)
 
-  // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
-  //_persist.rehydrated parameter is initially set to false
-  if(!state._persist.rehydrated){
-    return {}
-  }
+    // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
+    //_persist.rehydrated parameter is initially set to false
+    if(!state._persist.rehydrated){
+        return {}
+    }
 
-  return{
-    uid:getUid(state),
-    my_applications:state.auth.users.my_applications
-  }
+    if(!state.auth.isLogin){
+        return;
+    }
+
+    return{
+        // uid:getUid(state),
+        // my_applications:state.auth.users.my_applications
+
+        uid: makeUidState(state, ownProps),
+        my_applications: makeMyAppicationsState(state, ownProps),
+    }
 }
 
 export default connect(mapStateToProps, actions)(EditNameMyApplicationPage);

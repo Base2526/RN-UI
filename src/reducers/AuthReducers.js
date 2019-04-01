@@ -63,6 +63,11 @@ import {USER_LOGIN_SUCCESS,
         MODIFIED_MY_APPLICATIONS_POSTS_LIKES,
         REMOVED_MY_APPLICATIONS_POSTS_LIKES,
 
+        UPDATE_PICTURE_MY_APPLICATION,
+        UPDATE_NAME_MY_APPLICATION,
+        UPDATE_CATEGORY_MY_APPLICATION,
+        UPDATE_SUBCATEGORY_MY_APPLICATION,
+
         UPDATE_PICTURE_PROFILE,
         UPDATE_PICTURE_BG_PROFILE,
         EDIT_DISPLAY_NAME_PROFILE,
@@ -122,7 +127,7 @@ const INITIAL_STATE = {users:null,
                        application_category: null
                        }
 
-import {isEquivalent2Object} from '../utils/Helpers'
+import {isEquivalent2Object, isEmpty} from '../utils/Helpers'
 
 import Constant from '../utils/Constant'
 
@@ -3050,7 +3055,7 @@ export default (state= INITIAL_STATE, action)=>{
 
         case ADDED_MY_APPLICATION:
         case MODIFIED_MY_APPLICATION:{
-            if(state.user === null){
+            if(isEmpty(state.user)){
                 return state
             }
 
@@ -3059,7 +3064,7 @@ export default (state= INITIAL_STATE, action)=>{
                 return k == action.my_application_id
             })
 
-            if(my_application === undefined){
+            if(isEmpty(my_application)){
                 let v = {
                     ...state,
                     user: {
@@ -3379,6 +3384,132 @@ export default (state= INITIAL_STATE, action)=>{
                 }
                 return v
             }
+            return state
+        }
+
+        case UPDATE_PICTURE_MY_APPLICATION:{
+            if(isEmpty(state.user)){
+                return state
+            }
+
+            let my_applications = state.user.my_applications
+            let my_application  =_.find(my_applications,  function(v, k) { 
+                                    return k == action.my_application_id
+                                })
+
+            if(isEmpty(my_application)){
+                return state
+            }else{
+                if(my_application.image_url != action.image_url){
+                    my_application = {...my_application, image_url:action.image_url}
+                    let new_state = {...state,
+                                        user : {
+                                            ...state.user,
+                                            my_applications : {
+                                                ...state.user.my_applications,
+                                                [action.my_application_id]:my_application
+                                            }
+                                        }
+                                    }
+                    return new_state;
+                }
+            }
+
+            return state
+        }
+
+        case UPDATE_NAME_MY_APPLICATION:{
+            if(isEmpty(state.user)){
+                return state
+            }
+
+            let my_applications = state.user.my_applications
+            let my_application  =_.find(my_applications,  function(v, k) { 
+                                    return k == action.my_application_id
+                                })
+
+            if(isEmpty(my_application)){
+                return state
+            }else{
+
+                if(my_application.name != action.application_name){
+                    my_application = {...my_application, name:action.application_name}
+                    let new_state = {...state,
+                                        user : {
+                                            ...state.user,
+                                            my_applications : {
+                                                ...state.user.my_applications,
+                                                [action.my_application_id]:my_application
+                                            }
+                                        }
+                                    }
+                    return new_state;
+                }
+            }
+
+            return state
+        }
+
+        case UPDATE_CATEGORY_MY_APPLICATION:{
+            if(isEmpty(state.user)){
+                return state
+            }
+
+            let my_applications =state.user.my_applications
+            let my_application  =_.find(my_applications,  function(v, k) { 
+                                    return k == action.my_application_id
+                                })
+
+            if(isEmpty(my_application)){
+                return state
+            }else{
+                if(my_application.category != action.my_application_category){
+                    my_application = {...my_application, category:action.my_application_category, subcategory:0}
+                    let new_state = {...state,
+                                        user : {
+                                            ...state.user,
+                                            my_applications : {
+                                                ...state.user.my_applications,
+                                                [action.my_application_id]:my_application
+                                            }
+                                        }
+                                    }
+                    return new_state;
+                }
+            }
+
+            return state
+        }
+
+        case UPDATE_SUBCATEGORY_MY_APPLICATION:{
+            if(isEmpty(state.user)){
+                return state
+            }
+
+            let my_applications =state.user.my_applications
+            let my_application  =_.find(my_applications,  function(v, k) { 
+                                    return k == action.my_application_id
+                                })
+
+            if(isEmpty(my_application)){
+                return state
+            }else{
+                if(my_application.subcategory != action.my_application_subcategory){
+                    my_application = {...my_application, subcategory:action.my_application_subcategory}
+                    
+                    let new_state = {...state,
+                                        user : {
+                                            ...state.user,
+                                            my_applications : {
+                                                ...state.user.my_applications,
+                                                [action.my_application_id]:my_application
+                                            }
+                                        }
+                                    }
+                    return new_state;
+                }
+            }
+
             return state
         }
 

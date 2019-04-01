@@ -15,7 +15,7 @@ import MyApplicationProfilePage from './MyApplicationProfilePage'
 
 import CenterSearch from './CenterSearch'
 
-import ManageMyApplicationPage from './ManageMyApplicationPage'
+import SettingMyApplicationPage from './SettingMyApplicationPage'
 
 
 import MyApplicationMyPost from './MyApplicationMyPost'
@@ -83,8 +83,8 @@ const index = createStackNavigator({
           title: 'Search',
         }
     },
-    'ManageMyApplicationPage': {
-      screen: ManageMyApplicationPage,
+    'setting_myapplication': {
+      screen: SettingMyApplicationPage,
       navigationOptions: {
         title: '',
       }
@@ -199,8 +199,9 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
         routeName === 'MyApplicationAddPost' ||
         routeName === 'MyApplicationReport'  ||
         routeName === 'MyApplicationAddFeelings' ||
+        routeName === 'setting_myapplication' ||
         routeName === 'MyApplicationAddPrivacy') {
-        //  routeName === 'MyProfileEditBasicInfoPage' ||
+        //  
         //  routeName === 'MyProfileEditContactInfoPage'
 
         
@@ -225,6 +226,7 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
         routeName === 'MyApplicationAddPost' ||
         routeName === 'ManagePhonesPage' || 
         routeName === 'ManageEmailsPage' ||
+        routeName === 'setting_myapplication' ||
         routeName === 'EditNameMyApplicationPage') {
       navigationOptions.tabBarVisible = false;
     }

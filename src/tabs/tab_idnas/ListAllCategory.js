@@ -10,9 +10,14 @@ import { View,
      } from 'react-native';
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
-import MyIcon from '../../config/icon-font.js';
+var _ = require('lodash');
+import Spinner from 'react-native-loading-spinner-overlay';
 
+import MyIcon from '../../config/icon-font.js';
 import * as actions from '../../actions'
+import {isEmpty} from '../../utils/Helpers'
+
+import {makeUidState, makeApplicationCategoryState,} from '../../reselect'
 
 class ListAllCategory extends Component {
   
@@ -41,49 +46,45 @@ class ListAllCategory extends Component {
           seed: 1,
           error: null,
           refreshing: false,
-          category_select: null,
+          category: null,
+
+          mode:'add',
+          application_id: 0
         };
     }
 
     componentDidMount() {
+      const { navigation }  = this.props;
+      const application_id  = navigation.getParam('application_id', null)
+      const category = navigation.getParam('category', null);
+      const mode = navigation.getParam('mode', null);
 
-      setTimeout(() => {this.setState({renderContent: true})}, 0);
-
-      this.setState({
-        data: [],
-        error: null,
-        loading: false,
-        refreshing: false
-      });
-
-      // category_select
-      const { navigation } = this.props;
-      const category_select = navigation.getParam('category_select', null);
-      
       // กรณีสร้าง application ใหม่
-      let {application_category} = this.props.auth
-      if(application_category != null){
-
-        let newData = []
-        Object.entries(application_category).forEach(([key, value]) => {
-          newData.push(value)
-        })
+      let {application_category} = this.props
+      if( !isEmpty(application_category) ){
+        let data =_.map(application_category, (v, k)=>{
+                    return v
+                  })
 
         this.setState({
-          data: newData,
-          category_select
+          data,
+          category,
+          mode,
+          application_id,
+          renderContent: true
         })
       }else{
         this.props.actionApplicationCategory().then((result) => {
-  
-          let newData = []
-          Object.entries(result.data).forEach(([key, value]) => {
-            newData.push(value)
-          })
-  
+          let data =_.map(result.data, (v, k)=>{
+                      return v
+                    })
+
           this.setState({
-            data: newData,
-            category_select
+            data,
+            category,
+            mode,
+            application_id,
+            renderContent: true
           })
         })
       }
@@ -102,42 +103,36 @@ class ListAllCategory extends Component {
       );
     };
   
-    renderFooter = () => {
-      if (!this.state.loading) return null;
-      return (
-        <View
-          style={{
-            paddingVertical: 20,
-            borderTopWidth: 1,
-            borderColor: "#CED0CE"
-          }}>
-          <ActivityIndicator animating size="large" />
-        </View>
-      );
-    };
+    onSelect = (item) =>{
+      let {uid} = this.props
+      let {mode, application_id} = this.state
+      // console.log(uid, mode, application_id, item.tid)
+      if(mode == 'edit'){
+        this.setState({loading: true})
+        this.props.actionUpdateCategoryMyApplication(uid, application_id, item.tid, (result)=>{
+          this.setState({loading: false})
+          console.log(result)
+
+          this.props.navigation.goBack()
+          this.props.navigation.state.params.handleCategoryBack({ item });
+        })
+      }else{
+        this.props.navigation.goBack()
+        this.props.navigation.state.params.handleCategoryBack({ item });
+      }
+    }
 
     renderItem = ({ item, index }) => {
-      let __check = null
-      if(this.state.category_select != null){
-        if(this.state.category_select.tid == item.tid) 
-          __check = <View style={{position:'absolute', right:0, paddingRight:10}}>
-                    <MyIcon
-                      name={'check-ok'}
-                      size={25}
-                      color={'gray'} />
-                    </View>
-      }
-      
+      let {category} = this.state
       return(<TouchableOpacity 
                 key={ item.name } 
                 onPress={() => {
-                    this.props.navigation.goBack()
-                    this.props.navigation.state.params.handleCategoryBack({ item });
+                  this.onSelect(item)
                 }}>
                 <View
                   style={{
                     alignItems: 'center', 
-                    padding: 20,
+                    padding: 10,
                     flexDirection: 'row',
                     backgroundColor: 'white'
                   }}>
@@ -145,9 +140,9 @@ class ListAllCategory extends Component {
                       <FastImage
                           style={{width: 35, height: 35, borderRadius: 5, borderColor:'gray', borderWidth:.5}}
                           source={{
-                          uri: item.field_image,
-                          headers:{ Authorization: 'someAuthToken' },
-                          priority: FastImage.priority.normal,
+                            uri: item.field_image,
+                            headers:{ Authorization: 'someAuthToken' },
+                            priority: FastImage.priority.normal,
                           }}
                           resizeMode={FastImage.resizeMode.contain}
                       />
@@ -155,22 +150,33 @@ class ListAllCategory extends Component {
                   <Text style={{fontSize: 22, paddingLeft: 10}}>
                       {item.name}
                   </Text>
-                  {__check}
+                  {category == item.tid ?  <View style={{position:'absolute', right:0, paddingRight:10}}>
+                                                    <MyIcon
+                                                      name={'check-ok'}
+                                                      size={25}
+                                                      color={'red'} />
+                                                  </View>
+                                                :<View />}
                 </View>
             </TouchableOpacity>
       )
   }
     
   render() {
-    let {data} = this.state;
+    let {data, loading} = this.state;
     return (
       <View style={{flex:1, backgroundColor: 'white'}}>
+       <Spinner
+                visible={loading}
+                textContent={'Wait...'}
+                textStyle={{color: '#FFF'}}
+                overlayColor={'rgba(0,0,0,0.5)'}
+            />
         <FlatList
           data={data}
           renderItem={this.renderItem}
           keyExtractor={item => item.name}
           ItemSeparatorComponent={this.renderSeparator}
-          ListFooterComponent={this.renderFooter}
           onEndReachedThreshold={50}
           extraData={this.state}
         />
@@ -179,7 +185,7 @@ class ListAllCategory extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   console.log(state)
 
   // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
@@ -188,9 +194,15 @@ const mapStateToProps = (state) => {
     return {}
   }
 
+  if(!state.auth.isLogin){
+    return;
+  }
+
   return{
     // uid:getUid(state),
-    auth:state.auth
+    // auth:state.auth
+    uid: makeUidState(state, ownProps),
+    application_category: makeApplicationCategoryState(state, ownProps),
   }
 }
 

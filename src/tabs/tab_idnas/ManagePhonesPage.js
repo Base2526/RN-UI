@@ -44,12 +44,12 @@ class ManagePhonesPage extends React.Component{
     }
 
     componentDidMount() {
-        const { navigation } = this.props;
-        const item_id = navigation.getParam('item_id', null);
+        // const { navigation } = this.props;
+        // const item_id = navigation.getParam('item_id', null);
 
-        this.setState({item_id}, ()=>{
-            this.loadData(this.props)
-        })
+        // this.setState({item_id}, ()=>{
+        //     this.loadData(this.props)
+        // })
     }  
 
     componentWillReceiveProps(nextProps) {
@@ -57,16 +57,7 @@ class ManagePhonesPage extends React.Component{
     }
 
     loadData = (props) =>{
-        // let {phones, my_applications} = props
-        // let data =_.map(phones, (v, k)=>{
-        //             return {...v, phone_key:k}
-        //         })
-
-        // // let my_application 
-
-        // console.log(data)
-        // this.setState({data})
-
+        /*
         let {phones, my_applications} = props
         let {item_id} = this.state
 
@@ -91,16 +82,8 @@ class ManagePhonesPage extends React.Component{
                         return {...v, phone_key:k, select:false}
                     })
         
-        console.log(data)
-
-        // _.each(item,  function(_v, _k) { 
-        //     console.log(_v, _k)
-        //     console.group(item)
-        //     // if()
-        // })
-
-        // console.log(data)
         this.setState({data})
+        */
     }
 
     select = (item) =>{

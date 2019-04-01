@@ -5,12 +5,9 @@ import {View,
         ActivityIndicator, 
         TouchableOpacity, 
         Dimensions} from 'react-native'
-
 import ExpandableList from 'react-native-expandable-section-flatlist'
 import FastImage from 'react-native-fast-image'
-import Swipeout from 'react-native-swipeout'
 import { connect } from 'react-redux';
-// import Image from 'react-native-remote-svg'
 import {
   MenuProvider,
   Menu,
@@ -19,15 +16,17 @@ import {
   MenuOptions,
   MenuOption,
 } from 'react-native-popup-menu';
+
 import ActionButton from 'react-native-action-button';
 import Spinner from 'react-native-loading-spinner-overlay';
+var _ = require('lodash');
 
 import MyIcon from '../../config/icon-font.js';
-
 import * as actions from '../../actions'
-import {getUid, getHeaderInset} from '../../utils/Helpers'
+import {getHeaderInset, isEmpty} from '../../utils/Helpers'
 
 import {makeUidState,
+        makeApplicationCategoryState,
         makeMyAppicationsState} from '../../reselect'
         
 let unsubscribes = []
@@ -45,8 +44,6 @@ class ListMyAppPage extends React.Component{
         error: null,
         refreshing: false,
         numColumns:4,
-        showSpinner: false,
-
 
         sectionID: null,
         rowID: null,
@@ -59,100 +56,55 @@ class ListMyAppPage extends React.Component{
       this.props.trackMyApplications(uid, my_applications, (data)=>{
         unsubscribes.push(data.unsubscribe)
       })
-      
-      setTimeout(() => {this.setState({renderContent: true})}, 0);
 
-      this.setState({
-        // data: this._data(),
-        error: null,
-        loading: false,
-        refreshing: false
-      });
-
-      // let my_applications = this.props.my_applications
-
-      // console.log(my_applications)
-
-      let newValue = []
-      Object.entries(my_applications).forEach(([key, value]) => {
-        newValue.push({key, item_id: key, ...value})
-      })
-
-      this.setState({data:newValue})
+      this.loadData(this.props)
     }
 
     componentWillUnmount(){
       unsubscribes.map((unsubscribe, k)=>{
-          unsubscribe()
+        unsubscribe()
       })
     }
- 
-    renderSeparator = () => {
-      return (
-        <View
-          style={{
-            height: 1,
-            width: "86%",
-            backgroundColor: "#CED0CE",
-            marginLeft: "14%"
-          }}
-        />
-      );
-    };
-  
-    renderFooter = () => {
-      if (!this.state.loading) return null;
-  
-      return (
-        <View
-          style={{
-            paddingVertical: 20,
-            borderTopWidth: 1,
-            borderColor: "#CED0CE"
-          }}>
-          <ActivityIndicator animating size="large" />
-        </View>
-      );
-    };
 
-    loadData=()=>{
-      let my_applications = this.props.my_applications
+    componentWillReceiveProps(nextProps){
+      this.loadData(nextProps)
+    }
 
-      let publishedMember = []
-      let unPublishedMember = []
-      Object.entries(my_applications).forEach(([key, value]) => {
+    loadData = (props) =>{
+      let {uid, my_applications} = props
 
+      let published = []
+      let un_published = []
+      _.map(my_applications, (value, key)=>{
         if(value.status){
-          publishedMember.push({key, item_id: key, ...value})
+          published.push({key, item_id: key, ...value})
         }else{
-          unPublishedMember.push({key, item_id: key, ...value})
+          un_published.push({key, item_id: key, ...value})
         }
       })
 
-      let published = {
+      let publisheds = {
         title: 'Published',
-        member: publishedMember
+        member: published
       }
 
-      let unPublished = {
+      let un_publisheds = {
         title:'Unpublished',
-        member: unPublishedMember
+        member: un_published
       }
-      return [published, unPublished];        
+      this.setState({data:[publisheds, un_publisheds], renderContent: true})
     }
-
-    // let {application_category} = this.props.auth
-
-    manageMyApplicationPage = (item)=>{
-      let {application_category} = this.props.auth
-      if(application_category){
-        this.props.params.navigation.navigate("ManageMyApplicationPage", {item})
+ 
+    settings = (item)=>{
+      let {application_category} = this.props
+      if( !isEmpty(application_category) ){ // item_id
+        this.props.params.navigation.navigate("setting_myapplication", {application_id: item.item_id})
       }else{
-        this.setState({showSpinner: true})
+        this.setState({loading: true})
         this.props.actionApplicationCategory().then((result) => {
-          this.setState({showSpinner: false})
+          this.setState({loading: false})
           if(result.status){
-            this.props.params.navigation.navigate("ManageMyApplicationPage", {item})
+            this.props.params.navigation.navigate("setting_myapplication", {application_id: item.item_id})
           }
         })
       }
@@ -175,19 +127,12 @@ class ListMyAppPage extends React.Component{
                   </MenuTrigger>
                   <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
                       <MenuOption onSelect={() => {
-                          // this.props.navigation.navigate("FriendProfilePage",{'friend_id': item.friend_id})
-
                           this.props.params.navigation.navigate("MyApplicationMyPost", {'app_id': rowItem.item_id})
                       }}>
                           <Text style={{padding:10, fontSize:18}}>All post</Text>
                       </MenuOption>
                       <MenuOption onSelect={() => {
-                          // this.setState({loading:true})
-                          // this.props.actionDeleteClassMember(this.props.uid, this.state.class_id, item.member_key, (result) => {
-                          //     console.log(result)
-                          //     this.setState({loading:false})
-                          // })
-                          this.manageMyApplicationPage(rowItem)
+                          this.settings(rowItem)
                       }}>
                           <Text style={{padding:10, fontSize:18}}>Settings</Text>
                       </MenuOption>
@@ -198,129 +143,21 @@ class ListMyAppPage extends React.Component{
 
     _renderRow = (rowItem, rowId, sectionId) => {
       console.log(rowItem)
-
-      var swipeoutRightBtns = []
-      if(rowItem.status){
-        swipeoutRightBtns = [
-          {
-            component:<View style={{flex: 1, 
-                                    alignItems: "center", 
-                                    justifyContent: "center", 
-                                    backgroundColor: 'red',
-                                    }}>
-                        <Text style={{fontWeight:'bold', 
-                                      color:'white',
-                                      textAlign:'center',
-                                      fontSize:16}}>UNPUBLISHED</Text>
-                      </View>,
-            onPress: () => {
-              // console.log('UNPUBLISHED')
-
-              this.setState({
-                sectionID: sectionId,
-                rowID: rowId,
-                showSpinner:true
-              })
-
-              this.props.actionUpdateStatusMyApplication(this.props.uid, rowItem.item_id, (result)=>{
-                this.setState({showSpinner:false})
-              })
-            }
-          },
-        ]
-      }else{
-        swipeoutRightBtns = [
-          {
-            component:<View style={{flex: 1, 
-                                    alignItems: "center", 
-                                    justifyContent: "center", 
-                                    backgroundColor: 'blue',
-                                    }}>
-                        <Text style={{fontWeight:'bold', 
-                                      color:'white',
-                                      textAlign:'center',
-                                      fontSize:16}}>PUBLISHED</Text>
-                      </View>,
-            onPress: () => {
-
-              this.setState({
-                sectionID: sectionId,
-                rowID: rowId,
-                showSpinner:true
-              })
-
-              this.props.actionUpdateStatusMyApplication(this.props.uid, rowItem.item_id, (result)=>{
-                console.log(result)
-
-                this.setState({showSpinner:false})
-              })
-            }
-          },
-          {
-            component:<View style={{flex: 1, 
-                                    alignItems: "center", 
-                                    justifyContent: "center", 
-                                    backgroundColor: 'red',
-                                    }}>
-                        <Text style={{fontWeight:'bold', 
-                                      color:'white',
-                                      textAlign:'center',
-                                      fontSize:16}}>DELETE</Text>
-                      </View>,
-            onPress: () => {
-              alert('DELETE')
-            }
-          },
-        ]
-      }
-
-      swipeoutRightBtns = []
-
       return (
-        // <Swipeout 
-        //     // key={item.item_id}
-        //     style={{backgroundColor:'white'}} 
-        //     right={swipeoutRightBtns}
-            
-        //     rowID={rowId}
-        //     sectionID={sectionId}
-        //     // onOpen={(sectionId, rowId) => {
-        //     //   this.setState({
-        //     //     sectionID: sectionId,
-        //     //     rowID: rowId,
-        //     //   })
-        //     // }}
-        //     close={(this.state.sectionID === sectionId && this.state.rowID === rowId)}>
-        // {/* <TouchableOpacity 
-        //   key={ rowId } 
-        //   onPress={()=>{
-        //     // this._itemOnPress(rowItem, rowId, sectionId)
-          
-        //     this.manageMyApplicationPage(rowItem)
-        //   }}> */}
           <View
             style={{
               alignItems: 'center', 
               padding: 10,
               borderColor: '#E4E4E4',
-              flexDirection: 'row',
-            }}>
-              {/* <TouchableOpacity
-                onPress={()=>{
-                  // this.props.params.navigation.navigate("ManageMyApplicationPage", {item: rowItem})
-                
-                  this.manageMyApplicationPage(rowItem)
-                }}> */}
-                  <FastImage
-                      style={{width: 50, height: 50, borderRadius: 25}}
-                      source={{
-                      uri: rowItem.image_url,
-                      headers:{ Authorization: 'someAuthToken' },
-                      priority: FastImage.priority.normal,
-                      }}
-                      resizeMode={FastImage.resizeMode.cover}
-                  />
-              {/* </TouchableOpacity> */}
+              flexDirection: 'row',}}>
+              <FastImage
+                  style={{width: 50, height: 50, borderRadius: 25}}
+                  source={{
+                  uri: rowItem.image_url,
+                  headers:{ Authorization: 'someAuthToken' },
+                  priority: FastImage.priority.normal,
+                  }}
+                  resizeMode={FastImage.resizeMode.cover}/>
               <View>
                 <Text style={{fontSize: 18, 
                               fontWeight: '600',
@@ -332,21 +169,20 @@ class ListMyAppPage extends React.Component{
               </View>
               {this.showMenu(rowItem)}
           </View>
-        // {/* </TouchableOpacity> */}
-        // </Swipeout>
       )
     }
 
     _renderSection = (section, sectionId, state)  => {
-
       let ic_collapse = <MyIcon
-                        name={state ? 'collapse-up' : 'collapse-down'}
-                        size={8}
-                        color={'#C7D8DD'} />
+                          name={state ? 'collapse-up' : 'collapse-down'}
+                          size={8}
+                          color={'#C7D8DD'} />
 
-      let member_size = this.loadData()[sectionId].member.length
+      let {data} = this.state
+
+      let member_size = data[sectionId].member.length
       if(member_size == 0){
-        return ;
+        return
       }
 
       return (
@@ -377,21 +213,19 @@ class ListMyAppPage extends React.Component{
     render() {
       let {renderContent, data} = this.state;
 
-      console.log(this.state.showSpinner)
       return (
         <MenuContext>
         <View style={{flex:1}}>
-        <Spinner
-                visible={this.state.showSpinner}
-                textContent={'Wait...'}
-                textStyle={{color: '#FFF'}}
-                overlayColor={'rgba(0,0,0,0.5)'}
-            />
-        { 
+          <Spinner
+            visible={this.state.loading}
+            textContent={'Wait...'}
+            textStyle={{color: '#FFF'}}
+            overlayColor={'rgba(0,0,0,0.5)'}/>
+          { 
           renderContent &&
           <ExpandableList
               ref={instance => this.ExpandableList = instance}
-              dataSource={this.loadData()}
+              dataSource={data}
               headerKey="title"
               memberKey="member"
               renderRow={this._renderRow}
@@ -402,23 +236,21 @@ class ListMyAppPage extends React.Component{
               renderSectionHeaderX={this._renderSection}
               openOptions={[0, 1, 2, 3]}
             />
-        }
-        <ActionButton 
-              buttonColor="rgba(231,76,60,1)"
-              offsetX={10} 
-              offsetY={10}
-              hideShadow={true}
-              renderIcon={() => {
-                  return(<MyIcon
-                      name={'plus'}
-                      size={25}
-                      color={'#C7D8DD'} />)
-                  }}
-              onPress={()=>{
-                  // this.props.params.navigation.navigate("AddFriendsPage")
-
-                  this.props.params.navigation.navigate("CreateApplicationPage")
-              }} />
+          }
+          <ActionButton 
+            buttonColor="rgba(231,76,60,1)"
+            offsetX={10} 
+            offsetY={10}
+            hideShadow={true}
+            renderIcon={() => {
+                return(<MyIcon
+                    name={'plus'}
+                    size={25}
+                    color={'#C7D8DD'} />)
+                }}
+            onPress={()=>{
+                this.props.params.navigation.navigate("CreateApplicationPage")
+            }}/>
         </View>
         </MenuContext>
       );
@@ -440,7 +272,7 @@ const mapStateToProps = (state, ownProps) => {
 
   return{
     uid: makeUidState(state, ownProps),
-    auth: state.auth,
+    application_category: makeApplicationCategoryState(state, ownProps),
     my_applications: makeMyAppicationsState(state, ownProps),
   }
 }
