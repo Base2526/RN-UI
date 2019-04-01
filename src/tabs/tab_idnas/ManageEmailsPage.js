@@ -247,8 +247,5 @@ const mapStateToProps = (state, ownProps) => {
         my_applications: makeMyAppicationsState(state, ownProps),
     }
 }
-
-
-/// test
   
 export default connect(mapStateToProps, actions)(ManageEmailsPage)
