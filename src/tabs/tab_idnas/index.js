@@ -28,6 +28,8 @@ import ManagePhonesPage from './ManagePhonesPage'
 import ManageEmailsPage from './ManageEmailsPage'
 import EditNameMyApplicationPage from './EditNameMyApplicationPage'
 
+import EditMyApplicationAddressPage from './EditMyApplicationAddressPage'
+
 const index = createStackNavigator({
     'Home': {
         screen: home,
@@ -109,6 +111,12 @@ const index = createStackNavigator({
     'EditNameMyApplicationPage': {
       screen: EditNameMyApplicationPage,
       navigationOptions: {
+      }
+    },
+    'EditMyApplicationAddressPage': {
+      screen: EditMyApplicationAddressPage,
+      navigationOptions: {
+
       }
     },
 });
@@ -227,7 +235,8 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
         routeName === 'ManagePhonesPage' || 
         routeName === 'ManageEmailsPage' ||
         routeName === 'setting_myapplication' ||
-        routeName === 'EditNameMyApplicationPage') {
+        routeName === 'EditNameMyApplicationPage' ||
+        routeName === 'EditMyApplicationAddressPage') {
       navigationOptions.tabBarVisible = false;
     }
   

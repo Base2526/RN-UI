@@ -269,6 +269,20 @@ const actionMyApplicationPhone = (uid, application_id, phones, callback) => disp
     callback({'status':true})
 }
 
+const actionMyApplicationAddress = (uid, application_id, address, callback) => dispatch =>{
+
+    // console.log(intereste_in)
+    // dispatch({ type: INTERESTE_IN_PROFILE, intereste_in});
+
+    // /users/549098/my_applications/1223
+    // my_applications
+    firebase.firestore().collection('users').doc(uid).collection('my_applications').doc(application_id).set({
+        address
+    }, { merge: true});
+
+    callback({'status':true})
+}
+
 const actionLogin = ({email, password}) => dispatch => {
     return login(email, password).then(data => {
         if((data instanceof Array)){
@@ -2624,6 +2638,7 @@ const actions = {
     loginWithFacebook,
     actionMyApplicationPhone,
     actionMyApplicationEmail,
+    actionMyApplicationAddress,
     actionCreateMyApplication,
     actionRecreateQRcode,
     actionGetPostFeelingsAndPrivacy,

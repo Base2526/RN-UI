@@ -120,10 +120,21 @@ class ManageEmailsPage extends React.Component{
     select = (item, index) =>{
         console.log(item, index)
 
-        let {data} = this.state
+        let {uid} = this.props
+        let {data, application_id} = this.state
 
         let new_data = [...data];
         new_data[index] = {...new_data[index], select: !item.select};
+
+        let select_emails = []
+        
+        new_data.map((v, k)=>{
+                        if(v.select){
+                            select_emails.push(v.email_key)
+                        }
+                    })
+
+        console.log(select_emails, new_data, uid, application_id)
 
         this.setState({data:new_data})
 
@@ -239,9 +250,6 @@ const mapStateToProps = (state, ownProps) => {
     }
   
     return{
-        //   uid:getUid(state),
-        //   emails:state.auth.users.profiles.emails,
-        //   my_applications:state.auth.users.my_applications
         uid: makeUidState(state, ownProps),
         emails: makeEmailsState(state, ownProps),
         my_applications: makeMyAppicationsState(state, ownProps),

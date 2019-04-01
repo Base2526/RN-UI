@@ -347,7 +347,12 @@ class SettingMyApplicationPage extends React.Component{
                             title="Address"
                             hideSeparator={true} 
                             accessory="DisclosureIndicator"
-                            detail={'Not set'}/>
+                            detail={'Not set'}
+                            onPress={()=>{
+                                // alert('EditMyApplicationAddressPage')
+                                this.props.navigation.navigate("EditMyApplicationAddressPage", {application_id})
+                            }}
+                            />
 
         if( !isEmpty(my_application.address) ){
             cell_address =<Cell
@@ -356,7 +361,7 @@ class SettingMyApplicationPage extends React.Component{
                             hideSeparator={true} 
                             accessory="DisclosureIndicator"
                             cellContentView={
-                                <View>
+                                <View style={{flex:1}}>
                                     <Text style={{fontSize:18}}>Address</Text>
                                 <TextInput
                                     style={{fontSize: 16, 
@@ -368,17 +373,20 @@ class SettingMyApplicationPage extends React.Component{
                                             color:'black',
                                             textAlignVertical: 'top'}}
                                     // onChangeText={(text) => this.setState({text})}
-                                    value={address}
+                                    value={my_application.address}
                                     clearButtonMode='while-editing'
                                     maxLength={500}
                                     multiline = {true}
                                     editable={false} 
-                                            // multiline = {true}
+                                    // multiline = {true}
                                     pointerEvents="none"
                                     // placeholder= {this.state.text}
                                 />
                                 </View>
                               }
+                              onPress={()=>{
+                                this.props.navigation.navigate("EditMyApplicationAddressPage", {application_id})
+                              }}
                             />
         }
       
@@ -517,7 +525,7 @@ class SettingMyApplicationPage extends React.Component{
                                 hideSeparator={true} 
                                 accessory="DisclosureIndicator"
                                 onPress={()=>{
-                                    this.props.navigation.navigate("ManagePhonesPage")
+                                    this.props.navigation.navigate("ManagePhonesPage", {application_id})
                                 }}/>
 
                             {cell_address}

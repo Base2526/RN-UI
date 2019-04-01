@@ -17,8 +17,12 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import { connect } from 'react-redux';
 import * as actions from '../../actions'
-import {getUid, isEquivalent2Object} from '../../utils/Helpers'
+import {isEmpty} from '../../utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
+
+import {makeUidState, 
+        makePhonesState,
+        makeMyAppicationsState } from '../../reselect'
 
 class ManagePhonesPage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
@@ -39,17 +43,19 @@ class ManagePhonesPage extends React.Component{
         super(props);
         this.state = {
             item_id: 0,
-            data: []
+            data: [],
+            application_id: 0,
+            loading: false
         }
     }
 
     componentDidMount() {
-        // const { navigation } = this.props;
-        // const item_id = navigation.getParam('item_id', null);
+        const { navigation } = this.props;
+        const application_id = navigation.getParam('application_id', null);
 
-        // this.setState({item_id}, ()=>{
-        //     this.loadData(this.props)
-        // })
+        this.setState({application_id}, ()=>{
+            this.loadData(this.props)
+        })
     }  
 
     componentWillReceiveProps(nextProps) {
@@ -84,11 +90,54 @@ class ManagePhonesPage extends React.Component{
         
         this.setState({data})
         */
+
+       let {application_id} = this.state
+       let {phones, my_applications} = props
+
+       console.log(my_applications, application_id)
+
+       let my_application =_.find(my_applications, (v, k)=>{
+                               return k == application_id
+                           })
+
+       let data =  _.map(phones, (v, k)=>{
+                       if( !isEmpty(my_application.phones) ){
+                           let phone =_.find(my_application.phones, (ev, ek)=>{
+                                       return k == ev
+                                   })
+
+                           if( !isEmpty(phone) ){
+                               return {...v, phone_key:k, select:true}
+                           }
+                       }
+
+                       return {...v, phone_key:k, select:false}
+                   })
+
+       this.setState({data})
     }
 
-    select = (item) =>{
-        console.log(item)
+    select = (item, index) =>{
+        // console.log(item, index)
+        let {data} = this.state
 
+        let new_data = [...data];
+        new_data[index] = {...new_data[index], select: !item.select};
+
+
+        let select_phones = []
+        
+        new_data.map((v, k)=>{
+                        if(v.select){
+                            select_phones.push(v.phone_key)
+                        }
+                    })
+
+        console.log(select_phones, new_data)
+
+        this.setState({data:new_data})
+
+        /*
         let {phones, my_applications} = this.props
         let {item_id} = this.state
 
@@ -126,12 +175,13 @@ class ManagePhonesPage extends React.Component{
         }
 
         console.log(my_application)
+        */
     }
 
     renderItem = ({item, index}) => { 
         return(<TouchableOpacity
                 onPress={()=>{
-                    this.select(item)
+                    this.select(item, index)
                 }}>
                 <View style={{flex:1, 
                               padding:20, 
@@ -166,11 +216,11 @@ class ManagePhonesPage extends React.Component{
 
     render() {
 
-        let {data} = this.state
+        let {data, loading} = this.state
 
         return(<View style={{ flex:1}}>
                     <Spinner
-                        visible={this.state.loading}
+                        visible={loading}
                         textContent={'Wait...'}
                         textStyle={{color: '#FFF'}}
                         overlayColor={'rgba(0,0,0,0.5)'}/>
@@ -183,8 +233,8 @@ class ManagePhonesPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state) => {
-    console.log(state)
+const mapStateToProps = (state, ownProps) => {
+    // console.log(state)
   
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
     //_persist.rehydrated parameter is initially set to false
@@ -193,9 +243,12 @@ const mapStateToProps = (state) => {
     }
   
     return{
-      uid:getUid(state),
-      phones:state.auth.users.profiles.phones,
-      my_applications:state.auth.users.my_applications
+    //   uid:getUid(state),
+    //   phones:state.auth.users.profiles.phones,
+    //   my_applications:state.auth.users.my_applications
+        uid: makeUidState(state, ownProps),
+        phones: makePhonesState(state, ownProps),
+        my_applications: makeMyAppicationsState(state, ownProps),
     }
 }
   
