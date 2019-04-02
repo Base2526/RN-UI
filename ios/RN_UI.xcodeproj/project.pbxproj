@@ -48,6 +48,7 @@
 		43FC54BF31FC40128EE697C4 /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6ECE58078C2E4CD6BB58C892 /* AntDesign.ttf */; };
 		48CA84DB806447BD8F0A5B69 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 793A774F8F6344F795C0D794 /* Octicons.ttf */; };
 		4E74DDC0B8004333A2BCB125 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D768439A7918459182BD69CC /* FontAwesome.ttf */; };
+		600B75D52253554000CC69A7 /* idnaicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 600B75D42253553400CC69A7 /* idnaicons.ttf */; };
 		600B88DF223C9B41004574A7 /* libSplashScreen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 600B88DD223C9B33004574A7 /* libSplashScreen.a */; };
 		601D1C04224B88F400646352 /* libRNFetchBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 601D1BF6224B88DC00646352 /* libRNFetchBlob.a */; };
 		6029165221D5BE4100401259 /* libART.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6029164F21D5BE3300401259 /* libART.a */; };
@@ -56,7 +57,6 @@
 		6048BF0B21CB2D8E00B1E049 /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048BF0821CB2D8E00B1E049 /* FBSDKShareKit.framework */; };
 		6048BF0C21CB2D8E00B1E049 /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048BF0921CB2D8E00B1E049 /* FBSDKCoreKit.framework */; };
 		6051380C21B50F8B0046D911 /* libRCTCameraRoll.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 605137E321B50ED00046D911 /* libRCTCameraRoll.a */; };
-		6067B54222420C980058199B /* idnaicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6067B54022420C850058199B /* idnaicons.ttf */; };
 		607B986021C0C6C800AB0CBF /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 607B984321C0BB3D00AB0CBF /* libRNDeviceInfo.a */; };
 		607D79E422424B3B008A9DF7 /* libRNShare.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F8B5E621F57F8600F10F48 /* libRNShare.a */; };
 		607D7A7E224251C4008A9DF7 /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 603B22C22241F0E4007763D7 /* libRNFS.a */; };
@@ -612,6 +612,7 @@
 		5966EA3452EE4DDAB0934A38 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		59D1A526DD1E9FBFC4F14AA8 /* libPods-RN_UI-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RN_UI-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
+		600B75D42253553400CC69A7 /* idnaicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = idnaicons.ttf; sourceTree = "<group>"; };
 		600B88A0223C9B33004574A7 /* SplashScreen.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SplashScreen.xcodeproj; path = "../node_modules/react-native-splash-screen/ios/SplashScreen.xcodeproj"; sourceTree = "<group>"; };
 		601D1BC1224B88DC00646352 /* RNFetchBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFetchBlob.xcodeproj; path = "../node_modules/rn-fetch-blob/ios/RNFetchBlob.xcodeproj"; sourceTree = "<group>"; };
 		6029164921D5BE3300401259 /* ART.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ART.xcodeproj; path = "../node_modules/react-native/Libraries/ART/ART.xcodeproj"; sourceTree = "<group>"; };
@@ -621,7 +622,6 @@
 		6048BF0821CB2D8E00B1E049 /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKShareKit.framework; path = ../../../Documents/FacebookSDK/FBSDKShareKit.framework; sourceTree = "<group>"; };
 		6048BF0921CB2D8E00B1E049 /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKCoreKit.framework; path = ../../../Documents/FacebookSDK/FBSDKCoreKit.framework; sourceTree = "<group>"; };
 		605137D821B50ED00046D911 /* RCTCameraRoll.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTCameraRoll.xcodeproj; path = "../node_modules/react-native/Libraries/CameraRoll/RCTCameraRoll.xcodeproj"; sourceTree = "<group>"; };
-		6067B54022420C850058199B /* idnaicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = idnaicons.ttf; sourceTree = "<group>"; };
 		607B983D21C0BB3D00AB0CBF /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNDeviceInfo.xcodeproj; path = "../node_modules/react-native-device-info/ios/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; };
 		607D79DE2242445F008A9DF7 /* libRNFS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libRNFS.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		607D79E022424477008A9DF7 /* libReactNativePermissions.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReactNativePermissions.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -863,8 +863,8 @@
 		13B07FAE1A68108700A75B9A /* RN_UI */ = {
 			isa = PBXGroup;
 			children = (
+				600B75D42253553400CC69A7 /* idnaicons.ttf */,
 				60DEF3C3224C76DA00031C86 /* fonts */,
-				6067B54022420C850058199B /* idnaicons.ttf */,
 				60C41D172223B22D00EE298A /* RN_UI.entitlements */,
 				6099C96B2220117900B6F046 /* RNMessageCompose */,
 				60CE1A2821E3A5210014523D /* GoogleService-Info.plist */,
@@ -2025,9 +2025,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				600B75D52253554000CC69A7 /* idnaicons.ttf in Resources */,
 				60DEF42E224C770000031C86 /* Roboto-Medium.ttf in Resources */,
 				60DEF439224C770000031C86 /* Roboto-Italic.ttf in Resources */,
-				6067B54222420C980058199B /* idnaicons.ttf in Resources */,
 				60CE1A2921E3A5210014523D /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				60DEF436224C770000031C86 /* RobotoCondensed-BoldItalic.ttf in Resources */,

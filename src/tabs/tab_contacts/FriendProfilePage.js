@@ -14,7 +14,6 @@ import {FlatList,
         Linking,
         TextInput} from 'react-native'
 
-import firebase from 'react-native-firebase';
 import { Header } from 'react-navigation';
 import FastImage from 'react-native-fast-image'
 import { connect } from 'react-redux';
@@ -23,27 +22,20 @@ import { Cell, Section, TableView } from 'react-native-tableview-simple';
 import Modal from 'react-native-modalbox';
 import Share, {ShareSheet, Button} from 'react-native-share';
 import Spinner from 'react-native-loading-spinner-overlay';
-
 var _ = require('lodash');
-
 import Moment from 'moment'
+
 import {getStatusBarHeight, randomKey, isEmpty} from '../../utils/Helpers'
 import * as actions from '../../actions'
-// import {isEmpty} from '../../utils/Helpers'
 import Constant from '../../utils/Constant'
 import MyIcon from '../../config/icon-font.js';
 
-
-
 import {makeUidState, 
-        makeProfileState, 
         makeFriendsState, 
         makeFriendProfilePhonesState, 
         makeFriendProfileWebsitesState, 
         makeFriendProfileEmailsState, 
-        // makeFriendProfileMyidsState,
         makePresencesState,
-        makeFriendProfileState,
         makeClasssState,
         makeClassMembersState} from '../../reselect'
 
@@ -69,7 +61,6 @@ class FriendProfilePage extends React.Component{
 
             classs:[],
 
-            // renderContent_ContactInfo: false,
             contact_info:{},
             is_online:false,
 
@@ -80,11 +71,6 @@ class FriendProfilePage extends React.Component{
     }
 
     componentDidMount() {
-        // setTimeout(() => {this.setState({renderContent: true})}, 0);
-
-        // this.props.navigation.setParams({handleFriendFavorite: this.handleFriendFavorite})
-        // this.props.navigation.setParams({handleShare: this.handleShare})
-
         const { navigation } = this.props;
         const friend_id = navigation.getParam('friend_id', null);
 
@@ -92,97 +78,12 @@ class FriendProfilePage extends React.Component{
             this.loadData(this.props)
         })
 
-        /*
-        let {uid, friends, friend_profile, classs, class_members}   = this.props
-        let friend =_.find(friends, (v,k)=>{
-                        return k == friend_id
-                    })
-
-        if(!friend){
-            this.props.navigation.goBack(null)
-            return
-        }
-
-        let new_classs =_.map(classs, (v, k)=>{
-                            let members =   _.find(class_members, (mv, mk)=>{
-                                                return k == mk
-                                            })
-                            if(members){
-                                return {class_id:k, ...v, members}
-                            }else{
-                                return {class_id:k, ...v}
-                            }
-                        })
-
-        this.setState({friend, classs:new_classs})
-
-        if(isEmpty(friend_profile)){
-            this.props.actionFriendProfile99(uid, friend_id).then((data) => {
-                console.log(data)
-                if(data.status){
-                    this.loadData(data.data)
-                }
-            })
-        }else{
-            console.log(friend_profile)
-            this.loadData(friend_profile)
-        }
-        */
-
         this.props.trackProfileFriend(friend_id, (data)=>{
             unsubscribes = data.unsubscribes
         })
-        
-        // let friend_profile =_.find(friend_profiles, (v,k)=>{
-        //                         return k == friend_id
-        //                     })
-        // if(!friend_profile){
-        // }
-                // let friend_emails   = v.friend_emails
-                // let friend_my_ids   = v.friend_my_ids
-                // let friend_phones   = v.friend_phones
-                // let friend_profile  = v.friend_profile
-                // let friend_websites = v.friend_websites
-        /*
-        let unsubscribe = firebase.firestore().collection('profiles').doc(friend_id).onSnapshot((friendProfileDocSnapshot) => {
-            // console.log(change.doc.id, friendDocSnapshot)
-            if (!friendProfileDocSnapshot.exists) {
-                console.log('No such document!', friend_id);
-            } else {
-                console.log('friend profiles >', friendProfileDocSnapshot.data())
-    
-                // let friend_data = friendProfileDocSnapshot.data()
-    
-                // let friend_profile =_.find(friend_profiles, (v, k)=>{
-                //                         return k == friend_id
-                //                     })
-    
-                // if(!_.isEqual(friend_profile, friend_data) ){
-                //     console.log('friend profiles > added not equal')
-                //     dispatch({ type: ADDED_FRIEND_PROFILE, friend_id, friend_profile:friend_data });
-                // }
-            }
-        })
-        unsubscribes.push(unsubscribe)
-        
-        console.log(friend_id, friend, friend_profile, unsubscribes)
-        */
-        // if(friend_profile === undefined){
-        //     this.setState({loading:true})
-        //     this.props.actionFriendProfile99(uid, friend_id).then((result) => {
-        //         this.setState({friend_id, loading:false}, ()=>{
-        //             this.loadData(this.props)
-        //         })
-        //     })
-        // }else{
-        //     this.setState({friend_id}, ()=>{
-        //         this.loadData(this.props)
-        //     })
-        // }
     }
 
     componentWillUnmount(){
-        // console.log('componentWillUnmount')
         unsubscribes.map((unsubscribe, k)=>{
             unsubscribe()
         })
@@ -202,9 +103,9 @@ class FriendProfilePage extends React.Component{
             friend_websites, 
             friend_emails} = props
 
-        console.log(friend_phones, 
-                    friend_websites, 
-                    friend_emails,)
+        // console.log(friend_phones, 
+        //             friend_websites, 
+        //             friend_emails,)
 
         let friend =_.find(friends, (v,k)=>{
                         return k == friend_id
@@ -243,14 +144,14 @@ class FriendProfilePage extends React.Component{
                             })
         }
 
-        console.log(friend_phone, friend_website, friend_email)
+        // console.log(friend_phone, friend_website, friend_email)
         // phone, website, email
 
         /// check is online
         let presence =  _.find(presences, (v, k)=>{
                             return k == friend_id
                         })
-        console.log(presence)
+        // console.log(presence)
         let is_online = false
         if(!isEmpty(presence)){
             let __ =_.find(presence, (presence_v, presence_k)=>{
@@ -262,7 +163,7 @@ class FriendProfilePage extends React.Component{
         }
         /// check is online
 
-        console.log(is_online)
+        // console.log(is_online)
 
         this.setState({ friend, 
                         classs:new_classs, 
@@ -272,66 +173,6 @@ class FriendProfilePage extends React.Component{
                         friend_email,
                         renderContent:true})
     }
-
-    // loadData = (contact_info) =>{
-    //     console.log(contact_info)
-
-    //     this.setState({contact_info, renderContent_ContactInfo:true})
-    // }
-
-
-    /*
-    loadData = (props) =>{
-
-        let {friend_id, friend, is_favorite, friend_status} = this.state
-        let {uid, friends, friend_profiles, classs, class_members}   = props
-
-        let newFriend = _.find(friends, (v, k)=>{
-                            return friend_id == k
-                        })
-
-        let friend_profile =_.find(friend_profiles, (v,k)=>{
-                                return k == friend_id
-                            })
-
-        // console.log(newFriend)
-
-        let new_classs =_.map(classs, (v, k)=>{
-                            let members =   _.find(class_members, (mv, mk)=>{
-                                                return k == mk
-                                            })
-
-                            if(members){
-                                return {class_id:k, ...v, members}
-                            }else{
-                                return {class_id:k, ...v}
-                            }
-                        })
-        console.log(classs, new_classs)
-
-        // console.log('loadData = (props) =>{', friend_profile)
-
-        if(friend_profile){
-            newFriend = {...newFriend, friend_id, profile:friend_profile}
-
-            // const { navigation } = this.props;
-            // const ___is_favorite = navigation.getParam('is_favorite', null);
-
-            // if(is_favorite != newFriend.is_favorite ){
-            //     // console.log('--+--', newFriend, friend)
-            //     if(friend_status != newFriend.status){
-            //         this.props.navigation.setParams({is_favorite:newFriend.is_favorite, friend_status: newFriend.status});
-            //     }
-            // }else{
-            //     if(friend_status != newFriend.status){
-            //         this.props.navigation.setParams({is_favorite:newFriend.is_favorite, friend_status: newFriend.status});
-            //     }
-            // }
-
-            this.setState({friend:newFriend, renderContent: true, is_favorite:newFriend.is_favorite, friend_status:newFriend.status, classs:new_classs})
-        }
-    }
-    */
 
     // https://github.com/react-navigation/react-navigation/blob/master/examples/NavigationPlayground/js/StackWithTranslucentHeader.js
     // Inset to compensate for navigation bar being transparent.
@@ -348,18 +189,14 @@ class FriendProfilePage extends React.Component{
           ? BASE_HEADER_HEIGHT + NOTCH_HEIGHT
           : BASE_HEADER_HEIGHT + getStatusBarHeight();
   
-          console.log("HEADER_HEIGHT : " , HEADER_HEIGHT)
         return HEADER_HEIGHT
     }
 
     handleFriendFavorite = () =>{
-        // console.log(is_favorite)
-
         let {is_favorite} = this.state.friend
 
         this.setState({loading:true})
         this.props.actionFriendFavirite(this.props.uid, this.state.friend_id, !is_favorite, (result) => {
-            // console.log(result)
             this.setState({loading:false})
         })
     }
@@ -398,9 +235,7 @@ class FriendProfilePage extends React.Component{
     }
 
     isSelectClass = (classs, friend, key) =>{
-
         let members = classs[key].members
-        console.log('members ', members, friend)
         let select =_.find(members, (v, k)=>{
                         return friend.uid === v.friend_id && v.status
                     })
@@ -414,180 +249,89 @@ class FriendProfilePage extends React.Component{
     }
 
     renderListClasss(friend, classs) {
-        /*
-        var list = [];
-
-        Object.keys(classs).map(key => {
-            list.push(
+        return _.map(classs, (value, key)=>{
+            return(
                 <TouchableOpacity 
-                key={ key } 
-                onPress={() => {
-                    let members = classs[key].members
-                    let select = _.find(members, (v, k)=>{
-                        return friend.friend_id === v.friend_id
-                    })
-
-                    let status = true
-                    if(select){
-                        status = !select.status
-
-                        let member_key = _.findKey(members,  function(v, k) { 
-                            return friend.friend_id === v.friend_id
+                    key={ key } 
+                    onPress={() => {
+                        let members = classs[key].members
+                        let select = _.find(members, (v, k)=>{
+                            return friend.uid === v.friend_id
                         })
 
-                        this.props.actionSelectClassMember(this.props.uid, friend.friend_id, key, member_key, status, (result)=>{
-                            console.log(result)
-                        })
-                    }else{
-                        this.props.actionSelectClassMember(this.props.uid, friend.friend_id, key, undefined, status, (result)=>{
-                            console.log(result)
-                        })
-                    }
-                }}>
-                <View
-                  style={{
-                    alignItems: 'center', 
-                    padding: 10,
-                    flexDirection: 'row',
-                  }}>
-                    <TouchableOpacity>
-                        <FastImage
-                            style={{width: 50, 
-                                    height: 50, 
-                                    borderRadius: 25, 
-                                    // borderWidth:.5, 
-                                    // borderColor:'gray'
-                                    }}
-                            source={{
-                                uri: classs[key].image_url,
-                                headers:{ Authorization: 'someAuthToken' },
-                                priority: FastImage.priority.normal,
-                            }}
-                            resizeMode={FastImage.resizeMode.cover}
-                        />
-                    </TouchableOpacity>
-                    <View style={{paddingLeft: 10}}>
-                        <Text style={{fontSize: 18, 
-                                        fontWeight: '600', 
-                                        paddingBottom:5
-                                    }}>
-                            {classs[key].name}
-                        </Text>
-                    </View>
-                    <View style={{paddingLeft: 10, position:'absolute', right:0, marginRight:10}}>
-                        {this.isSelectClass(classs, friend, key)}
-                    </View>
-    
+                        let status = true
+                        if(select){
+                            status = !select.status
+
+                            let member_key = _.findKey(members,  function(v, k) { 
+                                return friend.uid === v.friend_id
+                            })
+
+                            this.setState({loading:true})
+                            this.props.actionSelectClassMember(this.props.uid, friend.uid, value.class_id, member_key, status, (result)=>{
+                                this.setState({loading:false})
+                            })
+                        }else{
+
+                            let member_key = randomKey()
+                            this.setState({loading:true})
+                            this.props.actionSelectClassMember(this.props.uid, friend.uid, value.class_id, member_key, status, (result)=>{
+                                this.setState({loading:false})
+                            })
+                        }
+                    }}>
                     <View
-                        style={{
-                            height: .5,
-                            width: "86%",
-                            backgroundColor: "#CED0CE",
-                            marginLeft: "14%",
-                            position:'absolute',
-                            bottom: 0,
-                            right: 0,
-                        }}
-                    />
-                </View>
+                    style={{
+                        alignItems: 'center', 
+                        padding: 10,
+                        flexDirection: 'row',
+                    }}>
+                        <TouchableOpacity>
+                            <FastImage
+                                style={{width: 50, 
+                                        height: 50, 
+                                        borderRadius: 25, 
+                                        }}
+                                source={{
+                                    uri: classs[key].image_url,
+                                    headers:{ Authorization: 'someAuthToken' },
+                                    priority: FastImage.priority.normal,
+                                }}
+                                resizeMode={FastImage.resizeMode.cover}
+                            />
+                        </TouchableOpacity>
+                        <View style={{paddingLeft: 10}}>
+                            <Text style={{fontSize: 18, 
+                                            fontWeight: '600', 
+                                            paddingBottom:5
+                                        }}>
+                                {classs[key].name}
+                            </Text>
+                        </View>
+                        <View style={{paddingLeft: 10, position:'absolute', right:0, marginRight:10}}>
+                            {this.isSelectClass(classs, friend, key)}
+                        </View>
+                        <View
+                            style={{
+                                height: .5,
+                                width: "86%",
+                                backgroundColor: "#CED0CE",
+                                marginLeft: "14%",
+                                position:'absolute',
+                                bottom: 0,
+                                right: 0,
+                            }}
+                        />
+                    </View>
                 </TouchableOpacity>
             )
-            }
-        )
-        // return list;
-        */
-
-        return _.map(classs, (value, key)=>{
-                    return(
-                        <TouchableOpacity 
-                            key={ key } 
-                            onPress={() => {
-                                let members = classs[key].members
-                                let select = _.find(members, (v, k)=>{
-                                    return friend.uid === v.friend_id
-                                })
-
-                                let status = true
-                                if(select){
-                                    status = !select.status
-
-                                    let member_key = _.findKey(members,  function(v, k) { 
-                                        return friend.uid === v.friend_id
-                                    })
-
-                                    this.setState({loading:true})
-                                    this.props.actionSelectClassMember(this.props.uid, friend.uid, value.class_id, member_key, status, (result)=>{
-                                        console.log(result)
-
-                                        this.setState({loading:false})
-                                    })
-                                }else{
-
-                                    let member_key = randomKey()
-                                    this.setState({loading:true})
-                                    this.props.actionSelectClassMember(this.props.uid, friend.uid, value.class_id, member_key, status, (result)=>{
-                                        console.log(result)
-
-                                        this.setState({loading:false})
-                                    })
-                                }
-                            }}>
-                            <View
-                            style={{
-                                alignItems: 'center', 
-                                padding: 10,
-                                flexDirection: 'row',
-                            }}>
-                                <TouchableOpacity>
-                                    <FastImage
-                                        style={{width: 50, 
-                                                height: 50, 
-                                                borderRadius: 25, 
-                                                // borderWidth:.5, 
-                                                // borderColor:'gray'
-                                                }}
-                                        source={{
-                                            uri: classs[key].image_url,
-                                            headers:{ Authorization: 'someAuthToken' },
-                                            priority: FastImage.priority.normal,
-                                        }}
-                                        resizeMode={FastImage.resizeMode.cover}
-                                    />
-                                </TouchableOpacity>
-                                <View style={{paddingLeft: 10}}>
-                                    <Text style={{fontSize: 18, 
-                                                    fontWeight: '600', 
-                                                    paddingBottom:5
-                                                }}>
-                                        {classs[key].name}
-                                    </Text>
-                                </View>
-                                <View style={{paddingLeft: 10, position:'absolute', right:0, marginRight:10}}>
-                                    {this.isSelectClass(classs, friend, key)}
-                                </View>
-                
-                                <View
-                                    style={{
-                                        height: .5,
-                                        width: "86%",
-                                        backgroundColor: "#CED0CE",
-                                        marginLeft: "14%",
-                                        position:'absolute',
-                                        bottom: 0,
-                                        right: 0,
-                                    }}
-                                />
-                            </View>
-                            </TouchableOpacity>
-                    )
-                })
+        })
     }
 
     getClasssName=(classs)=>{
         let {friend_id} = this.state
     
         let n = []
-        // classs.map((v, _k)=>{
         _.map(classs, (v, _k)=>{
             if(v.members){
                 let class_name = v.name
@@ -615,7 +359,6 @@ class FriendProfilePage extends React.Component{
         if( isEmpty(phone) ){
             return;
         }
-
         return _.map(phone, (value, key)=>{
             return <Cell
                 key={key}
@@ -671,12 +414,10 @@ class FriendProfilePage extends React.Component{
     }
 
     viewModalClasss = (friend, classs) =>{
-        console.log(friend, classs)
         return( <Modal 
                     style={{zIndex:10, height:this.getHeightListClasss()}} 
                     position={"bottom"} 
                     ref={"modalListClasss"}
-                    // backdropPressToClose={false}
                     swipeToClose={true}
                     coverScreen={true}
                     swipeArea={50}>
@@ -689,11 +430,12 @@ class FriendProfilePage extends React.Component{
     }
 
     render() {
-        let {friend, is_online, renderContent} = this.state
+        let {friend, is_online, renderContent, loading} = this.state
         if(!renderContent){
             return(<View style={{flex:1}}></View>)
         }
 
+        console.log(friend)
         let {
             name,
             change_friend_name,
@@ -707,11 +449,7 @@ class FriendProfilePage extends React.Component{
             address,
             intereste_in} = friend
 
-        console.log(name,
-            change_friend_name,)
-
         let {friend_id, 
-            // renderContent, 
             classs, 
             friend_phone, 
             friend_website, 
@@ -843,25 +581,17 @@ class FriendProfilePage extends React.Component{
                                 <TextInput
                                     style={{fontSize: 16, 
                                             paddingBottom:10, 
-                                            // borderColor:'gray', 
-                                            // borderWidth:.5,
-                                            // backgroundColor:'red',
-                                            // minHeight:150,
                                             color:'black',
                                             textAlignVertical: 'top'}}
-                                    // onChangeText={(text) => this.setState({text})}
                                     value={address}
                                     clearButtonMode='while-editing'
                                     maxLength={500}
                                     multiline = {true}
                                     editable={false} 
-                                            // multiline = {true}
                                     pointerEvents="none"
-                                    // placeholder= {this.state.text}
                                 />
                                 </View>
-                              }
-                            />
+                              }/>
         }
 
         let cell_phones =  <Cell
@@ -939,9 +669,7 @@ class FriendProfilePage extends React.Component{
                                     {this.websitesList(friend_website)} 
 
                                     {cell_email}
-                                    {this.emailsList(friend_email)}
-
-                                    
+                                    {this.emailsList(friend_email)}                                    
                                 </Section>
 
         let view_name = <View style={{ }}>
@@ -966,6 +694,11 @@ class FriendProfilePage extends React.Component{
         }
 
         return( <View style={{flex:1}}>
+                    <Spinner
+                        visible={loading}
+                        textContent={'Wait...'}
+                        textStyle={{color: '#FFF'}}
+                        overlayColor={'rgba(0,0,0,0.5)'}/>
                     <View style={{height:Header.HEIGHT +  (isIphoneX() ? 25 : 0), //- (Platform.OS == "ios" ? 20 : 0), 
                               backgroundColor: 'rgba(186, 53, 100, 1.0)',
                               justifyContent: Platform.OS == "ios" ?'flex-end':'center'}}>
@@ -1030,13 +763,10 @@ class FriendProfilePage extends React.Component{
                             />
                             <View style={{flexDirection:'row', margin:20}}>
                             <TouchableOpacity>
-                                {/* backgroundColor: '#00ff80',  */}
                                 <FastImage
                                     style={{width: 80, 
                                             height: 80, 
                                             borderRadius: 10, 
-                                            // borderWidth:1,
-                                            // borderColor: is_online ? '#00ff80' : 'white'
                                         }}
                                     source={{
                                         uri: image_url,
@@ -1095,10 +825,6 @@ class FriendProfilePage extends React.Component{
 }
 
 const mapStateToProps = (state, ownProps) => {
-    // console.log(state)
-  
-    // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
-    //_persist.rehydrated parameter is initially set to false
     if(!state._persist.rehydrated){
         return {}
     }
@@ -1110,18 +836,12 @@ const mapStateToProps = (state, ownProps) => {
     return{
         uid:makeUidState(state, ownProps),
         friends:makeFriendsState(state, ownProps),
-
         friend_phones: makeFriendProfilePhonesState(state, ownProps),
         friend_websites: makeFriendProfileWebsitesState(state, ownProps),
         friend_emails: makeFriendProfileEmailsState(state, ownProps),
-        // friend_myids: makeFriendProfileMyidsState(state, ownProps),
-
         presences:makePresencesState(state, ownProps),
-
         classs:makeClasssState(state, ownProps),
         class_members:makeClassMembersState(state, ownProps),
-
-        // friend_profile:makeFriendProfileState(state, ownProps),
     }
 }
 

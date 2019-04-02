@@ -20,7 +20,7 @@ var _ = require('lodash');
 
 import * as actions from '../../actions'
 import Constant from '../../utils/Constant'
-import {getHeaderInset, checkInternetDialog} from '../../utils/Helpers'
+import {getHeaderInset, checkInternetDialog, isEmpty} from '../../utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState, 
@@ -61,15 +61,15 @@ class SettingListBlock extends React.Component{
     }
 
     loadData = (props) =>{
-      let {friends, friend_profiles} = props
+      let {friends} = props
 
       let data = []
       _.map(friends, (value, key)=>{
         if(value.status === Constant.FRIEND_STATUS_FRIEND && value.block){
-          let friend_profile =_.find(friend_profiles, (v, k)=>{
-                                return k == key
-                              })
-          data.push({...value, friend_id:key, friend_profile});
+          // let friend_profile =_.find(friend_profiles, (v, k)=>{
+          //                       return k == key
+          //                     })
+          data.push({...value, friend_id:key});
         }
       })
 
@@ -77,9 +77,7 @@ class SettingListBlock extends React.Component{
     }
 
     showMenu = (item)=>{
-
       let {is_connected} = this.props
-
       return( <View style={{flex:1,
                             position:'absolute', 
                             top:0,
@@ -102,10 +100,10 @@ class SettingListBlock extends React.Component{
                           return 
                         }
 
-                        // this.setState({loading:true})
+                        this.setState({loading:true})
                         this.props.actionFriendBlock(this.props.uid, item.friend_id, false, (result)=>{
-                            console.log(result)
-                            // this.setState({loading:false})
+                            // console.log(result)
+                            this.setState({loading:false})
                         })
                       }}>
                           <Text style={{padding:10, fontSize:18}}>Unblock</Text>
@@ -117,10 +115,10 @@ class SettingListBlock extends React.Component{
                           return 
                         }
 
-                        // this.setState({loading:true})
+                        this.setState({loading:true})
                         this.props.actionFriendDelete(this.props.uid, item.friend_id, (result)=>{
-                            console.log(result)
-                            // this.setState({loading:false})
+                            // console.log(result)
+                            this.setState({loading:false})
                         })
                       }}>
                         <Text style={{padding:10, fontSize:18}}>Delete friend</Text>
@@ -131,8 +129,6 @@ class SettingListBlock extends React.Component{
     }
 
     renderItem({ item, index }) {
-        // return (<View><Text>{index}</Text></View>)
-        // console.log(item)
         return(
             <View
               style={{
@@ -145,19 +141,13 @@ class SettingListBlock extends React.Component{
               }}>
                 <TouchableOpacity 
                     style={{}}>
-                      {/* <PlaceHolderFastImage 
-                        source={{uri:item.profile.image_url}}
-                        style={{width: 60, height: 60, borderRadius: 10, borderWidth:1, borderColor:'gray'}}/> */}
-
                       <FastImage
                         style={{width: 50, 
                                 height: 50, 
                                 borderRadius: 10, 
-                                // borderWidth:.5, 
-                                // borderColor:'gray'
                             }}
                         source={{
-                            uri: item.friend_profile.image_url,
+                            uri: item.image_url,
                             headers:{ Authorization: 'someAuthToken' },
                             priority: FastImage.priority.normal,
                         }}
@@ -170,13 +160,12 @@ class SettingListBlock extends React.Component{
                                   color: '#222',
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
-
-                         {item.hasOwnProperty('change_friend_name') ? item.change_friend_name : item.friend_profile.name}
+                         { isEmpty(item.change_friend_name) ? item.name : item.change_friend_name} 
                     </Text>
                     <Text style={{fontSize: 13, 
                                 color: '#222',
                                 paddingLeft: 10}}>
-                         {item.friend_profile.status_message}
+                         {item.status_message}
                     </Text>
                 </View>
                 {this.showMenu(item)}
@@ -210,8 +199,6 @@ class SettingListBlock extends React.Component{
 }
 
 const mapStateToProps = (state, ownProps) => {
-    // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
-    //_persist.rehydrated parameter is initially set to false
     if(!state._persist.rehydrated){
       return {}
     }
@@ -223,8 +210,6 @@ const mapStateToProps = (state, ownProps) => {
     return{
       uid: makeUidState(state, ownProps),
       friends: makeFriendsState(state, ownProps),
-      friend_profiles:makeFriendProfilesState(state, ownProps),
-
       is_connected: makeIsConnectedState(state, ownProps),
     }
 }

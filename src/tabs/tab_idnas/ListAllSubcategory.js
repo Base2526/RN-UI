@@ -107,7 +107,7 @@ class ListAllSubcategory extends Component {
       this.setState({loading: true})
       this.props.actionUpdateSubcategoryMyApplication(uid, application_id, item.tid, (result)=>{
         this.setState({loading: false})
-        console.log(result)
+        // console.log(result)
 
         this.props.navigation.goBack()
         this.props.navigation.state.params.handleSubcategoryBack({ item }); 
@@ -119,20 +119,8 @@ class ListAllSubcategory extends Component {
   }
 
   renderItem = ({ item, index }) => {
-    // console.log(item)
-    // let __check = null
-    // if(this.state.subcategory_select != null){
-    //   if(this.state.subcategory_select.tid == item.tid) 
-    //     __check = <View style={{position:'absolute', right:0, paddingRight:10}}>
-    //                 <MyIcon
-    //                     name={'check-ok'}
-    //                     size={25}
-    //                     color={'gray'} />
-    //               </View>
-    // }
 
     let {subcategory} = this.state
-
     return(<TouchableOpacity 
               key={ item.name } 
               onPress={() => {
@@ -146,7 +134,12 @@ class ListAllSubcategory extends Component {
                     backgroundColor: 'white'}}>
                   <TouchableHighlight>
                       <FastImage
-                          style={{width:35, height:35, borderRadius:5, borderColor:'gray', borderWidth:.5}}
+                          style={{width:35, 
+                                  height:35, 
+                                  borderRadius:5, 
+                                  // borderColor:'gray', 
+                                  // borderWidth:.5
+                                }}
                           source={{
                             uri: item.field_image,
                             headers:{ Authorization: 'someAuthToken' },

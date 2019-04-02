@@ -25,9 +25,8 @@ var _ = require('lodash');
 
 import * as actions from '../../actions'
 import Constant from '../../utils/Constant'
-import {getHeaderInset, isEmpty} from '../../utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
-import {checkInternetDialog} from '../../utils/Helpers'
+import {getHeaderInset, isEmpty, checkInternetDialog} from '../../utils/Helpers'
 
 import {makeUidState, 
         makeProfileState, 
@@ -199,7 +198,7 @@ class FriendsPage extends React.Component{
       }
         
       let data = [my_profile, favorites, friendRequests, friendRequestSents, _friends];
-      this.setState({data})
+      this.setState({data, renderContent: true})
     }
 
     _itemOnPress=(item, rowId, sectionId)=>{
@@ -248,10 +247,10 @@ class FriendsPage extends React.Component{
                               mute = !rowItem.mute
                             }
                             
-                            // this.setState({loading:true})
+                            this.setState({loading:true})
                             this.props.actionFriendMute(this.props.uid, rowItem.friend_id, mute,(result)=>{
-                              console.log(result)
-                              // this.setState({loading:false})
+                              // console.log(result)
+                              this.setState({loading:false})
                             })
                           }}>
                           <Text style={{padding:10, fontSize:18}}>{rowItem.mute ? 'Mute': 'Unmute'}</Text>
@@ -267,10 +266,10 @@ class FriendsPage extends React.Component{
                                 is_favorite = !rowItem.is_favorite
                             }
 
-                            // this.setState({loading:true})
+                            this.setState({loading:true})
                             this.props.actionFriendFavirite(this.props.uid, rowItem.friend_id, is_favorite, (result) => {
-                                console.log(result)
-                                // this.setState({loading:false})
+                                // console.log(result)
+                                this.setState({loading:false})
                             })
                           }}>
                           <Text style={{padding:10, fontSize:18}}>{rowItem.is_favorite ? 'Unfavorite': 'Favorite'}</Text>
@@ -292,10 +291,10 @@ class FriendsPage extends React.Component{
                             style: 'cancel'},
                             {text: 'OK', 
                             onPress: () => {
-                                // this.setState({loading:true})
+                                this.setState({loading:true})
                                 this.props.actionFriendHide(this.props.uid, rowItem.friend_id, true, (result)=>{
-                                  console.log(result)
-                                  // this.setState({loading:false})
+                                  // console.log(result)
+                                  this.setState({loading:false})
                                 })
                               }, 
                             },
@@ -322,10 +321,10 @@ class FriendsPage extends React.Component{
                               style: 'cancel'},
                               {text: 'OK', 
                               onPress: () => {
-                                // this.setState({loading:true})
+                                this.setState({loading:true})
                                 this.props.actionFriendBlock(this.props.uid, rowItem.friend_id, true,(result)=>{
-                                  console.log(result)
-                                  // this.setState({loading:false})
+                                  // console.log(result)
+                                  this.setState({loading:false})
                                 })
                               }, 
                               },
@@ -373,12 +372,6 @@ class FriendsPage extends React.Component{
                       }}>
                           <Text style={{padding:10, fontSize:18}}>Cancel</Text>
                       </MenuOption>
-
-                      {/* <MenuOption onSelect={() => {
-                        this.props.params.navigation.navigate("FriendProfilePage", {'friend_id': rowItem.friend_id})
-                      }}>
-                          <Text style={{padding:10, fontSize:18}}>View profile</Text>
-                      </MenuOption> */}
                   </MenuOptions>
                   </Menu>
               </View>)
@@ -648,29 +641,21 @@ class FriendsPage extends React.Component{
         )
       }
     }
-    
-    _btnPress = () => {
-      this.ExpandableList.setSectionState(0, false);
-    };
-    
+        
     render() {
-      let {renderContent, data} = this.state;
-
-      if(data.length == 0){
+      let {renderContent, data, loading} = this.state;
+      if(!renderContent){
         return <View style={{flex: 1}}></View>
       }
 
-      console.log('FriendsPage > render()')
       return (
           <View style={{flex: 1}}>
           <Spinner
-            visible={this.state.loading}
+            visible={loading}
             textContent={'Wait...'}
             textStyle={{color: '#FFF'}}
-            overlayColor={'rgba(0,0,0,0.5)'}
-          />
+            overlayColor={'rgba(0,0,0,0.5)'}/>
           {
-            // renderContent && 
             <ExpandableList
               ref={instance => this.ExpandableList = instance}
               dataSource={data}
@@ -678,13 +663,9 @@ class FriendsPage extends React.Component{
               memberKey="member"
               renderRow={this._renderRow}
               headerOnPress={(i, state) => {
-                // console.log(i, state)
-                // alert('headerOnPress')
               } }
               renderSectionHeaderX={this._renderSection}
-              openOptions={[0, 1, 2, 3, 4]}
-              // onScroll={this.props.handleScroll}
-            />
+              openOptions={[0, 1, 2, 3, 4]}/>
           }
             <ActionButton 
               buttonColor="rgba(231,76,60,1)"

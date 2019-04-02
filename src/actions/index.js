@@ -406,9 +406,9 @@ const actionInviteFriend = (uid, friend_id,  user_data, friend_data, callback) =
     });
 }
 
-const actionAddFriend = (uid, friend_id, data, profile, callback) => dispatch =>{
-    // dispatch({ type: ADD_FRIEND, friend_id,  friend_data:data, profile})
-    callback({'status':true, friend_id, data, profile})
+const actionAddFriend = (uid, friend_id, friend_data, callback) => dispatch =>{
+    dispatch({ type: ADD_FRIEND, friend_id,  friend_data})
+    callback({'status':true})
 }
 
 // create_group
@@ -1558,7 +1558,7 @@ const trackProfiles=(uid, profiles)=> dispatch =>{
         //     })
         // }
         if(docSnapshot.data()){
-            console.log('trackProfiles', profiles, docSnapshot.data())
+            // console.log('trackProfiles', profiles, docSnapshot.data())
             if(!_.isEqual(profiles, docSnapshot.data())){
                 dispatch({ type: UPDATE_PROFILE, profile_data:docSnapshot.data()});
             }
@@ -1645,7 +1645,7 @@ const trackProfileWebsites=(uid, websites, callback)=> dispatch =>{
                 })
                 
                 if(website === undefined){
-                    console.log('website > ', websites, website, doc_id )
+                    // console.log('website > ', websites, website, doc_id )
                     dispatch({ type: ADD_WEBSITE_PROFILE, website_key:doc_id, url:doc_data.url});
                 }
             }

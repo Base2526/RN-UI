@@ -351,6 +351,12 @@
       "css": "android-arrow-left",
       "code": 59422,
       "src": "mfglabs"
+    },
+    {
+      "uid": "457c8e2b305e7af74c1be4f07a01ca92",
+      "css": "name-card",
+      "code": 59423,
+      "src": "entypo"
     }
   ]
 }

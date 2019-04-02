@@ -167,10 +167,12 @@ class SettingMyApplicationPage extends React.Component{
         let {application_id, my_application} = this.state
 
         my_application = {...my_application, status}
-        this.setState({my_application})
+        
 
+        this.setState({loading: true})
         this.props.actionUpdateStatusMyApplication(this.props.uid, application_id, status, (result)=>{
-            console.log(result)
+            // console.log(result)
+            this.setState({my_application, loading: false})
         })
     }
 
@@ -186,7 +188,7 @@ class SettingMyApplicationPage extends React.Component{
         let {emails} = this.props
         array_emails.map((v, k)=>{
             let email = _.find(emails, (ev, ek)=>{
-                            console.log(ek, v)
+                            // console.log(ek, v)
                             return v == ek
                         })
             if(!isEmpty(email)){
@@ -197,7 +199,7 @@ class SettingMyApplicationPage extends React.Component{
         // console.log(result)
         return result.map((v, k)=>{
             return(<Cell
-                // key={key}
+                key={k}
                 cellStyle="Subtitle"
                 titleTextColor="#007AFF"
                 hideSeparator={true} 
@@ -235,11 +237,11 @@ class SettingMyApplicationPage extends React.Component{
             }
         })
 
-        console.log(result)
+        // console.log(result)
 
         return result.map((v, k)=>{
             return(<Cell
-                // key={key}
+                key={k}
                 cellStyle="Subtitle"
                 titleTextColor="#007AFF"
                 hideSeparator={true} 
@@ -268,7 +270,7 @@ class SettingMyApplicationPage extends React.Component{
             return (<View style={{flex:1, backgroundColor:'white'}}></View>)
         }
 
-        console.log(my_application)
+        // console.log(my_application)
 
         let cell_published = <Cell
                                 cellStyle="Basic" 

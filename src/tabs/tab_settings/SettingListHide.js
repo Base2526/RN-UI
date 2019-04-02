@@ -18,7 +18,7 @@ import {
 } from 'react-native-popup-menu';
 var _ = require('lodash');
 import * as actions from '../../actions'
-import {getHeaderInset, checkInternetDialog} from '../../utils/Helpers'
+import {getHeaderInset, checkInternetDialog, isEmpty} from '../../utils/Helpers'
 import MyIcon from '../../config/icon-font.js';
 import Constant from '../../utils/Constant'
 import {makeUidState, 
@@ -59,17 +59,18 @@ class SettingListHide extends React.Component{
     }
 
     loadData = (props) =>{
-      let {friends, friend_profiles} = props
+      let {friends} = props
 
       let data = []
       _.map(friends, (value, key)=>{
         if(value.status === Constant.FRIEND_STATUS_FRIEND && value.hide){
-          let friend_profile =_.find(friend_profiles, (v, k)=>{
-                                return k == key
-                              })
-          data.push({...value, friend_id:key, friend_profile});
+          // let friend_profile =_.find(friend_profiles, (v, k)=>{
+          //                       return k == key
+          //                     })
+          data.push({...value, friend_id:key});
         }
       })
+      console.log(data)
       this.setState({data, renderContent:true})
     }
 
@@ -105,31 +106,30 @@ class SettingListHide extends React.Component{
                   </MenuTrigger>
                   <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
                       <MenuOption onSelect={() => {
-                        // this.setState({loading:true})
                         if(!is_connected){
                           checkInternetDialog()
                           return 
                         }
 
+                        this.setState({loading:true})
                         this.props.actionFriendHide(this.props.uid, item.friend_id, false, (result)=>{
-                            console.log(result)
-                            // this.setState({loading:false})
+                            // console.log(result)
+                            this.setState({loading:false})
                         })
                       }}>
                           <Text style={{padding:10, fontSize:18}}>Unhide</Text>
                       </MenuOption>
 
                       <MenuOption onSelect={() => {
-                        
                         if(!is_connected){
                           checkInternetDialog()
                           return 
                         }
 
-                         // this.setState({loading:true})
+                        this.setState({loading:true})
                         this.props.actionFriendDelete(this.props.uid, item.friend_id, (result)=>{
-                            console.log(result)
-                            // this.setState({loading:false})
+                          // console.log(result)
+                          this.setState({loading:false})
                         })
                       }}>
                         <Text style={{padding:10, fontSize:18}}>Delete friend</Text>
@@ -156,7 +156,7 @@ class SettingListHide extends React.Component{
                                 borderRadius: 10, 
                             }}
                         source={{
-                            uri: item.friend_profile.image_url,
+                            uri: item.image_url,
                             headers:{ Authorization: 'someAuthToken' },
                             priority: FastImage.priority.normal,
                         }}
@@ -169,12 +169,12 @@ class SettingListHide extends React.Component{
                                   color: '#222',
                                   paddingLeft: 10, 
                                   paddingBottom:5}}>
-                        {item.hasOwnProperty('change_friend_name') ? item.change_friend_name : item.friend_profile.name}
+                        {isEmpty(item.change_friend_name) ? item.name : item.change_friend_name}
                     </Text>
                     <Text style={{fontSize: 13, 
                                 color: '#222',
                                 paddingLeft: 10}}>
-                        {item.friend_profile.status_message}
+                        {item.status_message}
                     </Text>
                 </View>
                 {this.showMenu(item)}
@@ -209,10 +209,6 @@ class SettingListHide extends React.Component{
 }
 
 const mapStateToProps = (state,ownProps) => {
-    // console.log(state)
-  
-    // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
-    //_persist.rehydrated parameter is initially set to false
     if(!state._persist.rehydrated){
       return {}
     }
@@ -224,8 +220,6 @@ const mapStateToProps = (state,ownProps) => {
     return{
       uid: makeUidState(state, ownProps),
       friends: makeFriendsState(state, ownProps),
-      friend_profiles:makeFriendProfilesState(state, ownProps),
-
       is_connected: makeIsConnectedState(state, ownProps),
     }
 }

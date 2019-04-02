@@ -37,7 +37,6 @@ import {getUid, getHeaderInset} from '../../utils/Helpers'
 import {makeUidState} from '../../reselect'
 
 class homeY extends React.Component {
-
   static navigationOptions = ({ navigation }) => ({
     title: "Settings",
     headerTintColor: '#C7D8DD',

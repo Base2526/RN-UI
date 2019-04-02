@@ -138,7 +138,12 @@ class ListAllCategory extends Component {
                   }}>
                   <TouchableHighlight>
                       <FastImage
-                          style={{width: 35, height: 35, borderRadius: 5, borderColor:'gray', borderWidth:.5}}
+                          style={{width: 35, 
+                                  height: 35, 
+                                  borderRadius: 5, 
+                                  // borderColor:'gray', 
+                                  // borderWidth:.5
+                                }}
                           source={{
                             uri: item.field_image,
                             headers:{ Authorization: 'someAuthToken' },
@@ -147,7 +152,7 @@ class ListAllCategory extends Component {
                           resizeMode={FastImage.resizeMode.contain}
                       />
                   </TouchableHighlight>
-                  <Text style={{fontSize: 22, paddingLeft: 10}}>
+                  <Text style={{paddingLeft: 10}}>
                       {item.name}
                   </Text>
                   {category == item.tid ?  <View style={{position:'absolute', right:0, paddingRight:10}}>

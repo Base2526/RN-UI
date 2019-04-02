@@ -68,12 +68,6 @@ class AddFriendsPage extends React.Component{
 
     if(isEmpty(people_you_may_khows)){
       this.props.actionPeopleYouMayKhow(uid).then((result) => {
-        // if(result.status){
-  
-        //   this.setState({refreshing: false});
-        // }else{
-        //   this.setState({refreshing: false});
-        // }
 
         console.log(result)
       })
@@ -92,7 +86,7 @@ class AddFriendsPage extends React.Component{
     let data =[]
     _.map(people_you_may_khows, (v, k)=>{
       let friend =  _.find(friends, (fv, fk)=>{
-                      return v.uid == fk
+                      return v.uid == fk && v.status == Constant.FRIEND_STATUS_FRIEND_99
                     })
 
       if(!friend){
@@ -135,7 +129,25 @@ class AddFriendsPage extends React.Component{
                 </MenuTrigger>
                 <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset() + 50)}}>
                     <MenuOption onSelect={() => {
-                      this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
+                      // console.log(item.uid)
+
+                      let {uid, friends} = this.props
+                      let friend =_.find(friends, (v, k)=>{
+                                    return k == item.uid
+                                  })
+
+                      if(isEmpty(friend)){
+                        let chat_id = randomKey()
+                        let friend_data = {...item, chat_id, status:Constant.FRIEND_STATUS_FRIEND_99}
+
+                        this.setState({loading:true})
+                        this.props.actionAddFriend(uid, item.uid, friend_data, (result) => {
+                          this.setState({loading:false})
+                          this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
+                        })
+                      }else{
+                        this.props.navigation.navigate("FriendProfilePage", {'friend_id': item.uid})
+                      }
                     }}>
                         <Text style={{padding:10, fontSize:18}}>View profile</Text>
                     </MenuOption>
