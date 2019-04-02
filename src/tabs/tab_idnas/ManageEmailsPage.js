@@ -61,40 +61,8 @@ class ManageEmailsPage extends React.Component{
     }
 
     loadData = (props) =>{
-        // console.log(props)
-        /*
-        let {emails, my_applications} = props
-        let {item_id} = this.state
-
-        let my_application =_.find(my_applications, (v, k)=>{
-                                return k == item_id
-                            })
-
-        console.log(my_application, emails)
-
-        let data =  _.map(emails, (v, k)=>{
-                        if(my_application.emails !== undefined){
-                            let __ = _.find(my_application.emails, (ev, ek)=>{
-                                        return k == ev
-                                      })
-
-                            console.log(__)
-                            if(__ !== undefined){
-                                return {...v, email_key:k, select:true}
-                            }
-                        }
-
-                        return {...v, email_key:k, select:false}
-                    })
-        
-
-        this.setState({data})
-        */
-
         let {application_id} = this.state
         let {emails, my_applications} = props
-
-        console.log(my_applications)
 
         let my_application =_.find(my_applications, (v, k)=>{
                                 return k == application_id
@@ -102,15 +70,15 @@ class ManageEmailsPage extends React.Component{
 
         let data =  _.map(emails, (v, k)=>{
                         if( !isEmpty(my_application.emails) ){
-                            let email =_.find(my_application.emails, (ev, ek)=>{
-                                        return k == ev
-                                    })
+                            let my_application_emails = JSON.parse(my_application.emails)
+                            let email = my_application_emails.find((ev, ek)=>{
+                                            return k == ev
+                                        })
 
                             if( !isEmpty(email) ){
                                 return {...v, email_key:k, select:true}
                             }
                         }
-
                         return {...v, email_key:k, select:false}
                     })
 
@@ -118,8 +86,6 @@ class ManageEmailsPage extends React.Component{
     }
 
     select = (item, index) =>{
-        console.log(item, index)
-
         let {uid} = this.props
         let {data, application_id} = this.state
 
@@ -127,58 +93,17 @@ class ManageEmailsPage extends React.Component{
         new_data[index] = {...new_data[index], select: !item.select};
 
         let select_emails = []
-        
         new_data.map((v, k)=>{
                         if(v.select){
                             select_emails.push(v.email_key)
                         }
                     })
 
-        console.log(select_emails, new_data, uid, application_id)
+        this.setState({loading:true})
+        this.props.actionMyApplicationEmail(uid, application_id, JSON.stringify(select_emails), (result) => {
+            this.setState({data:new_data, loading:false})
+        })
 
-        this.setState({data:new_data})
-
-        // console.log(item, new_data, index)
-        
-        /*
-        let {emails, my_applications} = this.props
-        let {item_id} = this.state
-
-        let my_application =_.find(my_applications, (v, k)=>{
-                                return k == item_id
-                            })
-
-        let __em = my_application.emails
-
-        if(__em === undefined){
-            __em = [item.email_key]
-            
-            this.props.actionMyApplicationEmail(this.props.uid, this.state.item_id, __em, (result) => {
-                console.log(result)
-            })
-        }else{
-            let _find = __em.find(v=>{
-                return v == item.email_key;
-            })
-
-            let newValue = null
-            if(_find === undefined){
-                newValue = [...__em, item.email_key]
-            }else{
-                newValue = __em.filter(function(v) { 
-                    return v != item.email_key
-                })
-            }
-
-
-            this.props.actionMyApplicationEmail(this.props.uid, this.state.item_id, newValue, (result) => {
-                console.log(result)
-            })
-
-        }
-        */
-
-        // console.log(my_application)
     }
 
     renderItem = ({item, index}) => { 
@@ -237,8 +162,6 @@ class ManageEmailsPage extends React.Component{
 }
 
 const mapStateToProps = (state, ownProps) => {
-    // console.log(state)
-  
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
     //_persist.rehydrated parameter is initially set to false
     if(!state._persist.rehydrated){

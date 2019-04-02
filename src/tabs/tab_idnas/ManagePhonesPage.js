@@ -56,6 +56,12 @@ class ManagePhonesPage extends React.Component{
         this.setState({application_id}, ()=>{
             this.loadData(this.props)
         })
+
+        // let myObj = ["foo", "bar"]
+        // const myObjStr = JSON.stringify(myObj);
+
+        // console.log(myObjStr);
+        // console.log(JSON.parse(myObjStr));
     }  
 
     componentWillReceiveProps(nextProps) {
@@ -102,14 +108,15 @@ class ManagePhonesPage extends React.Component{
 
        let data =  _.map(phones, (v, k)=>{
                        if( !isEmpty(my_application.phones) ){
-                           let phone =_.find(my_application.phones, (ev, ek)=>{
-                                       return k == ev
-                                   })
+                            let my_application_phones = JSON.parse(my_application.phones)
+                            let phone = my_application_phones.find((ev, ek)=>{
+                                            return k == ev
+                                        })
 
-                           if( !isEmpty(phone) ){
+                            if( !isEmpty(phone) ){
                                return {...v, phone_key:k, select:true}
-                           }
-                       }
+                            }
+                        }
 
                        return {...v, phone_key:k, select:false}
                    })
@@ -119,63 +126,25 @@ class ManagePhonesPage extends React.Component{
 
     select = (item, index) =>{
         // console.log(item, index)
-        let {data} = this.state
+        let {uid} = this.props
+        let {data, application_id} = this.state
 
         let new_data = [...data];
         new_data[index] = {...new_data[index], select: !item.select};
 
-
         let select_phones = []
-        
         new_data.map((v, k)=>{
                         if(v.select){
                             select_phones.push(v.phone_key)
                         }
                     })
+        
+        this.setState({loading:true})
+        this.props.actionMyApplicationPhone(uid, application_id, JSON.stringify(select_phones), (result) => {
+            console.log(result)
 
-        console.log(select_phones, new_data)
-
-        this.setState({data:new_data})
-
-        /*
-        let {phones, my_applications} = this.props
-        let {item_id} = this.state
-
-        let my_application =_.find(my_applications, (v, k)=>{
-                                return k == item_id
-                            })
-
-        let __em = my_application.phones
-
-        if(__em === undefined){
-            __em = [item.phone_key]
-            
-            this.props.actionMyApplicationPhone(this.props.uid, this.state.item_id, __em, (result) => {
-                console.log(result)
-            })
-        }else{
-            let _find = __em.find(v=>{
-                return v == item.phone_key;
-            })
-
-            let newValue = null
-            if(_find === undefined){
-                newValue = [...__em, item.phone_key]
-            }else{
-                newValue = __em.filter(function(v) { 
-                    return v != item.phone_key
-                })
-            }
-
-
-            this.props.actionMyApplicationPhone(this.props.uid, this.state.item_id, newValue, (result) => {
-                console.log(result)
-            })
-
-        }
-
-        console.log(my_application)
-        */
+            this.setState({data:new_data, loading:false})
+        })
     }
 
     renderItem = ({item, index}) => { 
@@ -215,9 +184,7 @@ class ManagePhonesPage extends React.Component{
     }
 
     render() {
-
         let {data, loading} = this.state
-
         return(<View style={{ flex:1}}>
                     <Spinner
                         visible={loading}
@@ -233,9 +200,7 @@ class ManagePhonesPage extends React.Component{
     }
 }
 
-const mapStateToProps = (state, ownProps) => {
-    // console.log(state)
-  
+const mapStateToProps = (state, ownProps) => {  
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
     //_persist.rehydrated parameter is initially set to false
     if(!state._persist.rehydrated){
@@ -243,9 +208,6 @@ const mapStateToProps = (state, ownProps) => {
     }
   
     return{
-    //   uid:getUid(state),
-    //   phones:state.auth.users.profiles.phones,
-    //   my_applications:state.auth.users.my_applications
         uid: makeUidState(state, ownProps),
         phones: makePhonesState(state, ownProps),
         my_applications: makeMyAppicationsState(state, ownProps),

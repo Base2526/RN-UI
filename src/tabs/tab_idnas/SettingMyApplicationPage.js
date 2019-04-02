@@ -29,6 +29,8 @@ import {getHeaderInset, isEquivalent2Object, checkInternetDialog, isEmpty} from 
 import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState, 
+        makeEmailsState, 
+        makePhonesState,
         makeMyAppicationsState, 
         makeApplicationCategoryState,} from '../../reselect'
 
@@ -172,94 +174,88 @@ class SettingMyApplicationPage extends React.Component{
         })
     }
 
-    showMenuEmail= ()=>{
-        // let {is_connected} = this.props
-        return( <View style={{flex:1,
-                              position:'absolute', 
-                              top:0,
-                              right:0}}>
-                  <Menu>
-                    <MenuTrigger>
-                        <MyIcon 
-                            style={{padding:3}}
-                            name={'dot-horizontal'}
-                            size={15}
-                            color={'gray'} />  
-                    </MenuTrigger>
-                    <MenuOptions
-                        optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
-                        <MenuOption onSelect={() => {}}>
-                          <Text style={{padding:10, fontSize:18}}>Delete</Text>
-                        </MenuOption>
-                    </MenuOptions>
-                </Menu>
-              </View>)
-    }
+    emailsList = (e) =>{
+        if(isEmpty(e)){
+            return
+        }
 
-    emailsList = () =>{
-        return(<Cell
-            // key={key}
-            cellStyle="Subtitle"
-            titleTextColor="#007AFF"
-            hideSeparator={true} 
-            // accessory="DisclosureIndicator"
-            cellContentView={
-            <View style={{flex:1, justifyContent:'center', padding:5}}>
-                <Text style={{fontSize: 16, fontStyle:'italic'}}>
-                    mr.simajarn@gmail.com
-                </Text>
-                {this.showMenuEmail()}
-            </View>
+        let array_emails = JSON.parse(e)
+
+        let result = []
+
+        let {emails} = this.props
+        array_emails.map((v, k)=>{
+            let email = _.find(emails, (ev, ek)=>{
+                            console.log(ek, v)
+                            return v == ek
+                        })
+            if(!isEmpty(email)){
+                result.push(email)
             }
-            onPress={()=>{
-                // Linking.openURL('mailto:' + value.email)
-            }}/>)
-    }
+        })
 
-    showMenuPhone = ()=>{
-        // let {is_connected} = this.props
-        return( <View style={{flex:1,
-                              position:'absolute', 
-                              top:0,
-                              right:0, 
-                              }}>
-                  <Menu>
-                    <MenuTrigger>
-                        <MyIcon 
-                            style={{padding:3}}
-                            name={'dot-horizontal'}
-                            size={15}
-                            color={'gray'} />  
-                    </MenuTrigger>
-                    <MenuOptions
-                        optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
-                        <MenuOption onSelect={() => {}}>
-                          <Text style={{padding:10, fontSize:18}}>Delete</Text>
-                        </MenuOption>
-                    </MenuOptions>
-                </Menu>
-              </View>)
-    }
-
-    phonesList = () =>{
-        return(<Cell
-            // key={key}
-            cellStyle="Subtitle"
-            titleTextColor="#007AFF"
-            hideSeparator={true} 
-            // accessory="DisclosureIndicator"
-            cellContentView={
+        // console.log(result)
+        return result.map((v, k)=>{
+            return(<Cell
+                // key={key}
+                cellStyle="Subtitle"
+                titleTextColor="#007AFF"
+                hideSeparator={true} 
+                // accessory="DisclosureIndicator"
+                cellContentView={
                 <View style={{flex:1, justifyContent:'center', padding:5}}>
                     <Text style={{fontSize: 16, fontStyle:'italic'}}>
-                        09831243124
+                        {v.email}
                     </Text>
-                    {this.showMenuPhone()}
+                    {/* {this.showMenuEmail()} */}
                 </View>
+                }
+                onPress={()=>{
+                    // Linking.openURL('mailto:' + value.email)
+                }}/>)
+        })
+    }
+
+    phonesList = (p) =>{
+        if(isEmpty(p)){
+            return
+        }
+        let array_phones = JSON.parse(p)
+
+        let result = []
+
+        let {phones} = this.props
+        array_phones.map((v, k)=>{
+            let phone = _.find(phones, (ev, ek)=>{
+                            // console.log(ek, v)
+                            return v == ek
+                        })
+            if(!isEmpty(phone)){
+                result.push(phone)
             }
-            onPress={()=>{
-                // Linking.openURL('mailto:' + value.email)
-            }}
-            />)
+        })
+
+        console.log(result)
+
+        return result.map((v, k)=>{
+            return(<Cell
+                // key={key}
+                cellStyle="Subtitle"
+                titleTextColor="#007AFF"
+                hideSeparator={true} 
+                // accessory="DisclosureIndicator"
+                cellContentView={
+                <View style={{flex:1, justifyContent:'center', padding:5}}>
+                    <Text style={{fontSize: 16, fontStyle:'italic'}}>
+                        {v.phone_number}
+                    </Text>
+                    {/* {this.showMenuEmail()} */}
+                </View>
+                }
+                onPress={()=>{
+                    // Linking.openURL('mailto:' + value.email)
+                }}/>)
+        })
     }
 
     render() {
@@ -496,10 +492,10 @@ class SettingMyApplicationPage extends React.Component{
                                     // this.state.item.item_id
                                     // this.props.navigation.navigate("ManageEmailsPage", {'item_id': this.state.item.item_id})
                                 }}/>
-                            {this.emailsList()}
+                            {this.emailsList(my_application.emails)}
                             <Cell
                                 cellStyle="Basic"
-                                title="Add another email"
+                                title="Select email"
                                 titleTextStyle={{ fontSize: 16}} 
                                 hideSeparator={true} 
                                 accessory="DisclosureIndicator"
@@ -517,10 +513,10 @@ class SettingMyApplicationPage extends React.Component{
                                 onPress={()=>{
                                     // this.props.navigation.navigate("ManageEmailsPage", {'item_id': this.state.item.item_id})
                                 }}/>
-                            {this.phonesList()}
+                            { this.phonesList(my_application.phones) }
                             <Cell
                                 cellStyle="Basic"
-                                title="Add another phone"
+                                title="Select phone"
                                 titleTextStyle={{ fontSize: 16}} 
                                 hideSeparator={true} 
                                 accessory="DisclosureIndicator"
@@ -603,6 +599,8 @@ const mapStateToProps = (state, ownProps) => {
     return{
         uid: makeUidState(state, ownProps),
         my_applications: makeMyAppicationsState(state, ownProps),
+        emails: makeEmailsState(state, ownProps),
+        phones: makePhonesState(state, ownProps),
         application_category: makeApplicationCategoryState(state, ownProps),
     }
 }
