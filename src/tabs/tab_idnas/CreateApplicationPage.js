@@ -14,13 +14,12 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import { connect } from 'react-redux';
 import * as actions from '../../actions'
-import {getUid, isEquivalent2Object} from '../../utils/Helpers'
+import {checkInternetDialog, isEquivalent2Object} from '../../utils/Helpers'
 
 import MyIcon from '../../config/icon-font.js';
 
 import {makeUidState,
-    makeApplicationCategoryState,
-    makeMyAppicationsState} from '../../reselect'
+        makeIsConnectedState} from '../../reselect'
 
 // More info on all the options is below in the API Reference... just some common use cases shown here
 const options = {
@@ -93,19 +92,12 @@ class CreateApplicationPage extends React.Component{
     }
 
     handleCreateApplication = () => {
-        // let uid = this.props.uid
+        let {is_connected} = this.props
         
         let uri = this.state.applicationImage.uri; 
         let applicationName = this.state.applicationName.trim()
         let category = this.state.category_select
         let subcategory = this.state.subcategory_select
-
-        /*
-        console.log(applicationName)
-        console.log(uri)
-        console.log(category)
-        console.log(subcategory)
-        */
  
         if(uri === "" && applicationName === "" ){
             alert("Picture && application name is empty.")
@@ -118,6 +110,12 @@ class CreateApplicationPage extends React.Component{
         }else if(Object.keys(subcategory).length == 0){
             alert("Subcategory not select.")
         }else {
+
+            if(!is_connected){
+                checkInternetDialog()
+                return 
+            }
+
             this.setState({loading: true})
             this.props.actionCreateMyApplication(this.props.uid, applicationName, category.tid, subcategory.tid, uri).then((result) => {
                 // console.log(result)
@@ -296,7 +294,7 @@ class CreateApplicationPage extends React.Component{
 }
 
 const mapStateToProps = (state, ownProps) => {
-    console.log(state)
+    // console.log(state)
   
     // https://codeburst.io/redux-persist-the-good-parts-adfab9f91c3b
     //_persist.rehydrated parameter is initially set to false
@@ -309,9 +307,8 @@ const mapStateToProps = (state, ownProps) => {
     }
   
     return{
-        //   uid:getUid(state),
-        //   auth:state.auth
         uid: makeUidState(state, ownProps),
+        is_connected: makeIsConnectedState(state, ownProps),
     }
 }
   

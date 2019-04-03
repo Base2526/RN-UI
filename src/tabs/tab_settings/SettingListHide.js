@@ -192,17 +192,16 @@ class SettingListHide extends React.Component{
         return(<MenuContext>
                 <View style={{flex:1}}>
                   <Spinner
-                      visible={loading}
-                      textContent={'Wait...'}
-                      textStyle={{color: '#FFF'}}
-                      overlayColor={'rgba(0,0,0,0.5)'}
-                    />
+                    visible={loading}
+                    textContent={'Wait...'}
+                    textStyle={{color: '#FFF'}}
+                    overlayColor={'rgba(0,0,0,0.5)'}/>
                   <FlatList
-                      data={data}
-                      showsVerticalScrollIndicator={false}
-                      renderItem={this.renderItem}
-                      keyExtractor = { (item, index) => index.toString() } 
-                      ItemSeparatorComponent={this.ItemSeparatorComponent}/>
+                    data={data}
+                    showsVerticalScrollIndicator={false}
+                    renderItem={this.renderItem}
+                    keyExtractor = { (item, index) => index.toString() } 
+                    ItemSeparatorComponent={this.ItemSeparatorComponent}/>
                 </View>
               </MenuContext>)
     }

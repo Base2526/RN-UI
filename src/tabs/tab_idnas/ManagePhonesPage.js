@@ -26,7 +26,7 @@ import {makeUidState,
 
 class ManagePhonesPage extends React.Component{
     static navigationOptions = ({ navigation }) => ({
-        title: 'List phone',
+        title: 'Select phone',
         headerTintColor: 'white',
         headerStyle: {
             backgroundColor: 'rgba(186, 53, 100, 1.0)',

@@ -12205,7 +12205,6 @@ function create_my_application(){
     
     //Saves a file to the specified destination and creates a database entry.
     $image_url = (array)klovers_file_save_data($uid, $binary, $directory. '/' . $file_name, FILE_EXISTS_RENAME);
-
   }
 
   /*
@@ -12249,8 +12248,6 @@ function create_my_application(){
   */
 
 
-
-  // 
   $node = new stdClass();
   $node->title = $name;// preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $name);
   $node->type  = "application";

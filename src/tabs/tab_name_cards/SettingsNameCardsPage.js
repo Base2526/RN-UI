@@ -85,7 +85,7 @@ class SettingsNameCardsPage extends React.Component {
               accessory="DisclosureIndicator"
               hideSeparator={true}
               onPress={()=>{
-                // this.props.navigation.navigate("hide")
+                this.props.navigation.navigate("manage_category")
               }} />
           </Section>
           </TableView>

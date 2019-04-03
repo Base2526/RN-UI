@@ -131,11 +131,11 @@ class ListMyAppPage extends React.Component{
                       }}>
                           <Text style={{padding:10, fontSize:18}}>All post</Text>
                       </MenuOption>
-                      <MenuOption onSelect={() => {
+                      {/* <MenuOption onSelect={() => {
                           this.settings(rowItem)
                       }}>
                           <Text style={{padding:10, fontSize:18}}>Settings</Text>
-                      </MenuOption>
+                      </MenuOption> */}
                   </MenuOptions>
               </Menu>
             </View>)
@@ -144,6 +144,10 @@ class ListMyAppPage extends React.Component{
     _renderRow = (rowItem, rowId, sectionId) => {
       console.log(rowItem)
       return (
+          <TouchableOpacity
+            onPress={()=>{
+              this.settings(rowItem)
+            }}>
           <View
             style={{
               alignItems: 'center', 
@@ -169,6 +173,7 @@ class ListMyAppPage extends React.Component{
               </View>
               {this.showMenu(rowItem)}
           </View>
+          </TouchableOpacity>
       )
     }
 
