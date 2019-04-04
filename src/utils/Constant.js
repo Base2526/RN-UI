@@ -40,7 +40,9 @@ module.exports = {
 
     SCAN_QRCODE: API_URL + END_POINT + '/scan_qrcode',
 
-    RECREATE_QRCODE: API_URL + END_POINT +  '/recreate_qrcode',
+    RECREATE_QRCODE_FOR_PROFILE: API_URL + END_POINT +  '/recreate_qrcode_for_profile',
+
+    RECREATE_QRCODE_FOR_APPLICATION: API_URL + END_POINT +  '/recreate_qrcode_for_application',
 
     // Get friend profile กรณียังไม่ได้เป้นเพือนกัน FRIEND_STATUS_FRIEND_99
     FRIEND_PROFILE_99: API_URL + END_POINT + '/friend_profile_99',

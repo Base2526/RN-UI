@@ -22,17 +22,18 @@ import {
 
 var RNFS = require('react-native-fs')
 import Share, {ShareSheet, Button} from 'react-native-share';
+var _ = require('lodash');
 
 import * as actions from '../../actions'
 import MyIcon from '../../config/icon-font.js';
+import {isEmpty} from '../../utils/Helpers'
+import {makeUidState, makeMyAppicationsState} from '../../reselect'
 
-import {makeUidState, makeProfileState} from '../../reselect'
-
-class MyQRcode extends React.Component{
+class MyApplicationQRcodePage extends React.Component{
 
     static navigationOptions = ({ navigation }) => {
       return {
-          title: "My QR code",
+          // title: "QR code for ",
           headerTintColor: '#C7D8DD',
           headerStyle: {
               backgroundColor: 'rgba(186, 53, 100, 1.0)',
@@ -43,12 +44,12 @@ class MyQRcode extends React.Component{
               elevation: 0,
               shadowOpacity: 0
           },
-          headerLeft: (
+          headerRight: (
             <View style={{flexDirection:'row', padding:5}}>
                     <Menu style={{ zIndex: 10 }}>
                         <MenuTrigger>
                             <MyIcon
-                                // style={{paddingRight:10}}
+                                style={{paddingRight:5}}
                                 name={'dot-vertical'}
                                 size={20}
                                 color={'#C7D8DD'} />
@@ -67,29 +68,9 @@ class MyQRcode extends React.Component{
                             }}>
                                 <Text style={{padding:10, fontSize:18}}>Save to device</Text>
                             </MenuOption>
-                            {/* <MenuOption onSelect={() => {}}>
-                                <Text style={{padding:10, fontSize:18}}>Menu 2</Text>
-                            </MenuOption> */}
-                            
                         </MenuOptions>
                     </Menu>
                 </View>
-          ),
-          headerRight: (
-              <View style={{marginRight:10}}>
-                  <TouchableOpacity
-                      style={{padding:5}}
-                      // disabled={isModify ? false: true}
-                      onPress={() => {
-                          const { params = {} } = navigation.state
-                          params.handleCancel()
-                      }}>
-                      <MyIcon
-                          name={'cancel'}
-                          size={25}
-                          color={'#C7D8DD'} />
-                  </TouchableOpacity>
-              </View>
           ),
       }
     }
@@ -106,19 +87,25 @@ class MyQRcode extends React.Component{
         error: null,
         refreshing: false,
 
-
-        profile:{}
+        application_id:0,
+        my_application:{}
       };
     }
   
     componentDidMount() {
-      // setTimeout(() => {this.setState({renderContent: true})}, 0);
-      this.props.navigation.setParams({handleShare: this.handleShare })
-      this.props.navigation.setParams({handleSaveToDevice: this.handleSaveToDevice })
+        // setTimeout(() => {this.setState({renderContent: true})}, 0);
+        this.props.navigation.setParams({handleShare: this.handleShare })
+        this.props.navigation.setParams({handleSaveToDevice: this.handleSaveToDevice })
 
-      this.props.navigation.setParams({handleCancel: this.handleCancel })
-    
-      this.loadData(this.props)
+        this.props.navigation.setParams({handleCancel: this.handleCancel })
+        
+        const { navigation } = this.props;
+        const application_id = navigation.getParam('application_id', null);
+
+        this.setState({application_id},()=>{
+            this.loadData(this.props)
+        })
+
     }
 
     componentWillReceiveProps(nextProps){
@@ -126,17 +113,40 @@ class MyQRcode extends React.Component{
     }
 
     loadData = (props) =>{
-      let {profile} = props
-      this.setState({profile, renderContent:true})
+    //   let {profile} = props
+    //   this.setState({profile, renderContent:true})
+
+        let {uid, my_applications} = props
+        let {application_id}  = this.state
+
+        let my_application =_.find(my_applications, (v, k)=>{
+                                return k == application_id
+                            })
+
+        if(isEmpty(my_application)){
+            this.props.navigation.goBack(null);
+            return
+        }
+
+        if(isEmpty(my_application.qrcode_url)){
+          this.setState({loading:true})
+          this.props.actionRecreateQRcodeforApplication(uid, application_id).then((result) => {
+            console.log(result)
+
+            this.setState({loading:false, my_application, renderContent:true})
+          })
+        }else{
+          this.setState({my_application, renderContent:true})
+        }
     }
 
     handleShare = () => {
-      let {profile} = this.state
+        let {my_application} = this.state
 
       let shareOptions = {
         title: "Share QRcode",
         message: "Share QRcode",
-        url: profile.url_my_qrcode,
+        url: my_application.qrcode_url,
         subject: "Share QRcode" //  for email
       }
     
@@ -144,12 +154,12 @@ class MyQRcode extends React.Component{
     }
 
     handleSaveToDevice = () =>{
-      console.log('handleSaveToDevice')
-      let {profile} = this.state
+    //   console.log('handleSaveToDevice')
+      let {my_application} = this.state
       
       let toFile = `${RNFS.DocumentDirectoryPath}/react-native.png`
       RNFS.downloadFile({
-        fromUrl: profile.url_my_qrcode,
+        fromUrl: my_application.qrcode_url,
         toFile,
       }).promise.then((r) => {
         // this.setState({ isDone: true })
@@ -195,15 +205,18 @@ class MyQRcode extends React.Component{
     }
 
     reCreateQRcode = () =>{
+      let {uid} = this.props
+      let {application_id} = this.state
+
       this.setState({loading:true})
-      this.props.actionRecreateQRcodeforProfile(this.props.uid).then((result) => {
+      this.props.actionRecreateQRcodeforApplication(uid, application_id).then((result) => {
         this.setState({loading:false})
         console.log(result)
       })
     }
    
     render() {
-        let {profile, renderContent, loading} = this.state
+        let {my_application, renderContent, loading} = this.state
 
         if(!renderContent){
           return(<View style={{flex:1}}></View>)
@@ -223,7 +236,7 @@ class MyQRcode extends React.Component{
                     <FastImage
                         style={{width: 200, height: 200, }}
                         source={{
-                          uri: profile.url_my_qrcode,
+                          uri: my_application.qrcode_url,
                           headers:{ Authorization: 'someAuthToken' },
                           priority: FastImage.priority.normal,
                         }}
@@ -240,19 +253,6 @@ class MyQRcode extends React.Component{
                     </TouchableOpacity>
                   </View>
             </View>
-            <TouchableOpacity style={{position:'absolute', 
-                                      right:0, 
-                                      ...ifIphoneX({
-                                        bottom: 30
-                                      }, {
-                                        bottom: 0
-                                      }),
-                                      padding:10,}}
-                              onPress={()=>{
-                                this.props.navigation.navigate("MyQRcode_QRCodeReaderPage")
-                              }}>
-                <Text style={{fontSize:18}}>QR code reader</Text>
-            </TouchableOpacity>
         </SafeAreaView>
       )
     }
@@ -272,8 +272,9 @@ const mapStateToProps = (state, ownProps) => {
   return{
     // profiles:state.auth.users.profiles
     uid: makeUidState(state, ownProps),
-    profile: makeProfileState(state, ownProps),
+    // profile: makeProfileState(state, ownProps),
+    my_applications: makeMyAppicationsState(state, ownProps),
   }
 }
 
-export default connect(mapStateToProps, actions)(MyQRcode);
+export default connect(mapStateToProps, actions)(MyApplicationQRcodePage);

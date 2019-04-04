@@ -153,7 +153,8 @@ import {login,
         friend_profile_99,
         friend_profile_multi_99,
         add_new_post,
-        recreate_qrcode,
+        recreate_qrcode_for_profile,
+        recreate_qrcode_for_application,
         update_picture_my_application,
     
         test_users} from '../utils/Services'
@@ -186,14 +187,23 @@ const actionGetPostFeelingsAndPrivacy = () =>dispatch =>{
     })
 }
 
-const actionRecreateQRcode = (uid) =>dispatch=>{
-    return recreate_qrcode(uid).then(data=>{
-        console.log(data)
+const actionRecreateQRcodeforProfile = (uid) =>dispatch=>{
+    return recreate_qrcode_for_profile(uid).then(data=>{
         if(data.result){
             // dispatch({ type: ADDED_FEELINGS_AND_PRIVACY, post_feelings: data.data.post_feelings, post_privacys: data.data.post_privacys});
             return {'status':true}
         }
         return {'status':false}
+    })
+}
+
+const actionRecreateQRcodeforApplication = (uid, application_id) =>dispatch=>{
+    return recreate_qrcode_for_application(uid, application_id).then(data=>{
+        if(data.result){
+            // dispatch({ type: ADDED_FEELINGS_AND_PRIVACY, post_feelings: data.data.post_feelings, post_privacys: data.data.post_privacys});
+            return {'status':true, data}
+        }
+        return {'status':false, data}
     })
 }
 
@@ -2640,10 +2650,11 @@ const actions = {
     actionMyApplicationEmail,
     actionMyApplicationAddress,
     actionCreateMyApplication,
-    actionRecreateQRcode,
+    actionRecreateQRcodeforProfile,
     actionGetPostFeelingsAndPrivacy,
     actionApplicationCategory,
 
+    actionRecreateQRcodeforApplication,
 
 
     trackNameCards,

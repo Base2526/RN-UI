@@ -386,7 +386,7 @@ export const update_picture_profile  = (uid, image_uri) =>{
 }
 
 // Recreate QRcode
-export const recreate_qrcode = (uid) => {
+export const recreate_qrcode_for_profile = (uid) => {
     let data = {
         method: 'POST',
         body: JSON.stringify({
@@ -395,7 +395,26 @@ export const recreate_qrcode = (uid) => {
         headers: Constant.FETCH_HEADERS
     }
 
-    return fetch(Constant.RECREATE_QRCODE, data)
+    return fetch(Constant.RECREATE_QRCODE_FOR_PROFILE, data)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            return responseJson;
+        }).catch((error) => {
+            console.error(error);
+        });
+}
+
+export const recreate_qrcode_for_application = (uid, application_id) => {
+    let data = {
+        method: 'POST',
+        body: JSON.stringify({
+            'uid':uid,
+            'application_id':application_id
+        }),
+        headers: Constant.FETCH_HEADERS
+    }
+
+    return fetch(Constant.RECREATE_QRCODE_FOR_APPLICATION, data)
         .then((response) => response.json())
         .then((responseJson) => {
             return responseJson;

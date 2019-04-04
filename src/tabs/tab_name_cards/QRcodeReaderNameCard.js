@@ -80,11 +80,13 @@ class QRcodeReaderNameCard extends Component {
 
   dataSplit = (data) =>{
 
-    let {uid, is_connected} = this.props
+    // let {uid, is_connected} = this.props
 
-    let qe = data.split("?");
-    console.log(qe)
+    // let qe = data.split("?");
+    // console.log(qe)
 
+    this.props.navigation.navigate("ResultScanForQRcodeNameCardPage", {close:this.close, scanAgain:this.scanAgain})
+    /*
     if(qe.length == 2){
 
       if(!is_connected){
@@ -158,6 +160,7 @@ class QRcodeReaderNameCard extends Component {
           }    
       })
     }
+    */
   }
   
   selectFromDevice(){

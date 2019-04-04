@@ -1668,10 +1668,20 @@ function me_services_resources()
       ),
     ),
 
-    'recreate_qrcode'=>array(
+    'recreate_qrcode_for_profile'=>array(
       'create' =>array(
-        'help'=>'สร้าง qrcode ใหม่ให้กับ user',
-        'callback'=>'recreate_qrcode',
+        'help'=>'สร้าง qrcode ใหม่ให้กับ user profile',
+        'callback'=>'recreate_qrcode_for_profile',
+        'access callback' => 'user_access',
+        'access arguments' => array('access content'),
+        'access arguments append' => FALSE,
+      ),
+    ),
+
+    'recreate_qrcode_for_application'=>array(
+      'create' =>array(
+        'help'=>'สร้าง qrcode ใหม่ให้กับ application',
+        'callback'=>'recreate_qrcode_for_application',
         'access callback' => 'user_access',
         'access arguments' => array('access content'),
         'access arguments append' => FALSE,
@@ -5813,7 +5823,7 @@ function delete_friend_v1(){
   return $result;
 }
 
-function recreate_qrcode(){
+function recreate_qrcode_for_profile(){
   $result = array();
 
   if (!check_header()) {
@@ -5877,6 +5887,65 @@ function recreate_qrcode(){
 
   $result['result']        = TRUE;
   $result['url_my_qrcode'] = $url_my_qrcode;
+  return $result;
+}
+
+function recreate_qrcode_for_application(){
+  $result = array();
+
+  if (!check_header()) {
+    $result['result']   = FALSE;
+    // $result['message']  = "check_header()";
+    return $result;
+  }
+
+  $param = json_decode(file_get_contents('php://input'), true);
+  if (!isset($param['uid']) || !isset($param['application_id']) ) {
+    $result['result'] = FALSE;
+    $result['param']  = $param;
+    return $result;
+  }
+
+  // global $firebase;
+  $getallheaders = nginx_getallheaders();
+
+  $uid                = $param['uid'];
+  $application_id     = $param['application_id'];
+  // $platform           = $getallheaders['platform'];
+  // $bundleidentifier   = $getallheaders['bundle_identifier'];
+
+
+  $qrcode_url = createNewQRcodeforApplication($uid, $application_id);
+
+  // background_process_start('createNewQRcodeforApplication', $uid, $node->nid);
+  ///-----------
+
+  // $account = user_load($uid);
+
+  // generatorQRCode($account, $platform, $bundleidentifier);
+
+  /*
+  $encrypt        = dec_enc('encrypt', 'bundle*' . BUNDLE_IDENTIFIER .'|type*friend|friendId*'. $uid);//dec_enc('encrypt', $group_id);
+  $file_my_qrcode = createQRcode($uid, $encrypt);
+
+  // file_create_url(image_style_url('medium', $file_my_qrcode['uri']))
+
+  $profile = profile2_by_uid_load($uid, 'main');
+  $profile->field_profile_my_qrcode[LANGUAGE_NONE][0] = $file_my_qrcode;
+  profile2_save($profile);
+
+
+  $url_my_qrcode = file_create_url(image_style_url('medium', $file_my_qrcode['uri']));
+
+  $data_update = array(
+    "url_my_qrcode" => $url_my_qrcode
+  );
+  firestore_db()->collection(FIRESTORE_PROFILES)->document($uid)->set($data_update, ['merge' => true]);
+
+  */
+
+  $result['result']     = TRUE;
+  $result['qrcode_url'] = $qrcode_url;
   return $result;
 }
 
@@ -12171,15 +12240,15 @@ function create_my_application(){
 
   if (!check_header()) {
     $result['result'] = FALSE;
-    $result['message']= "check_header()";
+    // $result['message']= "check_header()";
     return $result;
   }
 
   if (empty($_REQUEST['uid']) || empty($_REQUEST['name']) || empty($_REQUEST['category']) || empty($_REQUEST['subcategory'])) {
     $result['result'] = FALSE;
-    $result['message']  = "function : create_my_application, parameter";
-    $result['_REQUEST'] = $_REQUEST;
-    $result['_FILES'] = $_FILES;
+    // $result['message']  = "function : create_my_application, parameter";
+    // $result['_REQUEST'] = $_REQUEST;
+    // $result['_FILES'] = $_FILES;
     return $result;
   }
 
@@ -12259,12 +12328,15 @@ function create_my_application(){
   $node->field_my_app_picture[LANGUAGE_NONE][0]             = $image_url;
   $node->field_my_app_category[LANGUAGE_NONE][0]['tid']     = $category;
   $node->field_my_app_subcategoty[LANGUAGE_NONE][0]['tid']  = $subcategory;
+  
 
   $node->language = LANGUAGE_NONE;
   $node->status   = 0;
   $node->comment  = 0; 
   $node = node_submit($node);
   node_save($node);
+
+  background_process_start('createNewQRcodeforApplication', $uid, $node->nid);
 
   $data_update = array(
       "owner_id"    => $uid,
@@ -12273,20 +12345,8 @@ function create_my_application(){
       "category"    => $category,
       "subcategory" => $subcategory,
       "status"      => false,
-
-      // $url = substr(file_create_url(image_style_url('medium',$image_url['uri'])), strlen($GLOBALS['base_url']));
-      
-      // "image_url"   => substr(file_create_url(image_style_url('medium', $image_url['uri'])), strlen($GLOBALS['base_url']))
       "image_url"   => file_create_url(image_style_url('medium', $image_url['uri']))
   );
-  // $firebase->update(FIREBASE_DEFAULT_PATH . FIREBASE_LOGIN_PATH .  $uid ."/" . FIREBASE_MY_APPLIPATIONS_PATH . $node->nid, $data_update);
-
-
-  // firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_FRIENDS)->document($friend_id)->set($values);
-
-  // FIRESTORE_MY_APPLIPATIONS
-
-  // firestore_db()->collection(FIRESTORE_GROUPS)->document($node->nid)->set($f_item);
 
   firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_MY_APPLIPATIONS)->document($node->nid)->set($data_update, ['merge' => true]);
 

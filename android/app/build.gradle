@@ -103,7 +103,7 @@ android {
         applicationId "th.dna"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 5
+        versionCode 6
         versionName "1.0"
         multiDexEnabled true
         ndk {
@@ -178,13 +178,6 @@ dependencies {
     implementation project(':react-native-qr-scanner')
     implementation project(':react-native-message-compose')
     implementation project(':react-native-mail')
-//    implementation project(':react-native-svg') {
-//        buildscript {
-//            repositories {
-//                maven { url = "https://dl.bintray.com/android/android-tools/" }
-//            }
-//        }
-//    }
     implementation project(':react-native-share') {
         buildscript {
             repositories {
@@ -192,10 +185,6 @@ dependencies {
             }
         }
     }
-//    compile project(':react-native-image-base64')
-//    implementation project(':react-native-fetch-blob')
-//    compile project(':react-native-locale')
-//    compile project(':rn-fetch-blob')
     implementation project(':react-native-vector-icons') {
         buildscript {
             repositories {
@@ -260,7 +249,6 @@ dependencies {
             }
         }
     }
-//    implementation project(':react-native-gesture-handler')
     implementation project(':react-native-contacts') {
         buildscript {
             repositories {
@@ -289,9 +277,7 @@ dependencies {
             }
         }
     }
-//    implementation project(':react-native-vector-icons')
     implementation fileTree(dir: "libs", include: ["*.jar"])
-//    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.android.support:support-v4:27.1.1"
     implementation "com.facebook.react:react-native:+"  // From node_modules

@@ -111,7 +111,7 @@ class ListMyAppPage extends React.Component{
     }
 
     showMenu = (rowItem)=>{
-      console.log('rowItem', rowItem)
+      // console.log('rowItem', rowItem)
       return( <View style={{flex:1,
                             position:'absolute', 
                             top:0,
@@ -131,11 +131,11 @@ class ListMyAppPage extends React.Component{
                       }}>
                           <Text style={{padding:10, fontSize:18}}>All post</Text>
                       </MenuOption>
-                      {/* <MenuOption onSelect={() => {
-                          this.settings(rowItem)
+                      <MenuOption onSelect={() => {
+                          // this.settings(rowItem)
                       }}>
-                          <Text style={{padding:10, fontSize:18}}>Settings</Text>
-                      </MenuOption> */}
+                          <Text style={{padding:10, fontSize:18}}>Delete</Text>
+                      </MenuOption>
                   </MenuOptions>
               </Menu>
             </View>)

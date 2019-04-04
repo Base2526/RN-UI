@@ -30,6 +30,10 @@ import EditNameMyApplicationPage from './EditNameMyApplicationPage'
 
 import EditMyApplicationAddressPage from './EditMyApplicationAddressPage'
 
+import MyApplicationQRcodePage from './MyApplicationQRcodePage'
+
+// import ResultScanForQRcodeNameCardPage from './ResultScanForQRcodeNameCardPage'
+
 const index = createStackNavigator({
     'Home': {
         screen: home,
@@ -119,6 +123,12 @@ const index = createStackNavigator({
 
       }
     },
+    'MyApplicationQRcodePage': {
+      screen: MyApplicationQRcodePage,
+      navigationOptions: {
+
+      }
+    },
 });
 
 const MyApplicationAddPostNavigator = createStackNavigator(
@@ -170,6 +180,7 @@ const MainModalNavigator = createStackNavigator(
 );
 
 
+
 MainModalNavigator.navigationOptions = ({ navigation }) => {
     // let { routeName } = navigation.state.routes[navigation.state.index];
     // let navigationOptions = {};
@@ -208,7 +219,8 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
         routeName === 'MyApplicationReport'  ||
         routeName === 'MyApplicationAddFeelings' ||
         routeName === 'setting_myapplication' ||
-        routeName === 'MyApplicationAddPrivacy') {
+        routeName === 'MyApplicationAddPrivacy'
+        ) {
         //  
         //  routeName === 'MyProfileEditContactInfoPage'
 
@@ -236,7 +248,8 @@ MainModalNavigator.navigationOptions = ({ navigation }) => {
         routeName === 'ManageEmailsPage' ||
         routeName === 'setting_myapplication' ||
         routeName === 'EditNameMyApplicationPage' ||
-        routeName === 'EditMyApplicationAddressPage') {
+        routeName === 'EditMyApplicationAddressPage' ||
+        routeName === 'MyApplicationQRcodePage' ) {
       navigationOptions.tabBarVisible = false;
     }
   

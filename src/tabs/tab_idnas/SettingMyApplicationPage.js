@@ -61,6 +61,27 @@ class SettingMyApplicationPage extends React.Component{
                 elevation: 0,
                 shadowOpacity: 0
             },
+            headerRight: (
+                <View style={{flexDirection:'row', padding:5}}>
+                        <Menu style={{ zIndex: 10 }}>
+                            <MenuTrigger>
+                                <MyIcon
+                                    style={{paddingRight:5}}
+                                    name={'dot-vertical'}
+                                    size={20}
+                                    color={'#C7D8DD'} />
+                            </MenuTrigger>
+                            <MenuOptions optionsContainerStyle={{ }}>
+                                <MenuOption onSelect={() => {
+                                  const { params = {} } = navigation.state
+                                  params.handlePreviewCard()
+                                }}>
+                                    <Text style={{padding:10, fontSize:18}}>Preview card</Text>
+                                </MenuOption>
+                            </MenuOptions>
+                        </Menu>
+                    </View>
+              ),
         }
     }
 
@@ -92,6 +113,8 @@ class SettingMyApplicationPage extends React.Component{
     }
 
     componentDidMount() {
+        this.props.navigation.setParams({handlePreviewCard: this.handlePreviewCard })
+
         const { navigation } = this.props;
         const application_id = navigation.getParam('application_id', null);
 
@@ -132,6 +155,10 @@ class SettingMyApplicationPage extends React.Component{
   
     handleApplicatonName = (text) => {
         this.setState({ applicatonName:text })
+    }
+
+    handlePreviewCard = () =>{
+        alert('handlePreviewCard')
     }
 
     onSelectPicture = () => {
@@ -481,6 +508,15 @@ class SettingMyApplicationPage extends React.Component{
 
                             {cell_category}
                             {cell_subcategory}
+                            <Cell 
+                                cellStyle="Basic" 
+                                title="QR code" 
+                                // detail={Object.keys(this.state.category_select).length == 0 ? "None" : this.state.category_select.name}
+                                accessory="DisclosureIndicator"
+                                contentContainerStyle={{ padding:10}} 
+                                onPress={()=>{
+                                    this.props.navigation.navigate("MyApplicationQRcodePage", {application_id})
+                                }}/>
                             {cell_published}
                         
                             <Cell 

@@ -2019,7 +2019,46 @@ function generatorQRCode($account, $platform, $bundleidentifier){
 	}
 }
 
-// ;
+function createNewQRcodeforApplication($uid, $application_id){
+  // qrcode
+  $encrypt        = dec_enc('encrypt', 'bundle*' . BUNDLE_IDENTIFIER .'|type*application|applicationId*'. $application_id);
+
+  //set it to writable location, a place for temp generated PNG files
+	$PNG_TEMP_DIR = PATH_FOLDER_QRCODE;//config_pages_get(CONFIG_PAGES_TYPE, 'field_path_folder_qrcode'); 
+
+	//Create the directory if it does not already exist, otherwise check the permissions
+	file_prepare_directory($PNG_TEMP_DIR, FILE_CREATE_DIRECTORY);
+	
+	$errorCorrectionLevel = "M";
+	$matrixPointSize = 8;
+
+	$filename = $PNG_TEMP_DIR.'/'.md5($encrypt.'|'.$errorCorrectionLevel.'|'.$matrixPointSize).'.png';
+	QRcode::png(URL_SERVER() . "/qe?" . $encrypt, $filename, $errorCorrectionLevel, $matrixPointSize, 2);  
+
+	$qrcode_name  = date("Ymd") .'_'. rand(0, 999) . rand(0, 999) . rand(0, 999) . ".png";
+	$qrcode_image = file_get_contents($filename); 
+	//Saves a file to the specified destination and creates a database entry.
+	$qrcode_image_url = klovers_file_save_data($uid, $qrcode_image, 'public://' . $qrcode_name, FILE_EXISTS_RENAME);
+	
+	$qrcode_image_url = (array)$qrcode_image_url;
+	$application_wrapper = entity_metadata_wrapper('node', node_load($application_id));
+	$application_wrapper->field_my_app_qrcode->set($qrcode_image_url);
+	$application_wrapper->save();
+
+
+	$qrcode_url = file_create_url(image_style_url('medium', $qrcode_image_url['uri']));
+	watchdog(TAG, 'createNewQRcodeforApplication : %v-%qrcode_url', array('%v'=> $qrcode_image_url['uri'], '%qrcode_url'=>$qrcode_url), WATCHDOG_INFO);
+	
+	$data_update = array("qrcode_url"  => $qrcode_url);
+	firestore_db()->collection(FIRESTORE_USERS)->document($uid)->collection(FIRESTORE_MY_APPLIPATIONS)->document($application_id)->set($data_update, ['merge' => true]);
+
+	// Delete file ที่  QRCode  สร้างขึ้นมาเพราะว่าเราเก็บเข้าระบบแล้ว
+	unlink($filename);
+
+	return $qrcode_url;
+}
+
+
 function generatorQRCodeForGroupChat($uid, $group_id){
 	$file = array();
 
