@@ -357,6 +357,12 @@
       "css": "name-card",
       "code": 59423,
       "src": "entypo"
+    },
+    {
+      "uid": "d58dc0a0927a7dea2992f615f2fbf400",
+      "css": "wallet",
+      "code": 59424,
+      "src": "linecons"
     }
   ]
 }

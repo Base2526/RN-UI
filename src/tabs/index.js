@@ -35,10 +35,10 @@ const SettingsTabs = createBottomTabNavigator({
             tabBarIcon: ({ tintColor, focused}) => (
                 <View style={{padding:5, flex:1, alignItems:'center'}}>
                     <MyIcon
-                        name={'name-card'}
+                        name={'wallet'}
                         size={25}
                         color={focused ? '#DF2D6C':'#BCD1D5'} />
-                    <Text style={{color:focused ? '#D52A6B' : '#BCD1D5' , fontSize:10}}>Name Cards</Text>
+                    <Text style={{color:focused ? '#D52A6B' : '#BCD1D5' , fontSize:10}}>Wallet</Text>
                 </View>
             )
         }

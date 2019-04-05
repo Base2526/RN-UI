@@ -787,7 +787,34 @@ class FriendProfilePage extends React.Component{
                                                             }} /> : <View />}
                             </TouchableOpacity>
                                 {view_name}
-                                
+                            </View>
+
+                            <View style={{position:'absolute', 
+                                        flexDirection:'row', 
+                                        right:0, 
+                                        bottom:0,
+                                        padding:5}}>
+                                <TouchableOpacity
+                                    onPress={()=>{
+                                        let params = {'type':'private', 'data':friend}
+                                        this.props.navigation.navigate("ChatPage", {'title': 'Private ' + friend.name, params})
+                                    }}>
+                                    <MyIcon
+                                        style={{padding:5}}
+                                        name={'friend-chat'}
+                                        size={30}
+                                        color={'#C7D8DD'} />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={()=>{
+                                        alert('video call')
+                                    }}>
+                                    <MyIcon
+                                        style={{padding:5}}
+                                        name={'call'}
+                                        size={30}
+                                        color={'#C7D8DD'} />
+                                </TouchableOpacity>
                             </View>
                         </View>
 

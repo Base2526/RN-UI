@@ -34,11 +34,11 @@ import {
     MenuOption,
   } from 'react-native-popup-menu';
 
+import FriendsPage from '../tab_contacts/FriendsPage'
+import GroupsPage from '../tab_contacts/GroupsPage'
+import ClasssPage from '../tab_contacts/ClasssPage'
 
-import NameCard_HomePage from './NameCard_HomePage'
-import NameCard_AboutPage from './NameCard_AboutPage'
-
-import {getHeaderInset, randomKey, isEmpty} from '../../utils/Helpers'
+import {getStatusBarHeight, randomKey, isEmpty} from '../../utils/Helpers'
 import * as actions from '../../actions'
 import Constant from '../../utils/Constant'
 import MyIcon from '../../config/icon-font.js';
@@ -54,7 +54,7 @@ import {makeUidState,
 
 let unsubscribes = [];
 
-class NameCardPage extends React.Component{
+class NameCard_HomePage extends React.Component{
     static navigationOptions = { 
         // title: 'Friend profile', 
         header: null ,
@@ -131,122 +131,8 @@ class NameCardPage extends React.Component{
                                     color={'#C7D8DD'} />
         }
 
-        const collapsableComponent = (
-            <View style={{height:100}}>
-                <Text>TextTextTextText</Text>
-            </View>
-        );
-
         return(<View style={{flex:1}}>
-                <Spinner
-                    visible={loading}
-                    textContent={'Wait...'}
-                    textStyle={{color: '#FFF'}}
-                    overlayColor={'rgba(0,0,0,0.5)'}/>
-                <View style={{height:Header.HEIGHT +  (isIphoneX() ? 25 : 0), //- (Platform.OS == "ios" ? 20 : 0), 
-                        backgroundColor: 'rgba(186, 53, 100, 1.0)',
-                        justifyContent: Platform.OS == "ios" ?'flex-end':'center'}}>
-
-                    <View style={{flexDirection:'row', 
-                                position:'absolute', 
-                                }}>
-                        <TouchableOpacity
-                            style={{padding:10}}
-                            onPress={()=>{
-                                this.props.navigation.goBack(null)
-                            }}>
-                            {button_arrow_back}
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{
-                                    flexDirection:'row', 
-                                    position:'absolute', 
-                                    right:0,
-                                    // padding:10
-                                }}>
-                        <Menu style={{ zIndex: 10 }}>
-                            <MenuTrigger>
-                                <MyIcon
-                                    style={{padding:10}}
-                                    name={'dot-vertical'}
-                                    size={20}
-                                    color={'#C7D8DD'} />
-                            </MenuTrigger>
-                            <MenuOptions optionsContainerStyle={{ }}>
-                                
-                                <MenuOption onSelect={() => {
-                                    this.handleShare()
-                                }}>
-                                    <Text style={{padding:10, fontSize:18}}>Share</Text>
-                                </MenuOption>
-
-                                <MenuOption onSelect={() => {
-                                    // this.handleShare()
-                                }}>
-                                    <Text style={{padding:10, fontSize:18}}>Add friend</Text>
-                                </MenuOption>
-
-                                <MenuOption onSelect={() => {
-                                    // this.handleShare()
-                                }}>
-                                    <Text style={{padding:10, fontSize:18}}>Register member</Text>
-                                </MenuOption>
-                                <MenuOption onSelect={() => {}}>
-                                    <Text style={{padding:10, fontSize:18}}>Delete</Text>
-                                </MenuOption> 
-                            </MenuOptions>
-                        </Menu>
-                    </View> 
-                </View>
-                <View style={{height:100, flexDirection:'row'}}>
-                        <FastImage
-                            style={StyleSheet.absoluteFill}
-                            source={{
-                                uri: 'http://rrplast.com/images/sliders/revolution/banner5-bg.png',
-                                headers:{ Authorization: 'someAuthToken' },
-                                priority: FastImage.priority.normal,
-                            }}
-                            resizeMode={FastImage.resizeMode.cover}
-                        />
-                        <View style={{margin:20}}>
-                            <TouchableOpacity>
-                                <FastImage
-                                    style={{width: 50, 
-                                            height: 50, 
-                                            borderRadius: 10}}
-                                    source={{
-                                    uri: 'http://www.funarium.co.th/images/bg.png',
-                                    headers:{ Authorization: 'someAuthToken' },
-                                    priority: FastImage.priority.normal,
-                                    }}
-                                    resizeMode={FastImage.resizeMode.cover}
-                                />
-                            </TouchableOpacity>
-                            <View style = {{
-                                // justifyContent: 'flex-end',
-                                // alignItems: 'center'
-                                }}>
-                                <Text style={{color:'white'}}>
-                                    name}
-                                </Text>
-                            </View>
-                        </View>
-                    </View>
-                <ScrollableTabView
-                    collapsableBar={collapsableComponent}
-                    // tabStyle={{height:10}}
-                    initialPage={0}
-                    renderTabBar={() => <DefaultTabBar />}
-                    // locked={true}
-                    tabBarPosition='top'
-                    //  contentProps={...props}
-                    tabBarTextStyle={{fontSize:15}}
-                    // onChangeTab={this.handleChangeTab.bind(this)}
-                    >
-                    <NameCard_HomePage tabLabel='Home' index={0} amount={4} params={this.props} handleScroll={this.handleScroll}/>
-                    <NameCard_AboutPage tabLabel='About' index={1} amount={5} params={this.props} handleScroll={this.handleScroll}/>
-                    {/* <ClasssPage tabLabel='Classs' index={2} amount={6} params={this.props} handleScroll={this.handleScroll}/> */}
-                </ScrollableTabView>
+                <Text>Text</Text>
                 </View>)
         /*
         return( <View style={{flex:1}}>
@@ -450,4 +336,4 @@ const mapStateToProps = (state, ownProps) => {
     }
 }
 
-export default connect(mapStateToProps, actions)(NameCardPage);
+export default connect(mapStateToProps, actions)(NameCard_HomePage);
