@@ -112,18 +112,18 @@ class MyProfilePage extends React.Component{
     componentDidMount() {
         let {uid, phones, websites, emails, myIds} = this.props
 
-        this.props.trackProfilesPhones(uid, phones, (data)=>{
-            unsubscribes.push(data.unsubscribe)
-        })
-        this.props.trackProfileWebsites(uid, websites, (data)=>{
-            unsubscribes.push(data.unsubscribe)
-        })
-        this.props.trackProfileEmails(uid, emails, (data)=>{
-            unsubscribes.push(data.unsubscribe)
-        })
-        this.props.trackProfileMyIds(uid, myIds, (data)=>{
-            unsubscribes.push(data.unsubscribe)
-        })
+        // this.props.trackProfilesPhones(uid, phones, (data)=>{
+        //     unsubscribes.push(data.unsubscribe)
+        // })
+        // this.props.trackProfileWebsites(uid, websites, (data)=>{
+        //     unsubscribes.push(data.unsubscribe)
+        // })
+        // this.props.trackProfileEmails(uid, emails, (data)=>{
+        //     unsubscribes.push(data.unsubscribe)
+        // })
+        // this.props.trackProfileMyIds(uid, myIds, (data)=>{
+        //     unsubscribes.push(data.unsubscribe)
+        // })
 
         setTimeout(() => {this.setState({renderContent: true})}, 0);
     
@@ -595,10 +595,10 @@ const mapStateToProps = (state, ownProps) => {
     return{
         uid:makeUidState(state, ownProps),
         profile: makeProfileState(state, ownProps),
-        myIds: makeMyIdsState(state, ownProps),
-        phones: makePhonesState(state, ownProps),
-        websites: makeWebsitesState(state, ownProps),
-        emails: makeEmailsState(state, ownProps),
+        // myIds: makeMyIdsState(state, ownProps),
+        // phones: makePhonesState(state, ownProps),
+        // websites: makeWebsitesState(state, ownProps),
+        // emails: makeEmailsState(state, ownProps),
     }
 }
 

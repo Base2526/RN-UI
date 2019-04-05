@@ -1578,6 +1578,8 @@ const trackProfiles=(uid, profiles)=> dispatch =>{
         //...
         console.log(error)
     })
+
+    
 }
 
 // track location

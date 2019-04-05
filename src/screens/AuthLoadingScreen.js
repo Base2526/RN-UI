@@ -13,7 +13,11 @@ import SplashScreen from 'react-native-splash-screen'
 import * as actions from '../actions';
 import {makeUidState, 
         makeProfileState,
-        makeFriendsState,} from '../reselect'
+        makeFriendsState,
+        makeMyIdsState, 
+        makePhonesState, 
+        makeWebsitesState, 
+        makeEmailsState} from '../reselect'
 
 class AuthLoadingScreen extends React.Component {
     static navigationOptions = {
@@ -90,11 +94,28 @@ class AuthLoadingScreen extends React.Component {
         if(!is_login){
             this.props.navigation.navigate('Auth');
         }else{
-            let {uid, profile,friends, } = this.props
+            let {uid, profile,friends, phones, websites, emails, myIds} = this.props
+
+            // let {uid, } = this.props
 
             this.props.trackProfiles(uid, profile)
             this.props.trackFriends(uid, friends)
             this.props.trackLocation(uid)
+
+
+            this.props.trackProfilesPhones(uid, phones, (data)=>{
+                // unsubscribes.push(data.unsubscribe)
+            })
+            this.props.trackProfileWebsites(uid, websites, (data)=>{
+                // unsubscribes.push(data.unsubscribe)
+            })
+            this.props.trackProfileEmails(uid, emails, (data)=>{
+                // unsubscribes.push(data.unsubscribe)
+            })
+            this.props.trackProfileMyIds(uid, myIds, (data)=>{
+                // unsubscribes.push(data.unsubscribe)
+            })
+
             AsyncStorage.getItem('fcmToken', null).then((fcmToken) => {
                 this.props.watchTaskEvent(uid, fcmToken)
                 this.props.navigation.navigate('App');
@@ -138,8 +159,14 @@ const mapStateToProps = (state, ownProps) => {
             uid: makeUidState(state, ownProps),
             profile: makeProfileState(state, ownProps),
             friends:makeFriendsState(state, ownProps),
+
+            myIds: makeMyIdsState(state, ownProps),
+            phones: makePhonesState(state, ownProps),
+            websites: makeWebsitesState(state, ownProps),
+            emails: makeEmailsState(state, ownProps),
         }
     }
 }
+
 
 export default connect(mapStateToProps, actions)(AuthLoadingScreen);

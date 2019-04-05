@@ -24,6 +24,14 @@ import Share, {ShareSheet, Button} from 'react-native-share';
 import Spinner from 'react-native-loading-spinner-overlay';
 var _ = require('lodash');
 import Moment from 'moment'
+import {
+    MenuProvider,
+    Menu,
+    MenuContext,
+    MenuTrigger,
+    MenuOptions,
+    MenuOption,
+  } from 'react-native-popup-menu';
 
 import {getStatusBarHeight, randomKey, isEmpty} from '../../utils/Helpers'
 import * as actions from '../../actions'
@@ -141,23 +149,21 @@ class NameCardPage extends React.Component{
                                 {button_arrow_back}
                             </TouchableOpacity>
                         </View>
+                        { /*
                         <View style={{
                                         flexDirection:'row', 
                                         position:'absolute', 
                                         right:0,
                                     }}>
-                            {/* <TouchableOpacity 
-                                style={{padding:10}}
+                            <TouchableOpacity style={{padding:10}}
                                 onPress={()=>{
-                                    // this.handleFriendFavorite()
+                                    // this.handleShare()
                                 }}>
-
                                 <MyIcon
-                                    // name={is_favorite ? 'star' : 'star-empty'}
-                                    name={'star'}
+                                    name={'user-plus'}
                                     size={25}
                                     color={'#C7D8DD'} />
-                            </TouchableOpacity> */}
+                            </TouchableOpacity>
                             <TouchableOpacity style={{padding:10}}
                                 onPress={()=>{
                                     this.handleShare()
@@ -167,7 +173,51 @@ class NameCardPage extends React.Component{
                                     size={25}
                                     color={'#C7D8DD'} />
                             </TouchableOpacity>
-                        </View>    
+                        </View> 
+                        */ }  
+                        {/* <View style={{flexDirection:'row', paddingRight:10}}> */}
+                        <View style={{
+                                        flexDirection:'row', 
+                                        position:'absolute', 
+                                        right:0,
+                                        // padding:10
+                                    }}>
+                            <Menu style={{ zIndex: 10 }}>
+                                <MenuTrigger>
+                                    <MyIcon
+                                        style={{padding:10}}
+                                        name={'dot-vertical'}
+                                        size={20}
+                                        color={'#C7D8DD'} />
+                                </MenuTrigger>
+                                <MenuOptions optionsContainerStyle={{ }}>
+                                    {/* <MenuOption onSelect={() => {}}>
+                                        <Text style={{padding:10, fontSize:18}}>Export and share</Text>
+                                    </MenuOption>*/}
+                                    
+                                    <MenuOption onSelect={() => {
+                                        this.handleShare()
+                                    }}>
+                                        <Text style={{padding:10, fontSize:18}}>Share</Text>
+                                    </MenuOption>
+
+                                    <MenuOption onSelect={() => {
+                                        // this.handleShare()
+                                    }}>
+                                        <Text style={{padding:10, fontSize:18}}>Add friend</Text>
+                                    </MenuOption>
+
+                                    <MenuOption onSelect={() => {
+                                        // this.handleShare()
+                                    }}>
+                                        <Text style={{padding:10, fontSize:18}}>Register member</Text>
+                                    </MenuOption>
+                                    <MenuOption onSelect={() => {}}>
+                                        <Text style={{padding:10, fontSize:18}}>Delete</Text>
+                                    </MenuOption> 
+                                </MenuOptions>
+                            </Menu>
+                        </View> 
                     </View>
                     <ScrollView style={{ }}>
                     <View style={{  flex:1, 

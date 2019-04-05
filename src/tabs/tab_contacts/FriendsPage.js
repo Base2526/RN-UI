@@ -35,7 +35,6 @@ import {makeUidState,
         makeIsConnectedState} from '../../reselect'
 
 class FriendsPage extends React.Component{
-
     constructor(props){
         super(props)
         this.state = {
@@ -60,22 +59,9 @@ class FriendsPage extends React.Component{
       if(props.uid === undefined){
         return;
       }
-
-      // if( /*_.isEqual(this.props.presences, props.presences) && */
-      //    _.isEqual(this.props.profiles, props.profiles) &&
-      //    _.isEqual(this.props.friends, props.friends) &&
-      //    _.isEqual(this.props.friend_profiles, props.friend_profiles) && this.state.renderContent){
-      //      return;
-      // }
-
-      // if(!this.state.renderContent){
-      //   this.setState({renderContent: true})
-      //   console.log('FriendsPage > loadData : this.setState({renderContent: true})')
-      // }
       
       let {presences, profile, friends} = props
 
-      // console.log(friends, friend_profiles)
       let my_profile = {
         title: 'Profile',
         member: [

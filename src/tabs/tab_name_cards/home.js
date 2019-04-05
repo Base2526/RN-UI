@@ -60,14 +60,15 @@ class home extends React.Component {
       </TouchableOpacity>
     ),
     headerRight: (
-      <View style={{flexDirection:'row', paddingRight:10}}>
+      <View style={{flexDirection:'row', paddingRight:5}}>
         <Menu style={{ zIndex: 10 }}>
             <MenuTrigger>
                 <MyIcon
-                    // style={{paddingRight:10}}
-                    name={'dot-vertical'}
-                    size={25}
-                    color={'#C7D8DD'} />
+                  // style={{paddingRight:10}}
+                  style={{padding:5}}
+                  name={'dot-vertical'}
+                  size={20}
+                  color={'#C7D8DD'} />
             </MenuTrigger>
             <MenuOptions optionsContainerStyle={{ }}>
                 <MenuOption onSelect={() => {}}>
@@ -197,15 +198,21 @@ class home extends React.Component {
                 </MenuTrigger>
                 <MenuOptions optionsContainerStyle={{ marginTop: -(getHeaderInset())}}>
                     <MenuOption onSelect={() => {
-                      let shareOptions = {
-                        title: "React Native",
-                        message: "Hola mundo",
-                        url: "http://facebook.github.io/react-native/",
-                        subject: "Share Link" //  for email
-                      }
-                      Share.open(shareOptions);
-                    }}>
+                        let shareOptions = {
+                          title: "React Native",
+                          message: "Hola mundo",
+                          url: "http://facebook.github.io/react-native/",
+                          subject: "Share Link" //  for email
+                        }
+                        Share.open(shareOptions);
+                      }}>
                         <Text style={{padding:10, fontSize:18}}>Share</Text>
+                    </MenuOption>
+                    <MenuOption onSelect={() => {}}>
+                        <Text style={{padding:10, fontSize:18}}>Add Friend</Text>
+                    </MenuOption>
+                    <MenuOption onSelect={() => {}}>
+                        <Text style={{padding:10, fontSize:18}}>Register member</Text>
                     </MenuOption>
                 </MenuOptions>
                 </Menu>
@@ -341,7 +348,7 @@ class home extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    console.log(state)
+    // console.log(state)
 
     if(!state._persist.rehydrated){
         return {}
@@ -350,7 +357,6 @@ const mapStateToProps = (state, ownProps) => {
     if(!state.auth.isLogin){
         return;
     }
-  
     return{
         uid:makeUidState(state, ownProps),
     }
