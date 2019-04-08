@@ -208,7 +208,7 @@ class NameCardPage extends React.Component{
                             }}
                             resizeMode={FastImage.resizeMode.cover}
                         />
-                        <View style={{margin:20}}>
+                        <View style={{justifyContent:'center', paddingLeft:10}}>
                             <TouchableOpacity>
                                 <FastImage
                                     style={{width: 50, 
@@ -230,6 +230,12 @@ class NameCardPage extends React.Component{
                                     name}
                                 </Text>
                             </View>
+                            
+                        </View>
+                        <View style={{position:'absolute', right:0, bottom:0, padding:5}}>
+                            <TouchableOpacity>
+                                <Text style={{color:'red'}}>SUBSCRIBE</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 <ScrollableTabView
@@ -243,7 +249,7 @@ class NameCardPage extends React.Component{
                     tabBarTextStyle={{fontSize:15}}
                     // onChangeTab={this.handleChangeTab.bind(this)}
                     >
-                    <NameCard_HomePage tabLabel='Home' index={0} amount={4} params={this.props} handleScroll={this.handleScroll}/>
+                    <NameCard_HomePage tabLabel='Posts' index={0} amount={4} params={this.props} handleScroll={this.handleScroll}/>
                     <NameCard_AboutPage tabLabel='About' index={1} amount={5} params={this.props} handleScroll={this.handleScroll}/>
                     {/* <ClasssPage tabLabel='Classs' index={2} amount={6} params={this.props} handleScroll={this.handleScroll}/> */}
                 </ScrollableTabView>
